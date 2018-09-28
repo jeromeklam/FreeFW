@@ -1,0 +1,1 @@
+ALTER TABLE `pawbx_users` ADD COLUMN user_cnx TEXT DEFAULT NULL;

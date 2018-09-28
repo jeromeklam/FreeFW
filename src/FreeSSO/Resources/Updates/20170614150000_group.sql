@@ -1,0 +1,1 @@
+ALTER TABLE `pawbx_groups` ADD COLUMN `grp_verif_prefix` VARCHAR(32) DEFAULT NULL;

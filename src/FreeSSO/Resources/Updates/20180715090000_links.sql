@@ -1,0 +1,1 @@
+ALTER TABLE pawbx_links_users ADD COLUMN `lku_ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;

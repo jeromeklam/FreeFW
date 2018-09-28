@@ -1,0 +1,44 @@
+{
+    "name"        : "jeromeklam/freefw",
+    "type"        : "application",
+    "description" : "Free PHP FrameWork",
+    "keywords"    : ["FREE", "ASSOCIATION", "PHP"],
+    "homepage"    : "http://github.com/jeromeklam",
+    "license"     : "gpl",
+    "authors" : [
+        {
+            "name"  : "KLAM Jérôme",
+            "email" : "jeromeklam@free.fr"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require" : {
+        "php"                                  : ">=7.0",
+        "robmorgan/phinx"                      : "*",
+        "phing/phing"                          : "*",
+        "phpmailer/phpmailer"                  : "*",
+        "twig/twig"                            : "*",
+        "tecnickcom/tcpdf"                     : "*",
+        "setasign/fpdi-tcpdf"                  : "*",
+        "giggsey/libphonenumber-for-php"       : "*",
+        "psr/log"                              : "*",
+        "psr/cache"                            : "*",
+        "psr/http-message"                     : "*",
+        "psr/http-server-middleware"           : "*",
+        "http-interop/http-factory"            : "*",
+        "neomerx/json-api"                     : "^0.8",
+        "neomerx/cors-psr7"                    : "^1.0",
+        "firebase/php-jwt"                     : "^5.0",
+        "bshaffer/oauth2-server-php"           : "~1.8"
+    },
+    "autoload" : {
+        "psr-4" : {
+            "FreeFW\\" : "src/FreeFW/",
+            "FreeSso\\" : "src/FreeSso/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.4",
+        "guzzlehttp/guzzle": "~6.0"
+    }
+}

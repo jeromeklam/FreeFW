@@ -1,0 +1,2 @@
+ALTER TABLE pawbx_links_users ADD COLUMN `brk_id` bigint(20) unsigned NOT NULL;
+CREATE UNIQUE INDEX `pawbx_links_users_idx1` ON `pawbx_links_users` (`brk_id`, `user_id`, `lku_partner_type`, `lku_partner_id`);
