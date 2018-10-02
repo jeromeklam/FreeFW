@@ -1,7 +1,8 @@
 <?php
 namespace FreeFW\Tools;
 
-class MailMerge{
+class MailMerge
+{
 
     protected $tbs = null;
 }

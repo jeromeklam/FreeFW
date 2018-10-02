@@ -1,6 +1,6 @@
 {
     "name"        : "jeromeklam/freefw",
-    "type"        : "application",
+    "type"        : "library",
     "description" : "Free PHP FrameWork",
     "keywords"    : ["FREE", "ASSOCIATION", "PHP"],
     "homepage"    : "http://github.com/jeromeklam",
@@ -17,9 +17,6 @@
         "robmorgan/phinx"                      : "*",
         "phing/phing"                          : "*",
         "phpmailer/phpmailer"                  : "*",
-        "twig/twig"                            : "*",
-        "tecnickcom/tcpdf"                     : "*",
-        "setasign/fpdi-tcpdf"                  : "*",
         "giggsey/libphonenumber-for-php"       : "*",
         "psr/log"                              : "*",
         "psr/cache"                            : "*",
@@ -33,8 +30,7 @@
     },
     "autoload" : {
         "psr-4" : {
-            "FreeFW\\" : "src/FreeFW/",
-            "FreeSso\\" : "src/FreeSso/"
+            "FreeFW\\" : "src/FreeFW/"
         }
     },
     "require-dev": {

@@ -65,7 +65,8 @@ class Dir
      *
      * @return boolean
      */
-    public static function copy ($source, $dest, $permissions = 0775) {
+    public static function copy($source, $dest, $permissions = 0775)
+    {
         // Check for symlinks
         if (is_link($source)) {
             return symlink(readlink($source), $dest);

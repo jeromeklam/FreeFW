@@ -1,1 +1,0 @@
-ALTER TABLE pawbx_links_users DROP INDEX `idx_links_users_uniq`;

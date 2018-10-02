@@ -44,7 +44,6 @@ class EventManager
         if (self::$instance === null) {
             self::$instance = new self();
         }
-        
         return self::$instance;
     }
 
@@ -65,7 +64,6 @@ class EventManager
         foreach ($listener as $event) {
             call_user_func($event['callback'], $data);
         }
-        
         return $this;
     }
 
@@ -118,7 +116,6 @@ class EventManager
         if (count($this->listeners[$event_name]) > 1) {
             usort($this->listeners[$event_name], array($this, 'sortListenerByPriority'));
         }
-        
         return $this;
     }
 
@@ -159,7 +156,6 @@ class EventManager
         if (isset($this->listeners[$listener])) {
             return $this->listeners[$listener];
         }
-        
         return false;
     }
 
@@ -171,7 +167,6 @@ class EventManager
         if ($a['priority'] == $b['priority']) {
             return 0;
         }
-        
         return ($a['priority'] < $b['priority']) ? -1 : 1;
     }
 }

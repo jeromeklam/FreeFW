@@ -1,45 +1,64 @@
 <?php
-/**
- * Liste des routes
- *
- * @author jeromeklam
- * @package Routing
- * @category Collection
- */
 namespace FreeFW\Router;
 
 /**
- * Liste des routes
+ * Route collection
+ *
  * @author jeromeklam
  */
-class RouteCollection extends \SplObjectStorage
+class RouteCollection
 {
 
     /**
-     * Ajout d'une route
-     *
-     * @param \FreeFW\Router\Route $attachObject
+     * Routes
+     * @var array
      */
-    public function attachRoute(\FreeFW\Router\Route $attachObject)
+    protected $routes = [];
+
+    /**
+     * Flush all routes
+     *
+     * @return \FreeFW\Router\RouteCollection
+     */
+    public function flush()
     {
-        parent::attach($attachObject, null);
+        $this->routes = [];
+        return $this;
     }
 
     /**
-     * Retourne la liste des routes
+     * Get all routes
      *
      * @return array
      */
-    public function getAll()
+    public function getRoutes()
     {
-        $temp = array();
-        $urls = array();
-        foreach ($this as $route) {
-            $temp[] = $route;
-            $urls[] = $route->getUrl();
-        }
-        array_multisort($urls, SORT_ASC, SORT_STRING, $temp);
+        return $this->routes;
+    }
 
-        return $temp;
+    /**
+     * Add one route
+     *
+     * @param \FreeFW\Router\Route $p_route
+     *
+     * @return \FreeFW\Router\RouteCollection
+     */
+    public function addRoute(\FreeFW\Router\Route $p_route)
+    {
+        $this->routes[] = $p_route;
+        return $this;
+    }
+
+    /**
+     * Add routes
+     *
+     * @param \FreeFW\Router\RouteCollection $p_collection
+     *
+     * @return \FreeFW\Router\RouteCollection
+     */
+    public function addRoutes(\FreeFW\Router\RouteCollection $p_collection)
+    {
+        $this->routes = array_merge($this->routes, $p_collection->getRoutes());
+        return $this;
     }
 }

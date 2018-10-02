@@ -67,4 +67,14 @@ class Constants
     const TYPE_RESULTSET          = 'RESULTSET';
     const TYPE_FILE               = 'FILE';
     const TYPE_HTML               = 'HTML';
+
+    /**
+     * Options
+     * @var string
+     */
+    const OPTION_REQUIRED         = 'REQUIRED';
+    const OPTION_PK               = 'PK';
+    const OPTION_JSONIGNORE       = 'NOJSON';
+    const OPTION_LOCAL            = 'LOCAL';
+    const OPTION_UNIQ             = 'UNIQ';
 }

@@ -1,1 +1,0 @@
-ALTER TABLE `pawbx_groups_users` ADD COLUMN `gru_default` TINYINT(1) DEFAULT 0;

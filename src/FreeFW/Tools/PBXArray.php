@@ -16,7 +16,7 @@ class PBXArray
      *
      * @return string
      */
-    static public function stringify(array $array)
+    public static function stringify(array $array)
     {
         $result = array();
         foreach ($array as $key => $value) {

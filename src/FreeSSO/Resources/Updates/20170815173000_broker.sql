@@ -1,1 +1,0 @@
-replace into `pawbx_brokers` (`brk_id`, `dom_id`, `brk_key`, `brk_name`, `brk_certificate`, `brk_active`, `brk_ts`, `brk_api_scope`, `brk_users_scope`, `brk_ips`) values('9','1','omega-web-fo','Omega WEB FrontOffice','dfc9f994abcb0404277662e4a68d7c4e','1',NULL,'server',NULL,NULL);
