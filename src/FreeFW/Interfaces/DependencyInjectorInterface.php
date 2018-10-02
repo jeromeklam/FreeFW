@@ -44,4 +44,13 @@ interface DependencyInjectorInterface
      * @return \FreeFW\Core\Manager
      */
     public function getManager($p_name);
+
+    /**
+     * Get middleware
+     *
+     * @param string $p_name
+     *
+     * @return \Psr\Http\Server\MiddlewareInterface
+     */
+    public function getMiddleware($p_name);
 }

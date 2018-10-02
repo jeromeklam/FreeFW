@@ -173,7 +173,16 @@ class Route implements \Psr\Log\LoggerAwareInterface
         try {
             $cls = \FreeFW\DI\DI::get($this->contoller);
             if (method_exists($cls, $this->function)) {
-                return call_user_func_array([$cls, $this->function], [$p_request]);
+                // Must go through middlewares....
+                // The final is the route execution
+                $routerMiddleware = new \FreeFW\Middleware\Router($cls, $this->function);
+                // Middleware pipeline
+                $pipeline = new \FreeFW\Middleware\Pipeline();
+                $pipeline->setConfig($this->config);
+                $pipeline->setLogger($this->logger);
+                $pipeline->pipe($routerMiddleware);
+                // Go
+                return $pipeline->handle($p_request);
             }
         } catch (\Exception $ex) {
             // @todo

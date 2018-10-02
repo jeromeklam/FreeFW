@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<buildpath>
+	<buildpathentry combineaccessrules="false" kind="prj" path="/http-factory"/>
+	<buildpathentry kind="src" path=""/>
+	<buildpathentry combineaccessrules="false" kind="prj" path="/guzzle"/>
+	<buildpathentry combineaccessrules="false" kind="prj" path="/http-server-middleware"/>
+	<buildpathentry kind="con" path="org.eclipse.php.core.LANGUAGE"/>
+	<buildpathentry combineaccessrules="false" kind="prj" path="/git_http-factory"/>
+	<buildpathentry combineaccessrules="false" kind="prj" path="/log"/>
+	<buildpathentry combineaccessrules="false" kind="prj" path="/psr7"/>
+	<buildpathentry combineaccessrules="false" kind="prj" path="/http-middleware"/>
+	<buildpathentry combineaccessrules="false" kind="prj" path="/http-server-handler"/>
+	<buildpathentry combineaccessrules="false" kind="prj" path="/http-message"/>
+</buildpath>
