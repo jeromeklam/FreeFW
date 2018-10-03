@@ -180,6 +180,15 @@ class Route implements \Psr\Log\LoggerAwareInterface
                 $pipeline = new \FreeFW\Middleware\Pipeline();
                 $pipeline->setConfig($this->config);
                 $pipeline->setLogger($this->logger);
+                // Pipe default config middleware
+                $midCfg = $this->config->get('middleware');
+                if (is_array($midCfg)) {
+                    foreach ($midCfg as $idx => $middleware) {
+                        $newMiddleware = \FreeFW\DI\DI::get($middleware);
+                        $pipeline->pipe($newMiddleware);
+                    }
+                }
+                // Last middleware is router
                 $pipeline->pipe($routerMiddleware);
                 // Go
                 return $pipeline->handle($p_request);

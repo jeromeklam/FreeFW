@@ -53,8 +53,8 @@ class Router implements
      * Process an incoming server request and return a response, optionally delegating
      * to the next middleware component to create the response.
      *
-     * @param ServerRequestInterface  $request
-     * @param RequestHandlerInterface $handler
+     * @param ServerRequestInterface  $p_request
+     * @param RequestHandlerInterface $p_handler
      *
      * @return ResponseInterface
      */
