@@ -58,7 +58,8 @@ class Application extends \FreeFW\Core\Application
      */
     protected function send(\Psr\Http\Message\ResponseInterface $p_response)
     {
-        $http_line = sprintf('HTTP/%s %s %s',
+        $http_line = sprintf(
+            'HTTP/%s %s %s',
             $p_response->getProtocolVersion(),
             $p_response->getStatusCode(),
             $p_response->getReasonPhrase()

@@ -123,6 +123,6 @@ class Condition extends \FreeFW\Core\Model
      *
      */
     protected function validate()
-    {}
-
+    {
+    }
 }

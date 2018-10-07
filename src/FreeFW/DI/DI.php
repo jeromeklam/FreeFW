@@ -46,8 +46,8 @@ class DI
     public static function registerDI(
         string $p_ns,
         \FreeFW\Application\Config $p_config,
-        \Psr\Log\LoggerInterface $p_logger)
-    {
+        \Psr\Log\LoggerInterface $p_logger
+    ) {
         $di = \FreeFW\DI\DependencyInjector::getFactory($p_ns, $p_config, $p_logger);
         self::add($p_ns, $di);
         return $di;

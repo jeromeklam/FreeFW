@@ -249,11 +249,13 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
      *
      */
     public function init()
-    {}
+    {
+    }
 
     /**
      *
      */
     protected function validate()
-    {}
+    {
+    }
 }

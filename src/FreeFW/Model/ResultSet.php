@@ -281,6 +281,5 @@ class ResultSet extends \FreeFW\Core\Model implements
      */
     public function init()
     {
-
     }
 }
