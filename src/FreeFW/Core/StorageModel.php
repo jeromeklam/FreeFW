@@ -6,7 +6,9 @@ namespace FreeFW\Core;
  *
  * @author jeromeklam
  */
-abstract class StorageModel extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStrategyInterface
+abstract class StorageModel extends \FreeFW\Core\Model implements
+    \FreeFW\Interfaces\StorageStrategyInterface,
+    \FreeFW\Interfaces\DirectStorageInterface
 {
 
     /**
@@ -43,8 +45,25 @@ abstract class StorageModel extends \FreeFW\Core\Model implements \FreeFW\Interf
      */
     public function create()
     {
-        $this->strategy->create($this);
-        return $this->isValid();
+        if ($this->isValid()) {
+            $this->strategy->create($this);
+            return $this->isValid();
+        }
+        return false;
+    }
+
+    /**
+     *
+     * {@inheritDoc}
+     * @see \FreeFW\Interfaces\StorageStrategyInterface::save()
+     */
+    public function save()
+    {
+        if ($this->isValid()) {
+            $this->strategy->save($this);
+            return $this->isValid();
+        }
+        return false;
     }
 
     /**
@@ -52,10 +71,37 @@ abstract class StorageModel extends \FreeFW\Core\Model implements \FreeFW\Interf
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\StorageStrategyInterface::findFirst()
      */
-    public function findFirst($p_filters = null)
+    public static function findFirst(array $p_filters = [])
     {
-        $this->strategy->findFirst($this, $p_filters);
-        return $this->isValid();
+        $cls   = get_called_class();
+        $cls   = rtrim(ltrim($cls, '\\'), '\\');
+        $query = \FreeFW\DI\DI::get('FreeFW::Model::Query');
+        $query
+            ->setType(\FreeFW\Model\Query::QUERY_SELECT)
+            ->setMainModel(str_replace('\\', '::', $cls))
+            ->setConditions($p_filters)
+        ;
+        $model = false;
+        if ($query->execute()) {
+            /**
+             * @var \FreeFW\Model\ResultSet $result
+             */
+            $result = $query->getResult();
+            if (!$result->isEmpty()) {
+                $model = $result[0];
+            }
+        }
+        return $model;
+    }
+
+    /**
+     *
+     * {@inheritDoc}
+     * @see \FreeFW\Interfaces\StorageStrategyInterface::remove()
+     */
+    public function remove()
+    {
+        return $this->strategy->remove($this);
     }
 
     /**
@@ -84,6 +130,25 @@ abstract class StorageModel extends \FreeFW\Core\Model implements \FreeFW\Interf
                 }
             }
         }
+    }
+
+    /**
+     * Get new Query Model
+     *
+     * @param string $p_type
+     *
+     * @return \FreeFW\Model\Query
+     */
+    public static function getQuery(string $p_type = \FreeFW\Model\Query::QUERY_SELECT)
+    {
+        $cls   = get_called_class();
+        $cls   = rtrim(ltrim($cls, '\\'), '\\');
+        $query = \FreeFW\DI\DI::get('FreeFW::Model::Query');
+        $query
+            ->setType($p_type)
+            ->setMainModel(str_replace('\\', '::', $cls))
+        ;
+        return $query;
     }
 
     /**

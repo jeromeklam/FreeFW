@@ -32,7 +32,13 @@ interface SSOInterface
      *
      * @return \FreeFW\Interfaces\UserInterface | false
      */
-    public function registerNewUser($p_login, $p_email, $p_password, $p_datas = array(), $p_withValidation = false);
+    public function registerNewUser(
+        $p_login,
+        $p_email,
+        $p_password,
+        array $p_datas = [],
+        $p_withValidation = false
+    );
 
     /**
      * Signin

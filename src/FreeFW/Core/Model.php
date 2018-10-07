@@ -6,8 +6,13 @@ namespace FreeFW\Core;
  *
  * @author jeromeklam
  */
-abstract class Model
+abstract class Model implements \FreeFW\Interfaces\ValidatorInterface
 {
+
+    /**
+     * Behaviour
+     */
+    use \FreeFW\Behaviour\ValidatorTrait;
 
     /**
      * Magic call
@@ -70,6 +75,17 @@ abstract class Model
     {
         $this->$p_property = $p_value;
         return $this;
+    }
+
+    /**
+     *
+     * @return \FreeFW\Core\Model
+     */
+    public static function getNew()
+    {
+        $cls = get_called_class();
+        $cls = rtrim(ltrim($cls, '\\'), '\\');
+        return \FreeFW\DI\DI::get(str_replace('\\', '::', $cls));
     }
 
     /**

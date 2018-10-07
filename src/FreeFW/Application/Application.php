@@ -12,6 +12,11 @@ class Application extends \FreeFW\Core\Application
 {
 
     /**
+     * Behaviour
+     */
+    use \FreeFW\Behaviour\HttpFactoryTrait;
+
+    /**
      * Application instance
      * @var \FreeFW\Application\Application
      */
@@ -47,21 +52,54 @@ class Application extends \FreeFW\Core\Application
     }
 
     /**
+     * Send an HTTP response
+     *
+     * @return void
+     */
+    protected function send(\Psr\Http\Message\ResponseInterface $p_response)
+    {
+        $http_line = sprintf('HTTP/%s %s %s',
+            $p_response->getProtocolVersion(),
+            $p_response->getStatusCode(),
+            $p_response->getReasonPhrase()
+        );
+        header($http_line, true, $p_response->getStatusCode());
+        foreach ($p_response->getHeaders() as $name => $values) {
+            foreach ($values as $value) {
+                header("$name: $value", false);
+            }
+        }
+        $stream = $p_response->getBody();
+        if ($stream->isSeekable()) {
+            $stream->rewind();
+        }
+        while (!$stream->eof()) {
+            echo $stream->read(1024 * 8);
+        }
+    }
+
+    /**
      * Handle request
      */
     public function handle()
     {
         $this->logger->debug('Application.handle.start');
-        $request = \GuzzleHttp\Psr7\ServerRequest::fromGlobals();
-        $route   = $this->router->findRoute($request);
-        if ($route) {
-            $route->setLogger($this->logger);
-            $route->setConfig($this->config);
-            $route->render($request);
-        } else {
-            $this->fireEvent(\FreeFW\Constants::EVENT_ROUTE_NOT_FOUND);
+        try {
+            $request = \GuzzleHttp\Psr7\ServerRequest::fromGlobals();
+            $route   = $this->router->findRoute($request);
+            if ($route) {
+                $route->setLogger($this->logger);
+                $route->setConfig($this->config);
+                $this->send($route->render($request));
+            } else {
+                $this->fireEvent(\FreeFW\Constants::EVENT_ROUTE_NOT_FOUND);
+            }
+            $this->afterRender();
+        } catch (\Exception $ex) {
+            // @todo : handle 500 response
+            $response = $this->createResponse(500, $ex->getMessage());
+            $this->send($response);
         }
-        $this->afterRender();
         $this->logger->debug('Application.handle.end');
     }
 }

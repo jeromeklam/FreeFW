@@ -82,8 +82,8 @@ class Cookies implements \Countable, \Iterator, \ArrayAccess
 
     /**
      *
-     * @param unknown $offset
-     * @return NULL
+     * {@inheritDoc}
+     * @see \ArrayAccess::offsetGet()
      */
     public function offsetGet($offset)
     {
@@ -92,8 +92,8 @@ class Cookies implements \Countable, \Iterator, \ArrayAccess
 
     /**
      *
-     * @param unknown $offset
-     * @return unknown
+     * {@inheritDoc}
+     * @see \ArrayAccess::offsetExists()
      */
     public function offsetExists($offset)
     {
@@ -102,7 +102,8 @@ class Cookies implements \Countable, \Iterator, \ArrayAccess
 
     /**
      *
-     * @param unknown $offset
+     * {@inheritDoc}
+     * @see \ArrayAccess::offsetUnset()
      */
     public function offsetUnset($offset)
     {
@@ -111,8 +112,8 @@ class Cookies implements \Countable, \Iterator, \ArrayAccess
 
     /**
      *
-     * @param unknown $offset
-     * @param unknown $value
+     * {@inheritDoc}
+     * @see \ArrayAccess::offsetSet()
      */
     public function offsetSet($offset, $value)
     {
@@ -133,5 +134,35 @@ class Cookies implements \Countable, \Iterator, \ArrayAccess
     public function has($key)
     {
         return isset($this->cookies[$key]);
+    }
+
+    /**
+     * Add a cookie
+     *
+     * @param string $p_name
+     * @param string $p_value
+     *
+     * @return \FreeFW\Http\Cookies
+     */
+    public function add($p_name, $p_value)
+    {
+        $cookie          = new \FreeFW\Http\Cookie($p_name, $p_value);
+        $this->cookies[] = $cookie;
+        return $this;
+    }
+
+    /**
+     * Add cookies to response
+     *
+     * @param \Psr\Http\Message\ResponseInterface $p_response
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function addToResponse(\Psr\Http\Message\ResponseInterface $p_response)
+    {
+        foreach ($this->cookies as $idx => $cookie) {
+            $p_response = $p_response->withAddedHeader('Set-Cookie', (string)$cookie);
+        }
+        return $p_response;
     }
 }
