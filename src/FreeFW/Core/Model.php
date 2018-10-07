@@ -6,7 +6,9 @@ namespace FreeFW\Core;
  *
  * @author jeromeklam
  */
-abstract class Model implements \FreeFW\Interfaces\ValidatorInterface
+abstract class Model implements
+    \FreeFW\Interfaces\ValidatorInterface,
+    \Serializable
 {
 
     /**
@@ -86,6 +88,42 @@ abstract class Model implements \FreeFW\Interfaces\ValidatorInterface
         $cls = get_called_class();
         $cls = rtrim(ltrim($cls, '\\'), '\\');
         return \FreeFW\DI\DI::get(str_replace('\\', '::', $cls));
+    }
+
+    /**
+     * Serialize
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return @serialize($this);
+    }
+
+    /**
+     *
+     * {@inheritDoc}
+     * @see \Serializable::serialize()
+     */
+    public function serialize()
+    {
+        $serializable = get_object_vars($this);
+        return serialize($serializable);
+    }
+
+    /**
+     *
+     * {@inheritDoc}
+     * @see \Serializable::unserialize()
+     */
+    public function unserialize($data)
+    {
+        $unserialized = unserialize($serialized);
+        if (is_array($unserialized) === true) {
+            foreach ($unserialized as $property => $value) {
+                $this->{$property} = $value;
+            }
+        }
     }
 
     /**

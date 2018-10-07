@@ -152,6 +152,34 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
     }
 
     /**
+     *
+     * {@inheritDoc}
+     * @see \Serializable::serialize()
+     */
+    public function serialize()
+    {
+        $serializable = get_object_vars($this);
+        unset($serializable['strategy']);
+        return serialize($serializable);
+    }
+
+    /**
+     *
+     * {@inheritDoc}
+     * @see \Serializable::unserialize()
+     */
+    public function unserialize($data)
+    {
+        $unserialized = unserialize($serialized);
+        if (is_array($unserialized) === true) {
+            // @todo : add strategy... from DI ?
+            foreach ($unserialized as $property => $value) {
+                $this->{$property} = $value;
+            }
+        }
+    }
+
+    /**
      * Return object source
      *
      * @return string
