@@ -1,29 +1,22 @@
 <?php
-namespace FreeFW\Model;
+namespace FreeFW\JsonApi\V1\Model;
 
 /**
- * Query resultset
+ * Errors object
  *
  * @author jeromeklam
- * @package SQL\Result
  */
-class ResultSet extends \FreeFW\Core\Model implements
+class ErrorsObject implements
     \ArrayAccess,
     \Countable,
-    \Iterator,
-    \JsonSerializable
+    \Iterator
 {
 
     /**
-     * Behaviour
+     * Errors
+     * @var array[\FreeFW\JsonApi\V1\Model\ErrorObject]
      */
-    use \FreeFW\Behaviour\ValidatorTrait;
-
-    /**
-     * Models
-     * @var array
-     */
-    protected $var = [];
+    protected $errors = [];
 
     /**
      * Count
@@ -45,9 +38,9 @@ class ResultSet extends \FreeFW\Core\Model implements
     public function __construct(array $p_array = [])
     {
         if (is_array($p_array)) {
-            $this->var = $p_array;
+            $this->errors = $p_array;
         }
-        $this->my_count = count($this->var);
+        $this->my_count = count($this->errors);
     }
 
     /**
@@ -80,7 +73,7 @@ class ResultSet extends \FreeFW\Core\Model implements
      */
     public function rewind()
     {
-        reset($this->var);
+        reset($this->errors);
     }
 
     /**
@@ -90,7 +83,7 @@ class ResultSet extends \FreeFW\Core\Model implements
      */
     public function current()
     {
-        $var = current($this->var);
+        $var = current($this->errors);
         return $var;
     }
 
@@ -101,7 +94,7 @@ class ResultSet extends \FreeFW\Core\Model implements
      */
     public function key()
     {
-        $var = key($this->var);
+        $var = key($this->errors);
         return $var;
     }
 
@@ -112,7 +105,7 @@ class ResultSet extends \FreeFW\Core\Model implements
      */
     public function next()
     {
-        $var = next($this->var);
+        $var = next($this->errors);
         return $var;
     }
 
@@ -123,7 +116,7 @@ class ResultSet extends \FreeFW\Core\Model implements
      */
     public function valid()
     {
-        $key = key($this->var);
+        $key = key($this->errors);
         $var = ($key !== null && $key !== false);
         return $var;
     }
@@ -146,8 +139,8 @@ class ResultSet extends \FreeFW\Core\Model implements
      */
     public function add($value)
     {
-        $this->var[]    = $p_value;
-        $this->my_count = count($this->var);
+        $this->errors[]    = $p_value;
+        $this->my_count = count($this->errors);
         return $this;
     }
 
@@ -159,11 +152,11 @@ class ResultSet extends \FreeFW\Core\Model implements
     public function offsetSet($offset, $value)
     {
         if (is_null($offset)) {
-            $this->var[] = $value;
+            $this->errors[] = $value;
         } else {
-            $this->var[$offset] = $value;
+            $this->errors[$offset] = $value;
         }
-        $this->my_count = count($this->var);
+        $this->my_count = count($this->errors);
     }
 
     /**
@@ -173,7 +166,7 @@ class ResultSet extends \FreeFW\Core\Model implements
      */
     public function offsetExists($offset)
     {
-        return isset($this->var[$offset]);
+        return isset($this->errors[$offset]);
     }
 
     /**
@@ -183,8 +176,8 @@ class ResultSet extends \FreeFW\Core\Model implements
      */
     public function offsetUnset($offset)
     {
-        unset($this->var[$offset]);
-        $this->my_count = count($this->var);
+        unset($this->errors[$offset]);
+        $this->my_count = count($this->errors);
     }
 
     /**
@@ -194,7 +187,7 @@ class ResultSet extends \FreeFW\Core\Model implements
      */
     public function offsetGet($offset)
     {
-        return isset($this->var[$offset]) ? $this->var[$offset] : null;
+        return isset($this->errors[$offset]) ? $this->errors[$offset] : null;
     }
 
     /**
@@ -217,67 +210,10 @@ class ResultSet extends \FreeFW\Core\Model implements
      */
     public function __toArray()
     {
-        $result = array();
-        $idx = 0;
-        foreach ($this->var as $idx => $line) {
-            $result[] = $line->__toFields();
+        $result = [];
+        foreach ($this->errors as $idx => $oneError) {
+            $result[] = $oneError->__toArray();
         }
         return $result;
-    }
-
-    /**
-     * Convert to json
-     *
-     * @param string $p_version
-     *
-     * @return array
-     */
-    public function __toJsonApi($p_version)
-    {
-        $result = array();
-        foreach ($this->var as $idx => $line) {
-            if (is_object($line) && method_exists($line, '__toJsonApi')) {
-                $result[] = $line->__toJsonApi($p_version);
-            } else {
-                throw new \Exception('Impossible de convertir le résultat en json api, contenu incorrect !');
-            }
-        }
-        return $result;
-    }
-
-    /**
-     *
-     * {@inheritDoc}
-     * @see \JsonSerializable::jsonSerialize()
-     */
-    public function jsonSerialize()
-    {
-        return $this->__toArray();
-    }
-
-    /**
-     * get all datas
-     *
-     * @return array
-     */
-    public function getDatas()
-    {
-        return $this->var;
-    }
-
-    /**
-     *
-     */
-    protected function validate()
-    {
-    }
-
-    /**
-     *
-     * {@inheritDoc}
-     * @see \FreeFW\Core\Model::init()
-     */
-    public function init()
-    {
     }
 }

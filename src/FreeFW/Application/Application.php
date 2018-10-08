@@ -86,7 +86,7 @@ class Application extends \FreeFW\Core\Application
     {
         $this->logger->debug('Application.handle.start');
         try {
-            $request = \GuzzleHttp\Psr7\ServerRequest::fromGlobals();
+            $request = \FreeFW\Http\ApiServerRequest::fromGlobals();
             $route   = $this->router->findRoute($request);
             if ($route) {
                 $route->setLogger($this->logger);

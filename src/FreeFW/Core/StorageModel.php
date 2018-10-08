@@ -170,7 +170,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
      */
     public function unserialize($data)
     {
-        $unserialized = unserialize($serialized);
+        $unserialized = unserialize($data);
         if (is_array($unserialized) === true) {
             // @todo : add strategy... from DI ?
             foreach ($unserialized as $property => $value) {
