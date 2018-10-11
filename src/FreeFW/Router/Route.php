@@ -49,6 +49,12 @@ class Route implements \Psr\Log\LoggerAwareInterface
     protected $function = null;
 
     /**
+     * Secured route ?
+     * @var bool
+     */
+    protected $secured = false;
+
+    /**
      * Set HTTP method
      *
      * @param string $p_method
@@ -141,6 +147,29 @@ class Route implements \Psr\Log\LoggerAwareInterface
     }
 
     /**
+     * Set secured
+     *
+     * @param bool $p_secured
+     *
+     * @return \FreeFW\Router\Route
+     */
+    public function setSecured($p_secured)
+    {
+        $this->secured = $p_secured;
+        return $this;
+    }
+
+    /**
+     * Get secured
+     *
+     * @return bool
+     */
+    public function getSecured()
+    {
+        return $this->secured;
+    }
+
+    /**
      * Get route regexp
      *
      * @return string
@@ -181,12 +210,22 @@ class Route implements \Psr\Log\LoggerAwareInterface
                 $pipeline->setConfig($this->config);
                 $pipeline->setLogger($this->logger);
                 // Pipe default config middleware
-                $midCfg = $this->config->get('middleware');
+                $midCfg  = $this->config->get('middleware');
+                $authMid = false;
                 if (is_array($midCfg)) {
                     foreach ($midCfg as $idx => $middleware) {
                         $newMiddleware = \FreeFW\DI\DI::get($middleware);
+                        if ($newMiddleware instanceof \FreeFW\Interfaces\AuthAdapterInterface) {
+                            $authMid = true;
+                            $newMiddleware->setSecured($this->getSecured());
+                        }
                         $pipeline->pipe($newMiddleware);
                     }
+                }
+                // Inject route middlewares...
+                // Check ...
+                if ($this->getSecured() && ! $authMid) {
+                    throw new \FreeFW\Core\FreeFWException('Secured route with no Auth middleware !');
                 }
                 // Last middleware is router
                 $pipeline->pipe($routerMiddleware);

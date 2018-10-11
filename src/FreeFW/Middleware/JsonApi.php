@@ -26,8 +26,24 @@ class JsonApi extends \FreeFW\Middleware\ApiAdapter
      */
     public function decodeRequest(ServerRequestInterface $p_request): ServerRequestInterface
     {
+        $this->logger->debug(sprintf('FreeFW.Middleware.JsonApi.decode.start'));
         $apiParams = new \FreeFW\Http\ApiParams();
-        return $p_request->withAttribute('api_params', $apiParams);
+        // Datas
+        $contents = $p_request->getBody()->getContents();
+        $json     = json_decode($contents, false);
+        if ($json && $json instanceof \stdClass) {
+            if (isset($json->data)) {
+                $decoder  = new \FreeFW\JsonApi\V1\Decoder();
+                $document = new \FreeFW\JsonApi\V1\Model\Document($json);
+                $body    = $decoder->decode($document);
+                $apiParams->setData($body);
+            } else {
+                // @todo
+            }
+        }
+        $this->logger->debug(sprintf('FreeFW.Middleware.JsonApi.decode.end'));
+        $p_request = $p_request->withAttribute('api_params', $apiParams);
+        return $p_request;
     }
 
     /**
@@ -54,7 +70,7 @@ class JsonApi extends \FreeFW\Middleware\ApiAdapter
             $p_ex->getCode()
         );
         $document->addError($error);
-        $response = $this->createResponse(200);
+        $response = $this->createResponse(500);
         return $response->withBody(
             \GuzzleHttp\Psr7\stream_for(
                 json_encode($document)
@@ -69,31 +85,54 @@ class JsonApi extends \FreeFW\Middleware\ApiAdapter
      */
     public function encodeResponse(ResponseInterface $p_response): ResponseInterface
     {
-        $body = $p_response->getBody();
-        if (is_object($body)) {
-            if ($body instanceof StreamInterface) {
-                $content = $body->getContents();
-                $object  = unserialize($content);
-                if ($object instanceof \FreeFW\Interfaces\ApiResponseInterface) {
-                    $encoder    = new \FreeFW\JsonApi\V1\Encoder();
-                    $data       = $encoder->encode($object);
-                    $json       = json_encode($data);
-                    $p_response = $p_response->withBody(\GuzzleHttp\Psr7\stream_for($json));
+        $this->logger->debug(sprintf('FreeFW.Middleware.JsonApi.encode.start'));
+        if ($p_response->getStatusCode() < 300) {
+            $body = $p_response->getBody();
+            if (is_object($body)) {
+                if ($body instanceof StreamInterface) {
+                    $content = $body->getContents();
+                    $object  = unserialize($content);
+                    if ($object instanceof \FreeFW\Interfaces\ApiResponseInterface) {
+                        $encoder    = new \FreeFW\JsonApi\V1\Encoder();
+                        $document   = $encoder->encode($object);
+                        $json       = json_encode($document);
+                        if ($document->hasErrors()) {
+                            $p_response = $this->createResponse(
+                                $document->getHttpCode(),
+                                $json
+                            );
+                        } else {
+                            $p_response = $p_response->withBody(\GuzzleHttp\Psr7\stream_for($json));
+                        }
+                    } else {
+                        $p_response = $this->createErrorResponse(
+                            new \Exception('Api error : body is not an ApiResponseInterface !')
+                        );
+                    }
                 } else {
                     $p_response = $this->createErrorResponse(
-                        new \Exception('Api error : body is not an ApiResponseInterface !')
+                        new \Exception('Api error : body is not a StreamInterface !')
                     );
                 }
             } else {
                 $p_response = $this->createErrorResponse(
-                    new \Exception('Api error : body is not a StreamInterface !')
+                    new \Exception('Api error : body is not an object !')
                 );
             }
         } else {
-            $p_response = $this->createErrorResponse(
-                new \Exception('Api error : body is not an object !')
+            $document = new \FreeFW\JsonApi\V1\Model\Document();
+            $error    = new \FreeFW\JsonApi\V1\Model\ErrorObject(
+                $p_response->getStatusCode(),
+                $p_response->getReasonPhrase()
+            );
+            $document->addError($error);
+            $p_response = $p_response->withBody(
+                \GuzzleHttp\Psr7\stream_for(
+                    json_encode($document)
+                )
             );
         }
+        $this->logger->debug(sprintf('FreeFW.Middleware.JsonApi.encode.end'));
         return $p_response->withHeader('Content-Type', 'application/vnd.api+json');
     }
 }

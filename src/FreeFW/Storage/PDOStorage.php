@@ -72,7 +72,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     // Compute getter
                     $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
                     // Get data
-                    $fields[':' . $oneProperty['destination']] = $p_model->$getter();
+                    $val = $p_model->$getter();
+                    if ($val === false) {
+                        $val = 0;
+                    }
+                    $fields[':' . $oneProperty['destination']] = $val;
                 }
             }
         }
@@ -128,6 +132,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
             if (is_array($p_filters)) {
                 foreach ($p_filters as $field => $value) {
                     if (array_key_exists($field, $properties)) {
+                        if ($value === false) {
+                            $value = 0;
+                        }
                         $fields[':' . $properties[$field]['destination']] = $value;
                     } else {
                         throw new \FreeFW\Core\FreeFWStorageException(sprintf('Unkown %s field !', $field));
@@ -240,7 +247,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     $pks[':' . $oneProperty['destination']] = $p_model->$getter();
                 } else {
                     // Get data
-                    $fields[':' . $oneProperty['destination']] = $p_model->$getter();
+                    $val = $p_model->$getter();
+                    if ($val === false) {
+                        $val = 0;
+                    }
+                    $fields[':' . $oneProperty['destination']] = $val;
                 }
             }
         }

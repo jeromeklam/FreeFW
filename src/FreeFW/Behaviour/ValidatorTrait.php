@@ -11,16 +11,16 @@ trait ValidatorTrait
 
     /**
      * Errors
-     * @var array
+     * @var array[\FreeFW\Core\Error]
      */
     protected $errors = [];
 
     /**
      * Get errors
      *
-     * @return array
+     * @return array[\FreeFW\Core\Error]
      */
-    public function getErrors()
+    public function getErrors() : array
     {
         return $this->errors;
     }
@@ -60,6 +60,16 @@ trait ValidatorTrait
     {
         $this->validate();
         return empty($this->errors);
+    }
+
+    /**
+     * Errors
+     *
+     * @return bool
+     */
+    public function hasErrors() : bool
+    {
+        return (count($this->errors) > 0);
     }
 
     /**

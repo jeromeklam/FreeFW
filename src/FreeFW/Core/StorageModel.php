@@ -1,6 +1,8 @@
 <?php
 namespace FreeFW\Core;
 
+use \FreeFW\Constants as FFCST;
+
 /**
  * Storage model
  *
@@ -180,16 +182,38 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
     }
 
     /**
+     * Get Id
+     *
+     * @return string
+     */
+    public function getApiId() : string
+    {
+        foreach ($this->getProperties() as $name => $property) {
+            if (in_array(FFCST::OPTION_PK, $property['options'])) {
+                $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                return (string)$this->$getter();
+            }
+        }
+        return '';
+    }
+
+    /**
+     * Get type
+     *
+     * @return string
+     */
+    public function getApiType() : string
+    {
+        $class = get_called_class();
+        $class = rtrim(ltrim($class, '\\'), '\\');
+        $class = str_replace('\\Model\\', '_', $class);
+        return $class;
+    }
+
+    /**
      * Return object source
      *
      * @return string
      */
     abstract public static function getSource();
-
-    /**
-     * Return object properties
-     *
-     * @return array
-     */
-    abstract public static function getProperties();
 }

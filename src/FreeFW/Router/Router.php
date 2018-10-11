@@ -111,27 +111,27 @@ class Router
                             continue;
                         }
                         // Ok
-                    }
-                    // On a trouvé une route, on récupère les paramètres.
-                    // On va en profiter pour les injecter dans la requête
-                    $matchedText = array_shift($matches);
-                    if (preg_match_all("/:([\w-\._@%]+)/", $oneRoute->getUrl(), $argument_keys)) {
-                        $argument_keys = $argument_keys[1];
-                        if (count($argument_keys) != count($matches)) {
-                            continue;
-                        }
-                        foreach ($argument_keys as $key => $name) {
-                            if (isset($matches[$key]) && $matches[$key] !== null
-                                && $matches[$key] != '' && $matches[$key] != '/'
-                            ) {
-                                $params[$name] = ltrim($matches[$key], '/'); // Pour les paramètres optionnel
-                            } else {
-                                $params[$name] = '';
+                        // On a trouvé une route, on récupère les paramètres.
+                        // On va en profiter pour les injecter dans la requête
+                        $matchedText = array_shift($matches);
+                        if (preg_match_all("/:([\w-\._@%]+)/", $oneRoute->getUrl(), $argument_keys)) {
+                            $argument_keys = $argument_keys[1];
+                            if (count($argument_keys) != count($matches)) {
+                                continue;
+                            }
+                            foreach ($argument_keys as $key => $name) {
+                                if (isset($matches[$key]) && $matches[$key] !== null
+                                    && $matches[$key] != '' && $matches[$key] != '/'
+                                ) {
+                                    $params[$name] = ltrim($matches[$key], '/'); // Pour les paramètres optionnel
+                                } else {
+                                    $params[$name] = '';
+                                }
                             }
                         }
-                    }
-                    foreach ($params as $name => $value) {
-                        $p_request = $p_request->withAttribute($name, $value);
+                        foreach ($params as $name => $value) {
+                            $p_request = $p_request->withAttribute($name, $value);
+                        }
                     }
                     $this->logger->debug('router.findRoute.match : ' . $oneRoute->getUrl());
                     return $oneRoute;

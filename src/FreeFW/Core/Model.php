@@ -1,6 +1,8 @@
 <?php
 namespace FreeFW\Core;
 
+use \FreeFW\Constants as FFCST;
+
 /**
  * Standard model
  *
@@ -80,14 +82,65 @@ abstract class Model implements
     }
 
     /**
+     * Init object with datas
+     *
+     * @param array $p_datas
      *
      * @return \FreeFW\Core\Model
      */
-    public static function getNew()
+    public function initWithJson(array $p_datas = [])
+    {
+        $props = $this->getProperties();
+        $this->init();
+        foreach ($p_datas as $name => $value) {
+            foreach ($props as $prp => $property) {
+                $test = $prp;
+                if (array_key_exists('jsonname', $property)) {
+                    $test = $property['jsonname'];
+                }
+                if ($test == $name) {
+                    $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                    $this->$setter($value);
+                    break;
+                }
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Get attributes
+     *
+     * @return array
+     */
+    public function getApiAttributes() : array
+    {
+        $attributes = [];
+        foreach ($this->getProperties() as $name => $property) {
+            if (!in_array(FFCST::OPTION_PK, $property['options']) &&
+                !in_array(FFCST::OPTION_JSONIGNORE, $property['options'])) {
+                $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                if (array_key_exists('jsonname', $property)) {
+                    $attributes[$property['jsonname']] = $this->$getter();
+                } else {
+                    $attributes[$name] = $this->$getter();
+                }
+            }
+        }
+        return $attributes;
+    }
+
+    /**
+     *
+     * @return \FreeFW\Core\Model
+     */
+    public static function getNew(array $p_fields = [])
     {
         $cls = get_called_class();
         $cls = rtrim(ltrim($cls, '\\'), '\\');
-        return \FreeFW\DI\DI::get(str_replace('\\', '::', $cls));
+        $obj = \FreeFW\DI\DI::get(str_replace('\\', '::', $cls));
+        // @todo
+        return $obj;
     }
 
     /**
@@ -118,7 +171,7 @@ abstract class Model implements
      */
     public function unserialize($data)
     {
-        $unserialized = unserialize($serialized);
+        $unserialized = unserialize($data);
         if (is_array($unserialized) === true) {
             foreach ($unserialized as $property => $value) {
                 $this->{$property} = $value;
@@ -130,4 +183,16 @@ abstract class Model implements
      * Init object
      */
     abstract public function init();
+
+    /**
+     * Return object properties
+     *
+     * @return array
+     */
+    public static function getProperties()
+    {
+        $props = get_class_vars(get_called_class());
+        var_dump($props);
+        die('getProperties');
+    }
 }

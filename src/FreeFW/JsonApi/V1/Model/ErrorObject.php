@@ -85,11 +85,21 @@ class ErrorObject
      * @param string $p_message
      * @param string $p_code
      */
-    public function __construct(int $p_status, string $p_message, string $p_code)
+    public function __construct(int $p_status, string $p_message = '', $p_code = null)
     {
         $this->status = $p_status;
         $this->title  = $p_message;
         $this->code   = $p_code;
+    }
+
+    /**
+     * Return status
+     *
+     * @return int
+     */
+    public function getStatus()
+    {
+        return $this->status;
     }
 
     /**

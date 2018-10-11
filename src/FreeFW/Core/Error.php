@@ -13,7 +13,8 @@ class Error
      * Types
      * @var int
      */
-    const TYPE_ERROR = '500';
+    const TYPE_ERROR        = 500;
+    const TYPE_PRECONDITION = 412;
 
     /**
      * Error code

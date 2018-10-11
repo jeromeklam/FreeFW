@@ -14,7 +14,8 @@ use \Psr\Http\Message\ResponseInterface;
 abstract class ApiAdapter implements
     MiddlewareInterface,
     \Psr\Log\LoggerAwareInterface,
-    \FreeFW\Interfaces\ConfigAwareTraitInterface
+    \FreeFW\Interfaces\ConfigAwareTraitInterface,
+    \FreeFW\Interfaces\ApiAdapterInterface
 {
 
     /**
@@ -76,7 +77,7 @@ abstract class ApiAdapter implements
      *
      * @return \FreeFW\Middleware\ApiAdapter
      */
-    public function setOverride(bool $p_override = true)
+    public function setOverride(bool $p_override = true) : self
     {
         $this->override = $p_override;
         return $this;
@@ -114,13 +115,21 @@ abstract class ApiAdapter implements
     }
 
     /**
-     * Check method and ContentType
      *
-     * @param ServerRequestInterface $p_request
-     *
-     * @return boolean
+     * {@inheritDoc}
+     * @see \FreeFW\Interfaces\ApiAdapterInterface::canOverride()
      */
-    protected function checkRequest(ServerRequestInterface $p_request)
+    public function canOverride() : bool
+    {
+        return $this->override;
+    }
+
+    /**
+     *
+     * {@inheritDoc}
+     * @see \FreeFW\Interfaces\ApiAdapterInterface::checkRequest()
+     */
+    public function checkRequest(ServerRequestInterface $p_request) : bool
     {
         $method = $p_request->getMethod();
         if (!in_array($method, $this->methods, true)) {
@@ -134,38 +143,4 @@ abstract class ApiAdapter implements
         }
         return false;
     }
-
-    /**
-     * Return a standard 415 response
-     *
-     * @return ResponseInterface
-     */
-    abstract function createUnsupportedRequestResponse() : ResponseInterface;
-
-    /**
-     * Return a standard 200 error response
-     *
-     * @param \Exception $p_ex
-     *
-     * @return ResponseInterface
-     */
-    abstract function createErrorResponse(\Exception $p_ex) : ResponseInterface;
-
-    /**
-     * Decode the request
-     *
-     * @param ServerRequestInterface $p_request
-     *
-     * @return ServerRequestInterface
-     */
-    abstract function decodeRequest(ServerRequestInterface $p_request) : ServerRequestInterface;
-
-    /**
-     * Encode the response
-     *
-     * @param ResponseInterface $p_response
-     *
-     * @return ResponseInterface
-     */
-    abstract function encodeResponse(ResponseInterface $p_response) : ResponseInterface;
 }

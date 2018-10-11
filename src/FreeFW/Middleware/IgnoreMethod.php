@@ -8,9 +8,9 @@ use \Psr\Http\Message\ServerRequestInterface;
 use \Psr\Http\Message\ResponseInterface;
 
 /**
+ * Ignore methods
  *
  * @author jerome.klam
- *
  */
 class IgnoreMethod implements
     MiddlewareInterface,
@@ -19,7 +19,7 @@ class IgnoreMethod implements
 {
 
     /**
-     * comportements
+     * Behaviour
      */
     use \Psr\Log\LoggerAwareTrait;
     use \FreeFW\Behaviour\EventManagerAwareTrait;
