@@ -42,12 +42,17 @@ trait ValidatorTrait
      * @param int    $p_code
      * @param string $p_message
      * @param int    $p_type
+     * @param mixed  $p_field
      *
      * @return static
      */
-    public function addError(int $p_code, $p_message = null, $p_type = \FreeFW\Core\Error::TYPE_ERROR)
-    {
-        $this->errors[] = new \FreeFW\Core\Error($p_code, $p_message, $p_type);
+    public function addError(
+        int $p_code,
+        $p_message = null,
+        $p_type = \FreeFW\Core\Error::TYPE_ERROR,
+        $p_field = null
+    ) {
+        $this->errors[] = new \FreeFW\Core\Error($p_code, $p_message, $p_type, $p_field);
         return $this;
     }
 

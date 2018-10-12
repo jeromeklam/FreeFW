@@ -105,24 +105,4 @@ class Condition extends \FreeFW\Core\Model
         $final = '';
         return $final;
     }
-
-    /**
-     *
-     * {@inheritDoc}
-     * @see \FreeFW\Core\Model::init()
-     */
-    public function init()
-    {
-        $this->left = null;
-        $this->operator = null;
-        $this->right = null;
-        return $this;
-    }
-
-    /**
-     *
-     */
-    protected function validate()
-    {
-    }
 }

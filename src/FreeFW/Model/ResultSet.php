@@ -264,20 +264,4 @@ class ResultSet extends \FreeFW\Core\Model implements
     {
         return $this->var;
     }
-
-    /**
-     *
-     */
-    protected function validate()
-    {
-    }
-
-    /**
-     *
-     * {@inheritDoc}
-     * @see \FreeFW\Core\Model::init()
-     */
-    public function init()
-    {
-    }
 }

@@ -246,16 +246,13 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
     }
 
     /**
+     * Initialization
      *
+     * return self
      */
     public function init()
     {
-    }
-
-    /**
-     *
-     */
-    protected function validate()
-    {
+        $this->conditions = [];
+        $this->result_set = false;
     }
 }

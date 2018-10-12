@@ -6,8 +6,7 @@ namespace FreeFW\Http;
  *
  * @author jeromeklam
  */
-class ApiServerResponse extends \GuzzleHttp\Psr7\Response
-    implements \Psr\Http\Message\ResponseInterface
+class ApiServerResponse extends \GuzzleHttp\Psr7\Response implements
+    \Psr\Http\Message\ResponseInterface
 {
-
 }

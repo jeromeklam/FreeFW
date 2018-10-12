@@ -69,6 +69,17 @@ class Constants
     const TYPE_HTML               = 'HTML';
 
     /**
+     * Properties
+     * @var unknown
+     */
+    const PROPERTY_NAME    = 'name';
+    const PROPERTY_PRIVATE = 'private';
+    const PROPERTY_TYPE    = 'type';
+    const PROPERTY_OPTIONS = 'options';
+    const PROPERTY_PUBLIC  = 'public';
+    const PROPERTY_DEFAULT = 'default';
+
+    /**
      * Options
      * @var string
      */
@@ -77,4 +88,18 @@ class Constants
     const OPTION_JSONIGNORE       = 'NOJSON';
     const OPTION_LOCAL            = 'LOCAL';
     const OPTION_UNIQ             = 'UNIQ';
+
+    /**
+     * Default constants
+     * @var string
+     */
+    const DEFAULT_NOW   = 'NOW';
+    const DEFAULT_TRUE  = 1;
+    const DEFAULT_FALSE = 0;
+
+    /**
+     * Errors types
+     * @var string
+     */
+    const ERROR_REQUIRED     = 666001;
 }

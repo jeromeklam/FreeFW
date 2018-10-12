@@ -16,7 +16,8 @@ class Decoder
      *
      * @return \FreeFW\Core\Model
      */
-    public function decode(\FreeFW\JsonApi\V1\Model\Document $p_document
+    public function decode(
+        \FreeFW\JsonApi\V1\Model\Document $p_document
     ) : \FreeFW\Core\Model {
         if ($p_document->isSimpleResource()) {
             $resource = $p_document->getData();

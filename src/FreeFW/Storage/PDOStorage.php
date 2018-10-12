@@ -54,18 +54,18 @@ class PDOStorage extends \FreeFW\Storage\Storage
         foreach ($properties as $name => $oneProperty) {
             $add = true;
             $pk  = false;
-            if (array_key_exists('options', $oneProperty)) {
-                if (in_array(FFCST::OPTION_LOCAL, $oneProperty['options'])) {
+            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $oneProperty)) {
+                if (in_array(FFCST::OPTION_LOCAL, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $add = false;
                 }
-                if (in_array(FFCST::OPTION_PK, $oneProperty['options'])) {
+                if (in_array(FFCST::OPTION_PK, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $pk = true;
                 }
             }
             if ($add) {
                 // PK fields must be autoincrement...
                 if ($pk) {
-                    $fields[$oneProperty['destination']] = null;
+                    $fields[$oneProperty[FFCST::PROPERTY_PRIVATE]] = null;
                     // setter for id
                     $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
                 } else {
@@ -76,7 +76,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     if ($val === false) {
                         $val = 0;
                     }
-                    $fields[':' . $oneProperty['destination']] = $val;
+                    $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $val;
                 }
             }
         }
@@ -106,7 +106,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
             $this->logger->debug('PDOStorage.create.error : ' . print_r($ex->getMessage(), true));
             $p_model->addError($ex->getCode(), $ex->getMessage());
         }
-        return $p_model->isValid();
+        return !$p_model->hasErrors();
     }
 
     /**
@@ -121,9 +121,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $fields     = [];
         if (is_int($p_filters)) {
             foreach ($properties as $name => $oneProperty) {
-                if (array_key_exists('options', $oneProperty)) {
-                    if (in_array(FFCST::OPTION_PK, $oneProperty['options'])) {
-                        $fields[':' . $oneProperty['destination']] = $p_filters;
+                if (array_key_exists(FFCST::PROPERTY_OPTIONS, $oneProperty)) {
+                    if (in_array(FFCST::OPTION_PK, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
+                        $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $p_filters;
                         break;
                     }
                 }
@@ -135,7 +135,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                         if ($value === false) {
                             $value = 0;
                         }
-                        $fields[':' . $properties[$field]['destination']] = $value;
+                        $fields[':' . $properties[$field][FFCST::PROPERTY_PRIVATE]] = $value;
                     } else {
                         throw new \FreeFW\Core\FreeFWStorageException(sprintf('Unkown %s field !', $field));
                     }
@@ -181,12 +181,12 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $source     = $p_model::getSource();
         $properties = $p_model::getProperties();
         foreach ($properties as $name => $oneProperty) {
-            if (array_key_exists('options', $oneProperty)) {
-                if (in_array(FFCST::OPTION_PK, $oneProperty['options'])) {
+            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $oneProperty)) {
+                if (in_array(FFCST::OPTION_PK, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     // Compute getter
                     $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
                     // Get data
-                    $fields[':' . $oneProperty['destination']] = $p_model->$getter();
+                    $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $p_model->$getter();
                 }
             }
         }
@@ -231,11 +231,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
         foreach ($properties as $name => $oneProperty) {
             $add = true;
             $pk  = false;
-            if (array_key_exists('options', $oneProperty)) {
-                if (in_array(FFCST::OPTION_LOCAL, $oneProperty['options'])) {
+            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $oneProperty)) {
+                if (in_array(FFCST::OPTION_LOCAL, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $add = false;
                 }
-                if (in_array(FFCST::OPTION_PK, $oneProperty['options'])) {
+                if (in_array(FFCST::OPTION_PK, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $pk = true;
                 }
             }
@@ -244,14 +244,14 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
                 if ($pk) {
                     // Get data
-                    $pks[':' . $oneProperty['destination']] = $p_model->$getter();
+                    $pks[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $p_model->$getter();
                 } else {
                     // Get data
                     $val = $p_model->$getter();
                     if ($val === false) {
                         $val = 0;
                     }
-                    $fields[':' . $oneProperty['destination']] = $val;
+                    $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $val;
                 }
             }
         }
@@ -277,7 +277,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         } catch (\Exception $ex) {
             var_dump($ex);
         }
-        return $p_model->isValid();
+        return !$p_model->hasErrors();
     }
 
     /**
@@ -490,8 +490,8 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $properties = $model::getProperties();
         $type       = \FreeFW\Constants::TYPE_STRING;
         if (array_key_exists($field, $properties)) {
-            $real = $source . '.' . $properties[$field]['destination'];
-            $type = $properties[$field]['type'];
+            $real = $source . '.' . $properties[$field][FFCST::PROPERTY_PRIVATE];
+            $type = $properties[$field][FFCST::PROPERTY_TYPE];
         } else {
             throw new \FreeFW\Core\FreeFWStorageException(
                 sprintf('Unknown field : %s !', $p_field)

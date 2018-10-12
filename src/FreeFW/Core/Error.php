@@ -35,18 +35,30 @@ class Error
     protected $type = self::TYPE_ERROR;
 
     /**
+     * Field
+     * @var mixed
+     */
+    protected $field = null;
+
+    /**
      * Constructor
      *
      * @param int    $p_code
      * @param string $p_message
      * @param int    $p_type
+     * @param mixed  $p_field
      */
-    public function __construct(int $p_code, $p_message = null, $p_type = \FreeFW\Core\Error::TYPE_ERROR)
-    {
+    public function __construct(
+        int $p_code,
+        $p_message = null,
+        $p_type = \FreeFW\Core\Error::TYPE_ERROR,
+        $p_field = null
+    ) {
         $this
             ->setCode($p_code)
             ->setMessage($p_message)
             ->setType($p_type)
+            ->setField($p_field)
         ;
     }
 
@@ -117,5 +129,28 @@ class Error
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * Set field
+     *
+     * @param mixed $p_field
+     *
+     * @return \FreeFW\Core\Error
+     */
+    public function setField($p_field)
+    {
+        $this->field = $p_field;
+        return $this;
+    }
+
+    /**
+     * Get field
+     *
+     * @return mixed
+     */
+    public function getField()
+    {
+        return $this->field;
     }
 }

@@ -18,8 +18,7 @@ class Encoder
      */
     protected function encodeSingleResource(
         \FreeFW\Interfaces\ApiResponseInterface $p_api_response
-    ) : \FreeFW\JsonApi\V1\Model\ResourceObject
-    {
+    ) : \FreeFW\JsonApi\V1\Model\ResourceObject {
         $resource = new \FreeFW\JsonApi\V1\Model\ResourceObject(
             $p_api_response->getApiType(),
             $p_api_response->getApiId()
@@ -39,7 +38,8 @@ class Encoder
      *
      * @return \FreeFW\JsonApi\V1\Model\Document
      */
-    public function encode(\FreeFW\Interfaces\ApiResponseInterface $p_api_response
+    public function encode(
+        \FreeFW\Interfaces\ApiResponseInterface $p_api_response
     ) : \FreeFW\JsonApi\V1\Model\Document {
         $document = new \FreeFW\JsonApi\V1\Model\Document();
         if ($p_api_response->hasErrors()) {

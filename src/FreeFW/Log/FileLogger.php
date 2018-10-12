@@ -90,6 +90,10 @@ class FileLogger extends \Psr\Log\AbstractLogger
             $myMsg = \FreeFW\Tools\PBXString::parse($message, $context);
             $this->write($myMsg, $level);
         }
+        if ($level >= \Psr\Log\LogLevel::ERROR) {
+            // send alert to monitoring...
+            // APP_NAME, server name, broker...
+        }
     }
 
     /**

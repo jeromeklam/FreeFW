@@ -48,8 +48,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
     public function create()
     {
         if ($this->isValid()) {
-            $this->strategy->create($this);
-            return $this->isValid();
+            return $this->strategy->create($this);
         }
         return false;
     }
@@ -62,8 +61,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
     public function save()
     {
         if ($this->isValid()) {
-            $this->strategy->save($this);
-            return $this->isValid();
+            return $this->strategy->save($this);
         }
         return false;
     }
@@ -122,7 +120,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
             $properties = $this->getProperties();
             $fields     = [];
             foreach ($properties as $key => $prop) {
-                $fields[$prop['destination']] = $key;
+                $fields[$prop[FFCST::PROPERTY_PRIVATE]] = $key;
             }
             foreach ($p_array as $field => $value) {
                 if (array_key_exists($field, $fields)) {
@@ -189,9 +187,11 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
     public function getApiId() : string
     {
         foreach ($this->getProperties() as $name => $property) {
-            if (in_array(FFCST::OPTION_PK, $property['options'])) {
-                $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
-                return (string)$this->$getter();
+            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
+                if (in_array(FFCST::OPTION_PK, $property[FFCST::PROPERTY_OPTIONS])) {
+                    $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                    return (string)$this->$getter();
+                }
             }
         }
         return '';
