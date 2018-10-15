@@ -105,8 +105,12 @@ class JsonApi extends \FreeFW\Middleware\ApiAdapter
                             $p_response = $p_response->withBody(\GuzzleHttp\Psr7\stream_for($json));
                         }
                     } else {
-                        $p_response = $this->createErrorResponse(
-                            new \Exception('Api error : body is not an ApiResponseInterface !')
+                        $encoder    = new \FreeFW\JsonApi\V1\Encoder();
+                        $document   = new \FreeFW\JsonApi\V1\Model\Document();
+                        $p_response = $p_response->withBody(
+                            \GuzzleHttp\Psr7\stream_for(
+                                json_encode($document)
+                            )
                         );
                     }
                 } else {
@@ -120,17 +124,51 @@ class JsonApi extends \FreeFW\Middleware\ApiAdapter
                 );
             }
         } else {
-            $document = new \FreeFW\JsonApi\V1\Model\Document();
-            $error    = new \FreeFW\JsonApi\V1\Model\ErrorObject(
-                $p_response->getStatusCode(),
-                $p_response->getReasonPhrase()
-            );
-            $document->addError($error);
-            $p_response = $p_response->withBody(
-                \GuzzleHttp\Psr7\stream_for(
-                    json_encode($document)
-                )
-            );
+            $body = $p_response->getBody();
+            if (is_object($body)) {
+                $document = new \FreeFW\JsonApi\V1\Model\Document();
+                if ($body instanceof StreamInterface) {
+                    $content = $body->getContents();
+                    $object  = unserialize($content);
+                    if ($object instanceof \FreeFW\Interfaces\ValidatorInterface) {
+                        $encoder = new \FreeFW\JsonApi\V1\Encoder();
+                        /**
+                         * @var \FreeFW\Core\Error $oneError
+                         */
+                        foreach ($object->getErrors() as $idx => $oneError) {
+                            $error = new \FreeFW\JsonApi\V1\Model\ErrorObject(
+                                $oneError->getType(),
+                                $oneError->getMessage(),
+                                $oneError->getCode()
+                            );
+                            $document->addError($error);
+                        }
+                    } else {
+                        $error = new \FreeFW\JsonApi\V1\Model\ErrorObject(500, 'Unknown Error 1');
+                        $document->addError($error);
+                    }
+                } else {
+                    $error = new \FreeFW\JsonApi\V1\Model\ErrorObject(500, 'Unknown Error 2');
+                    $document->addError($error);
+                }
+                $p_response = $p_response->withBody(
+                    \GuzzleHttp\Psr7\stream_for(
+                        json_encode($document)
+                    )
+                );
+            } else {
+                $document = new \FreeFW\JsonApi\V1\Model\Document();
+                $error    = new \FreeFW\JsonApi\V1\Model\ErrorObject(
+                    $p_response->getStatusCode(),
+                    $p_response->getReasonPhrase()
+                );
+                $document->addError($error);
+                $p_response = $p_response->withBody(
+                    \GuzzleHttp\Psr7\stream_for(
+                        json_encode($document)
+                    )
+                );
+            }
         }
         $this->logger->debug(sprintf('FreeFW.Middleware.JsonApi.encode.end'));
         return $p_response->withHeader('Content-Type', 'application/vnd.api+json');

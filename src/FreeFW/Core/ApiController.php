@@ -24,9 +24,11 @@ class ApiController extends \FreeFW\Core\Controller
              * @var \FreeFW\Core\StorageModel $data
              */
             $data = $apiParams->getData();
-            if ($data->isValid()) {
-                $data->create();
+            if (!$data->isValid()) {
+                $this->logger->debug('FreeFW.ApiController.createOne.end');
+                return $this->createResponse(409, $data);
             }
+            $data->create();
             $this->logger->debug('FreeFW.ApiController.createOne.end');
             return $this->createResponse(201, $data);
         } else {

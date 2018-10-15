@@ -62,11 +62,6 @@ class Router implements
         ServerRequestInterface $p_request,
         RequestHandlerInterface $p_handler
     ): ResponseInterface {
-        try {
-            $data = call_user_func_array([$this->object, $this->function], [$p_request]);
-        } catch (\Exception $ex) {
-            // @todo
-        }
-        return $data;
+        return call_user_func_array([$this->object, $this->function], [$p_request]);
     }
 }

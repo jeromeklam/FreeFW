@@ -65,4 +65,13 @@ interface StorageInterface
      * @return boolean
      */
     public function delete(\FreeFW\Core\StorageModel &$p_model, array $p_conditions = []);
+
+    /**
+     * Get fields
+     *
+     * @param string $p_object
+     *
+     * @return [\FreeFW\Model\Field]
+     */
+    public function getFields(string $p_object) : array;
 }

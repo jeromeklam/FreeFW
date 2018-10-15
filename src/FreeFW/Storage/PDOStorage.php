@@ -520,4 +520,21 @@ class PDOStorage extends \FreeFW\Storage\Storage
             'type'  => false
         ];
     }
+
+    /**
+     *
+     * {@inheritDoc}
+     * @see \FreeFW\Interfaces\StorageInterface::getFields()
+     */
+    public function getFields(string $p_object): array
+    {
+        $fields = [];
+        if ($this->provider) {
+            $rs = $this->provider->query('SELECT * FROM ' . $p_object . ' LIMIT 0');
+            for ($i = 0; $i < $rs->columnCount(); $i++) {
+                $fields[] = \FreeFW\Model\Field::getFromPDO($rs->getColumnMeta($i));
+            }
+        }
+        return $fields;
+    }
 }

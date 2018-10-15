@@ -218,25 +218,25 @@ abstract class Model implements
             $value = null;
             if (array_key_exists(FFCST::PROPERTY_DEFAULT, $oneProperty)) {
                 $value = $oneProperty[FFCST::PROPERTY_DEFAULT];
-            }
-            $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
-            switch ($oneProperty[FFCST::PROPERTY_TYPE]) {
-                case FFCST::TYPE_BOOLEAN:
-                    // boolean can't be null !
-                    if ($value == FFCST::DEFAULT_TRUE) {
-                        $this->$setter(1);
-                    } else {
-                        $this->$setter(0);
-                    }
-                    break;
-                case FFCST::TYPE_DATETIME:
-                    if ($value == FFCST::DEFAULT_NOW) {
-                        $this->$setter(\FreeFW\Tools\Date::getCurrentTimestamp());
-                    }
-                    break;
-                default:
-                    $this->$setter($value);
-                    break;
+                $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                switch ($oneProperty[FFCST::PROPERTY_TYPE]) {
+                    case FFCST::TYPE_BOOLEAN:
+                        // boolean can't be null !
+                        if ($value == FFCST::DEFAULT_TRUE) {
+                            $this->$setter(1);
+                        } else {
+                            $this->$setter(0);
+                        }
+                        break;
+                    case FFCST::TYPE_DATETIME:
+                        if ($value == FFCST::DEFAULT_NOW) {
+                            $this->$setter(\FreeFW\Tools\Date::getCurrentTimestamp());
+                        }
+                        break;
+                    default:
+                        $this->$setter($value);
+                        break;
+                }
             }
         }
         return $this;

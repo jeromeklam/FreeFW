@@ -199,43 +199,41 @@ class Route implements \Psr\Log\LoggerAwareInterface
      */
     public function render(\Psr\Http\Message\ServerRequestInterface $p_request)
     {
-        try {
-            $cls = \FreeFW\DI\DI::get($this->contoller);
-            if (method_exists($cls, $this->function)) {
-                // Must go through middlewares....
-                // The final is the route execution
-                $routerMiddleware = new \FreeFW\Middleware\Router($cls, $this->function);
-                // Middleware pipeline
-                $pipeline = new \FreeFW\Middleware\Pipeline();
-                $pipeline->setConfig($this->config);
-                $pipeline->setLogger($this->logger);
-                // Pipe default config middleware
-                $midCfg  = $this->config->get('middleware');
-                $authMid = false;
-                if (is_array($midCfg)) {
-                    foreach ($midCfg as $idx => $middleware) {
-                        $newMiddleware = \FreeFW\DI\DI::get($middleware);
-                        if ($newMiddleware instanceof \FreeFW\Interfaces\AuthAdapterInterface) {
-                            $authMid = true;
-                            $newMiddleware->setSecured($this->getSecured());
-                        }
-                        $pipeline->pipe($newMiddleware);
+        $cls = \FreeFW\DI\DI::get($this->contoller);
+        if (method_exists($cls, $this->function)) {
+            // Must go through middlewares....
+            // The final is the route execution
+            $routerMiddleware = new \FreeFW\Middleware\Router($cls, $this->function);
+            // Middleware pipeline
+            $pipeline = new \FreeFW\Middleware\Pipeline();
+            $pipeline->setConfig($this->config);
+            $pipeline->setLogger($this->logger);
+            // Pipe default config middleware
+            $midCfg  = $this->config->get('middleware');
+            $authMid = false;
+            if (is_array($midCfg)) {
+                foreach ($midCfg as $idx => $middleware) {
+                    $newMiddleware = \FreeFW\DI\DI::get($middleware);
+                    if ($newMiddleware instanceof \FreeFW\Interfaces\AuthAdapterInterface) {
+                        $authMid = true;
+                        $newMiddleware->setSecured($this->getSecured());
                     }
+                    $pipeline->pipe($newMiddleware);
                 }
-                // Inject route middlewares...
-                // Check ...
-                if ($this->getSecured() && ! $authMid) {
-                    throw new \FreeFW\Core\FreeFWException('Secured route with no Auth middleware !');
-                }
-                // Last middleware is router
-                $pipeline->pipe($routerMiddleware);
-                // Go
-                return $pipeline->handle($p_request);
             }
-        } catch (\Exception $ex) {
-            // @todo
-            var_dump($ex);
-            die;
+            // Inject route middlewares...
+            // Check ...
+            if ($this->getSecured() && ! $authMid) {
+                throw new \FreeFW\Core\FreeFWException('Secured route with no Auth middleware !');
+            }
+            // Last middleware is router
+            $pipeline->pipe($routerMiddleware);
+            // Go
+            return $pipeline->handle($p_request);
+        } else {
+            throw new \FreeFW\Core\FreeFWException(
+                sprintf('Function %s not found in %s class !', $this->function, $this->$contoller)
+            );
         }
         return false;
     }
