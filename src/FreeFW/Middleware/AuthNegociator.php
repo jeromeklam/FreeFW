@@ -44,6 +44,12 @@ class AuthNegociator implements
     protected $secured = false;
 
     /**
+     * Generate identity
+     * @var boolean
+     */
+    protected $identity = false;
+
+    /**
      * Constructor
      *
      * @param array $p_formats
@@ -97,5 +103,26 @@ class AuthNegociator implements
     {
         $this->secured = $p_secured;
         return $this;
+    }
+
+    /**
+     * Force identity generation
+     *
+     * @param bool $p_identity
+     */
+    public function setIdentityGeneration(bool $p_identity = true)
+    {
+        $this->identity = $p_identity;
+        return $this;
+    }
+
+    /**
+     * Get identity generation
+     *
+     * @return bool
+     */
+    public function getIndentityGeneration() : bool
+    {
+        return $this->identity;
     }
 }

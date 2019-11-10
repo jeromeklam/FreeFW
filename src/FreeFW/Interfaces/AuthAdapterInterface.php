@@ -24,4 +24,18 @@ interface AuthAdapterInterface
      * @return bool
      */
     public function isSecured() : bool;
+
+    /**
+     * Force identity generation
+     *
+     * @param bool $p_identity
+     */
+    public function setIdentityGeneration(bool $p_identity = true);
+
+    /**
+     * Get identity generation
+     *
+     * @return bool
+     */
+    public function getIndentityGeneration() : bool;
 }

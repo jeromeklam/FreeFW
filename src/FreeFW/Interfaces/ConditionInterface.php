@@ -10,18 +10,18 @@ interface ConditionInterface
 {
 
     /**
-     * Set field
+     * Set value
      *
-     * @param string $p_field
+     * @param mixed $p_value
      *
      * @return \FreeFW\Interfaces\ConditionInterface
      */
-    public function setField($p_field);
+    public function setValue($p_value);
 
     /**
-     * get Field
+     * get value
      *
      * @return mixed
      */
-    public function getField();
+    public function getValue();
 }

@@ -85,6 +85,7 @@ class ApiNegociator implements
                             )
                         );
                     } else {
+                        $this->logger->debug(sprintf('FreeFW.Middleware.ApiNegociator.notchecked %s', $class));
                         if ($mid->canOverride()) {
                             return $p_handler->handle($p_request);
                         }

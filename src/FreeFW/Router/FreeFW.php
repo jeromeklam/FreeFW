@@ -23,14 +23,20 @@ class FreeFW
             $apiRoutes = @include($onePath);
             if (is_array($apiRoutes)) {
                 foreach ($apiRoutes as $idx => $apiRoute) {
+                    if (!array_key_exists('auth', $apiRoute)) {
+                        $apiRoute['auth'] = \FreeFW\Router\Route::AUTH_IN;
+                    }
                     $myRoute = new \FreeFW\Router\Route();
                     $myRoute
                         ->setMethod($apiRoute['method'])
                         ->setUrl($apiRoute['url'])
                         ->setController($apiRoute['controller'])
                         ->setFunction($apiRoute['function'])
-                        ->setSecured($apiRoute['secured'])
+                        ->setAuth($apiRoute['auth'])
                     ;
+                    if (array_key_exists('model', $apiRoute)) {
+                        $myRoute->setDefaultModel($apiRoute['model']);
+                    }
                     $routes->addRoute($myRoute);
                 }
             }

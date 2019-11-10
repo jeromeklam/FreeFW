@@ -75,11 +75,14 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
     {
         $cls   = get_called_class();
         $cls   = rtrim(ltrim($cls, '\\'), '\\');
+        /**
+         * @var \FreeFW\Model\Query $query
+         */
         $query = \FreeFW\DI\DI::get('FreeFW::Model::Query');
         $query
             ->setType(\FreeFW\Model\Query::QUERY_SELECT)
             ->setMainModel(str_replace('\\', '::', $cls))
-            ->setConditions($p_filters)
+            ->addFromFilters($p_filters)
         ;
         $model = false;
         if ($query->execute()) {

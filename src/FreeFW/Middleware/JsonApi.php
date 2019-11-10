@@ -41,6 +41,63 @@ class JsonApi extends \FreeFW\Middleware\ApiAdapter
                 // @todo
             }
         }
+        $params = $p_request->getQueryParams();
+        /**
+         * Handle specific parameters
+         */
+        // Fields
+        if (array_key_exists('fields', $params)) {
+
+        }
+        // Filters
+        if (array_key_exists('filter', $params)) {
+            $filters = $params['filter'];
+            // Transform filters to \FreeFW\Model\Conditions...
+            $conditions = \FreeFW\Model\Conditions::getNew();
+            $conditions->initFromArray($filters);
+            $apiParams->setFilters($conditions);
+        }
+        // Page
+        if (array_key_exists('page', $params)) {
+            $page = $params['page'];
+            if (is_array($page)) {
+                $start = 0;
+                $len   = 25;
+                if (array_key_exists('number', $page) || array_key_exists('size', $page)) {
+                    $number = 1;
+                    $size   = 25;
+                    if (array_key_exists('number', $page)) {
+                        $number = $page['number'];
+                    }
+                    if (array_key_exists('size', $page)) {
+                        $size = $page['size'];
+                    }
+                    $start = ($number - 1) * $size;
+                    $len   = $size;
+                }
+                if (array_key_exists('offset', $page) || array_key_exists('limit', $page)) {
+                    $offset = 1;
+                    $limit  = 25;
+                    if (array_key_exists('offset', $page)) {
+                        $offset = $page['offset'];
+                    }
+                    if (array_key_exists('limit', $page)) {
+                        $limit = $page['limit'];
+                    }
+                    $start = $offset - 1;
+                    $len   = $limit - $offset;
+                }
+            } else {
+                throw new \FreeFW\JsonApi\FreeFWJsonApiException(
+                    sprintf('Incorrect values for page parameter !')
+                );
+            }
+            $apiParams
+                ->setStart($start)
+                ->setLength($len)
+            ;
+        }
+        // Next
         $this->logger->debug(sprintf('FreeFW.Middleware.JsonApi.decode.end'));
         $p_request = $p_request->withAttribute('api_params', $apiParams);
         return $p_request;
@@ -105,13 +162,23 @@ class JsonApi extends \FreeFW\Middleware\ApiAdapter
                             $p_response = $p_response->withBody(\GuzzleHttp\Psr7\stream_for($json));
                         }
                     } else {
-                        $encoder    = new \FreeFW\JsonApi\V1\Encoder();
-                        $document   = new \FreeFW\JsonApi\V1\Model\Document();
-                        $p_response = $p_response->withBody(
-                            \GuzzleHttp\Psr7\stream_for(
-                                json_encode($document)
-                            )
-                        );
+                        if ($object instanceof \Iterator) {
+                            $encoder  = new \FreeFW\JsonApi\V1\Encoder();
+                            $document = $encoder->encodeList($object);
+                            $p_response = $p_response->withBody(
+                                \GuzzleHttp\Psr7\stream_for(
+                                    json_encode($document)
+                                )
+                            );
+                        } else {
+                            $encoder    = new \FreeFW\JsonApi\V1\Encoder();
+                            $document   = new \FreeFW\JsonApi\V1\Model\Document();
+                            $p_response = $p_response->withBody(
+                                \GuzzleHttp\Psr7\stream_for(
+                                    json_encode($document)
+                                )
+                            );
+                        }
                     }
                 } else {
                     $p_response = $this->createErrorResponse(
@@ -129,23 +196,34 @@ class JsonApi extends \FreeFW\Middleware\ApiAdapter
                 $document = new \FreeFW\JsonApi\V1\Model\Document();
                 if ($body instanceof StreamInterface) {
                     $content = $body->getContents();
-                    $object  = unserialize($content);
-                    if ($object instanceof \FreeFW\Interfaces\ValidatorInterface) {
-                        $encoder = new \FreeFW\JsonApi\V1\Encoder();
-                        /**
-                         * @var \FreeFW\Core\Error $oneError
-                         */
-                        foreach ($object->getErrors() as $idx => $oneError) {
-                            $error = new \FreeFW\JsonApi\V1\Model\ErrorObject(
-                                $oneError->getType(),
-                                $oneError->getMessage(),
-                                $oneError->getCode()
-                            );
+                    if ($content != '') {
+                        $object  = unserialize($content);
+                        if ($object instanceof \FreeFW\Interfaces\ValidatorInterface) {
+                            $encoder = new \FreeFW\JsonApi\V1\Encoder();
+                            /**
+                             * @var \FreeFW\Core\Error $oneError
+                             */
+                            foreach ($object->getErrors() as $idx => $oneError) {
+                                $error = new \FreeFW\JsonApi\V1\Model\ErrorObject(
+                                    $oneError->getType(),
+                                    $oneError->getMessage(),
+                                    $oneError->getCode()
+                                );
+                                $document->addError($error);
+                            }
+                        } else {
+                            $error = new \FreeFW\JsonApi\V1\Model\ErrorObject(500, 'Unknown Error 1');
                             $document->addError($error);
                         }
                     } else {
-                        $error = new \FreeFW\JsonApi\V1\Model\ErrorObject(500, 'Unknown Error 1');
-                        $document->addError($error);
+                        // @todo...
+                        if ($p_response->getStatusCode() >= 300) {
+                            $error = new \FreeFW\JsonApi\V1\Model\ErrorObject(
+                                $p_response->getStatusCode(),
+                                $p_response->getReasonPhrase()
+                            );
+                            $document->addError($error);
+                        }
                     }
                 } else {
                     $error = new \FreeFW\JsonApi\V1\Model\ErrorObject(500, 'Unknown Error 2');

@@ -6,7 +6,7 @@ namespace FreeFW\Model;
  * @author jeromeklam
  *
  */
-class Condition extends \FreeFW\Core\Model
+class SimpleCondition extends \FreeFW\Core\Model
 {
 
     /**
@@ -19,7 +19,7 @@ class Condition extends \FreeFW\Core\Model
      *
      * @var string
      */
-    protected $operator = null;
+    protected $operator = \FreeFW\Storage\Storage::COND_EQUAL;
 
     /**
      *
@@ -32,7 +32,7 @@ class Condition extends \FreeFW\Core\Model
      *
      * @param \FreeFW\Interfaces\ConditionInterface $p_member
      *
-     * @return \FreeFW\Model\Condition
+     * @return \FreeFW\Model\SimpleCondition
      */
     public function setLeftMember(\FreeFW\Interfaces\ConditionInterface $p_member)
     {
@@ -55,7 +55,7 @@ class Condition extends \FreeFW\Core\Model
      *
      * @param \FreeFW\Interfaces\ConditionInterface $p_member
      *
-     * @return \FreeFW\Model\Condition
+     * @return \FreeFW\Model\SimpleCondition
      */
     public function setRightMember(\FreeFW\Interfaces\ConditionInterface $p_member)
     {
@@ -78,10 +78,15 @@ class Condition extends \FreeFW\Core\Model
      *
      * @param string $p_operator
      *
-     * @return \FreeFW\Model\Condition
+     * @return \FreeFW\Model\SimpleCondition
      */
     public function setOperator(string $p_operator)
     {
+        if (!in_array($p_operator, \FreeFW\Storage\Storage::getAllOperators())) {
+            throw new \FreeFW\Core\FreeFWStorageException(
+                sprinf('Unknown %s operator !', $p_operator)
+            );
+        }
         $this->operator = $p_operator;
         return $this;
     }

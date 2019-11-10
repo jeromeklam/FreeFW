@@ -97,6 +97,23 @@ class Document implements \JsonSerializable
     {
         return $this->data;
     }
+
+    /**
+     * Add one element to data
+     *
+     * @param unknown $p_data
+     *
+     * @return \FreeFW\JsonApi\V1\Model\Document
+     */
+    public function addData($p_data)
+    {
+        if ($this->data === null) {
+            $this->data = [];
+        }
+        $this->data[] = $p_data;
+        return $this;
+    }
+
     /**
      *
      * {@inheritDoc}
@@ -115,7 +132,15 @@ class Document implements \JsonSerializable
             $return['errors'] = $this->errors->__toArray();
         }
         if ($this->data !== null) {
-            $return['data'] = $this->data->__toArray();
+            if (is_Array($this->data)) {
+                $data = [];
+                foreach ($this->data as $idx => $oneData) {
+                    $data[] = $oneData->__toArray();
+                }
+                $return['data'] = $data;
+            } else {
+                $return['data'] = $this->data->__toArray();
+            }
         }
         return $return;
     }
@@ -142,7 +167,7 @@ class Document implements \JsonSerializable
             }
             return $resource;
         }
-        throw new \FreeFW\Core\FreeFWJsonApiException('type is required in data attribute !');
+        throw new \FreeFW\JsonApi\FreeFWJsonApiException('type is required in data attribute !');
     }
 
     /**

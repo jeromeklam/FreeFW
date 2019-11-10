@@ -18,20 +18,20 @@ class ConditionMember implements \FreeFW\Interfaces\ConditionInterface
     /**
      *
      * {@inheritDoc}
-     * @see \FreeFW\Interfaces\ConditionInterface::setField()
+     * @see \FreeFW\Interfaces\ConditionInterface::setValue()
      */
-    public function setField($p_field)
+    public function setValue($p_value)
     {
-        $this->field = $p_field;
+        $this->field = $p_value;
         return $this;
     }
 
     /**
      *
      * {@inheritDoc}
-     * @see \FreeFW\Interfaces\ConditionInterface::getField()
+     * @see \FreeFW\Interfaces\ConditionInterface::getValue()
      */
-    public function getField()
+    public function getValue()
     {
         return $this->field;
     }

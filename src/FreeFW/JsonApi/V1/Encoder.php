@@ -55,12 +55,25 @@ class Encoder
                 $document->addError($newError);
             }
         } else {
-            if ($p_api_response instanceof \Iterator) {
-                // Composed of multiple objetcs
-            } else {
-                $resource = $this->encodeSingleResource($p_api_response);
-                $document->setData($resource);
-            }
+            $resource = $this->encodeSingleResource($p_api_response);
+            $document->setData($resource);
+        }
+        return $document;
+    }
+
+    /**
+     * Encode multiple objects
+     *
+     * @param \Iterator $p_api_response
+     *
+     * @return \FreeFW\JsonApi\V1\Model\Document
+     */
+    public function encodeList(\Iterator $p_api_response)
+    {
+        $document = new \FreeFW\JsonApi\V1\Model\Document();
+        foreach ($p_api_response as $idx => $oneElement) {
+            $resource = $this->encodeSingleResource($oneElement);
+            $document->addData($resource);
         }
         return $document;
     }

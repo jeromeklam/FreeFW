@@ -46,7 +46,7 @@ class Model extends \FreeFW\Core\Model
      *
      * @param string $p_class
      *
-     * @return \FreeFW\Model\Condition
+     * @return \FreeFW\Model\Model
      */
     public function setMdClass(string $p_class)
     {
@@ -128,7 +128,8 @@ class Model extends \FreeFW\Core\Model
      *
      * @return string
      */
-    public function getMdPath(){
+    public function getMdPath()
+    {
         return $this->md_path;
     }
 

@@ -38,15 +38,22 @@ class Router implements
     protected $function = null;
 
     /**
+     * default model
+     * @var string
+     */
+    protected $model = null;
+
+    /**
      * Constructor
      *
      * @param object $p_object
      * @param string $p_function
      */
-    public function __construct($p_object, $p_function)
+    public function __construct($p_object, $p_function, $p_model = null)
     {
         $this->object   = $p_object;
         $this->function = $p_function;
+        $this->model    = $p_model;
     }
 
     /**
@@ -62,6 +69,7 @@ class Router implements
         ServerRequestInterface $p_request,
         RequestHandlerInterface $p_handler
     ): ResponseInterface {
+        $p_request->default_model = $this->model;
         return call_user_func_array([$this->object, $this->function], [$p_request]);
     }
 }

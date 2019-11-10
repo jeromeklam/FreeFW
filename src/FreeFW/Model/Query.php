@@ -38,9 +38,9 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
 
     /**
      * Conditions
-     * @var array
+     * @var \FreeFW\Model\Conditions
      */
-    protected $conditions = [];
+    protected $conditions = null;
 
     /**
      * ResultSet
@@ -49,13 +49,26 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
     protected $result_set = false;
 
     /**
+     * From
+     * @var integer
+     */
+    protected $from = 0;
+
+    /**
+     * Length
+     * @var integer
+     */
+    protected $length = 0;
+
+    /**
      * Constructor
      *
      * @param \FreeFW\Interfaces\StorageInterface $p_strategy
      */
     public function __construct(\FreeFW\Interfaces\StorageInterface $p_strategy = null)
     {
-        $this->result_set = new \FreeFW\Model\ResultSet();
+        $this->result_set = \FreeFW\DI\DI::get('FreeFW::Model::ResultSet');
+        $this->conditions = \FreeFW\DI\DI::get('FreeFW::Model::Conditions');
         $this->strategy   = $p_strategy;
     }
 
@@ -119,13 +132,13 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
     /**
      * Add a condition
      *
-     * @param \FreeFW\Model\Condition $p_condition
+     * @param \FreeFW\Model\SimpleCondition $p_condition
      *
      * @return \FreeFW\Model\Query
      */
-    public function addCondition(\FreeFW\Model\Condition $p_condition)
+    public function addCondition(\FreeFW\Model\SimpleCondition $p_condition)
     {
-        $this->conditions[] = $p_condition;
+        $this->conditions->add($p_condition);
         return $this;
     }
 
@@ -144,23 +157,23 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
          * condition
          * @var \FreeFW\Model\Condition $condition
          */
-        $condition = \FreeFW\DI\DI::get('FreeFW::Model::Condition');
+        $condition = \FreeFW\DI\DI::get('FreeFW::Model::SimpleCondition');
         $left = null;
         if (strpos($p_left, '::Model::') !== false) {
-            $left = new \FreeFW\Model\ConditionMember();
-            $left->setField($p_left);
+            $left = new \FreeFW\Model\ConditionMember($p_left);
+            $left->setValue($p_left);
         } else {
-            $left = new \FreeFW\Model\ConditionValue();
-            $left->setField($p_left);
+            $left = new \FreeFW\Model\ConditionValue($p_left);
+            $left->setValue($p_left);
         }
         $right = null;
         if ($p_right !== null) {
             if (strpos($p_right, '::Model::') !== false) {
                 $right = new \FreeFW\Model\ConditionMember();
-                $right->setField($p_right);
+                $right->setValue($p_right);
             } else {
                 $right = new \FreeFW\Model\ConditionValue();
-                $right->setField($p_right);
+                $right->setValue($p_right);
             }
         }
         $condition
@@ -179,11 +192,26 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
      * @param string $p_member
      * @param mixed $p_value
      *
-     * @return \FreeFW\Core\StorageModel
+     * @return \FreeFW\Model\Query
      */
     public function conditionLower(string $p_member, $p_value)
     {
         return $this->addSimpleCondition(\FreeFW\Storage\Storage::COND_LOWER, $p_member, $p_value);
+    }
+
+    /**
+     * Add conditions
+     *
+     * @param \FreeFW\Model\Conditions $p_conditions
+     *
+     * @return \FreeFW\Model\Query
+     */
+    public function addConditions(\FreeFW\Model\Conditions $p_conditions = null)
+    {
+        if ($p_conditions) {
+            $this->conditions->add($p_conditions);
+        }
+        return $this;
     }
 
     /**
@@ -193,7 +221,7 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
      *
      * @return \FreeFW\Model\Query
      */
-    public function setConditions(array $p_filters = [])
+    public function addFromFilters(array $p_filters = [])
     {
         foreach ($p_filters as $field => $condition) {
             if (strpos($field, '::Model::') === false) {
@@ -221,7 +249,12 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
         switch ($this->type) {
             case self::QUERY_SELECT:
                 $model            = \FreeFW\DI\DI::get($this->main_model);
-                $this->result_set = $this->strategy->select($model, $this->conditions);
+                $this->result_set = $this->strategy->select(
+                    $model,
+                    $this->conditions,
+                    $this->from,
+                    $this->length
+                );
                 return true;
                 break;
             case self::QUERY_DELETE:
@@ -233,6 +266,41 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
                 die;
         }
         return false;
+    }
+
+    /**
+     * Set query limit
+     *
+     * @param int $p_start
+     * @param int $p_len
+     *
+     * @return \FreeFW\Model\Query
+     */
+    public function setLimit(int $p_start = 0, int $p_len = 0)
+    {
+        $this->from   = $p_start;
+        $this->length = $p_len;
+        return $this;
+    }
+
+    /**
+     * Get start
+     *
+     * @return int
+     */
+    public function getStart()
+    {
+        return $this->start;
+    }
+
+    /**
+     * get length
+     *
+     * @return int
+     */
+    public function getLength()
+    {
+        return $this->length;
     }
 
     /**
@@ -252,7 +320,6 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
      */
     public function init()
     {
-        $this->conditions = [];
         $this->result_set = false;
     }
 }

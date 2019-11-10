@@ -8,7 +8,8 @@ namespace FreeFW\Http;
  */
 class ServerRequest
 {
-/**
+
+    /**
      * Get client IP
      *
      * @return string
@@ -45,6 +46,11 @@ class ServerRequest
         return $the_ip;
     }
 
+    /**
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $p_request
+     * @return \FreeFW\Http\Cookies|\FreeFW\Http\Cookie
+     */
     public static function getRequestCookies(\Psr\Http\Message\ServerRequestInterface $p_request = null)
     {
         $cookies = new \FreeFW\Http\Cookies();

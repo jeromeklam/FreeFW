@@ -1,5 +1,5 @@
 <?php
-namespace FreeFW\Core;
+namespace FreeFW\JsonApi;
 
 /**
  * FreeFW Exception

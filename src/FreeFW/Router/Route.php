@@ -16,13 +16,28 @@ class Route implements \Psr\Log\LoggerAwareInterface
     use \FreeFW\Behaviour\ConfigAwareTrait;
 
     /**
-     * Methos constants
+     * Methods constants
      * @var string
      */
     const METHOD_GET    = 'get';
     const METHOD_POST   = 'post';
     const METHOD_UPDATE = 'update';
     const METHOD_DELETE = 'delete';
+
+    /**
+     * Auth constants
+     * @var string
+     */
+    const AUTH_NONE = 'NONE';
+    const AUTH_IN   = 'IN';
+    const AUTH_OUT  = 'OUT';
+    const AUTH_BOTH = 'BOTH';
+
+    /**
+     * Lists
+     * @var string
+     */
+    const RESULT_LIST = 'list';
 
     /**
      * Method
@@ -50,9 +65,15 @@ class Route implements \Psr\Log\LoggerAwareInterface
 
     /**
      * Secured route ?
-     * @var bool
+     * @var string
      */
-    protected $secured = false;
+    protected $auth = self::AUTH_NONE;
+
+    /**
+     * Default model
+     * @var mixed
+     */
+    protected $default_model = null;
 
     /**
      * Set HTTP method
@@ -147,26 +168,49 @@ class Route implements \Psr\Log\LoggerAwareInterface
     }
 
     /**
-     * Set secured
+     * Set auth
      *
-     * @param bool $p_secured
+     * @param string $p_auth
      *
      * @return \FreeFW\Router\Route
      */
-    public function setSecured($p_secured)
+    public function setAuth($p_auth)
     {
-        $this->secured = $p_secured;
+        $this->auth = $p_auth;
         return $this;
     }
 
     /**
-     * Get secured
+     * Get auth
      *
-     * @return bool
+     * @return string
      */
-    public function getSecured()
+    public function getAuth()
     {
-        return $this->secured;
+        return $this->auth;
+    }
+
+    /**
+     * Set default model
+     *
+     * @param mixed $p_model
+     *
+     * @return \FreeFW\Router\Route
+     */
+    public function setDefaultModel($p_model)
+    {
+        $this->default_model = $p_model;
+        return $this;
+    }
+
+    /**
+     * Get default model
+     *
+     * @return mixed
+     */
+    public function getDefaultModel()
+    {
+        return $this->default_model;
     }
 
     /**
@@ -203,7 +247,12 @@ class Route implements \Psr\Log\LoggerAwareInterface
         if (method_exists($cls, $this->function)) {
             // Must go through middlewares....
             // The final is the route execution
-            $routerMiddleware = new \FreeFW\Middleware\Router($cls, $this->function);
+            $defaultModel     = $this->getDefaultModel();
+            $routerMiddleware = new \FreeFW\Middleware\Router(
+                $cls,
+                $this->function,
+                $defaultModel
+            );
             // Middleware pipeline
             $pipeline = new \FreeFW\Middleware\Pipeline();
             $pipeline->setConfig($this->config);
@@ -216,14 +265,27 @@ class Route implements \Psr\Log\LoggerAwareInterface
                     $newMiddleware = \FreeFW\DI\DI::get($middleware);
                     if ($newMiddleware instanceof \FreeFW\Interfaces\AuthAdapterInterface) {
                         $authMid = true;
-                        $newMiddleware->setSecured($this->getSecured());
+                        switch ($this->getAuth()) {
+                            case \FreeFW\Router\Route::AUTH_BOTH:
+                                $newMiddleware->setSecured(true);
+                                $newMiddleware->setIdentityGeneration(true);
+                                break;
+                            case \FreeFW\Router\Route::AUTH_IN:
+                                $newMiddleware->setSecured(true);
+                                break;
+                            case \FreeFW\Router\Route::AUTH_OUT:
+                                $newMiddleware->setIdentityGeneration(true);
+                                break;
+                            default:
+                                break;
+                        }
                     }
                     $pipeline->pipe($newMiddleware);
                 }
             }
             // Inject route middlewares...
             // Check ...
-            if ($this->getSecured() && ! $authMid) {
+            if ($this->getAuth() !== \FreeFW\Router\Route::AUTH_NONE && ! $authMid) {
                 throw new \FreeFW\Core\FreeFWException('Secured route with no Auth middleware !');
             }
             // Last middleware is router

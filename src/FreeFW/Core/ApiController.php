@@ -10,6 +10,41 @@ class ApiController extends \FreeFW\Core\Controller
 {
 
     /**
+     * Get all
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $p_request
+     */
+    public function getAll(\Psr\Http\Message\ServerRequestInterface $p_request)
+    {
+        $this->logger->debug('FreeFW.ApiController.getAll.start');
+        /**
+         * @var \FreeFW\Http\ApiParams $apiParams
+         */
+        $apiParams = $p_request->getAttribute('api_params', false);
+        if (!isset($p_request->default_model)) {
+            throw new \FreeFW\Core\FreeFWStorageException(
+                sprintf('No default model for route !')
+            );
+        }
+        $default = $p_request->default_model;
+        $model   = \FreeFW\DI\DI::get($default);
+        /**
+         * @var \FreeFW\Model\Query $query
+         */
+        $query = $model->getQuery();
+        $query
+            ->addConditions($apiParams->getFilters())
+            ->setLimit($apiParams->getStart(), $apiParams->getlength())
+        ;
+        $data = null;
+        if ($query->execute()) {
+            $data = $query->getResult();
+        }
+        $this->logger->debug('FreeFW.ApiController.getAll.end');
+        return $this->createResponse(200, $data);
+    }
+
+    /**
      * Add new single element
      *
      * @param \Psr\Http\Message\ServerRequestInterface $p_request

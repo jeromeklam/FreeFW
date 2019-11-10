@@ -49,11 +49,13 @@ class Sql
         $fields = '';
         $where  = '';
         foreach ($p_fields as $field => $value) {
-            $local = str_replace(':', '', $field);
-            if ($fields == '') {
-                $fields = $local . ' = :' . $local;
-            } else {
-                $fields = $fields . ', ' . $local . ' = :' . $local;
+            if (!array_key_exists($field, $p_pks)) {
+                $local = str_replace(':', '', $field);
+                if ($fields == '') {
+                    $fields = $local . ' = :' . $local;
+                } else {
+                    $fields = $fields . ', ' . $local . ' = :' . $local;
+                }
             }
         }
         foreach ($p_pks as $field => $value) {

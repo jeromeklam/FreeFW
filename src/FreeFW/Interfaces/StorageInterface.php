@@ -22,11 +22,14 @@ interface StorageInterface
      * Find a model
      *
      * @param \FreeFW\Core\StorageModel $p_model
-     * @param array                     $p_conditions
+     * @param \FreeFW\Model\Conditions  $p_conditions
      *
      * @return \FreeFW\Core\StorageModel
      */
-    public function findFirst(\FreeFW\Core\StorageModel &$p_model, array $p_conditions = []);
+    public function findFirst(
+        \FreeFW\Core\StorageModel &$p_model,
+        \FreeFW\Model\Conditions $p_conditions = null
+    );
 
     /**
      * Persist the model
@@ -50,21 +53,29 @@ interface StorageInterface
      * Select the model
      *
      * @param \FreeFW\Core\StorageModel $p_model
-     * @param array                     $p_conditions
+     * @param \FreeFW\Model\Conditions  $p_conditions
      *
-     * @return boolean
+     * @return \FreeFW\Model\ResultSet
      */
-    public function select(\FreeFW\Core\StorageModel &$p_model, array $p_conditions = []);
+    public function select(
+        \FreeFW\Core\StorageModel &$p_model,
+        \FreeFW\Model\Conditions $p_conditions = null,
+        int $p_from = 0,
+        int $p_length = 0
+    );
 
     /**
      * Remove the model
      *
      * @param \FreeFW\Core\StorageModel $p_model
-     * @param array                     $p_conditions
+     * @param \FreeFW\Model\Conditions  $p_conditions
      *
      * @return boolean
      */
-    public function delete(\FreeFW\Core\StorageModel &$p_model, array $p_conditions = []);
+    public function delete(
+        \FreeFW\Core\StorageModel &$p_model,
+        \FreeFW\Model\Conditions $p_conditions = null
+    );
 
     /**
      * Get fields

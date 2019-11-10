@@ -42,7 +42,7 @@ abstract class ApiAdapter implements
      * Accepted methods
      * @var string[]
      */
-    protected $methods = ['POST', 'PUT', 'PATCH', 'DELETE', 'COPY', 'LOCK', 'UNLOCK'];
+    protected $methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'COPY', 'LOCK', 'UNLOCK'];
 
     /**
      * Set content types

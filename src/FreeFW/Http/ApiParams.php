@@ -11,9 +11,9 @@ class ApiParams
 
     /**
      * Filters
-     * @var array
+     * @var \FreeFW\Model\Conditions
      */
-    protected $filters = [];
+    protected $filters = null;
 
     /**
      * Fields
@@ -34,10 +34,16 @@ class ApiParams
     protected $sort = [];
 
     /**
-     * Page
+     * Start
      * @var integer
      */
-    protected $page = 0;
+    protected $start = 0;
+
+    /**
+     * Length
+     * @var integer
+     */
+    protected $length = 0;
 
     /**
      * Data
@@ -90,4 +96,73 @@ class ApiParams
     {
         return ($this->data instanceof \FreeFW\Core\Model);
     }
+
+    /**
+     * Set filters
+     *
+     * @param \FreeFW\Model\Conditions $p_filters
+     *
+     * @return \FreeFW\Http\ApiParams
+     */
+    public function setFilters(\FreeFW\Model\Conditions $p_filters)
+    {
+        $this->filters = $p_filters;
+        return $this;
+    }
+
+    /**
+     * Get filters
+     *
+     * @return \FreeFW\Model\Conditions
+     */
+    public function getFilters()
+    {
+        return $this->filters;
+    }
+
+    /**
+     * Set start
+     *
+     * @param int $p_start
+     *
+     * @return \FreeFW\Http\ApiParams
+     */
+    public function setStart($p_start)
+    {
+        $this->start = $p_start;
+        return $this;
+    }
+
+    /**
+     * Get start
+     *
+     * @return int
+     */
+    public function getStart()
+    {
+        return $this->start;
+    }
+
+    /**
+     * Set length
+     *
+     * @param int $p_length
+     *
+     * @return \FreeFW\Http\ApiParams
+     */
+   public function setLength($p_length)
+   {
+       $this->length = $p_length;
+       return $this;
+   }
+
+   /**
+    * Get length
+    *
+    * @return int
+    */
+   public function getlength()
+   {
+       return $this->length;
+   }
 }

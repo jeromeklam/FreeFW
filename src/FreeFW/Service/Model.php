@@ -169,7 +169,7 @@ class Model extends \FreeFW\Core\Service
                 $add = '';
             }
             $lines[]  = '            \'' . $oneField->getFldName() .
-                '\'' . str_repeat(' ', ($max-strlen($oneField->getFldName()))) . ' => $PRP_' .
+                '\'' . str_repeat(' ', ($max-strlen($oneField->getFldName()))) . ' => self::$PRP_' .
                 strtoupper($oneField->getFldName()) . $add;
         }
         $lines[] = '        ];';

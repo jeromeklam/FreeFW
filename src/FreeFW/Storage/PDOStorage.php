@@ -244,7 +244,8 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
                 if ($pk) {
                     // Get data
-                    $pks[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $p_model->$getter();
+                    $pks[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]]    = $p_model->$getter();
+                    $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $p_model->$getter();
                 } else {
                     // Get data
                     $val = $p_model->$getter();
@@ -284,12 +285,16 @@ class PDOStorage extends \FreeFW\Storage\Storage
      * Select the model
      *
      * @param \FreeFW\Core\StorageModel $p_model
-     * @param array                     $p_conditions
+     * @param \FreeFW\Model\Conditions  $p_conditions
      *
      * @return \FreeFW\Model\ResultSet
      */
-    public function select(\FreeFW\Core\StorageModel &$p_model, array $p_conditions = [])
-    {
+    public function select(
+        \FreeFW\Core\StorageModel &$p_model,
+        \FreeFW\Model\Conditions $p_conditions = null,
+        int $p_from = 0,
+        int $p_length = 0
+    ) {
         $source     = $p_model::getSource();
         $properties = $p_model::getProperties();
         $values     = [];
@@ -297,17 +302,21 @@ class PDOStorage extends \FreeFW\Storage\Storage
         /**
          * @var \FreeFW\Model\Condition $oneCondition
          */
-        $where = '';
-        foreach ($p_conditions as $idx => $oneCondition) {
-            $part = $this->renderCondition($oneCondition);
-            if ($where != '') {
-                $where = $where . ' AND ';
-            }
-            $where  = $where . $part['sql'];
-            $values = array_merge($values, $part['values']);
-        }
+        $parts  = $this->renderConditions($p_conditions, $p_model);
+        $where  = $parts['sql'];
+        $values = $parts['values'];
         // Build query
-        $sql = 'SELECT * FROM ' . $source . ' WHERE ' . $where;
+        if (trim($where) == '') {
+            $where = ' 1 = 1';
+        }
+        $limit = '';
+        if ($p_from > 0 || $p_length > 0) {
+            $limit = ' LIMIT ' . $p_from;
+            if ($p_length > 0) {
+                $limit = $limit . ', ' . $p_length;
+            }
+        }
+        $sql = 'SELECT * FROM ' . $source . ' WHERE ' . $where . $limit;
         $this->logger->debug('PDOStorage.select : ' . $sql);
         // I got all, run query...
         try {
@@ -327,7 +336,6 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $localErr = $query->errorInfo();
                 $code     = 0;
                 $message  = 'PDOStorage.select.error : ' . print_r($query->errorInfo(), true);
-                die($message);
                 if (is_array($localErr) && count($localErr) > 1) {
                     $code    = intval($localErr[0]);
                     $message = $localErr[2];
@@ -348,8 +356,10 @@ class PDOStorage extends \FreeFW\Storage\Storage
      *
      * @return boolean
      */
-    public function delete(\FreeFW\Core\StorageModel &$p_model, array $p_conditions = [])
-    {
+    public function delete(
+        \FreeFW\Core\StorageModel &$p_model,
+        \FreeFW\Model\Conditions $p_conditions = null
+    ) {
         $source     = $p_model::getSource();
         $properties = $p_model::getProperties();
         $values     = [];
@@ -357,15 +367,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
         /**
          * @var \FreeFW\Model\Condition $oneCondition
          */
-        $where = '';
-        foreach ($p_conditions as $idx => $oneCondition) {
-            $part = $this->renderCondition($oneCondition);
-            if ($where != '') {
-                $where = $where . ' AND ';
-            }
-            $where  = $where . $part['sql'];
-            $values = array_merge($values, $part['values']);
-        }
+        $parts  = $this->renderConditions($p_conditions, $p_model);
+        $where  = $parts['sql'];
+        $values = $parts['values'];
         // Build query
         $sql = 'DELETE FROM ' . $source . ' WHERE ' . $where;
         $this->logger->debug('PDOStorage.delete : ' . $sql);
@@ -393,23 +397,69 @@ class PDOStorage extends \FreeFW\Storage\Storage
     }
 
     /**
+     * Render conditions
+     *
+     * @param \FreeFW\Model\Conditions   $p_conditions
+     * @param  \FreeFW\Core\StorageModel $p_model
+     */
+    protected function renderConditions(
+        \FreeFW\Model\Conditions $p_conditions,
+        \FreeFW\Core\StorageModel $p_model
+    ) {
+        $result = [
+            'sql'    => '',
+            'type'   => false,
+            'values' => []
+        ];
+        $oper = ' AND ';
+        if ($p_conditions->getOperator() == \FreeFW\Storage\Storage::COND_OR) {
+            $oper = ' OR ';
+        }
+        foreach ($p_conditions as $idx => $oneCondition) {
+            if ($oneCondition instanceof \FreeFW\Model\SimpleCondition) {
+                $parts = $this->renderCondition($oneCondition, $p_model);
+                if ($result['sql'] == '') {
+                    $result['sql']    = $parts['sql'];
+                    $result['values'] = $parts['values'];
+                } else {
+                    $result['sql']    = $result['sql'] . $oper . $parts['sql'];
+                    $result['values'] = array_merge($result['values'], $parts['values']);
+                }
+            } else {
+                $parts = $this->renderConditions($oneCondition, $p_model);
+                if ($result['sql'] == '') {
+                    $result['sql']    = $parts['sql'];
+                    $result['values'] = $parts['values'];
+                } else {
+                    $result['sql']    = $result['sql'] . $oper . $parts['sql'];
+                    $result['values'] = array_merge($result['values'], $parts['values']);
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
      * Render a condition
      *
      * @param \FreeFW\Interfaces\ConditionInterface $p_field
+     * @param \FreeFW\Core\StorageModel             $p_model
      *
      * @throws \FreeFW\Core\FreeFWStorageException
      *
      * @return array
      */
-    protected function renderConditionField(\FreeFW\Interfaces\ConditionInterface $p_field)
-    {
+    protected function renderConditionField(
+        \FreeFW\Interfaces\ConditionInterface $p_field,
+        \FreeFW\Core\StorageModel $p_model
+    ) {
         if ($p_field instanceof \FreeFW\Model\ConditionMember) {
-            $field = $p_field->getField();
-            return $this->renderModelField($field);
+            $field = $p_field->getValue();
+            return $this->renderModelField($field, $p_model);
         } else {
             if ($p_field instanceof \FreeFW\Model\ConditionValue) {
-                $value = $p_field->getField();
-                return $this->renderValueField($value);
+                $value = $p_field->getValue();
+                return $this->renderValueField($value, $p_model);
             } else {
                 throw new \FreeFW\Core\FreeFWStorageException(
                     sprintf('Unknown condition objecte !')
@@ -421,51 +471,70 @@ class PDOStorage extends \FreeFW\Storage\Storage
     /**
      * Render a full condition
      *
-     * @param \FreeFW\Model\Condition $p_condition
+     * @param \FreeFW\Model\SimpleCondition $p_condition
+     * @param \FreeFW\Core\StorageModel     $p_model
      *
      * @throws \FreeFW\Core\FreeFWStorageException
      */
-    protected function renderCondition(\FreeFW\Model\Condition $p_condition)
-    {
-        $result = [];
-        $left   = $p_condition->getLeftMember();
-        $right  = $p_condition->getRightMember();
-        $oper   = $p_condition->getOperator();
+    protected function renderCondition(
+        \FreeFW\Model\SimpleCondition $p_condition,
+        \FreeFW\Core\StorageModel $p_model
+    ) {
+        $result   = [];
+        $left     = $p_condition->getLeftMember();
+        $right    = $p_condition->getRightMember();
+        $oper     = $p_condition->getOperator();
+        $realOper = '=';
+        $nullable = false;
         switch ($oper) {
             case \FreeFW\Storage\Storage::COND_LOWER:
+                $rOper = '<';
+                break;
             case \FreeFW\Storage\Storage::COND_LOWER_EQUAL:
+                $rOper = '<=';
+                break;
             case \FreeFW\Storage\Storage::COND_GREATER:
+                $rOper = '>';
+                break;
             case \FreeFW\Storage\Storage::COND_GREATER_EQUAL:
+                $rOper = '>=';
+                break;
             case \FreeFW\Storage\Storage::COND_EQUAL:
-                if ($left !== null && $right !== null) {
-                    $leftDatas  = $this->renderConditionField($left);
-                    $rightDatas = $this->renderConditionField($right);
-                    $result = [
-                        'sql'    => $leftDatas['id'] . ' ' . $oper . ' ' . $rightDatas['id'],
-                        'values' => [],
-                        'type'   => false
-                    ];
-                    if ($leftDatas['type'] === false) {
-                        $result['values'][$leftDatas['id']] = $leftDatas['value'];
-                    } else {
-                        $result['type'] = $leftDatas['type'];
-                    }
-                    if ($rightDatas['type'] === false) {
-                        $result['values'][$rightDatas['id']] = $rightDatas['value'];
-                    } else {
-                        $result['type'] = $rightDatas['type'];
-                    }
-                } else {
-                    throw new \FreeFW\Core\FreeFWStorageException(
-                        sprintf('Wrong fields for %s condition', $oper)
-                    );
-                }
+                $rOper = '=';
                 break;
-            default:
-                throw new \FreeFW\Core\FreeFWStorageException(
-                    sprintf('Unknown condition : %s !', $oper)
-                );
+            case \FreeFW\Storage\Storage::COND_EQUAL_OR_NULL:
+                $rOper    = '=';
+                $nullable = true;
                 break;
+        }
+        if ($left !== null && $right !== null) {
+            $leftDatas  = $this->renderConditionField($left, $p_model);
+            $rightDatas = $this->renderConditionField($right, $p_model);
+            $result     = [
+                'values' => [],
+                'type'   => false
+            ];
+            if ($nullable) {
+                $result['sql'] = '(' .
+                    $leftDatas['id'] . $realOper . $rightDatas['id'] . ' OR ' .
+                    $leftDatas['id'] . ' IS NULL)';
+            } else {
+                $result['sql'] = $leftDatas['id'] . ' ' . $realOper . ' ' . $rightDatas['id'];
+            }
+            if ($leftDatas['type'] === false) {
+                $result['values'][$leftDatas['id']] = $leftDatas['value'];
+            } else {
+                $result['type'] = $leftDatas['type'];
+            }
+            if ($rightDatas['type'] === false) {
+                $result['values'][$rightDatas['id']] = $rightDatas['value'];
+            } else {
+                $result['type'] = $rightDatas['type'];
+            }
+        } else {
+            throw new \FreeFW\Core\FreeFWStorageException(
+                sprintf('Wrong fields for %s condition', $oper)
+            );
         }
         return $result;
     }
@@ -473,22 +542,29 @@ class PDOStorage extends \FreeFW\Storage\Storage
     /**
      * Render a model field
      *
-     * @param string $p_field
+     * @param string                    $p_field
+     * @param \FreeFW\Core\StorageModel $p_model
      *
      * @throws \FreeFW\Core\FreeFWStorageException
      */
-    protected function renderModelField(string $p_field)
+    protected function renderModelField(string $p_field, \FreeFW\Core\StorageModel $p_model)
     {
         $parts = explode('.', $p_field);
-        $class = $parts[0];
-        $field = $parts[1];
-        if (!array_key_exists($class, self::$models)) {
-            self::$models[$class] = \FreeFW\DI\DI::get($class);
+        if (count($parts) > 1) {
+            $class = $parts[0];
+            $field = $parts[1];
+            if (!array_key_exists($class, self::$models)) {
+                self::$models[$class] = \FreeFW\DI\DI::get($class);
+            }
+            $model      = self::$models[$class];
+            $source     = $model::getSource();
+            $properties = $model::getProperties();
+        } else {
+            $source     = $p_model::getSource();
+            $properties = $p_model::getProperties();
+            $field = $parts[0];
         }
-        $model      = self::$models[$class];
-        $source     = $model::getSource();
-        $properties = $model::getProperties();
-        $type       = \FreeFW\Constants::TYPE_STRING;
+        $type = \FreeFW\Constants::TYPE_STRING;
         if (array_key_exists($field, $properties)) {
             $real = $source . '.' . $properties[$field][FFCST::PROPERTY_PRIVATE];
             $type = $properties[$field][FFCST::PROPERTY_TYPE];
@@ -507,11 +583,12 @@ class PDOStorage extends \FreeFW\Storage\Storage
     /**
      * Render a value
      *
-     * @param mixed $p_value
+     * @param mixed                     $p_value
+     * @param \FreeFW\Core\StorageModel $p_model
      *
      * @return []
      */
-    protected function renderValueField($p_value)
+    protected function renderValueField($p_value, \FreeFW\Core\StorageModel $p_model)
     {
         self::$uniqid = self::$uniqid + 1;
         return [

@@ -143,7 +143,7 @@ abstract class Model implements
      *
      * @return \FreeFW\Core\Model
      */
-    public static function getNew(array $p_fields = [])
+    public static function getNew($p_fields = null)
     {
         $cls = get_called_class();
         $cls = rtrim(ltrim($cls, '\\'), '\\');

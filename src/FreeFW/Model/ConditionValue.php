@@ -10,29 +10,29 @@ class ConditionValue implements \FreeFW\Interfaces\ConditionInterface
 {
 
     /**
-     * field name
+     * field value
      * @var string
      */
-    protected $field = null;
+    protected $value = null;
 
     /**
      *
      * {@inheritDoc}
-     * @see \FreeFW\Interfaces\ConditionInterface::setField()
+     * @see \FreeFW\Interfaces\ConditionInterface::setValue()
      */
-    public function setField($p_field)
+    public function setValue($p_value)
     {
-        $this->field = $p_field;
+        $this->value = $p_value;
         return $this;
     }
 
     /**
      *
      * {@inheritDoc}
-     * @see \FreeFW\Interfaces\ConditionInterface::getField()
+     * @see \FreeFW\Interfaces\ConditionInterface::getValue()
      */
-    public function getField()
+    public function getValue()
     {
-        return $this->field;
+        return $this->value;
     }
 }
