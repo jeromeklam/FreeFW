@@ -23,12 +23,12 @@
         "psr/http-message"                     : "*",
         "psr/http-server-middleware"           : "*",
         "psr/http-factory"                     : "*",
-        "guzzlehttp/guzzle"                    : "^6.3",
-        "guzzlehttp/psr7"                      : "1.4.0",
-        "neomerx/json-api"                     : "^0.8",
-        "neomerx/cors-psr7"                    : "^1.0",
-        "firebase/php-jwt"                     : "^5.0",
-        "bshaffer/oauth2-server-php"           : "~1.8"
+        "guzzlehttp/guzzle"                    : "*",
+        "guzzlehttp/psr7"                      : "*",
+        "neomerx/json-api"                     : "*",
+        "neomerx/cors-psr7"                    : "*",
+        "firebase/php-jwt"                     : "*",
+        "bshaffer/oauth2-server-php"           : "*"
     },
     "autoload" : {
         "psr-4" : {
