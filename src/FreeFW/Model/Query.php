@@ -17,6 +17,13 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
     const QUERY_DISTINCT = 'DISTINCT';
     const QUERY_UPDATE   = 'UPDATE';
     const QUERY_DELETE   = 'DELETE';
+    
+    /**
+     * Joins
+     * @var string
+     */
+    const JOIN_LEFT      = 'LEFT';
+    const JOIN_INNER     = 'INNER';
 
     /**
      * Storage strategy
@@ -41,6 +48,12 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
      * @var \FreeFW\Model\Conditions
      */
     protected $conditions = null;
+
+    /**
+     * Relations
+     * @var array
+     */
+    protected $relations = [];
 
     /**
      * ResultSet
@@ -239,6 +252,19 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
     }
 
     /**
+     * Add relations
+     * 
+     * @param array $p_relations
+     * 
+     * @return \FreeFW\Model\Query
+     */
+    public function addRelations($p_relations)
+    {
+        $this->relations = $p_relations;
+        return $this;
+    }
+
+    /**
      * Execute
      *
      * @return boolean
@@ -252,6 +278,7 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
                 $this->result_set = $this->strategy->select(
                     $model,
                     $this->conditions,
+                    $this->relations,
                     $this->from,
                     $this->length
                 );

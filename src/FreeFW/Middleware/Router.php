@@ -26,10 +26,10 @@ class Router implements
     use \FreeFW\Behaviour\ConfigAwareTrait;
 
     /**
-     * Object
-     * @var Object
+     * Controller
+     * @var string
      */
-    protected $object = null;
+    protected $controller = null;
 
     /**
      * Function
@@ -44,16 +44,39 @@ class Router implements
     protected $model = null;
 
     /**
+     * Include
+     * @var array
+     */
+    protected $include = [];
+
+    /**
+     * Params
+     * @var array
+     */
+    protected $params = [];
+    
+    /**
      * Constructor
      *
-     * @param object $p_object
+     * @param string $p_controller
      * @param string $p_function
+     * @param string $p_model
+     * @param array  $p_params
+     * @param array  $p_include
      */
-    public function __construct($p_object, $p_function, $p_model = null)
+    public function __construct($p_controller, $p_function, $p_model = null, $p_params = [], $p_include = [])
     {
-        $this->object   = $p_object;
-        $this->function = $p_function;
-        $this->model    = $p_model;
+        $this->controller = $p_controller;
+        $this->function   = $p_function;
+        $this->model      = $p_model;
+        $this->params     = [];
+        $this->include    = [];
+        if (is_array($p_params)) {
+            $this->params = $p_params;
+        }
+        if (is_array($p_include)) {
+            $this->include = $p_include;
+        }
     }
 
     /**
@@ -70,6 +93,18 @@ class Router implements
         RequestHandlerInterface $p_handler
     ): ResponseInterface {
         $p_request->default_model = $this->model;
-        return call_user_func_array([$this->object, $this->function], [$p_request]);
+        $object                   = \FreeFW\DI\DI::get($this->controller);
+        $apiParams                = $p_request->getAttribute('api_params', false);
+        if ($apiParams instanceof \FreeFW\Http\ApiParams) {
+            $includes = $apiParams->getInclude();
+            if (array_key_exists('limit', $this->include)) {
+                // @todo, no mode than limit...
+            }
+            if (count($includes) <= 0 && array_key_exists('default', $this->include)) {
+                $apiParams->setInclude($this->include['default']);
+            }
+            $p_request = $p_request->withAttribute('api_params', $apiParams);
+        }
+        return call_user_func_array([$object, $this->function], array_merge([$p_request], $this->params));
     }
 }

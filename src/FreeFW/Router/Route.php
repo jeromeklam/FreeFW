@@ -2,6 +2,11 @@
 namespace FreeFW\Router;
 
 /**
+ * Uses
+ */
+use \FreeFW\Constants AS FFCST;
+
+/**
  * Standard route
  *
  * @author jeromeklam
@@ -37,7 +42,8 @@ class Route implements \Psr\Log\LoggerAwareInterface
      * Lists
      * @var string
      */
-    const RESULT_LIST = 'list';
+    const RESULT_LIST   = 'list';
+    const RESULT_OBJECT = 'object';
 
     /**
      * Method
@@ -55,7 +61,7 @@ class Route implements \Psr\Log\LoggerAwareInterface
      * Contoller : ns::Controller::class
      * @var string
      */
-    protected $contoller = null;
+    protected $controller = null;
 
     /**
      * Function to execute
@@ -74,6 +80,18 @@ class Route implements \Psr\Log\LoggerAwareInterface
      * @var mixed
      */
     protected $default_model = null;
+
+    /**
+     * Params
+     * @var array
+     */
+    protected $params = [];
+
+    /**
+     * Include
+     * @var array
+     */
+    protected $include = [];
 
     /**
      * Set HTTP method
@@ -130,7 +148,7 @@ class Route implements \Psr\Log\LoggerAwareInterface
      */
     public function setController($p_controller)
     {
-        $this->contoller = $p_controller;
+        $this->controller = $p_controller;
         return $this;
     }
 
@@ -141,7 +159,7 @@ class Route implements \Psr\Log\LoggerAwareInterface
      */
     public function getController()
     {
-        return $this->contoller;
+        return $this->controller;
     }
 
     /**
@@ -214,6 +232,56 @@ class Route implements \Psr\Log\LoggerAwareInterface
     }
 
     /**
+     * Set params
+     * 
+     * @param array $p_params
+     * 
+     * @return \FreeFW\Router\Route
+     */
+    public function setParams($p_params)
+    {
+        if (is_array($p_params)) {
+            $this->params = $p_params;
+        }
+        return $this;
+    }
+
+    /**
+     * Get Params
+     * 
+     * @return array|boolean
+     */
+    public function getParams()
+    {
+        return $this->params;
+    }
+
+    /**
+     * Set include
+     * 
+     * @param array $p_include
+     * 
+     * @return \FreeFW\Router\Route
+     */
+    public function setInclude($p_include)
+    {
+        if (is_array($p_include)) {
+            $this->include = $p_include;
+        }
+        return $this;
+    }
+
+    /**
+     * Get include
+     * 
+     * @return array
+     */
+    public function getInclude() : array
+    {
+        return $this->include;
+    }
+
+    /**
      * Get route regexp
      *
      * @return string
@@ -233,7 +301,7 @@ class Route implements \Psr\Log\LoggerAwareInterface
         if (isset($matches[1]) && isset($this->filters[$matches[1]])) {
             return $this->filters[$matches[1]];
         }
-        return "([/][\w-\._@%]*)";
+        return "([/]" . FFCST::PARAM_REGEX . ")";
     }
 
     /**
@@ -243,60 +311,54 @@ class Route implements \Psr\Log\LoggerAwareInterface
      */
     public function render(\Psr\Http\Message\ServerRequestInterface $p_request)
     {
-        $cls = \FreeFW\DI\DI::get($this->contoller);
-        if (method_exists($cls, $this->function)) {
-            // Must go through middlewares....
-            // The final is the route execution
-            $defaultModel     = $this->getDefaultModel();
-            $routerMiddleware = new \FreeFW\Middleware\Router(
-                $cls,
-                $this->function,
-                $defaultModel
-            );
-            // Middleware pipeline
-            $pipeline = new \FreeFW\Middleware\Pipeline();
-            $pipeline->setConfig($this->config);
-            $pipeline->setLogger($this->logger);
-            // Pipe default config middleware
-            $midCfg  = $this->config->get('middleware');
-            $authMid = false;
-            if (is_array($midCfg)) {
-                foreach ($midCfg as $idx => $middleware) {
-                    $newMiddleware = \FreeFW\DI\DI::get($middleware);
-                    if ($newMiddleware instanceof \FreeFW\Interfaces\AuthAdapterInterface) {
-                        $authMid = true;
-                        switch ($this->getAuth()) {
-                            case \FreeFW\Router\Route::AUTH_BOTH:
-                                $newMiddleware->setSecured(true);
-                                $newMiddleware->setIdentityGeneration(true);
-                                break;
-                            case \FreeFW\Router\Route::AUTH_IN:
-                                $newMiddleware->setSecured(true);
-                                break;
-                            case \FreeFW\Router\Route::AUTH_OUT:
-                                $newMiddleware->setIdentityGeneration(true);
-                                break;
-                            default:
-                                break;
-                        }
+        // Must go through middlewares....
+        // The final is the route execution
+        $defaultModel     = $this->getDefaultModel();
+        $routerMiddleware = new \FreeFW\Middleware\Router(
+            $this->controller,
+            $this->function,
+            $defaultModel,
+            $this->params,
+            $this->include
+        );
+        // Middleware pipeline
+        $pipeline = new \FreeFW\Middleware\Pipeline();
+        $pipeline->setConfig($this->config);
+        $pipeline->setLogger($this->logger);
+        // Pipe default config middleware
+        $midCfg  = $this->config->get('middleware');
+        $authMid = false;
+        if (is_array($midCfg)) {
+            foreach ($midCfg as $idx => $middleware) {
+                $newMiddleware = \FreeFW\DI\DI::get($middleware);
+                if ($newMiddleware instanceof \FreeFW\Interfaces\AuthAdapterInterface) {
+                    $authMid = true;
+                    switch ($this->getAuth()) {
+                        case \FreeFW\Router\Route::AUTH_BOTH:
+                            $newMiddleware->setSecured(true);
+                            $newMiddleware->setIdentityGeneration(true);
+                            break;
+                        case \FreeFW\Router\Route::AUTH_IN:
+                            $newMiddleware->setSecured(true);
+                            break;
+                        case \FreeFW\Router\Route::AUTH_OUT:
+                            $newMiddleware->setIdentityGeneration(true);
+                            break;
+                        default:
+                            break;
                     }
-                    $pipeline->pipe($newMiddleware);
                 }
+                $pipeline->pipe($newMiddleware);
             }
-            // Inject route middlewares...
-            // Check ...
-            if ($this->getAuth() !== \FreeFW\Router\Route::AUTH_NONE && ! $authMid) {
-                throw new \FreeFW\Core\FreeFWException('Secured route with no Auth middleware !');
-            }
-            // Last middleware is router
-            $pipeline->pipe($routerMiddleware);
-            // Go
-            return $pipeline->handle($p_request);
-        } else {
-            throw new \FreeFW\Core\FreeFWException(
-                sprintf('Function %s not found in %s class !', $this->function, $this->$contoller)
-            );
         }
-        return false;
+        // Inject route middlewares...
+        // Check ...
+        if ($this->getAuth() !== \FreeFW\Router\Route::AUTH_NONE && ! $authMid) {
+            throw new \FreeFW\Core\FreeFWException('Secured route with no Auth middleware !');
+        }
+        // Last middleware is router
+        $pipeline->pipe($routerMiddleware);
+        // Go
+        return $pipeline->handle($p_request);
     }
 }

@@ -2,6 +2,11 @@
 namespace FreeFW\Router;
 
 /**
+ * Uses
+ */
+use \FreeFW\Constants AS FFCST;
+
+/**
  * FreeFW Router
  *
  * @author jeromeklam
@@ -114,7 +119,7 @@ class Router
                         // On a trouvé une route, on récupère les paramètres.
                         // On va en profiter pour les injecter dans la requête
                         $matchedText = array_shift($matches);
-                        if (preg_match_all("/:([\w-\._@%]+)/", $oneRoute->getUrl(), $argument_keys)) {
+                        if (preg_match_all("/:(" . FFCST::PARAM_REGEX . ")/", $oneRoute->getUrl(), $argument_keys)) {
                             $argument_keys = $argument_keys[1];
                             if (count($argument_keys) != count($matches)) {
                                 continue;
@@ -132,6 +137,7 @@ class Router
                         foreach ($params as $name => $value) {
                             $p_request = $p_request->withAttribute($name, $value);
                         }
+                        $oneRoute->setParams($params);
                     }
                     $this->logger->debug('router.findRoute.match : ' . $oneRoute->getUrl());
                     return $oneRoute;

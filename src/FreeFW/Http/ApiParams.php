@@ -25,7 +25,7 @@ class ApiParams
      * Includes
      * @var array
      */
-    protected $includes = [];
+    protected $include = [];
 
     /**
      * Sort
@@ -150,19 +150,46 @@ class ApiParams
      *
      * @return \FreeFW\Http\ApiParams
      */
-   public function setLength($p_length)
-   {
-       $this->length = $p_length;
-       return $this;
-   }
+    public function setLength($p_length)
+    {
+        $this->length = $p_length;
+        return $this;
+    }
 
-   /**
-    * Get length
-    *
-    * @return int
-    */
-   public function getlength()
-   {
-       return $this->length;
-   }
+    /**
+     * Get length
+     *
+     * @return int
+     */
+    public function getlength()
+    {
+        return $this->length;
+    }
+
+    /**
+     * Set include
+     * 
+     * @param mixed $p_include
+     * 
+     * @return \FreeFW\Http\ApiParams
+     */
+    public function setInclude($p_include)
+    {
+       if (is_array($p_include)) {
+             $this->include = $p_include;
+        } else {
+            $this->include = explode(',', str_replace(' ', '', $p_include));
+        }
+        return $this;
+    }
+
+    /**
+     * Get include
+     * 
+     * @return array
+     */
+    public function getInclude()
+    {
+        return $this->include;
+    }
 }

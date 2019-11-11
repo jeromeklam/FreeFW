@@ -60,6 +60,7 @@ interface StorageInterface
     public function select(
         \FreeFW\Core\StorageModel &$p_model,
         \FreeFW\Model\Conditions $p_conditions = null,
+        array $p_relations = [],
         int $p_from = 0,
         int $p_length = 0
     );

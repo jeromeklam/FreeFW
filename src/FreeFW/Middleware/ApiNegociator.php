@@ -95,10 +95,10 @@ class ApiNegociator implements
                 }
                 return $mid->createUnsupportedRequestResponse();
             } else {
-                return $this->createResponse(500, []);
+                return $this->createResponse(500, "Api class error, wrong interface !");
             }
         }
         // Not found
-        return $this->createResponse(405, []);
+        return $this->createResponse(405, "No API config found !");
     }
 }

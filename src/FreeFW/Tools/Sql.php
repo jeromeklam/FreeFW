@@ -60,10 +60,10 @@ class Sql
         }
         foreach ($p_pks as $field => $value) {
             $local = str_replace(':', '', $field);
-            if ($fields == '') {
+            if ($where == '') {
                 $where = $local . ' = :' . $local;
             } else {
-                $where = $fields . ' AND ' . $local . ' = :' . $local;
+                $where = $where . ' AND ' . $local . ' = :' . $local;
             }
         }
         $sql    = 'UPDATE ' . $p_table . ' SET ' . $fields . ' WHERE ' . $where;

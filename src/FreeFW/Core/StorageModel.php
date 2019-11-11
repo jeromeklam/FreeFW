@@ -20,6 +20,12 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
     protected $stategy = null;
 
     /**
+     * Main broker id
+     * @var number
+     */
+    protected $main_broker = null;
+    
+    /**
      * Constructor
      *
      * @param \FreeFW\Interfaces\StorageInterface $p_strategy
@@ -29,6 +35,29 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
         $this->strategy = $p_strategy;
     }
 
+    /**
+     * Set main broker
+     * 
+     * @param number $p_id
+     * 
+     * @return \FreeFW\Core\StorageModel
+     */
+    public function setMainBroker($p_id)
+    {
+        $this->main_broker = $p_id;
+        return $this;
+    }
+    
+    /**
+     * Get main broker
+     * 
+     * @return number
+     */
+    public function getMainBroker()
+    {
+        return $this->main_broker;
+    }
+    
     /**
      *
      * {@inheritDoc}
@@ -211,6 +240,41 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
         $class = rtrim(ltrim($class, '\\'), '\\');
         $class = str_replace('\\Model\\', '_', $class);
         return $class;
+    }
+
+    /**
+     * Return pk field getter function
+     * 
+     * @return string
+     */
+    public function getPkGetter() : string
+    {
+        foreach ($this->getProperties() as $name => $property) {
+            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
+                if (in_array(FFCST::OPTION_PK, $property[FFCST::PROPERTY_OPTIONS])) {
+                    $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                    return $getter;
+                }
+            }
+        }
+        return '';
+    }
+
+    /**
+     * Return pk field name
+     *
+     * @return string
+     */
+    public function getPkField() : string
+    {
+        foreach ($this->getProperties() as $name => $property) {
+            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
+                if (in_array(FFCST::OPTION_PK, $property[FFCST::PROPERTY_OPTIONS])) {
+                    return $name;
+                }
+            }
+        }
+        return '';
     }
 
     /**

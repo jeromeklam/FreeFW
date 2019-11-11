@@ -67,7 +67,16 @@ class DI
             if (array_key_exists($parts[0], self::$containers)) {
                 $di  = self::$containers[$parts[0]];
                 $fct = 'get' . ucfirst($parts[1]);
-                return $di->$fct($parts[2]);
+                $obj = $di->$fct($parts[2]);
+                if (method_exists($obj, 'setMainBroker')) {
+                    $broker = \FreeFw\DI\DI::getShared('broker');
+                    if ($broker) {
+                        $obj->setMainBroker(intval($broker));
+                    } else {
+                        $obj->setMainBroker(0);
+                    }
+                }
+                return $obj;
             }
         }
         throw new \FreeFW\Core\FreeFWException(sprintf('DI : Nothing to handle %s', $p_object));

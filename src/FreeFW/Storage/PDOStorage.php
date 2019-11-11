@@ -292,13 +292,61 @@ class PDOStorage extends \FreeFW\Storage\Storage
     public function select(
         \FreeFW\Core\StorageModel &$p_model,
         \FreeFW\Model\Conditions $p_conditions = null,
+        array $p_relations = [],
         int $p_from = 0,
         int $p_length = 0
     ) {
-        $source     = $p_model::getSource();
+        $sso        = \FreeFW\DI\DI::getShared('sso');
+        $select     = $p_model::getSource() . '.*';
+        $from       = $p_model::getSource();
         $properties = $p_model::getProperties();
         $values     = [];
         $result     = \FreeFW\DI\DI::get('FreeFW::Model::ResultSet');
+        $fks        = [];
+        $joins      = [];
+        /**
+         * Check specific properties
+         */
+        foreach ($properties as $name => $property) {
+            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
+                if (in_array(FFCST::PROPERTY_BROKER, $property[FFCST::PROPERTY_OPTIONS])) {
+                    $aField = new \FreeFW\Model\ConditionMember();
+                    $aField->setValue($name);
+                    $aCondition = \FreeFW\Model\SimpleCondition::getNew();
+                    $aCondition->setLeftMember($aField);
+                    $aCondition->setOperator(\FreeFW\Storage\Storage::COND_EQUAL);
+                    $aValue = new \FreeFW\Model\ConditionValue();
+                    $aValue->setValue($p_model->getMainBroker());
+                    $aCondition->setRightMember($aValue);
+                    $p_conditions->add($aCondition);
+                }
+            }
+            if (array_key_exists(FFCST::PROPERTY_FK, $property)) {
+                foreach ($property[FFCST::PROPERTY_FK] as $fkname => $fkprops) {
+                    $fks[$fkname] = [
+                        'left'  => $name,
+                        'right' => $fkprops
+                    ];
+                }
+            }
+        }
+        foreach ($p_relations as $idx => $shortcut) {
+            $parts = explode('.', $shortcut);
+            foreach ($parts as $idxP => $onePart) {
+                if (array_key_exists($onePart, $fks)) {
+                    $joins[$onePart] = $fks[$onePart]['right'];
+                    $newModel = \FreeFW\DI\DI::get($fks[$onePart]['right']['model']);
+                    $select   = $select . ', ' . $newModel::getSource() . '.*';
+                    switch ($fks[$onePart]['right']['type']) {
+                        default:
+                            $from = $from . ' INNER JOIN ' . $newModel::getSource() . ' ON ';
+                            $from = $from . $newModel::getSource() . '.' . $fks[$onePart]['right']['field'] . ' = ';
+                            $from = $from . $p_model::getSource() . '.' . $fks[$onePart]['left'];
+                            break;
+                    }
+                }
+            }
+        }
         /**
          * @var \FreeFW\Model\Condition $oneCondition
          */
@@ -316,7 +364,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $limit = $limit . ', ' . $p_length;
             }
         }
-        $sql = 'SELECT * FROM ' . $source . ' WHERE ' . $where . $limit;
+        $sql = 'SELECT ' . $select . ' FROM ' . $from . ' WHERE ' . $where . $limit;
         $this->logger->debug('PDOStorage.select : ' . $sql);
         // I got all, run query...
         try {

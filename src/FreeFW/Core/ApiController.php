@@ -34,6 +34,7 @@ class ApiController extends \FreeFW\Core\Controller
         $query = $model->getQuery();
         $query
             ->addConditions($apiParams->getFilters())
+            ->addRelations($apiParams->getInclude())
             ->setLimit($apiParams->getStart(), $apiParams->getlength())
         ;
         $data = null;
@@ -44,6 +45,60 @@ class ApiController extends \FreeFW\Core\Controller
         return $this->createResponse(200, $data);
     }
 
+    /**
+     * Get one by id
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $p_request
+     */
+    public function getOne(\Psr\Http\Message\ServerRequestInterface $p_request, $p_id = null)
+    {
+        $this->logger->debug('FreeFW.ApiController.getOne.start');
+        /**
+         * @var \FreeFW\Http\ApiParams $apiParams
+         */
+        $apiParams = $p_request->getAttribute('api_params', false);
+        if (!isset($p_request->default_model)) {
+            throw new \FreeFW\Core\FreeFWStorageException(
+                sprintf('No default model for route !')
+            );
+        }
+        $default = $p_request->default_model;
+        $model   = \FreeFW\DI\DI::get($default);
+        /**
+         * Id
+         */
+        $filters  = new \FreeFW\Model\Conditions();
+        $pk_field = $model->getPkField();
+        $aField   = new \FreeFW\Model\ConditionMember();
+        $aValue   = new \FreeFW\Model\ConditionValue();
+        $aValue->setValue($p_id);
+        $aField->setValue($pk_field);
+        $aCondition = \FreeFW\Model\SimpleCondition::getNew();
+        $aCondition->setLeftMember($aField);
+        $aCondition->setOperator(\FreeFW\Storage\Storage::COND_EQUAL);
+        $aCondition->setRightMember($aValue);
+        $filters->add($aCondition);
+        /**
+         * @var \FreeFW\Model\Query $query
+         */
+        $query = $model->getQuery();
+        $query
+            ->addConditions($filters)
+            ->addRelations($apiParams->getInclude())
+            ->setLimit(0, 1)
+        ;
+        $data = null;
+        if ($query->execute()) {
+            $data = $query->getResult();
+        }
+        $this->logger->debug('FreeFW.ApiController.getOne.end');
+        if (count($data) > 0) {
+            return $this->createResponse(200, $data[0]);
+        } else {
+            return $this->createResponse(404);
+        }
+    }
+    
     /**
      * Add new single element
      *

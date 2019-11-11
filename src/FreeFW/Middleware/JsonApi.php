@@ -197,22 +197,27 @@ class JsonApi extends \FreeFW\Middleware\ApiAdapter
                 if ($body instanceof StreamInterface) {
                     $content = $body->getContents();
                     if ($content != '') {
-                        $object  = unserialize($content);
-                        if ($object instanceof \FreeFW\Interfaces\ValidatorInterface) {
-                            $encoder = new \FreeFW\JsonApi\V1\Encoder();
-                            /**
-                             * @var \FreeFW\Core\Error $oneError
-                             */
-                            foreach ($object->getErrors() as $idx => $oneError) {
-                                $error = new \FreeFW\JsonApi\V1\Model\ErrorObject(
-                                    $oneError->getType(),
-                                    $oneError->getMessage(),
-                                    $oneError->getCode()
-                                );
+                        try {
+                            $object = @unserialize($content);
+                            if ($object instanceof \FreeFW\Interfaces\ValidatorInterface) {
+                                $encoder = new \FreeFW\JsonApi\V1\Encoder();
+                                /**
+                                 * @var \FreeFW\Core\Error $oneError
+                                 */
+                                foreach ($object->getErrors() as $idx => $oneError) {
+                                    $error = new \FreeFW\JsonApi\V1\Model\ErrorObject(
+                                        $oneError->getType(),
+                                        $oneError->getMessage(),
+                                        $oneError->getCode()
+                                    );
+                                    $document->addError($error);
+                                }
+                            } else {
+                                $error = new \FreeFW\JsonApi\V1\Model\ErrorObject(500, 'Unknown Error 1');
                                 $document->addError($error);
                             }
-                        } else {
-                            $error = new \FreeFW\JsonApi\V1\Model\ErrorObject(500, 'Unknown Error 1');
+                        } catch (\Exception $ex) {
+                            $error = new \FreeFW\JsonApi\V1\Model\ErrorObject(500, $content);
                             $document->addError($error);
                         }
                     } else {

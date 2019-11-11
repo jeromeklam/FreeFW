@@ -31,7 +31,7 @@ class JwtAuth implements
      * Constants
      * @var string
      */
-    const JWT_HEADER_NAME = 'authorization';
+    const JWT_HEADER_NAME = 'Authorization';
 
     /**
      * Secured ?

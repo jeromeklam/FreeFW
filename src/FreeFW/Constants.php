@@ -78,6 +78,8 @@ class Constants
     const PROPERTY_OPTIONS = 'options';
     const PROPERTY_PUBLIC  = 'public';
     const PROPERTY_DEFAULT = 'default';
+    const PROPERTY_BROKER  = 'broker';
+    const PROPERTY_FK      = 'fk';
 
     /**
      * Options
@@ -85,6 +87,7 @@ class Constants
      */
     const OPTION_REQUIRED         = 'REQUIRED';
     const OPTION_PK               = 'PK';
+    const OPTION_FK               = 'FK';
     const OPTION_JSONIGNORE       = 'NOJSON';
     const OPTION_LOCAL            = 'LOCAL';
     const OPTION_UNIQ             = 'UNIQ';
@@ -96,6 +99,12 @@ class Constants
     const DEFAULT_NOW   = 'NOW';
     const DEFAULT_TRUE  = 1;
     const DEFAULT_FALSE = 0;
+
+    /**
+     * Regex
+     * @var string
+     */
+    const PARAM_REGEX = '[0-9a-z_\-\.\@\%]*';
 
     /**
      * Errors types

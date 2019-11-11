@@ -8,7 +8,7 @@ $localRoutes = [
         'url'        => '/v1/dev/model',
         'controller' => 'FreeFW::Controller::Model',
         'function'   => 'createModel',
-        'secured'    => false,
+        'auth'       => \FreeFW\Router\Route::AUTH_NONE,
         'middleware' => []
     ]
 ];

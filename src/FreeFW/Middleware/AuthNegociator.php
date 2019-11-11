@@ -31,9 +31,9 @@ class AuthNegociator implements
      * @var array
      */
     protected $formats = [
-        'application/vnd.api+json' => [
-            'class'   => 'FreeFW::Middleware::JsonApi',
-            'default' => true
+        'JWT' => [
+            'class'   => 'FreeFW::Middleware::JwtAuth',
+            'default' => false
         ]
     ];
 
@@ -75,11 +75,30 @@ class AuthNegociator implements
         RequestHandlerInterface $p_handler
     ): ResponseInterface {
         $allowed = true;
-        if ($this->secured) {
-            $allowed = false;
-        }
-        if (!$allowed) {
-            return $this->createResponse(401);
+        if ($this->secured || $this->requestIdentity()) {
+            $authString = trim($p_request->getHeaderLine('Authorization'));
+            $class      = false;
+            if ($authString != '') {
+                $parts      = explode(' ', $authString);
+                $authType   = strtoupper($parts[0]);
+                if (array_key_exists($authType, $this->formats)) {
+                    $class = $this->formats[$authType]['class'];
+                } else {
+                    foreach ($this->formats as $name => $format) {
+                        if ($format['default']) {
+                            $class = $format['class'];
+                        }
+                    }
+                }
+            }
+            if ($class) {
+                // Ok, encode, decode, ...
+                $this->logger->debug(sprintf('FreeFW.Middleware.AuthNegociator %s', $class));
+                $mid = \FreeFW\DI\DI::get($class);
+                // vérify interface, ...
+            } else {
+                return $this->createResponse(500, "No auth class found !");
+            }
         }
         return $p_handler->handle($p_request);
     }
@@ -122,6 +141,16 @@ class AuthNegociator implements
      * @return bool
      */
     public function getIndentityGeneration() : bool
+    {
+        return $this->identity;
+    }
+    
+    /**
+     * Request identity ?
+     * 
+     * @return bool
+     */
+    public function requestIdentity() : bool
     {
         return $this->identity;
     }
