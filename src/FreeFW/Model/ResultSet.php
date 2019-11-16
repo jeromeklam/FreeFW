@@ -264,4 +264,24 @@ class ResultSet extends \FreeFW\Core\Model implements
     {
         return $this->var;
     }
+
+    /**
+     * @see \FreeFW\Interfeces\ApiResponseInterface
+     *
+     * @return bool
+     */
+    public function isSingleElement() : bool
+    {
+        return true;
+    }
+
+    /**
+     * @see \FreeFW\Interfeces\ApiResponseInterface
+     *
+     * @return bool
+     */
+    public function isArrayElement() : bool
+    {
+        return false;
+    }
 }

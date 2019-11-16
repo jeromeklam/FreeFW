@@ -15,7 +15,7 @@ class AuthNegociator implements
     MiddlewareInterface,
     \Psr\Log\LoggerAwareInterface,
     \FreeFW\Interfaces\ConfigAwareTraitInterface,
-    \FreeFW\Interfaces\AuthAdapterInterface
+    \FreeFW\Interfaces\AuthNegociatorInterface
 {
 
     /**
@@ -74,7 +74,6 @@ class AuthNegociator implements
         ServerRequestInterface $p_request,
         RequestHandlerInterface $p_handler
     ): ResponseInterface {
-        $allowed = true;
         if ($this->secured || $this->requestIdentity()) {
             $authString = trim($p_request->getHeaderLine('Authorization'));
             $class      = false;
@@ -95,7 +94,21 @@ class AuthNegociator implements
                 // Ok, encode, decode, ...
                 $this->logger->debug(sprintf('FreeFW.Middleware.AuthNegociator %s', $class));
                 $mid = \FreeFW\DI\DI::get($class);
-                // vérify interface, ...
+                // verify interface, ...
+                $allowed = true;
+                if ($this->secured) {
+                    $allowed = $mid->verifyAuthorizationHeader($p_request);
+                }
+                if ($allowed) {
+                    $response = $p_handler->handle($p_request);
+                    if ($this->requestIdentity()) {
+                        $authHeader = $mid->getAuthorizationHeader($p_request);
+                        $response   = $response->withHeader('Authorization', $authHeader);
+                    }
+                } else {
+                    $response = $this->createResponse(401, "Not authorized !");
+                }
+                return $response;
             } else {
                 return $this->createResponse(500, "No auth class found !");
             }

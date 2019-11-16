@@ -304,12 +304,13 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $result     = \FreeFW\DI\DI::get('FreeFW::Model::ResultSet');
         $fks        = [];
         $joins      = [];
+        $loadModels = [];
         /**
          * Check specific properties
          */
         foreach ($properties as $name => $property) {
             if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
-                if (in_array(FFCST::PROPERTY_BROKER, $property[FFCST::PROPERTY_OPTIONS])) {
+                if (in_array(FFCST::OPTION_BROKER, $property[FFCST::PROPERTY_OPTIONS])) {
                     $aField = new \FreeFW\Model\ConditionMember();
                     $aField->setValue($name);
                     $aCondition = \FreeFW\Model\SimpleCondition::getNew();
@@ -344,6 +345,10 @@ class PDOStorage extends \FreeFW\Storage\Storage
                             $from = $from . $p_model::getSource() . '.' . $fks[$onePart]['left'];
                             break;
                     }
+                    $loadModels[] = [
+                        'model'  => $fks[$onePart]['right']['model'],
+                        'setter' => 'set' . \FreeFW\Tools\PBXString::toCamelCase($shortcut, true)
+                    ];
                 }
             }
         }
@@ -377,6 +382,15 @@ class PDOStorage extends \FreeFW\Storage\Storage
                         ->init()
                         ->setFromArray($row)
                     ;
+                    foreach ($loadModels as $idxModel => $otherModel) {
+                        $newModel = \FreeFW\DI\DI::get($otherModel['model']);
+                        $newModel
+                            ->init()
+                            ->setFromArray($row)
+                        ;
+                        $setter = $otherModel['setter'];
+                        $model->$setter($newModel);
+                    }
                     $result[] = $model;
                 }
             } else {

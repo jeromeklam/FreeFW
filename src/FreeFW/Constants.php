@@ -78,7 +78,6 @@ class Constants
     const PROPERTY_OPTIONS = 'options';
     const PROPERTY_PUBLIC  = 'public';
     const PROPERTY_DEFAULT = 'default';
-    const PROPERTY_BROKER  = 'broker';
     const PROPERTY_FK      = 'fk';
 
     /**
@@ -91,6 +90,7 @@ class Constants
     const OPTION_JSONIGNORE       = 'NOJSON';
     const OPTION_LOCAL            = 'LOCAL';
     const OPTION_UNIQ             = 'UNIQ';
+    const OPTION_BROKER           = 'BROKER';
 
     /**
      * Default constants

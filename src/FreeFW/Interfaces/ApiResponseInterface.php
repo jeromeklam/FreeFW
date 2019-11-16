@@ -31,6 +31,13 @@ interface ApiResponseInterface
     public function getApiAttributes() : array;
 
     /**
+     * Get relations as Array
+     * 
+     * @return array
+     */
+    public function getApiRelationShips() : array;
+
+    /**
      * Has errors
      *
      * @return bool
@@ -43,4 +50,18 @@ interface ApiResponseInterface
      * @return array[\FreeFW\Core\Error]
      */
     public function getErrors() : array;
+
+    /**
+     * Is just one element
+     * 
+     * @return bool
+     */
+    public function isSingleElement() : bool;
+
+    /**
+     * Is an array of elements
+     * 
+     * @return bool
+     */
+    public function isArrayElement() : bool;
 }

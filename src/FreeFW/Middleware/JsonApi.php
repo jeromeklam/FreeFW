@@ -10,9 +10,19 @@ use Psr\Http\Message\StreamInterface;
  *
  * @author jeromeklam
  */
-class JsonApi extends \FreeFW\Middleware\ApiAdapter
+class JsonApi implements 
+    \FreeFW\Interfaces\ApiAdapterInterface,
+    \Psr\Log\LoggerAwareInterface
 {
 
+    /**
+     * comportements
+     */
+    use \Psr\Log\LoggerAwareTrait;
+    use \FreeFW\Behaviour\EventManagerAwareTrait;
+    use \FreeFW\Behaviour\ConfigAwareTrait;
+    use \FreeFW\Behaviour\HttpFactoryTrait;
+    
     /**
      * Allowed types
      * @var array
@@ -106,38 +116,6 @@ class JsonApi extends \FreeFW\Middleware\ApiAdapter
     /**
      *
      * {@inheritDoc}
-     * @see \FreeFW\Middleware\ApiAdapter::createUnsupportedRequestResponse()
-     */
-    public function createUnsupportedRequestResponse(): ResponseInterface
-    {
-        return $this->createResponse(415);
-    }
-
-    /**
-     *
-     * {@inheritDoc}
-     * @see \FreeFW\Middleware\ApiAdapter::createErrorResponse()
-     */
-    public function createErrorResponse(\Exception $p_ex): ResponseInterface
-    {
-        $document = new \FreeFW\JsonApi\V1\Model\Document();
-        $error    = new \FreeFW\JsonApi\V1\Model\ErrorObject(
-            500,
-            $p_ex->getMessage(),
-            $p_ex->getCode()
-        );
-        $document->addError($error);
-        $response = $this->createResponse(500);
-        return $response->withBody(
-            \GuzzleHttp\Psr7\stream_for(
-                json_encode($document)
-            )
-        );
-    }
-
-    /**
-     *
-     * {@inheritDoc}
      * @see \FreeFW\Middleware\ApiAdapter::encodeResponse()
      */
     public function encodeResponse(ResponseInterface $p_response): ResponseInterface
@@ -213,7 +191,10 @@ class JsonApi extends \FreeFW\Middleware\ApiAdapter
                                     $document->addError($error);
                                 }
                             } else {
-                                $error = new \FreeFW\JsonApi\V1\Model\ErrorObject(500, 'Unknown Error 1');
+                                $error = new \FreeFW\JsonApi\V1\Model\ErrorObject(
+                                    $p_response->getStatusCode(),
+                                    $p_response->getReasonPhrase()
+                                );
                                 $document->addError($error);
                             }
                         } catch (\Exception $ex) {

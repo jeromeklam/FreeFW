@@ -1,6 +1,8 @@
 <?php
 namespace FreeFW\Interfaces;
 
+use \Psr\Http\Message\ServerRequestInterface;
+
 /**
  * AuthAdapterInterface
  *
@@ -10,32 +12,20 @@ interface AuthAdapterInterface
 {
 
     /**
-     * Set secured
+     * Get Authorization header
+     * 
+     * @param \Psr\Http\Message\ServerRequestInterface $p_request
      *
-     * @param bool $p_secured
-     *
-     * @return self
+     * @return string
      */
-    public function setSecured(bool $p_secured = true);
+    public function getAuthorizationHeader(ServerRequestInterface $p_request);
 
     /**
-     * Return secured
-     *
-     * @return bool
+     * Verify Auth header and log user in
+     * 
+     * @param \Psr\Http\Message\ServerRequestInterface $p_request
+     * 
+     * @return boolean
      */
-    public function isSecured() : bool;
-
-    /**
-     * Force identity generation
-     *
-     * @param bool $p_identity
-     */
-    public function setIdentityGeneration(bool $p_identity = true);
-
-    /**
-     * Get identity generation
-     *
-     * @return bool
-     */
-    public function getIndentityGeneration() : bool;
+    public function verifyAuthorizationHeader(ServerRequestInterface $p_request);
 }

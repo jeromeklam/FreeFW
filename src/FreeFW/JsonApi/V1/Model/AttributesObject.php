@@ -6,7 +6,7 @@ namespace FreeFW\JsonApi\V1\Model;
  *
  * @author jeromeklam
  */
-class AttributesObject
+class AttributesObject implements \Countable, \JsonSerializable
 {
 
     /**
@@ -26,15 +26,65 @@ class AttributesObject
     }
 
     /**
-     * To array
-     *
+     * Flush all attributes
+     * 
+     * @return \FreeFW\JsonApi\V1\Model\AttributesObject
+     */
+    public function flushAttributes()
+    {
+        $this->attributes = [];
+        return $this;
+    }
+
+    /**
+     * Add one attribute
+     * 
+     * @param \FreeFW\JsonApi\V1\Model\AttributeObject $p_attr
+     * 
+     * @return \FreeFW\JsonApi\V1\Model\AttributesObject
+     */
+    public function addAttribute(\FreeFW\JsonApi\V1\Model\AttributeObject $p_attr)
+    {
+        $this->attributes[] = $p_attr;
+        return $this;
+    }
+
+    /**
+     * As array
+     * 
      * @return array
      */
     public function __toArray()
     {
-        if (!is_array($this->attributes)) {
-            $this->attributes = [];
+        $arr = [];
+        foreach ($this->attributes as $idx => $attr) {
+            $arr[$idx] = $attr;
         }
-        return $this->attributes;
+        return $arr;
+    }
+
+    /**
+     * @see \Countable
+     */
+    public function count()
+    {
+        return count($this->attributes);
+    }
+
+    /**
+     * 
+     * {@inheritDoc}
+     * @see \JsonSerializable::jsonSerialize()
+     */
+    public function jsonSerialize()
+    {
+        $obj = new \stdClass();
+        foreach ($this->attributes as $idx => $attribute) {
+            if (!$attribute->getJsonIgnore()) {
+                $attName = $attribute->getJsonName();
+                $obj->$attName = $attribute->getValue();
+            }
+        }
+        return $obj;
     }
 }

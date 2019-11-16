@@ -331,7 +331,7 @@ class Route implements \Psr\Log\LoggerAwareInterface
         if (is_array($midCfg)) {
             foreach ($midCfg as $idx => $middleware) {
                 $newMiddleware = \FreeFW\DI\DI::get($middleware);
-                if ($newMiddleware instanceof \FreeFW\Interfaces\AuthAdapterInterface) {
+                if ($newMiddleware instanceof \FreeFW\Interfaces\AuthNegociatorInterface) {
                     $authMid = true;
                     switch ($this->getAuth()) {
                         case \FreeFW\Router\Route::AUTH_BOTH:

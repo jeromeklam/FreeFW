@@ -14,15 +14,29 @@ use \Psr\Http\Message\ResponseInterface;
 class ApiNegociator implements
     MiddlewareInterface,
     \Psr\Log\LoggerAwareInterface,
-    \FreeFW\Interfaces\ConfigAwareTraitInterface
+    \FreeFW\Interfaces\ConfigAwareTraitInterface,
+    \FreeFW\Interfaces\ApiNegociatorInterface
 {
-
+    
     /**
-     * Behaviour
+     * comportements
      */
     use \Psr\Log\LoggerAwareTrait;
     use \FreeFW\Behaviour\EventManagerAwareTrait;
     use \FreeFW\Behaviour\ConfigAwareTrait;
+    use \FreeFW\Behaviour\HttpFactoryTrait;
+    
+    /**
+     * Can override type ?
+     * @var bool
+     */
+    protected $override = false;
+    
+    /**
+     * Accepted methods
+     * @var string[]
+     */
+    protected $methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'COPY', 'LOCK', 'UNLOCK'];
 
     /**
      * Formats
@@ -46,6 +60,65 @@ class ApiNegociator implements
             $this->formats = $p_formats;
         }
     }
+    
+    /**
+     * Set methods
+     *
+     * @param array $p_methods
+     *
+     * @return \FreeFW\Middleware\ApiAdapter
+     */
+    public function setMethods(array $p_methods)
+    {
+        $this->methods = $p_methods;
+        return $this;
+    }
+    
+    /**
+     * Set override
+     *
+     * @param bool $p_override
+     *
+     * @return \FreeFW\Middleware\ApiAdapter
+     */
+    public function setOverride(bool $p_override = true) : self
+    {
+        $this->override = $p_override;
+        return $this;
+    }
+    
+    
+    /**
+     *
+     * {@inheritDoc}
+     * @see \FreeFW\Middleware\ApiAdapter::createUnsupportedRequestResponse()
+     */
+    public function createUnsupportedRequestResponse(): ResponseInterface
+    {
+        return $this->createResponse(415);
+    }
+    
+    /**
+     *
+     * {@inheritDoc}
+     * @see \FreeFW\Middleware\ApiAdapter::createErrorResponse()
+     */
+    public function createErrorResponse(\Exception $p_ex): ResponseInterface
+    {
+        $document = new \FreeFW\JsonApi\V1\Model\Document();
+        $error    = new \FreeFW\JsonApi\V1\Model\ErrorObject(
+            500,
+            $p_ex->getMessage(),
+            $p_ex->getCode()
+        );
+        $document->addError($error);
+        $response = $this->createResponse(500);
+        return $response->withBody(
+            \GuzzleHttp\Psr7\stream_for(
+                json_encode($document)
+            )
+        );
+    }
 
     /**
      * Process an incoming server request and return a response, optionally delegating
@@ -60,45 +133,59 @@ class ApiNegociator implements
         ServerRequestInterface $p_request,
         RequestHandlerInterface $p_handler
     ): ResponseInterface {
-        // Get Content-Type and check if defined...
-        $contentType = $p_request->getHeaderLine('Content-Type');
-        $class       = false;
-        if (array_key_exists($contentType, $this->formats)) {
-            $class = $this->formats[$contentType]['class'];
-        } else {
-            foreach ($this->formats as $name => $format) {
-                if ($format['default']) {
-                    $class = $format['class'];
-                }
+        try {
+            $method = $p_request->getMethod();
+            if (!in_array($method, $this->methods, true)) {
+                return false;
             }
-        }
-        if ($class) {
-            // Ok, encode, decode, ...
-            $this->logger->debug(sprintf('FreeFW.Middleware.ApiNegociator %s', $class));
-            $mid = \FreeFW\DI\DI::get($class);
-            if ($mid instanceof \FreeFW\Interfaces\ApiAdapterInterface) {
-                try {
-                    if ($mid->checkRequest($p_request)) {
-                        return $mid->encodeResponse(
-                            $p_handler->handle(
-                                $mid->decodeRequest($p_request)
-                            )
-                        );
-                    } else {
-                        $this->logger->debug(sprintf('FreeFW.Middleware.ApiNegociator.notchecked %s', $class));
-                        if ($mid->canOverride()) {
-                            return $p_handler->handle($p_request);
-                        }
-                    }
-                } catch (\Exception $ex) {
-                    return $mid->createErrorResponse($ex);
-                }
-                return $mid->createUnsupportedRequestResponse();
+            $contentType = trim($p_request->getHeaderLine('Content-Type'));
+            if ($contentType == '') {
+                $contentType = trim($p_request->getHeaderLine('Accept'));
+            }
+            if (array_key_exists($contentType, $this->formats)) {
+                $class = $this->formats[$contentType]['class'];
             } else {
-                return $this->createResponse(500, "Api class error, wrong interface !");
+                foreach ($this->formats as $name => $format) {
+                    if ($format['default']) {
+                        $class = $format['class'];
+                    }
+                }
             }
+            if ($class) {
+                // Ok, encode, decode, ...
+                $this->logger->debug(sprintf('FreeFW.Middleware.ApiNegociator %s', $class));
+                $mid = \FreeFW\DI\DI::get($class);
+                return $mid->encodeResponse(
+                    $p_handler->handle(
+                        $mid->decodeRequest($p_request)
+                    )
+                );
+            } else {
+                return $this->createResponse(500, "No api class found !");
+            }
+        } catch (\Exception $ex) {
+            return $this->createErrorResponse($ex);
         }
-        // Not found
-        return $this->createResponse(405, "No API config found !");
+        return $this->createUnsupportedRequestResponse();
+    }
+    
+    /**
+     *
+     * {@inheritDoc}
+     * @see \FreeFW\Interfaces\ApiAdapterInterface::canOverride()
+     */
+    public function canOverride() : bool
+    {
+        return $this->override;
+    }
+    
+    /**
+     *
+     * {@inheritDoc}
+     * @see \FreeFW\Interfaces\ApiAdapterInterface::checkRequest()
+     */
+    public function checkRequest(ServerRequestInterface $p_request) : bool
+    {
+
     }
 }

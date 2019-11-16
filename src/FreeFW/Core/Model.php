@@ -117,26 +117,63 @@ abstract class Model implements
     {
         $attributes = [];
         foreach ($this->getProperties() as $name => $property) {
+            $oneAttribute = new \FreeFW\JsonApi\V1\Model\AttributeObject($name);
+            $getter       = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+            $oneAttribute->setValue($this->$getter());
+            if (array_key_exists(FFCST::PROPERTY_PUBLIC, $property)) {
+                $oneAttribute->setJsonName($property[FFCST::PROPERTY_PUBLIC]);
+            }
             if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
-                if (!in_array(FFCST::OPTION_PK, $property[FFCST::PROPERTY_OPTIONS]) &&
-                    !in_array(FFCST::OPTION_JSONIGNORE, $property[FFCST::PROPERTY_OPTIONS])) {
-                    $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
-                    if (array_key_exists(FFCST::PROPERTY_PUBLIC, $property)) {
-                        $attributes[$property[FFCST::PROPERTY_PUBLIC]] = $this->$getter();
-                    } else {
-                        $attributes[$name] = $this->$getter();
-                    }
+                if (in_array(FFCST::OPTION_PK, $property[FFCST::PROPERTY_OPTIONS]) ||
+                    in_array(FFCST::OPTION_FK, $property[FFCST::PROPERTY_OPTIONS]) ||
+                    in_array(FFCST::OPTION_BROKER, $property[FFCST::PROPERTY_OPTIONS]) ||
+                    in_array(FFCST::OPTION_JSONIGNORE, $property[FFCST::PROPERTY_OPTIONS])) {
+                    $oneAttribute->setJsonIgnore(true);
                 }
-            } else {
-                $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
-                if (array_key_exists(FFCST::PROPERTY_PUBLIC, $property)) {
-                    $attributes[$property[FFCST::PROPERTY_PUBLIC]] = $this->$getter();
-                } else {
-                    $attributes[$name] = $this->$getter();
+            }
+            $attributes[] = $oneAttribute;
+        }
+        return $attributes;
+    }
+
+    /**
+     * Get relations
+     *
+     * @return array
+     */
+    public function getApiRelationShips() : array
+    {
+        $relations = [];
+        foreach ($this->getProperties() as $name => $property) {
+            if (array_key_exists(FFCST::PROPERTY_FK, $property)) {
+                foreach ($property[FFCST::PROPERTY_FK] as $nameP => $valueP) {
+                    $oneRelation = new \FreeFW\JsonApi\V1\Model\RelationshipObject($nameP);
+                    $oneRelation->setType(\FreeFW\JsonApi\V1\Model\RelationshipObject::ONE_TO_ONE);
+                    $relations[] = $oneRelation;
                 }
             }
         }
-        return $attributes;
+        return $relations;
+    }
+
+    /**
+     * @see \FreeFW\Interfaces\ApiResponseInterface
+     * 
+     * @return bool
+     */
+    public function isSingleElement() : bool
+    {
+        return true;
+    }
+
+    /**
+     * @see \FreeFW\Interfaces\ApiResponseInterface
+     * 
+     * @return bool
+     */
+    public function isArrayElement() : bool
+    {
+        return false;
     }
 
     /**

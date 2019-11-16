@@ -6,7 +6,7 @@ namespace FreeFW\JsonApi\V1\Model;
  *
  * @author jeromeklam
  */
-class ResourceObject
+class ResourceObject implements \JsonSerializable
 {
 
     /**
@@ -44,17 +44,25 @@ class ResourceObject
      * @var \FreeFW\JsonApi\V1\Model\MetaObject
      */
     protected $meta = null;
+    
+    /**
+     * Single ressource ?
+     * @var boolean
+     */
+    protected $single = true;
 
     /**
      * Constructor
      *
-     * @param string $p_type
-     * @param string $p_id
+     * @param string  $p_type
+     * @param string  $p_id
+     * @param boolean $p_single
      */
-    public function __construct(string $p_type, $p_id = null)
+    public function __construct(string $p_type, $p_id = null, $p_single = true)
     {
-        $this->id   = $p_id;
-        $this->type = $p_type;
+        $this->id     = $p_id;
+        $this->type   = $p_type;
+        $this->single = $p_single;
     }
 
     /**
@@ -93,7 +101,7 @@ class ResourceObject
     /**
      * Get attributes
      *
-     * @return \FreeFW\JsonApi\V1\Model\AttributesObject
+     * @return mixed
      */
     public function getAttributes()
     {
@@ -101,19 +109,54 @@ class ResourceObject
     }
 
     /**
-     * To array
+     * Get relationships
      *
-     * @return []
+     * @return \FreeFW\JsonApi\V1\Model\AttributesObject
      */
-    public function __toArray()
+    public function getRelationships()
     {
-        $datas = [
-            'id'   => (string)$this->id,
-            'type' => (string)$this->type
-        ];
-        if ($this->attributes !== null) {
-            $datas['attributes'] = $this->attributes->__toArray();
+        return $this->relationships;
+    }
+    
+    /**
+     * Set relationShips
+     * 
+     * @param \FreeFW\JsonApi\V1\Model\RelationshipsObject $p_relations
+     * 
+     * @return \FreeFW\JsonApi\V1\Model\ResourceObject
+     */
+    public function setRelationShips(\FreeFW\JsonApi\V1\Model\RelationshipsObject $p_relations)
+    {
+        $this->relationships = $p_relations;
+        return $this;
+    }
+
+    /**
+     * Single ressource ?
+     * 
+     * @return boolean
+     */
+    public function isSingle()
+    {
+        return $this->single;
+    }
+    
+    /**
+     *
+     * {@inheritDoc}
+     * @see \JsonSerializable::jsonSerialize()
+     */
+    public function jsonSerialize()
+    {
+        $obj       = new \stdClass();
+        $obj->type = $this->getType();
+        $obj->id   = $this->getId();
+        if ($this->attributes && count($this->attributes) > 0) {
+            $obj->attributes = $this->attributes;
         }
-        return $datas;
+        if ($this->relationships && count($this->relationships) > 0) {
+            $obj->relationships = $this->relationships;
+        }
+        return $obj;
     }
 }

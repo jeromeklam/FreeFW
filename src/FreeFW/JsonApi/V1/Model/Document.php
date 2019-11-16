@@ -132,14 +132,21 @@ class Document implements \JsonSerializable
             $return['errors'] = $this->errors->__toArray();
         }
         if ($this->data !== null) {
-            if (is_Array($this->data)) {
+            if (is_array($this->data)) {
                 $data = [];
                 foreach ($this->data as $idx => $oneData) {
-                    $data[] = $oneData->__toArray();
+                    $data[] = $oneData;
                 }
                 $return['data'] = $data;
             } else {
-                $return['data'] = $this->data->__toArray();
+                $return['data'] = $this->data;
+            }
+            $resources = $this->included->getIncluded();
+            if (count($resources) > 0) {
+                $return['included'] = [];
+                foreach ($resources as $key => $resource) {
+                    $return['included'][] = $resource;
+                }
             }
         }
         return $return;
@@ -168,6 +175,19 @@ class Document implements \JsonSerializable
             return $resource;
         }
         throw new \FreeFW\JsonApi\FreeFWJsonApiException('type is required in data attribute !');
+    }
+
+    /**
+     * Set included object
+     * 
+     * @param \FreeFW\JsonApi\V1\Model\IncludedObject $p_inluded
+     * 
+     * @return \FreeFW\JsonApi\V1\Model\Document
+     */
+    public function setIncluded(\FreeFW\JsonApi\V1\Model\IncludedObject $p_inluded)
+    {
+        $this->included = $p_inluded;
+        return $this;
     }
 
     /**
