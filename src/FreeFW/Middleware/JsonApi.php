@@ -34,7 +34,7 @@ class JsonApi implements
      * {@inheritDoc}
      * @see \FreeFW\Middleware\ApiAdapter::decodeRequest()
      */
-    public function decodeRequest(ServerRequestInterface $p_request): ServerRequestInterface
+    public function decodeRequest(ServerRequestInterface $p_request): \FreeFW\Http\ApiParams
     {
         $this->logger->debug(sprintf('FreeFW.Middleware.JsonApi.decode.start'));
         $apiParams = new \FreeFW\Http\ApiParams();
@@ -109,8 +109,7 @@ class JsonApi implements
         }
         // Next
         $this->logger->debug(sprintf('FreeFW.Middleware.JsonApi.decode.end'));
-        $p_request = $p_request->withAttribute('api_params', $apiParams);
-        return $p_request;
+        return $apiParams;
     }
 
     /**
@@ -118,7 +117,7 @@ class JsonApi implements
      * {@inheritDoc}
      * @see \FreeFW\Middleware\ApiAdapter::encodeResponse()
      */
-    public function encodeResponse(ResponseInterface $p_response): ResponseInterface
+    public function encodeResponse(ResponseInterface $p_response, \FreeFW\Http\ApiParams $p_api_params): ResponseInterface
     {
         $this->logger->debug(sprintf('FreeFW.Middleware.JsonApi.encode.start'));
         if ($p_response->getStatusCode() < 300) {
@@ -127,36 +126,36 @@ class JsonApi implements
                 if ($body instanceof StreamInterface) {
                     $content = $body->getContents();
                     $object  = unserialize($content);
+                    $single  = false;
                     if ($object instanceof \FreeFW\Interfaces\ApiResponseInterface) {
-                        $encoder    = new \FreeFW\JsonApi\V1\Encoder();
-                        $document   = $encoder->encode($object);
-                        $json       = json_encode($document);
-                        if ($document->hasErrors()) {
-                            $p_response = $this->createResponse(
-                                $document->getHttpCode(),
-                                $json
-                            );
+                        if ($object->isSingleElement()) {
+                            $encoder    = new \FreeFW\JsonApi\V1\Encoder();
+                            $document   = $encoder->encode($object, $p_api_params);
+                            $json       = json_encode($document);
+                            if ($document->hasErrors()) {
+                                $p_response = $this->createResponse(
+                                    $document->getHttpCode(),
+                                    $json
+                                );
+                            } else {
+                                $p_response = $p_response->withBody(\GuzzleHttp\Psr7\stream_for($json));
+                            }
                         } else {
-                            $p_response = $p_response->withBody(\GuzzleHttp\Psr7\stream_for($json));
+                            $encoder  = new \FreeFW\JsonApi\V1\Encoder();
+                            $document = $encoder->encodeList($object, $p_api_params);
+                            $p_response = $p_response->withBody(
+                                \GuzzleHttp\Psr7\stream_for(
+                                    json_encode($document)
+                                )
+                            );
                         }
                     } else {
-                        if ($object instanceof \Iterator) {
-                            $encoder  = new \FreeFW\JsonApi\V1\Encoder();
-                            $document = $encoder->encodeList($object);
-                            $p_response = $p_response->withBody(
-                                \GuzzleHttp\Psr7\stream_for(
-                                    json_encode($document)
-                                )
-                            );
-                        } else {
-                            $encoder    = new \FreeFW\JsonApi\V1\Encoder();
-                            $document   = new \FreeFW\JsonApi\V1\Model\Document();
-                            $p_response = $p_response->withBody(
-                                \GuzzleHttp\Psr7\stream_for(
-                                    json_encode($document)
-                                )
-                            );
-                        }
+                        $document   = new \FreeFW\JsonApi\V1\Model\Document();
+                        $p_response = $p_response->withBody(
+                            \GuzzleHttp\Psr7\stream_for(
+                                json_encode($document)
+                            )
+                        );
                     }
                 } else {
                     $p_response = $this->createErrorResponse(

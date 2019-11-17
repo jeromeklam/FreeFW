@@ -80,6 +80,35 @@ class Application extends \FreeFW\Core\Application
     }
 
     /**
+     * Send route for http code
+     * 
+     * @param unknown $p_http_code
+     */
+    public function sendHttpCode($p_http_code)
+    {
+        $this->logger->debug('Application.sendHttpCode.start');
+        try {
+            $request = \FreeFW\Http\ApiServerRequest::fromGlobals();
+            $route   = $this->router->findSpecificRoute($p_http_code);
+            if ($route) {
+                $route->setLogger($this->logger);
+                $route->setConfig($this->config);
+                $this->send($route->render($request));
+            } else {
+                // @todo
+                $response = $this->createResponse(404, 'Not found');
+                $this->send($response);
+            }
+            $this->afterRender();
+        } catch (\Exception $ex) {
+            // @todo : handle 500 response
+            $response = $this->createResponse(500, $ex->getMessage());
+            $this->send($response);
+        }
+        $this->logger->debug('Application.sendHttpCode.end');
+    }
+
+    /**
      * Handle request
      */
     public function handle()

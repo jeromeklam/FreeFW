@@ -35,6 +35,12 @@ class RelationshipObject
     protected $type = null;
 
     /**
+     * Property name
+     * @var string
+     */
+    protected $property_name = null;
+
+    /**
      * Constructor
      * 
      * @param string $p_name
@@ -92,5 +98,50 @@ class RelationshipObject
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * Set property name
+     * 
+     * @param string $p_name
+     * 
+     * @return \FreeFW\JsonApi\V1\Model\RelationshipObject
+     */
+    public function setPropertyName($p_name)
+    {
+        $this->property_name = $p_name;
+        return $this;
+    }
+
+    /**
+     * Get property name
+     * 
+     * @return string
+     */
+    public function getPropertyName()
+    {
+        return $this->property_name;
+    }
+
+    /**
+     * Set model
+     * 
+     * @param string $p_model
+     * 
+     * @return \FreeFW\JsonApi\V1\Model\RelationshipObject
+     */
+    public function setModel($p_model)
+    {
+        $this->model = $p_model;
+        return $this;
+    }
+
+    /**
+     * Get model
+     * @return string
+     */
+    public function getModel()
+    {
+        return $this->model;
     }
 }

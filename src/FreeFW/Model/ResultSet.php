@@ -266,22 +266,22 @@ class ResultSet extends \FreeFW\Core\Model implements
     }
 
     /**
-     * @see \FreeFW\Interfeces\ApiResponseInterface
+     * @see \FreeFW\Interfaces\ApiResponseInterface
      *
      * @return bool
      */
     public function isSingleElement() : bool
     {
-        return true;
+        return false;
     }
 
     /**
-     * @see \FreeFW\Interfeces\ApiResponseInterface
+     * @see \FreeFW\Interfaces\ApiResponseInterface
      *
      * @return bool
      */
     public function isArrayElement() : bool
     {
-        return false;
+        return true;
     }
 }

@@ -154,11 +154,11 @@ class ApiNegociator implements
             if ($class) {
                 // Ok, encode, decode, ...
                 $this->logger->debug(sprintf('FreeFW.Middleware.ApiNegociator %s', $class));
-                $mid = \FreeFW\DI\DI::get($class);
+                $mid       = \FreeFW\DI\DI::get($class);
+                $apiParams = $mid->decodeRequest($p_request);
+                $response  = $p_handler->handle($p_request->withAttribute('api_params', $apiParams));
                 return $mid->encodeResponse(
-                    $p_handler->handle(
-                        $mid->decodeRequest($p_request)
-                    )
+                    $response, $apiParams
                 );
             } else {
                 return $this->createResponse(500, "No api class found !");

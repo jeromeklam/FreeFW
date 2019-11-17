@@ -19,7 +19,7 @@ interface ApiAdapterInterface
      *
      * @return ServerRequestInterface
      */
-    public function decodeRequest(ServerRequestInterface $p_request) : ServerRequestInterface;
+    public function decodeRequest(ServerRequestInterface $p_request) : \FreeFW\Http\ApiParams;
 
     /**
      * Encode the response
@@ -28,5 +28,5 @@ interface ApiAdapterInterface
      *
      * @return ResponseInterface
      */
-    public function encodeResponse(ResponseInterface $p_response) : ResponseInterface;
+    public function encodeResponse(ResponseInterface $p_response, \FreeFW\Http\ApiParams $p_api_params) : ResponseInterface;
 }

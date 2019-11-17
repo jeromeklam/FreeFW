@@ -9,6 +9,7 @@ use \FreeFW\Constants as FFCST;
  * @author jeromeklam
  */
 abstract class Model implements
+    \FreeFW\Interfaces\ApiResponseInterface,
     \FreeFW\Interfaces\ValidatorInterface,
     \Serializable
 {
@@ -109,6 +110,35 @@ abstract class Model implements
     }
 
     /**
+     *
+     * @see \FreeFW\Interfaces\ApiModelInterface
+     */
+    public function getApiId() : string
+    {
+        foreach ($this->getProperties() as $name => $property) {
+            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
+                if (in_array(FFCST::OPTION_PK, $property[FFCST::PROPERTY_OPTIONS])) {
+                    $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                    return (string)$this->$getter();
+                }
+            }
+        }
+        return '';
+    }
+
+    /**
+     *
+     * @see \FreeFW\Interfaces\ApiModelInterface
+     */
+    public function getApiType() : string
+    {
+        $class = get_called_class();
+        $class = rtrim(ltrim($class, '\\'), '\\');
+        $class = str_replace('\\Model\\', '_', $class);
+        return $class;
+    }
+
+    /**
      * Get attributes
      *
      * @return array
@@ -144,13 +174,29 @@ abstract class Model implements
     public function getApiRelationShips() : array
     {
         $relations = [];
+        /**
+         * One to One, an attribute is the Foreign Key
+         */
         foreach ($this->getProperties() as $name => $property) {
             if (array_key_exists(FFCST::PROPERTY_FK, $property)) {
                 foreach ($property[FFCST::PROPERTY_FK] as $nameP => $valueP) {
                     $oneRelation = new \FreeFW\JsonApi\V1\Model\RelationshipObject($nameP);
                     $oneRelation->setType(\FreeFW\JsonApi\V1\Model\RelationshipObject::ONE_TO_ONE);
+                    $oneRelation->setPropertyName($name);
+                    $oneRelation->setModel($valueP['model']);
                     $relations[] = $oneRelation;
                 }
+            }
+        }
+        /**
+         * One to Many, we use the id field
+         */
+        if (method_exists($this, 'getRelationships')) {
+            foreach ($this->getRelationships() as $name => $oneRelation) {
+                $oneRelation = new \FreeFW\JsonApi\V1\Model\RelationshipObject($name);
+                $oneRelation->setType(\FreeFW\JsonApi\V1\Model\RelationshipObject::ONE_TO_MANY);
+                $oneRelation->setPropertyName($name);
+                $relations[] = $oneRelation;
             }
         }
         return $relations;

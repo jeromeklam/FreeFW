@@ -77,6 +77,29 @@ class Router
     }
 
     /**
+     * Find specific route
+     * 
+     * @param string $p_http_code
+     * 
+     * @return boolean|array
+     */
+    public function findSpecificRoute($p_http_code)
+    {
+        $retRoute = false;
+        if ($this->routes instanceof \FreeFW\Router\RouteCollection) {
+            /**
+             * @var \FreeFW\Router\Route $oneRoute
+             */
+            foreach ($this->routes->getRoutes() as $idx => $oneRoute) {
+                if ($oneRoute->getFunction() == 'specific' . $p_http_code) {
+                    $retRoute = $oneRoute;
+                    break;
+                }
+            }
+        }
+        return $retRoute;
+    }
+    /**
      * Find called route
      *
      * @param \Psr\Http\Message\ServerRequestInterface $p_request

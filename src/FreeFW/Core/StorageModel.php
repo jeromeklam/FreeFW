@@ -129,6 +129,34 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
     /**
      *
      * {@inheritDoc}
+     * @see \FreeFW\Interfaces\StorageStrategyInterface::find()
+     */
+    public static function find(array $p_filters = [])
+    {
+        $cls   = get_called_class();
+        $cls   = rtrim(ltrim($cls, '\\'), '\\');
+        /**
+         * @var \FreeFW\Model\Query $query
+         */
+        $query = \FreeFW\DI\DI::get('FreeFW::Model::Query');
+        $query
+            ->setType(\FreeFW\Model\Query::QUERY_SELECT)
+            ->setMainModel(str_replace('\\', '::', $cls))
+            ->addFromFilters($p_filters)
+        ;
+        $model = new \FreeFW\Model\ResultSet();
+        if ($query->execute()) {
+            /**
+             * @var \FreeFW\Model\ResultSet $result
+             */
+            $model = $query->getResult();
+        }
+        return $model;
+    }
+
+    /**
+     *
+     * {@inheritDoc}
      * @see \FreeFW\Interfaces\StorageStrategyInterface::remove()
      */
     public function remove()
@@ -209,37 +237,6 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
                 $this->{$property} = $value;
             }
         }
-    }
-
-    /**
-     * Get Id
-     *
-     * @return string
-     */
-    public function getApiId() : string
-    {
-        foreach ($this->getProperties() as $name => $property) {
-            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
-                if (in_array(FFCST::OPTION_PK, $property[FFCST::PROPERTY_OPTIONS])) {
-                    $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
-                    return (string)$this->$getter();
-                }
-            }
-        }
-        return '';
-    }
-
-    /**
-     * Get type
-     *
-     * @return string
-     */
-    public function getApiType() : string
-    {
-        $class = get_called_class();
-        $class = rtrim(ltrim($class, '\\'), '\\');
-        $class = str_replace('\\Model\\', '_', $class);
-        return $class;
     }
 
     /**

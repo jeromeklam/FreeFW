@@ -37,7 +37,16 @@ class RelationshipsObject implements \Countable, \JsonSerializable
         if ($this->relationships === null) {
             $this->relationships = [];
         }
-        $this->relationships[$p_name] = $p_relation;
+        if (array_key_exists($p_name, $this->relationships)) {
+            if (!is_array($this->relationships[$p_name])) {
+                $temp = $this->relationships[$p_name];
+                $this->relationships[$p_name] = [];
+                $this->relationships[$p_name][] = $temp;
+            }
+            $this->relationships[$p_name][] = $p_relation;
+        } else {
+            $this->relationships[$p_name] = $p_relation;
+        }
         return $this;
     }
     
@@ -65,10 +74,20 @@ class RelationshipsObject implements \Countable, \JsonSerializable
     {
         $rels = [];
         foreach ($this->relationships as $name => $relation) {
-            $rels[$name] = [
-                'id'   => $relation->getId(),
-                'type' => $relation->getType()
-            ];
+            if (is_array($relation)) {
+                $rels[$name] = [];
+                foreach ($relation as $rel) {
+                    $rels[$name][] = [
+                        'id'   => $rel->getId(),
+                        'type' => $rel->getType()
+                    ];
+                }
+            } else {
+                $rels[$name] = [
+                    'id'   => $relation->getId(),
+                    'type' => $relation->getType()
+                ];
+            }
         }
         return $rels;
     }
