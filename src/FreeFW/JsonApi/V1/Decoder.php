@@ -28,7 +28,13 @@ class Decoder
              */
             $obj  = \FreeFW\DI\DI::get($class);
             $attr = $resource->getAttributes();
-            $obj->initWithJson($attr->__toArray());
+            $rels = $resource->getRelationships();
+            if ($rels) {
+                $obj->initWithJson($attr->__toArray(), $rels->__toArray());
+            } else {
+                $obj->initWithJson($attr->__toArray());
+            }
+            $obj->setApiId($resource->getId());
             return $obj;
         }
         die('decoder');

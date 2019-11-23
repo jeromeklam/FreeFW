@@ -14,5 +14,5 @@ interface ValidatorInterface
      *
      * @return boolean
      */
-    public function isValid();
+    public function isValid() : bool;
 }

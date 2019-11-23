@@ -172,6 +172,10 @@ class Document implements \JsonSerializable
                 $attributes = new \FreeFW\JsonApi\V1\Model\AttributesObject((array)$p_object->attributes);
                 $resource->setAttributes($attributes);
             }
+            if (isset($p_object->relationships)) {
+                $relations = new \FreeFW\JsonApi\V1\Model\RelationshipsObject((array)$p_object->relationships);
+                $resource->setRelationShips($relations);
+            }
             return $resource;
         }
         throw new \FreeFW\JsonApi\FreeFWJsonApiException('type is required in data attribute !');

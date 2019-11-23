@@ -105,7 +105,8 @@ class Encoder
                 $newError = new \FreeFW\JsonApi\V1\Model\ErrorObject(
                     $oneError->getType(),
                     $oneError->getMessage(),
-                    $oneError->getCode()
+                    $oneError->getCode(),
+                    $oneError->getField()
                 );
                 $document->addError($newError);
             }

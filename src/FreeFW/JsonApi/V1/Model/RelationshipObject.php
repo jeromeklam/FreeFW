@@ -35,6 +35,12 @@ class RelationshipObject
     protected $type = null;
 
     /**
+     * Values
+     * @var array
+     */
+    protected $values = [];
+
+    /**
      * Property name
      * @var string
      */
@@ -121,6 +127,29 @@ class RelationshipObject
     public function getPropertyName()
     {
         return $this->property_name;
+    }
+
+    /**
+     * Add one value
+     * 
+     * @param mixed $p_value
+     * 
+     * @return \FreeFW\JsonApi\V1\Model\RelationshipObject
+     */
+    public function addValue($p_value)
+    {
+        $this->values[] = $p_value;
+        return $this;
+    }
+    
+    /**
+     * Get values
+     * 
+     * @return array
+     */
+    public function getValues()
+    {
+        return $this->values;
     }
 
     /**

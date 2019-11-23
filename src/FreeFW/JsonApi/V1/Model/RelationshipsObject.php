@@ -22,13 +22,33 @@ class RelationshipsObject implements \Countable, \JsonSerializable
      */
     public function __construct(array $p_relations = [])
     {
-        $this->relationships = $p_relations;
+        $this->relationships = [];
+        foreach ($p_relations as $key => $value) {
+            if ($value instanceof \FreeFW\JsonApi\V1\Model\RelationshipObject) {
+                $this->addRelation($key, $value);
+            } else {
+                if (is_object($value) && array_key_exists('data', $value)) {
+                    $data = $value->data;
+                    if (is_array($data)) {
+                        var_export('decoder . @todo');die;
+                    } else {
+                        $relation = new \FreeFW\JsonApi\V1\Model\RelationshipObject($key);
+                        $cls   = $data->type;
+                        $class = str_replace('_', '::Model::', $cls);
+                        $relation->setModel($class);
+                        $relation->addValue($data->id);
+                    }
+                    $this->addRelation($key, $relation);
+                }
+            }
+        }
+        $p_relations;
     }
 
     /**
      * Add a relation
      * 
-     * @param unknown $p_relation
+     * @param \FreeFW\JsonApi\V1\Model\RelationshipObject $p_relation
      * 
      * @return \FreeFW\JsonApi\V1\Model\RelationshipsObject
      */
@@ -78,17 +98,39 @@ class RelationshipsObject implements \Countable, \JsonSerializable
                 $rels[$name] = [];
                 foreach ($relation as $rel) {
                     $rels[$name][] = [
-                        'id'   => $rel->getId(),
-                        'type' => $rel->getType()
+                        'data' => [
+                            'id'   => $rel->getId(),
+                            'type' => $rel->getType()
+                        ]
                     ];
                 }
             } else {
                 $rels[$name] = [
-                    'id'   => $relation->getId(),
-                    'type' => $relation->getType()
+                    'data' => [
+                        'id'   => $relation->getId(),
+                        'type' => $relation->getType()
+                    ]
                 ];
             }
         }
         return $rels;
+    }
+
+    /**
+     * Convert to array
+     * 
+     * @return array
+     */
+    public function __toArray()
+    {
+        $arr = [];
+        foreach ($this->relationships as $key => $value) {
+            $arr[$value->getName()] = [
+                'name'   => $value->getName(),
+                'type'   => $value->getType(),
+                'values' => $value->getValues()
+            ];
+        }
+        return $arr;
     }
 }

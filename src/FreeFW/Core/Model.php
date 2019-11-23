@@ -89,7 +89,7 @@ abstract class Model implements
      *
      * @return \FreeFW\Core\Model
      */
-    public function initWithJson(array $p_datas = [])
+    public function initWithJson(array $p_datas = [], array $p_relations = [])
     {
         $props = $this->getProperties();
         $this->init();
@@ -106,12 +106,42 @@ abstract class Model implements
                 }
             }
         }
+        foreach ($p_relations as $name => $relation) {
+            foreach ($props as $prp => $property) {
+                $test = $prp;
+                if (array_key_exists(FFCST::PROPERTY_PUBLIC, $property)) {
+                    $test = $property[FFCST::PROPERTY_PUBLIC];
+                }
+                if (array_key_exists(FFCST::PROPERTY_FK, $property)) {
+                    $fks = $property[FFCST::PROPERTY_FK];
+                    if (array_key_exists($relation['name'], $fks)) {
+                        $fk     = $fks[$relation['name']];
+                        // Complete empty object
+                        $rel    = \FreeFW\DI\DI::get($fk['model']); 
+                        $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($test, true);
+                        foreach ($relation['values'] as $val) {
+                            $rel->setApiId($val);
+                        }
+                        $this->$setter($rel);
+                        // property
+                        $field = $fk['field'];
+                        if (array_key_exists($field, $props)) {
+                            $crtProp = $field;
+                            $setter  = 'set' . \FreeFW\Tools\PBXString::toCamelCase($crtProp, true);
+                            foreach ($relation['values'] as $val) {
+                                $this->$setter($val);
+                            }
+                        }
+                    }
+                }
+            }
+        }
         return $this;
     }
 
     /**
      *
-     * @see \FreeFW\Interfaces\ApiModelInterface
+     * @see \FreeFW\Interfaces\ApiResponseInterface
      */
     public function getApiId() : string
     {
@@ -128,7 +158,24 @@ abstract class Model implements
 
     /**
      *
-     * @see \FreeFW\Interfaces\ApiModelInterface
+     * @see \FreeFW\Interfaces\ApiResponseInterface
+     */
+    public function setApiId($p_id)
+    {
+        foreach ($this->getProperties() as $name => $property) {
+            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
+                if (in_array(FFCST::OPTION_PK, $property[FFCST::PROPERTY_OPTIONS])) {
+                    $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                    return $this->$setter($p_id);
+                }
+            }
+        }
+        return $this;
+    }
+    
+    /**
+     *
+     * @see \FreeFW\Interfaces\ApiResponseInterface
      */
     public function getApiType() : string
     {
@@ -352,6 +399,17 @@ abstract class Model implements
                         \FreeFW\Core\Error::TYPE_PRECONDITION,
                         $public
                     );
+                } else {
+                    if (in_array(FFCST::OPTION_FK, $options)) {
+                        if ($value <= 0) {
+                            $this->addError(
+                                FFCST::ERROR_REQUIRED,
+                                sprintf('%s relation is required !', $public),
+                                \FreeFW\Core\Error::TYPE_PRECONDITION,
+                                $public
+                            );
+                        }
+                    }
                 }
             }
         }

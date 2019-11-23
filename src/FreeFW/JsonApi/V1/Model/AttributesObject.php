@@ -22,7 +22,15 @@ class AttributesObject implements \Countable, \JsonSerializable
      */
     public function __construct(array $p_attributes = [])
     {
-        $this->attributes = $p_attributes;
+        $this->attributes = [];
+        foreach ($p_attributes as $key => $value) {
+            if ($value instanceof \FreeFW\JsonApi\V1\Model\AttributeObject) {
+                $this->addAttribute($value); 
+            } else {
+                $oneAttr = new \FreeFW\JsonApi\V1\Model\AttributeObject($key, $value);
+                $this->addAttribute($oneAttr); 
+            }
+        }
     }
 
     /**
@@ -58,7 +66,7 @@ class AttributesObject implements \Countable, \JsonSerializable
     {
         $arr = [];
         foreach ($this->attributes as $idx => $attr) {
-            $arr[$idx] = $attr;
+            $arr[$attr->getName()] = $attr->getValue();
         }
         return $arr;
     }

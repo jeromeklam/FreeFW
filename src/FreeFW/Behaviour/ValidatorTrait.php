@@ -61,7 +61,7 @@ trait ValidatorTrait
      *
      * @return boolean
      */
-    public function isValid()
+    public function isValid() : bool
     {
         $this->validate();
         return empty($this->errors);

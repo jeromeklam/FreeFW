@@ -50,16 +50,26 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $fields     = [];
         $source     = $p_model::getSource();
         $properties = $p_model::getProperties();
+        $sso        = \FreeFW\DI\DI::getShared('sso');
+        if (method_exists($p_model, 'beforeCreate')) {
+            if (!$p_model->beforeCreate()) {
+                return false;
+            }
+        }
         $setter     = false;
         foreach ($properties as $name => $oneProperty) {
             $add = true;
             $pk  = false;
+            $brk = false;
             if (array_key_exists(FFCST::PROPERTY_OPTIONS, $oneProperty)) {
                 if (in_array(FFCST::OPTION_LOCAL, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $add = false;
                 }
                 if (in_array(FFCST::OPTION_PK, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $pk = true;
+                }
+                if (in_array(FFCST::OPTION_BROKER, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
+                    $brk = true;
                 }
             }
             if ($add) {
@@ -69,14 +79,18 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     // setter for id
                     $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
                 } else {
-                    // Compute getter
-                    $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
-                    // Get data
-                    $val = $p_model->$getter();
-                    if ($val === false) {
-                        $val = 0;
+                    if ($brk) {
+                        $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $sso->getBrokerId();
+                    } else {
+                        // Compute getter
+                        $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                        // Get data
+                        $val = $p_model->$getter();
+                        if ($val === false) {
+                            $val = 0;
+                        }
+                        $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $val;
                     }
-                    $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $val;
                 }
             }
         }
@@ -228,15 +242,25 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $fields     = [];
         $source     = $p_model::getSource();
         $properties = $p_model::getProperties();
+        $sso        = \FreeFW\DI\DI::getShared('sso');
+        if (method_exists($p_model, 'beforeSave')) {
+            if (!$p_model->beforeSave()) {
+                return false;
+            }
+        }
         foreach ($properties as $name => $oneProperty) {
             $add = true;
             $pk  = false;
+            $brk = false;
             if (array_key_exists(FFCST::PROPERTY_OPTIONS, $oneProperty)) {
                 if (in_array(FFCST::OPTION_LOCAL, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $add = false;
                 }
                 if (in_array(FFCST::OPTION_PK, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $pk = true;
+                }
+                if (in_array(FFCST::OPTION_BROKER, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
+                    $brk = true;
                 }
             }
             if ($add) {
@@ -247,12 +271,16 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     $pks[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]]    = $p_model->$getter();
                     $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $p_model->$getter();
                 } else {
-                    // Get data
-                    $val = $p_model->$getter();
-                    if ($val === false) {
-                        $val = 0;
+                    if ($brk) {
+                        $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $sso->getBrokerId();
+                    } else {
+                        // Get data
+                        $val = $p_model->$getter();
+                        if ($val === false) {
+                            $val = 0;
+                        }
+                        $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $val;
                     }
-                    $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $val;
                 }
             }
         }
@@ -276,7 +304,15 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $p_model->addError($code, $message);
             }
         } catch (\Exception $ex) {
-            var_dump($ex);
+            $this->logger->debug('PDOStorage.save.error : ' . print_r($query->errorInfo(), true));
+            $localErr = $query->errorInfo();
+            $code     = 0;
+            $message  = 'PDOStorage.save.error : ' . print_r($query->errorInfo(), true);
+            if (is_array($localErr) && count($localErr) > 1) {
+                $code    = intval($localErr[0]);
+                $message = $localErr[2];
+            }
+            $p_model->addError($code, $message);
         }
         return !$p_model->hasErrors();
     }

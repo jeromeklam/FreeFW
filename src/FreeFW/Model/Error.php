@@ -2,13 +2,13 @@
 namespace FreeFW\Model;
 
 /**
+ * Error
  *
- * @author jeromeklam
- *
+ * @author : jeromeklam
  */
 class Error extends \FreeFW\Core\Model
 {
-
+    
     /**
      * Get new error from exception
      *

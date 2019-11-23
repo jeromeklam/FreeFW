@@ -26,7 +26,7 @@ class Route implements \Psr\Log\LoggerAwareInterface
      */
     const METHOD_GET    = 'get';
     const METHOD_POST   = 'post';
-    const METHOD_UPDATE = 'update';
+    const METHOD_PUT    = 'put';
     const METHOD_DELETE = 'delete';
     const METHOD_ALL    = 'all';
 

@@ -85,11 +85,14 @@ class ErrorObject
      * @param string $p_message
      * @param string $p_code
      */
-    public function __construct(int $p_status, string $p_message = '', $p_code = null)
+    public function __construct(int $p_status, string $p_message = '', $p_code = null, $p_field = null)
     {
-        $this->status = $p_status;
-        $this->title  = $p_message;
-        $this->code   = $p_code;
+        $this->status  = $p_status;
+        $this->title   = $p_message;
+        $this->code    = $p_code;
+        if ($p_field != '') {
+            $this->source = ['pointer' => '/data/attributes/' . $p_field];
+        }
     }
 
     /**
@@ -118,6 +121,9 @@ class ErrorObject
         }
         if ($this->title !== null) {
             $result['title'] = $this->title;
+        }
+        if ($this->source !== null) {
+            $result['source'] = $this->source;
         }
         return $result;
     }

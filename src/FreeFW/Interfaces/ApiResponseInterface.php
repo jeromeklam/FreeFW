@@ -17,6 +17,13 @@ interface ApiResponseInterface
     public function getApiId() : string;
 
     /**
+     * Set Id
+     * 
+     * @param mixed $p_id
+     */
+    public function setApiId($p_id);
+
+    /**
      * Return type
      *
      * @return string
