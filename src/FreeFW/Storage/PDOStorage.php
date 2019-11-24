@@ -712,4 +712,14 @@ class PDOStorage extends \FreeFW\Storage\Storage
         }
         return $fields;
     }
+
+    /**
+     * Get provider
+     * 
+     * @return \FreeFW\Interfaces\StorageProviderInterface
+     */
+    public function getProvider()
+    {
+        return $this->provider;
+    }
 }

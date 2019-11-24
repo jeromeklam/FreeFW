@@ -6,7 +6,7 @@ namespace FreeFW\Core;
  *
  * @author jeromeklam
  */
-class Application implements
+class Console implements
     \Psr\Log\LoggerAwareInterface,
     \FreeFW\Interfaces\ConfigAwareTraitInterface
 {
@@ -17,11 +17,10 @@ class Application implements
     use \Psr\Log\LoggerAwareTrait;
     use \FreeFW\Behaviour\EventManagerAwareTrait;
     use \FreeFW\Behaviour\ConfigAwareTrait;
-    use \FreeFW\Behaviour\RequestAwareTrait;
 
     /**
      * Router
-     * @var \FreeFW\Router\Router
+     * @var \FreeFW\Console\Router
      */
     protected $router = null;
 
@@ -36,12 +35,8 @@ class Application implements
     ) {
         $this->setConfig($p_config);
         $this->setLogger($p_logger);
-        $this->router = new \FreeFW\Http\Router();
+        $this->router = new \FreeFW\Console\Router();
         $this->router->setLogger($this->logger);
-        $bp = $p_config->get('basepath', false);
-        if ($bp !== false) {
-            $this->router->setBasePath($bp);
-        }
     }
 
     /**
@@ -51,10 +46,10 @@ class Application implements
      */
     protected function afterRender()
     {
-        $this->logger->debug('application.afterRender.start');
+        $this->logger->debug('console.afterRender.start');
         $manager = $this->getEventManager();
         $manager->notify(\FreeFW\Constants::EVENT_AFTER_RENDER);
-        $this->logger->debug('application.afterRender.end');
+        $this->logger->debug('console.afterRender.end');
         return $this;
     }
 
@@ -70,11 +65,11 @@ class Application implements
 
     /**
      *
-     * @param \FreeFW\Router\RouteCollection $p_collection
+     * @param \FreeFW\Console\CommandCollection $p_collection
      */
-    public function addRoutes(\FreeFW\Router\RouteCollection $p_collection)
+    public function addCommands(\FreeFW\Console\CommandCollection $p_collection)
     {
-        $this->router->addRoutes($p_collection);
+        $this->router->addCommands($p_collection);
         return $this;
     }
 }

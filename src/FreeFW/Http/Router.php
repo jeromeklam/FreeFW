@@ -1,5 +1,5 @@
 <?php
-namespace FreeFW\Router;
+namespace FreeFW\Http;
 
 /**
  * Uses
@@ -44,7 +44,7 @@ class Router
      *
      * @param string $p_basepath
      *
-     * @return \FreeFW\Router\Router
+     * @return \FreeFW\Http\Router
      */
     public function setBasePath($p_basepath = '')
     {
@@ -55,7 +55,7 @@ class Router
     /**
      * Delete all routes
      *
-     * @return \FreeFW\Router\Router
+     * @return \FreeFW\Http\Router
      */
     public function flush()
     {
@@ -68,7 +68,7 @@ class Router
      *
      * @param \FreeFW\Router\RouteCollection $p_collection
      *
-     * @return \FreeFW\Router\Router
+     * @return \FreeFW\Http\Router
      */
     public function addRoutes(\FreeFW\Router\RouteCollection $p_collection)
     {

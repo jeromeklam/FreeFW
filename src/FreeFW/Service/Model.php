@@ -65,14 +65,20 @@ class Model extends \FreeFW\Core\Service
         }
         if ($addStorage) {
             $filename = $path . '/' . $addp . '/StorageModel/' . $p_model->getMdClass() . '.php';
-            $this->createStorageModelClass($p_model, $filename);
+            if (!is_file($filename)) {
+                $this->createStorageModelClass($p_model, $filename);
+            }
         }
         if ($addBase) {
             $filename = $path . '/' . $addp . '/Base/' . $p_model->getMdClass() . '.php';
-            $this->createBaseModelClass($p_model, $filename);
+            if (!is_file($filename)) {
+                $this->createBaseModelClass($p_model, $filename);
+            }
         }
         $filename = $path . '/' . $addp . '/' . $p_model->getMdClass() . '.php';
-        $this->createModelClass($p_model, $filename);
+        if (!is_file($filename)) {
+            $this->createModelClass($p_model, $filename);
+        }
         return true;
     }
 
