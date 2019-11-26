@@ -186,7 +186,24 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
                 if (array_key_exists($field, $fields)) {
                     $property = $fields[$field];
                     $setter   = 'set' . \FreeFW\Tools\PBXString::toCamelCase($property, true);
-                    $this->$setter($value);
+                    switch ($properties[$property][FFCST::PROPERTY_TYPE]) {
+                        case FFCST::TYPE_BIGINT:
+                        case FFCST::TYPE_INTEGER:
+                            if ($value !== null) {
+                                $this->$setter(intval($value));
+                            }
+                            break;
+                        case FFCST::TYPE_BOOLEAN:
+                            if (intval($value) > 0) {
+                                $this->$setter(true);
+                            } else {
+                                $this->$setter(false);
+                            }
+                            break;
+                        default:
+                            $this->$setter($value);
+                            break;
+                    }
                 }
             }
         }

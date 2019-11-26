@@ -53,7 +53,7 @@ class Console extends \FreeFW\Core\Console
         try {
             $input   = \FreeFW\Console\Input\Input::getFromGlobals();
             
-            $sso     = new \FreeFW\Console\SsoMock('4');
+            $sso     = new \FreeFW\Console\SsoMock('3');
             \FreeFW\DI\DI::setShared('sso', $sso);
             
             
