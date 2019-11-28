@@ -368,23 +368,43 @@ class PDOStorage extends \FreeFW\Storage\Storage
             }
         }
         foreach ($p_relations as $idx => $shortcut) {
-            $parts = explode('.', $shortcut);
-            foreach ($parts as $idxP => $onePart) {
-                if (array_key_exists($onePart, $fks)) {
-                    $joins[$onePart] = $fks[$onePart]['right'];
-                    $newModel = \FreeFW\DI\DI::get($fks[$onePart]['right']['model']);
+            $parts   = explode('.', $shortcut);
+            $onePart = array_shift($parts);
+            $crtFKs  = $fks;
+            
+            while($onePart != '') {
+                if (array_key_exists($onePart, $crtFKs) && !array_key_exists($onePart, $joins)) {
+                    $joins[$onePart] = $crtFKs[$onePart]['right'];
+                    $newModel = \FreeFW\DI\DI::get($crtFKs[$onePart]['right']['model']);
                     $select   = $select . ', ' . $newModel::getSource() . '.*';
-                    switch ($fks[$onePart]['right']['type']) {
+                    switch ($crtFKs[$onePart]['right']['type']) {
                         default:
                             $from = $from . ' INNER JOIN ' . $newModel::getSource() . ' ON ';
-                            $from = $from . $newModel::getSource() . '.' . $fks[$onePart]['right']['field'] . ' = ';
-                            $from = $from . $p_model::getSource() . '.' . $fks[$onePart]['left'];
+                            $from = $from . $newModel::getSource() . '.' . $crtFKs[$onePart]['right']['field'] . ' = ';
+                            $from = $from . $p_model::getSource() . '.' . $crtFKs[$onePart]['left'];
                             break;
                     }
                     $loadModels[] = [
-                        'model'  => $fks[$onePart]['right']['model'],
+                        'model'  => $crtFKs[$onePart]['right']['model'],
                         'setter' => 'set' . \FreeFW\Tools\PBXString::toCamelCase($shortcut, true)
                     ];
+                }
+                if (count($parts) > 0) {
+                    $onePart    = array_shift($parts);
+                    $properties = $newModel::getProperties();
+                    $crtFKs     = [];
+                    foreach ($properties as $name => $property) {
+                        if (array_key_exists(FFCST::PROPERTY_FK, $property)) {
+                            foreach ($property[FFCST::PROPERTY_FK] as $fkname => $fkprops) {
+                                $crtFKs[$fkname] = [
+                                    'left'  => $name,
+                                    'right' => $fkprops
+                                ];
+                            }
+                        }
+                    }
+                } else {
+                    $onePart = '';
                 }
             }
         }
@@ -582,26 +602,33 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $left     = $p_condition->getLeftMember();
         $right    = $p_condition->getRightMember();
         $oper     = $p_condition->getOperator();
+        $addL     = '';
+        $addR     = '';
         $realOper = '=';
         $nullable = false;
         switch ($oper) {
             case \FreeFW\Storage\Storage::COND_LOWER:
-                $rOper = '<';
+                $realOper = '<';
                 break;
             case \FreeFW\Storage\Storage::COND_LOWER_EQUAL:
-                $rOper = '<=';
+                $realOper = '<=';
                 break;
             case \FreeFW\Storage\Storage::COND_GREATER:
-                $rOper = '>';
+                $realOper = '>';
                 break;
             case \FreeFW\Storage\Storage::COND_GREATER_EQUAL:
-                $rOper = '>=';
+                $realOper = '>=';
                 break;
             case \FreeFW\Storage\Storage::COND_EQUAL:
-                $rOper = '=';
+                $realOper = '=';
+                break;
+            case \FreeFW\Storage\Storage::COND_LIKE:
+                $realOper = 'like';
+                $addL     = '%';
+                $addR     = '%';
                 break;
             case \FreeFW\Storage\Storage::COND_EQUAL_OR_NULL:
-                $rOper    = '=';
+                $realOper = '=';
                 $nullable = true;
                 break;
         }
@@ -625,7 +652,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $result['type'] = $leftDatas['type'];
             }
             if ($rightDatas['type'] === false) {
-                $result['values'][$rightDatas['id']] = $rightDatas['value'];
+                $result['values'][$rightDatas['id']] = $addL . $rightDatas['value'] . $addR;
             } else {
                 $result['type'] = $rightDatas['type'];
             }

@@ -57,10 +57,11 @@ class Conditions extends \FreeFW\Core\Model implements
                  */
                 $aCondition = \FreeFW\Model\SimpleCondition::getNew();
                 $aCondition->setLeftMember($aField);
+                $aCondition->setOperator(\FreeFW\Storage\Storage::COND_LIKE);
                 if (is_array($value)) {
                     foreach ($value as $idx2 => $value2) {
                         // Verify oper...
-                        $aCondition->setOperator($idx2);
+                        //$aCondition->setOperator($idx2);
                         if (is_array($value2)) {
 
                         } else {
