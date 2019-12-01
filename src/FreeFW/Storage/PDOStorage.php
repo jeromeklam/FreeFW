@@ -368,10 +368,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
             }
         }
         foreach ($p_relations as $idx => $shortcut) {
-            $parts   = explode('.', $shortcut);
-            $onePart = array_shift($parts);
-            $crtFKs  = $fks;
-            
+            $parts    = explode('.', $shortcut);
+            $onePart  = array_shift($parts);
+            $crtFKs   = $fks;
+            $crtModel = $p_model;
+            $getter   = '';
             while($onePart != '') {
                 if (array_key_exists($onePart, $crtFKs) && !array_key_exists($onePart, $joins)) {
                     $joins[$onePart] = $crtFKs[$onePart]['right'];
@@ -381,14 +382,16 @@ class PDOStorage extends \FreeFW\Storage\Storage
                         default:
                             $from = $from . ' INNER JOIN ' . $newModel::getSource() . ' ON ';
                             $from = $from . $newModel::getSource() . '.' . $crtFKs[$onePart]['right']['field'] . ' = ';
-                            $from = $from . $p_model::getSource() . '.' . $crtFKs[$onePart]['left'];
+                            $from = $from . $crtModel::getSource() . '.' . $crtFKs[$onePart]['left'];
                             break;
                     }
                     $loadModels[] = [
                         'model'  => $crtFKs[$onePart]['right']['model'],
-                        'setter' => 'set' . \FreeFW\Tools\PBXString::toCamelCase($shortcut, true)
+                        'setter' => 'set' . \FreeFW\Tools\PBXString::toCamelCase($onePart, true),
+                        'getter' => $getter
                     ];
                 }
+                $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($onePart, true);
                 if (count($parts) > 0) {
                     $onePart    = array_shift($parts);
                     $properties = $newModel::getProperties();
@@ -406,6 +409,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 } else {
                     $onePart = '';
                 }
+                $crtModel = $newModel;
             }
         }
         /**
@@ -444,8 +448,15 @@ class PDOStorage extends \FreeFW\Storage\Storage
                             ->init()
                             ->setFromArray($row)
                         ;
+                        // @todo : SetFromArray can do all the job
+                        // Send relations...
+                        $getter = $otherModel['getter'];
                         $setter = $otherModel['setter'];
-                        $model->$setter($newModel);
+                        if ($getter == '') {
+                            $model->$setter($newModel);
+                        } else {
+                            $tmp = $model->$getter()->$setter($newModel);
+                        }
                     }
                     $result[] = $model;
                 }

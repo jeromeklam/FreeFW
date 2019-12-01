@@ -22,6 +22,7 @@ class Encoder
         \FreeFW\Http\ApiParams $p_api_params
     ) : \FreeFW\JsonApi\V1\Model\ResourceObject {
         $includes = '@@' . implode('@@', $p_api_params->getInclude()) . '@@';
+        $includes = str_replace('.', '@@', $includes);
         $resource = new \FreeFW\JsonApi\V1\Model\ResourceObject(
             $p_api_response->getApiType(),
             $p_api_response->getApiId(),
@@ -51,7 +52,7 @@ class Encoder
                             $p_included->addIncluded($included);
                         }
                     } else {
-                        if (strpos('@@' . $relation->getName() . '@@', $includes) !== false) {
+                        if (strpos($includes, '@@' . $relation->getName() . '@@') !== false) {
                             foreach ($model as $oneModel) {
                                 $resourceRel = new \FreeFW\JsonApi\V1\Model\ResourceObject(
                                     $oneModel->getApiType(),
