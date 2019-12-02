@@ -192,7 +192,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
      *
      * @return \FreeFW\Core\Model
      */
-    public function setFromArray($p_array)
+    public function setFromArray($p_array, array $p_aliases = [], $p_crtAlias = '@')
     {
         if ($p_array instanceof \stdClass) {
             $p_array = (array)$p_array;
@@ -200,10 +200,23 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
         if (is_array($p_array)) {
             $properties = $this->getProperties();
             $fields     = [];
+            $relations  = [];
             foreach ($properties as $key => $prop) {
                 $fields[$prop[FFCST::PROPERTY_PRIVATE]] = $key;
+                if (array_key_exists(FFCST::PROPERTY_OPTIONS, $prop) && in_array(FFCST::OPTION_FK, $prop[FFCST::PROPERTY_OPTIONS])) {
+                    $relations[$key] = $prop;
+                }
+            }
+            $alias = '';
+            $subst = 0;
+            if (array_key_exists($p_crtAlias, $p_aliases)) {
+                $alias = $p_aliases[$p_crtAlias];
+                $subst = strlen($alias) + 1;
             }
             foreach ($p_array as $field => $value) {
+                if ($subst > 0) {
+                    $field = substr($field, $subst);
+                }
                 if (array_key_exists($field, $fields)) {
                     $property = $fields[$field];
                     $setter   = 'set' . \FreeFW\Tools\PBXString::toCamelCase($property, true);
@@ -224,6 +237,26 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
                         default:
                             $this->$setter($value);
                             break;
+                    }
+                }
+            }
+            $newAliases = [];
+            foreach ($p_aliases as $kA => $vA) {
+                if (strpos($kA, $p_crtAlias . '.') == 0) {
+                    $newAliases[substr($kA, strlen($p_crtAlias . '.'))] = $vA;
+                }
+            }
+            if (count($newAliases) > 0) {
+                foreach ($relations as $key => $prop) {
+                    foreach ($prop[FFCST::PROPERTY_FK] as $fk => $pfk) {
+                        $fieldFK = $pfk['field'];
+                        $modelFK = $pfk['model'];
+                        if (array_key_exists($fk, $newAliases)) {
+                            $newModel = \FreeFW\DI\DI::get($modelFK);
+                            $newModel->setFromArray($p_array, $newAliases, $fk);
+                            $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($fk, true);
+                            $this->$setter($newModel);
+                        }
                     }
                 }
             }
@@ -310,6 +343,29 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
             }
         }
         return '';
+    }
+
+    /**
+     * Return all fields for a select clause
+     *
+     * @return string
+     */
+    public function getFieldsForSelect(string $p_alias = '') : string
+    {
+        $select = '';
+        foreach ($this->getProperties() as $name => $property) {
+            if ($p_alias == '') {
+                $add = $name;
+            } else {
+                $add = $p_alias . '.' . $name . ' AS ' . $p_alias . '_' . $name;
+            }
+            if ($select == '') {
+                $select = $add;
+            } else {
+                $select = $select . ', ' . $add;
+            }
+        }
+        return $select;
     }
 
     /**

@@ -160,16 +160,23 @@ class ApiController extends \FreeFW\Core\Controller
      *
      * @param \Psr\Http\Message\ServerRequestInterface $p_request
      */
-    public function removeOne(\Psr\Http\Message\ServerRequestInterface $p_request)
+    public function removeOne(\Psr\Http\Message\ServerRequestInterface $p_request, $p_id = null)
     {
         $this->logger->debug('FreeFW.ApiController.removeOne.start');
         $apiParams = $p_request->getAttribute('api_params', false);
+        if (!isset($p_request->default_model)) {
+            throw new \FreeFW\Core\FreeFWStorageException(
+                sprintf('No default model for route !')
+            );
+        }
+        $default = $p_request->default_model;
+        $model   = \FreeFW\DI\DI::get($default);
         //
-        if ($apiParams->hasData()) {
+        if ($p_id > 0) {
             /**
              * @var \FreeFW\Core\StorageModel $data
              */
-            $data = $apiParams->getData();
+            $data = $model->findFirst([$model->getPkField() => $p_id]);
             $data->remove();
             $this->logger->debug('FreeFW.ApiController.removeOne.end');
             return $this->createResponse(204);

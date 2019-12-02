@@ -22,8 +22,9 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
      * Joins
      * @var string
      */
-    const JOIN_LEFT      = 'LEFT';
-    const JOIN_INNER     = 'INNER';
+    const JOIN_LEFT  = 'LEFT';
+    const JOIN_RIGHT = 'RIGHT';
+    const JOIN_INNER = 'INNER';
 
     /**
      * Storage strategy

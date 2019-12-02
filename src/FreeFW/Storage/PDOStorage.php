@@ -332,15 +332,17 @@ class PDOStorage extends \FreeFW\Storage\Storage
         int $p_from = 0,
         int $p_length = 0
     ) {
-        $sso        = \FreeFW\DI\DI::getShared('sso');
-        $select     = $p_model::getSource() . '.*';
-        $from       = $p_model::getSource();
-        $properties = $p_model::getProperties();
-        $values     = [];
-        $result     = \FreeFW\DI\DI::get('FreeFW::Model::ResultSet');
-        $fks        = [];
-        $joins      = [];
-        $loadModels = [];
+        $crtAlias     = 'A';
+        $aliases      = [];
+        $aliases['@'] = $crtAlias;
+        $select       = $p_model->getFieldsForSelect($crtAlias);
+        $from         = $p_model::getSource() . ' AS ' . $crtAlias;
+        $properties   = $p_model::getProperties();
+        $values       = [];
+        $result       = \FreeFW\DI\DI::get('FreeFW::Model::ResultSet');
+        $fks          = [];
+        $joins        = [];
+        $loadModels   = [];
         /**
          * Check specific properties
          */
@@ -368,21 +370,34 @@ class PDOStorage extends \FreeFW\Storage\Storage
             }
         }
         foreach ($p_relations as $idx => $shortcut) {
-            $parts    = explode('.', $shortcut);
-            $onePart  = array_shift($parts);
-            $crtFKs   = $fks;
-            $crtModel = $p_model;
-            $getter   = '';
+            $parts     = explode('.', $shortcut);
+            $onePart   = array_shift($parts);
+            $crtFKs    = $fks;
+            $getter    = '';
+            $baseAlias = '@';
             while($onePart != '') {
                 if (array_key_exists($onePart, $crtFKs) && !array_key_exists($onePart, $joins)) {
                     $joins[$onePart] = $crtFKs[$onePart]['right'];
                     $newModel = \FreeFW\DI\DI::get($crtFKs[$onePart]['right']['model']);
-                    $select   = $select . ', ' . $newModel::getSource() . '.*';
+                    ++$crtAlias;
+                    $aliases[$baseAlias . '.' . $onePart] = $crtAlias;
+                    $select   = $select . ', ' . $newModel->getFieldsForSelect($crtAlias);
+                    $alias1   = $aliases[$baseAlias];
                     switch ($crtFKs[$onePart]['right']['type']) {
+                        case \FreeFW\Model\Query::JOIN_RIGHT:
+                            $from = $from . ' RIGHT JOIN ' . $newModel::getSource() . ' AS ' . $crtAlias . ' ON ';
+                            $from = $from . $crtAlias . '.' . $crtFKs[$onePart]['right']['field'] . ' = ';
+                            $from = $from . $alias1 . '.' . $crtFKs[$onePart]['left'];
+                            break;
+                        case \FreeFW\Model\Query::JOIN_LEFT:
+                            $from = $from . ' LEFT JOIN ' . $newModel::getSource() . ' AS ' . $crtAlias . ' ON ';
+                            $from = $from . $crtAlias . '.' . $crtFKs[$onePart]['right']['field'] . ' = ';
+                            $from = $from . $alias1 . '.' . $crtFKs[$onePart]['left'];
+                            break;
                         default:
-                            $from = $from . ' INNER JOIN ' . $newModel::getSource() . ' ON ';
-                            $from = $from . $newModel::getSource() . '.' . $crtFKs[$onePart]['right']['field'] . ' = ';
-                            $from = $from . $crtModel::getSource() . '.' . $crtFKs[$onePart]['left'];
+                            $from = $from . ' INNER JOIN ' . $newModel::getSource() . ' AS ' . $crtAlias . ' ON ';
+                            $from = $from . $crtAlias . '.' . $crtFKs[$onePart]['right']['field'] . ' = ';
+                            $from = $from . $alias1 . '.' . $crtFKs[$onePart]['left'];
                             break;
                     }
                     $loadModels[] = [
@@ -391,6 +406,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                         'getter' => $getter
                     ];
                 }
+                $baseAlias = $baseAlias . '.' . $onePart;
                 $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($onePart, true);
                 if (count($parts) > 0) {
                     $onePart    = array_shift($parts);
@@ -409,13 +425,12 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 } else {
                     $onePart = '';
                 }
-                $crtModel = $newModel;
             }
         }
         /**
          * @var \FreeFW\Model\Condition $oneCondition
          */
-        $parts  = $this->renderConditions($p_conditions, $p_model);
+        $parts  = $this->renderConditions($p_conditions, $p_model, $aliases, '@');
         $where  = $parts['sql'];
         $values = $parts['values'];
         // Build query
@@ -436,12 +451,14 @@ class PDOStorage extends \FreeFW\Storage\Storage
             // Get PDO and execute
             $query = $this->provider->prepare($sql, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
             if ($query->execute($values)) {
+                $clName = str_replace('\\', '::', get_class($p_model));
                 while ($row = $query->fetch(\PDO::FETCH_OBJ)) {
-                    $model = clone($p_model);
+                    $model = \FreeFW\DI\DI::get($clName);
                     $model
                         ->init()
-                        ->setFromArray($row)
+                        ->setFromArray($row, $aliases, '@')
                     ;
+                    /**
                     foreach ($loadModels as $idxModel => $otherModel) {
                         $newModel = \FreeFW\DI\DI::get($otherModel['model']);
                         $newModel
@@ -455,9 +472,10 @@ class PDOStorage extends \FreeFW\Storage\Storage
                         if ($getter == '') {
                             $model->$setter($newModel);
                         } else {
-                            $tmp = $model->$getter()->$setter($newModel);
+                            $model->$getter()->$setter($newModel);
                         }
                     }
+                    */
                     $result[] = $model;
                 }
             } else {
@@ -533,7 +551,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
      */
     protected function renderConditions(
         \FreeFW\Model\Conditions $p_conditions,
-        \FreeFW\Core\StorageModel $p_model
+        \FreeFW\Core\StorageModel $p_model,
+        array $p_aliases = [],
+        $p_crtAlias = '@'
     ) {
         $result = [
             'sql'    => '',
@@ -546,7 +566,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         }
         foreach ($p_conditions as $idx => $oneCondition) {
             if ($oneCondition instanceof \FreeFW\Model\SimpleCondition) {
-                $parts = $this->renderCondition($oneCondition, $p_model);
+                $parts = $this->renderCondition($oneCondition, $p_model, $p_aliases, $p_crtAlias);
                 if ($result['sql'] == '') {
                     $result['sql']    = $parts['sql'];
                     $result['values'] = $parts['values'];
@@ -555,7 +575,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     $result['values'] = array_merge($result['values'], $parts['values']);
                 }
             } else {
-                $parts = $this->renderConditions($oneCondition, $p_model);
+                $parts = $this->renderConditions($oneCondition, $p_model, $p_aliases, $p_crtAlias);
                 if ($result['sql'] == '') {
                     $result['sql']    = $parts['sql'];
                     $result['values'] = $parts['values'];
@@ -580,11 +600,13 @@ class PDOStorage extends \FreeFW\Storage\Storage
      */
     protected function renderConditionField(
         \FreeFW\Interfaces\ConditionInterface $p_field,
-        \FreeFW\Core\StorageModel $p_model
+        \FreeFW\Core\StorageModel $p_model,
+        array $p_aliases = [], 
+        $p_crtAlias = '@'
     ) {
         if ($p_field instanceof \FreeFW\Model\ConditionMember) {
             $field = $p_field->getValue();
-            return $this->renderModelField($field, $p_model);
+            return $this->renderModelField($field, $p_model, $p_aliases, $p_crtAlias);
         } else {
             if ($p_field instanceof \FreeFW\Model\ConditionValue) {
                 $value = $p_field->getValue();
@@ -607,7 +629,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
      */
     protected function renderCondition(
         \FreeFW\Model\SimpleCondition $p_condition,
-        \FreeFW\Core\StorageModel $p_model
+        \FreeFW\Core\StorageModel $p_model,
+        array $p_aliases = [],
+        $p_crtAlias = '@'
     ) {
         $result   = [];
         $left     = $p_condition->getLeftMember();
@@ -644,8 +668,8 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 break;
         }
         if ($left !== null && $right !== null) {
-            $leftDatas  = $this->renderConditionField($left, $p_model);
-            $rightDatas = $this->renderConditionField($right, $p_model);
+            $leftDatas  = $this->renderConditionField($left, $p_model, $p_aliases, $p_crtAlias);
+            $rightDatas = $this->renderConditionField($right, $p_model, $p_aliases, $p_crtAlias);
             $result     = [
                 'values' => [],
                 'type'   => false
@@ -683,8 +707,12 @@ class PDOStorage extends \FreeFW\Storage\Storage
      *
      * @throws \FreeFW\Core\FreeFWStorageException
      */
-    protected function renderModelField(string $p_field, \FreeFW\Core\StorageModel $p_model)
-    {
+    protected function renderModelField(
+        string $p_field,
+        \FreeFW\Core\StorageModel $p_model,
+        array $p_aliases = [],
+        $p_crtAlias = '@'
+    ) {
         $parts = explode('.', $p_field);
         if (count($parts) > 1) {
             $class = $parts[0];
@@ -698,11 +726,16 @@ class PDOStorage extends \FreeFW\Storage\Storage
         } else {
             $source     = $p_model::getSource();
             $properties = $p_model::getProperties();
-            $field = $parts[0];
+            $field      = $parts[0];
         }
-        $type = \FreeFW\Constants::TYPE_STRING;
+        if (array_key_exists($p_crtAlias, $p_aliases)) {
+            $alias = $p_aliases[$p_crtAlias];
+        } else {
+            $alias = $source;
+        }
+        $type  = \FreeFW\Constants::TYPE_STRING;
         if (array_key_exists($field, $properties)) {
-            $real = $source . '.' . $properties[$field][FFCST::PROPERTY_PRIVATE];
+            $real = $alias . '.' . $properties[$field][FFCST::PROPERTY_PRIVATE];
             $type = $properties[$field][FFCST::PROPERTY_TYPE];
         } else {
             throw new \FreeFW\Core\FreeFWStorageException(
