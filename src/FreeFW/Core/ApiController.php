@@ -10,6 +10,41 @@ class ApiController extends \FreeFW\Core\Controller
 {
 
     /**
+     * AutoComplete
+     * 
+     * @param \Psr\Http\Message\ServerRequestInterface $p_request
+     * @param string $p_search
+     * 
+     * @throws \FreeFW\Core\FreeFWStorageException
+     * 
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function autocomplete(\Psr\Http\Message\ServerRequestInterface $p_request, $p_search = '')
+    {
+        $this->logger->debug('FreeFW.ApiController.autocomplete.start');
+        $data = [];
+        /**
+         * @var \FreeFW\Http\ApiParams $apiParams
+         */
+        $apiParams = $p_request->getAttribute('api_params', false);
+        if (!isset($p_request->default_model)) {
+            throw new \FreeFW\Core\FreeFWStorageException(
+                sprintf('No default model for route !')
+            );
+        }
+        $default = $p_request->default_model;
+        $model   = \FreeFW\DI\DI::get($default);
+        $data    = $model->find(
+            [
+                $model->getAutocompleteField() => [\FreeFW\Storage\Storage::COND_LIKE => $p_search]
+                
+            ]
+        );
+        $this->logger->debug('FreeFW.ApiController.autocomplete.end');
+        return $this->createResponse(200, $data);
+    }
+
+    /**
      * Get all
      *
      * @param \Psr\Http\Message\ServerRequestInterface $p_request

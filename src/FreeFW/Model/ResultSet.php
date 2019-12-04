@@ -220,7 +220,7 @@ class ResultSet extends \FreeFW\Core\Model implements
         $result = array();
         $idx = 0;
         foreach ($this->var as $idx => $line) {
-            $result[] = $line->__toFields();
+            $result[] = $line->__toArray();
         }
         return $result;
     }

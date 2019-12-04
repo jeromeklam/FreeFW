@@ -1,1 +1,7 @@
+# 1.0.1 : First test version
+
+* JsonApi / Json input, output format
+* Autocomplete webservice
+* Phinx integration
+
 # 1.0.0 : Work in progress

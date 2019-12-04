@@ -46,6 +46,10 @@ class ApiNegociator implements
         'application/vnd.api+json' => [
             'class'   => 'FreeFW::Middleware::JsonApi',
             'default' => true
+        ],
+        'application/json' => [
+            'class'   => 'FreeFW::Middleware::Json',
+            'default' => false
         ]
     ];
 
@@ -136,7 +140,7 @@ class ApiNegociator implements
         try {
             $method = $p_request->getMethod();
             if (!in_array($method, $this->methods, true)) {
-                return false;
+                return $this->createResponse(405, "Method not allowed !");
             }
             $contentType = trim($p_request->getHeaderLine('Content-Type'));
             if ($contentType == '') {
@@ -145,6 +149,7 @@ class ApiNegociator implements
             if (array_key_exists($contentType, $this->formats)) {
                 $class = $this->formats[$contentType]['class'];
             } else {
+                return $this->createResponse(415, "Unsupported media type !");
                 foreach ($this->formats as $name => $format) {
                     if ($format['default']) {
                         $class = $format['class'];
