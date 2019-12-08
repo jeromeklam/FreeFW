@@ -118,19 +118,15 @@ abstract class Model implements
                         $fk     = $fks[$relation['name']];
                         // Complete empty object
                         $rel    = \FreeFW\DI\DI::get($fk['model']); 
-                        $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($test, true);
+                        $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($relation['name'], true);
                         foreach ($relation['values'] as $val) {
                             $rel->setApiId($val);
                         }
                         $this->$setter($rel);
                         // property
-                        $field = $fk['field'];
-                        if (array_key_exists($field, $props)) {
-                            $crtProp = $field;
-                            $setter  = 'set' . \FreeFW\Tools\PBXString::toCamelCase($crtProp, true);
-                            foreach ($relation['values'] as $val) {
-                                $this->$setter($val);
-                            }
+                        $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($test, true);
+                        foreach ($relation['values'] as $val) {
+                            $this->$setter($val);
                         }
                     }
                 }

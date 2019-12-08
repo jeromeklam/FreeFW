@@ -215,6 +215,9 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
             }
             foreach ($p_array as $field => $value) {
                 if ($subst > 0) {
+                    if (strpos($field, $alias) !== 0) {
+                        continue;
+                    }
                     $field = substr($field, $subst);
                 }
                 if (array_key_exists($field, $fields)) {

@@ -458,24 +458,6 @@ class PDOStorage extends \FreeFW\Storage\Storage
                         ->init()
                         ->setFromArray($row, $aliases, '@')
                     ;
-                    /**
-                    foreach ($loadModels as $idxModel => $otherModel) {
-                        $newModel = \FreeFW\DI\DI::get($otherModel['model']);
-                        $newModel
-                            ->init()
-                            ->setFromArray($row)
-                        ;
-                        // @todo : SetFromArray can do all the job
-                        // Send relations...
-                        $getter = $otherModel['getter'];
-                        $setter = $otherModel['setter'];
-                        if ($getter == '') {
-                            $model->$setter($newModel);
-                        } else {
-                            $model->$getter()->$setter($newModel);
-                        }
-                    }
-                    */
                     $result[] = $model;
                 }
             } else {
