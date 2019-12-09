@@ -16,6 +16,30 @@ class Date
 {
 
     /**
+     * String to mysql datetime
+     * 
+     * @param string $p_str
+     * 
+     * @return string
+     */
+    public static function stringToMysql($p_str)
+    {
+        return date('Y-m-d H:i:s', strtotime($p_str));
+    }
+
+    /**
+     * datetime to ISO8601
+     * 
+     * @param string $p_date
+     * 
+     * @return string
+     */
+    public static function stringToISO8601($p_date)
+    {
+        return date("c", strtotime($p_date));
+    }
+
+    /**
      * Return a datetime
      *
      * @param number $p_plus (minutes)

@@ -56,6 +56,7 @@ class Constants
     const TYPE_JSON               = 'JSON';
     const TYPE_DATE               = 'DATE';
     const TYPE_DATETIME           = 'DATETIME';
+    const TYPE_DATETIMETZ         = 'DATETIMETZ';
     const TYPE_BIGINT             = 'BIGINT';
     const TYPE_BOOLEAN            = 'BOOLEAN';
     const TYPE_INTEGER            = 'INTEGER';

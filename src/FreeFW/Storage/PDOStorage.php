@@ -61,6 +61,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
             $add = true;
             $pk  = false;
             $brk = false;
+            $dtz = false;
             if (array_key_exists(FFCST::PROPERTY_OPTIONS, $oneProperty)) {
                 if (in_array(FFCST::OPTION_LOCAL, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $add = false;
@@ -70,6 +71,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 }
                 if (in_array(FFCST::OPTION_BROKER, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $brk = true;
+                }
+                if ($oneProperty[FFCST::PROPERTY_TYPE] == FFCST::TYPE_DATETIMETZ) {
+                    $dtz = true;
                 }
             }
             if ($add) {
@@ -88,6 +92,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
                         $val = $p_model->$getter();
                         if ($val === false) {
                             $val = 0;
+                        }
+                        if ($dtz && $val != '') {
+                            $val = \FreeFW\Tools\Date::stringToMysql($val);
                         }
                         $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $val;
                     }
@@ -252,6 +259,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
             $add = true;
             $pk  = false;
             $brk = false;
+            $dtz = false;
             if (array_key_exists(FFCST::PROPERTY_OPTIONS, $oneProperty)) {
                 if (in_array(FFCST::OPTION_LOCAL, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $add = false;
@@ -261,6 +269,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 }
                 if (in_array(FFCST::OPTION_BROKER, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $brk = true;
+                }
+                if ($oneProperty[FFCST::PROPERTY_TYPE] == FFCST::TYPE_DATETIMETZ) {
+                    $dtz = true;
                 }
             }
             if ($add) {
@@ -278,6 +289,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
                         $val = $p_model->$getter();
                         if ($val === false) {
                             $val = 0;
+                        }
+                        if ($dtz && $val != '') {
+                            $val = \FreeFW\Tools\Date::stringToMysql($val);
                         }
                         $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $val;
                     }
