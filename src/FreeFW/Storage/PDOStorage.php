@@ -357,21 +357,14 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $fks          = [];
         $joins        = [];
         $loadModels   = [];
+        $whereBroker  = '';
         /**
          * Check specific properties
          */
         foreach ($properties as $name => $property) {
             if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
                 if (in_array(FFCST::OPTION_BROKER, $property[FFCST::PROPERTY_OPTIONS])) {
-                    $aField = new \FreeFW\Model\ConditionMember();
-                    $aField->setValue($name);
-                    $aCondition = \FreeFW\Model\SimpleCondition::getNew();
-                    $aCondition->setLeftMember($aField);
-                    $aCondition->setOperator(\FreeFW\Storage\Storage::COND_EQUAL);
-                    $aValue = new \FreeFW\Model\ConditionValue();
-                    $aValue->setValue($p_model->getMainBroker());
-                    $aCondition->setRightMember($aValue);
-                    $p_conditions->add($aCondition);
+                    $whereBroker = ' AND ( ' . $crtAlias . '.' . $name . ' = ' . $p_model->getMainBroker() . ')';
                 }
             }
             if (array_key_exists(FFCST::PROPERTY_FK, $property)) {
@@ -458,7 +451,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $limit = $limit . ', ' . $p_length;
             }
         }
-        $sql = 'SELECT ' . $select . ' FROM ' . $from . ' WHERE ' . $where . $limit;
+        $sql = 'SELECT ' . $select . ' FROM ' . $from . ' WHERE ( ' . $where . ' ) ' . $whereBroker . ' ' . $limit;
         $this->logger->debug('PDOStorage.select : ' . $sql);
         // I got all, run query...
         try {
