@@ -56,7 +56,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 return false;
             }
         }
-        $setter     = false;
+        $setter = false;
         foreach ($properties as $name => $oneProperty) {
             $add = true;
             $pk  = false;

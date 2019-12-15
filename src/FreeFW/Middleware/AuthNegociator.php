@@ -62,6 +62,31 @@ class AuthNegociator implements
     }
 
     /**
+     * Login with cookie
+     * 
+     * @param ServerRequestInterface $p_request
+     * 
+     * @return boolean
+     */
+    protected function checkAutoLogin(ServerRequestInterface $p_request)
+    {
+        $allowed = false;
+        $authString = trim($p_request->getHeaderLine('AutoLogin'));
+        if ($authString != '') {
+            $sso  = \FreeFW\DI\DI::getShared('sso');
+            try {
+                $user = $sso->signinByAutoLogin($authString);
+                if ($user instanceof \FreeSSO\Model\Base\User) {
+                    $allowed = true;
+                }
+            } catch (\Exception $ex) {
+                //
+            }
+        }
+        return $allowed;
+    }
+
+    /**
      * Process an incoming server request and return a response, optionally delegating
      * to the next middleware component to create the response.
      *
@@ -77,6 +102,8 @@ class AuthNegociator implements
         if ($this->secured || $this->requestIdentity()) {
             $authString = trim($p_request->getHeaderLine('Authorization'));
             $class      = false;
+            $allowed    = false;
+            $response   = false;
             if ($authString != '') {
                 $parts      = explode(' ', $authString);
                 $authType   = strtoupper($parts[0]);
@@ -98,6 +125,9 @@ class AuthNegociator implements
                 $allowed = true;
                 if ($this->secured) {
                     $allowed = $mid->verifyAuthorizationHeader($p_request);
+                    if (!$allowed) {
+                        $allowed = $this->checkAutoLogin($p_request);
+                    }
                 }
                 if ($allowed) {
                     $response = $p_handler->handle($p_request);
@@ -108,10 +138,10 @@ class AuthNegociator implements
                 } else {
                     $response = $this->createResponse(401, "Not authorized !");
                 }
-                return $response;
             } else {
-                return $this->createResponse(500, "No auth class found !");
+                $response = $this->createResponse(409, "Auth method not allowed !");
             }
+            return $response;
         }
         return $p_handler->handle($p_request);
     }

@@ -381,7 +381,7 @@ abstract class Model implements
             if (array_key_exists(FFCST::PROPERTY_OPTIONS, $oneProperty)) {
                 $options = $oneProperty[FFCST::PROPERTY_OPTIONS];
             }
-            if (in_array(FFCST::OPTION_REQUIRED, $options)) {
+            if (in_array(FFCST::OPTION_REQUIRED, $options) && !in_array(FFCST::OPTION_PK, $options)) {
                 $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
                 $value  = $this->$getter();
                 $public = $name;

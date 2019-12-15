@@ -170,23 +170,27 @@ class ApiController extends \FreeFW\Core\Controller
      *
      * @param \Psr\Http\Message\ServerRequestInterface $p_request
      */
-    public function updateOne(\Psr\Http\Message\ServerRequestInterface $p_request)
+    public function updateOne(\Psr\Http\Message\ServerRequestInterface $p_request, $p_id)
     {
         $this->logger->debug('FreeFW.ApiController.updateOne.start');
         $apiParams = $p_request->getAttribute('api_params', false);
         //
-        if ($apiParams->hasData()) {
-            /**
-             * @var \FreeFW\Core\StorageModel $data
-             */
-            $data = $apiParams->getData();
-            if ($data->isValid()) {
-                $data->save();
+        if (intval($p_id) > 0 ) {
+            if ($apiParams->hasData()) {
+                /**
+                 * @var \FreeFW\Core\StorageModel $data
+                 */
+                $data = $apiParams->getData();
+                if ($data->isValid()) {
+                    $data->save();
+                }
+                $this->logger->debug('FreeFW.ApiController.updateOne.end');
+                return $this->createResponse(200, $data);
+            } else {
+                return $this->createResponse(409);
             }
-            $this->logger->debug('FreeFW.ApiController.updateOne.end');
-            return $this->createResponse(200, $data);
         } else {
-            return $this->createResponse(409);
+            return $this->createResponse(409, 'Id is mantarory');
         }
     }
 
