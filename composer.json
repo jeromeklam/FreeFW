@@ -4,7 +4,7 @@
     "description" : "Free PHP FrameWork",
     "keywords"    : ["FREE", "ASSOCIATION", "PHP"],
     "homepage"    : "http://github.com/jeromeklam",
-    "license"     : "gpl",
+    "license"     : "gplv3",
     "authors" : [
         {
             "name"  : "KLAM Jérôme",

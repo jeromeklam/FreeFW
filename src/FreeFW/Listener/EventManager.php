@@ -51,11 +51,11 @@ class EventManager
      * Notification d'événement
      *
      * @param string $event_name
-     * @param array  $data
+     * @param mixed  $data
      *
      * @return \FreeFW\EventManager
      */
-    public function notify($event_name, array $data = array())
+    public function notify($event_name, $data = null)
     {
         $listener = $this->getListener($event_name);
         if (!$listener) {
@@ -70,15 +70,22 @@ class EventManager
     /**
      * Association d'un événement
      *
-     * @param string $event_name
-     * @param mixed  $callback
-     * @param int    $priority
+     * @param mixed $event (string/array)
+     * @param mixed $callback
+     * @param int   $priority
      *
      * @return \FreeFW\EventManager
      */
-    public function bind($event_name, $callback, $priority = 1)
+    public function bind($event, $callback, $priority = 1)
     {
-        return $this->registerEvent($event_name, $callback, $priority);
+        if (is_array($event)) {
+            foreach ($event as $oneEvent) {
+                $this->registerEvent($oneEvent, $callback, $priority);
+            }
+        } else {
+            $this->registerEvent($event, $callback, $priority);
+        }
+        return $this;
     }
 
     /**

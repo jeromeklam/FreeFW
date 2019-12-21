@@ -42,6 +42,9 @@ class Constants
     const EVENT_BEFORE_FINISH      = 'app-before-finish';
     const EVENT_AFTER_RENDER       = 'app-after-render';
     const EVENT_INCOMPLETE_REQUEST = 'app-inc-request';
+    const EVENT_STORAGE_CREATE     = 'storage_create';
+    const EVENT_STORAGE_UPDATE     = 'storage_update';
+    const EVENT_STORAGE_DELETE     = 'storage_delete';
 
     /**
      * Types d'objets

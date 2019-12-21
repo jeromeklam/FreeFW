@@ -52,11 +52,11 @@ class Console extends \FreeFW\Core\Console
         $this->logger->debug('Application.handle.start');
         try {
             $input   = \FreeFW\Console\Input\Input::getFromGlobals();
-            
-            $sso     = new \FreeFW\Console\SsoMock('3');
+            $cfg     = $this->getConfig();
+            $ssoBrk  = $cfg->get('sso');
+            $broker  = \FreeSSO\Model\Broker::findFirst(['brk_key' => $ssoBrk['broker']]);
+            $sso     = new \FreeFW\Console\SsoMock($broker->getBrkId());
             \FreeFW\DI\DI::setShared('sso', $sso);
-            
-            
             $output  = new \FreeFW\Console\Output\ConsoleOutput();
             $command = $this->router->findCommand($input);
             if ($command) {

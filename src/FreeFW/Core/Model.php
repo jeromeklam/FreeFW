@@ -411,4 +411,14 @@ abstract class Model implements
         }
         return $this;
     }
+
+    /**
+     * Add to queue ?
+     *
+     * @return boolean
+     */
+    public function forwardStorageEvent()
+    {
+        return false;
+    }
 }

@@ -112,6 +112,10 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     $lastId = $this->provider->lastInsertId();
                     $p_model->$setter($lastId);
                 }
+                try {
+                    $this->forwardRawEvent(FFCST::EVENT_STORAGE_CREATE, $p_model);
+                } catch (\Exception $ex) {
+                }
             } else {
                 $this->logger->debug('PDOStorage.create.error : ' . print_r($query->errorInfo(), true));
                 $localErr = $query->errorInfo();
@@ -221,6 +225,10 @@ class PDOStorage extends \FreeFW\Storage\Storage
             if ($query->execute($fields)) {
                 $code = '';
                 $ok   = true;
+                try {
+                    $this->forwardRawEvent(FFCST::EVENT_STORAGE_DELETE, $p_model);
+                } catch (\Exception $ex) {
+                }
             } else {
                 $this->logger->debug('PDOStorage.remove.error : ' . print_r($query->errorInfo(), true));
                 $localErr = $query->errorInfo();
@@ -306,6 +314,10 @@ class PDOStorage extends \FreeFW\Storage\Storage
             $query = $this->provider->prepare($sql, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
             if ($query->execute($fields)) {
                 $code = '';
+                try {
+                    $this->forwardRawEvent(FFCST::EVENT_STORAGE_UPDATE, $p_model);
+                } catch (\Exception $ex) {
+                }
             } else {
                 $this->logger->debug('PDOStorage.save.error : ' . print_r($query->errorInfo(), true));
                 $localErr = $query->errorInfo();

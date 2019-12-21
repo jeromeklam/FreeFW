@@ -52,16 +52,18 @@ class FileLogger extends \Psr\Log\AbstractLogger
     /**
      * Constructeur
      *
-     * @var string $p_file
-     * @var mixed  $p_level
+     * @param string  $p_file
+     * @param mixed   $p_level
+     * @param boolean $p_cache
      */
-    public function __construct($p_file, $p_level = \Psr\Log\LogLevel::ERROR)
+    public function __construct($p_file, $p_level = \Psr\Log\LogLevel::ERROR, $p_cache = true)
     {
         $this->level = $p_level;
         $this->file  = $p_file;
         if (self::$pid === null) {
             self::$pid = getmypid() . '.' . md5(uniqid());
         }
+        $this->cache = $p_cache;
     }
 
     /**

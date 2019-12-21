@@ -65,4 +65,19 @@ trait EventManagerAwareTrait
         $evtManager->notify($p_name, (array)$p_data);
         return $this;
     }
+    
+    /**
+     * Lance un événement
+     *
+     * @param string $p_name
+     * @param mixed  $p_data
+     *
+     * @return static
+     */
+    public function forwardRawEvent($p_name, $p_data = null)
+    {
+        $evtManager = $this->getEventManager();
+        $evtManager->notify($p_name, $p_data);
+        return $this;
+    }
 }
