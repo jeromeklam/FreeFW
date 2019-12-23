@@ -192,4 +192,31 @@ class ApiParams
     {
         return $this->include;
     }
+
+    /**
+     * Set sort
+     * 
+     * @param mixed $p_sort
+     * 
+     * @return \FreeFW\Http\ApiParams
+     */
+    public function setSort($p_sort)
+    {
+        if (is_array($p_sort)) {
+            $this->sort = $p_sort;
+        } else {
+            $this->sort = explode(',', $p_sort);
+        }
+        return $this;
+    }
+
+    /**
+     * Get sort
+     * 
+     * @return array
+     */
+    public function getSort()
+    {
+        return $this->sort;
+    }
 }

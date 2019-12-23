@@ -67,6 +67,10 @@ class JsonApi implements
             $conditions->initFromArray($filters);
             $apiParams->setFilters($conditions);
         }
+        // Sort
+        if (array_key_exists('sort', $params)) {
+            $apiParams->setSort($params['sort']);
+        }
         // Page
         if (array_key_exists('page', $params)) {
             $page = $params['page'];

@@ -161,12 +161,20 @@ class Date
      */
     public static function mysqlToDatetime($p_date)
     {
-        $date = new \Datetime();
+        $date = null;
         if ($p_date !== null && $p_date != '') {
             $format = 'Y-m-d H:i:s';
             $date = \DateTime::createFromFormat($format, $p_date);
             if ($date === false) {
-                $date = new \Datetime();
+                $format = 'Y-m-d H:i';
+                $date = \DateTime::createFromFormat($format, $p_date);
+                if ($date === false) {
+                    $format = 'Y-m-d';
+                    $date = \DateTime::createFromFormat($format, $p_date);
+                    if ($date === false) {
+                        $date = null;
+                    }
+                }
             }
         }
         return $date;
