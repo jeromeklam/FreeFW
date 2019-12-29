@@ -205,7 +205,19 @@ class ApiParams
         if (is_array($p_sort)) {
             $this->sort = $p_sort;
         } else {
-            $this->sort = explode(',', $p_sort);
+            $this->sort = [];
+            $sorts = explode(',', $p_sort);
+            foreach ($sorts as $idx => $field) {
+                if ($field[0] == '-') {
+                    $this->sort[substr($field, 1)] = '-';
+                } else {
+                    if ($field[0] == '-') {
+                        $this->sort[substr($field, 1)] = '+';
+                    } else {
+                        $this->sort[$field] = '+';
+                    }
+                }
+            }
         }
         return $this;
     }

@@ -390,6 +390,37 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
     }
 
     /**
+     * Count
+     *
+     * @param array $p_filters
+     *
+     * @return number
+     */
+    public static function count(array $p_filters = [])
+    {
+        $cls   = get_called_class();
+        $cls   = rtrim(ltrim($cls, '\\'), '\\');
+        /**
+         * @var \FreeFW\Model\Query $query
+         */
+        $query = \FreeFW\DI\DI::get('FreeFW::Model::Query');
+        $query
+            ->setType(\FreeFW\Model\Query::QUERY_COUNT)
+            ->setMainModel(str_replace('\\', '::', $cls))
+            ->addFromFilters($p_filters)
+        ;
+        $total = 0;
+        if ($query->execute()) {
+            /**
+             * @var \FreeFW\Model\ResultSet $result
+             */
+            $results = $query->getResult();
+            var_export($results);die;
+        }
+        return $total;
+    }
+
+    /**
      * Return object source
      *
      * @return string

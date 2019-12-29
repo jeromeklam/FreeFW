@@ -71,8 +71,8 @@ class ApiController extends \FreeFW\Core\Controller
             ->addConditions($apiParams->getFilters())
             ->addRelations($apiParams->getInclude())
             ->setLimit($apiParams->getStart(), $apiParams->getlength())
+            ->setSort($apiParams->getSort())
         ;
-        $data = null;
         if ($query->execute()) {
             $data = $query->getResult();
         }

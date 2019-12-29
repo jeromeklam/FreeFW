@@ -356,7 +356,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
         \FreeFW\Model\Conditions $p_conditions = null,
         array $p_relations = [],
         int $p_from = 0,
-        int $p_length = 0
+        int $p_length = 0,
+        array $p_sort = [],
+        string $p_force_select = ''
     ) {
         $crtAlias     = 'A';
         $aliases      = [];
@@ -370,6 +372,22 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $joins        = [];
         $loadModels   = [];
         $whereBroker  = '';
+        /**
+         * 
+         */
+        $sort = '';
+        foreach ($p_sort as $column => $order) {
+            if ($sort == '') {
+                $sort = ' ORDER BY ';
+            } else {
+                $sort = $sort . ', ';
+            }
+            if ($order == '+') {
+                $sort = $sort . $crtAlias . '.' . $column;
+            } else {
+                $sort = $sort . $crtAlias . '.' . $column . ' DESC';
+            }
+        }
         /**
          * Check specific properties
          */
@@ -394,10 +412,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
             $crtFKs    = $fks;
             $getter    = '';
             $baseAlias = '@';
-            while($onePart != '') {
+            while ($onePart != '') {
                 if (array_key_exists($onePart, $crtFKs) && !array_key_exists($onePart, $joins)) {
                     $joins[$onePart] = $crtFKs[$onePart]['right'];
                     $newModel = \FreeFW\DI\DI::get($crtFKs[$onePart]['right']['model']);
+                    self::$models[$onePart] = $newModel;
                     ++$crtAlias;
                     $aliases[$baseAlias . '.' . $onePart] = $crtAlias;
                     $select   = $select . ', ' . $newModel->getFieldsForSelect($crtAlias);
@@ -446,12 +465,12 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 }
             }
         }
-        /**
-         * @var \FreeFW\Model\Condition $oneCondition
-         */
         $parts  = $this->renderConditions($p_conditions, $p_model, $aliases, '@');
         $where  = $parts['sql'];
         $values = $parts['values'];
+        /**
+         * @var \FreeFW\Model\Condition $oneCondition
+         */
         // Build query
         if (trim($where) == '') {
             $where = ' 1 = 1';
@@ -463,21 +482,31 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $limit = $limit . ', ' . $p_length;
             }
         }
-        $sql = 'SELECT ' . $select . ' FROM ' . $from . ' WHERE ( ' . $where . ' ) ' . $whereBroker . ' ' . $limit;
+        if ($p_force_select !== '') {
+            $select = $p_force_select;
+        }
+        $sql = 'SELECT ' . $select . ' FROM ' . $from . ' WHERE ( ' . $where . ' ) ' . $whereBroker . ' ' . $sort . ' ' . $limit;
         $this->logger->debug('PDOStorage.select : ' . $sql);
         // I got all, run query...
         try {
             // Get PDO and execute
             $query = $this->provider->prepare($sql, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
             if ($query->execute($values)) {
-                $clName = str_replace('\\', '::', get_class($p_model));
-                while ($row = $query->fetch(\PDO::FETCH_OBJ)) {
-                    $model = \FreeFW\DI\DI::get($clName);
-                    $model
-                        ->init()
-                        ->setFromArray($row, $aliases, '@')
-                    ;
-                    $result[] = $model;
+                if ($p_force_select !== '') {
+                    $result = [];
+                    while ($row = $query->fetch(\PDO::FETCH_OBJ)) {
+                        $result[] = $row;
+                    }
+                } else {
+                    $clName = str_replace('\\', '::', get_class($p_model));
+                    while ($row = $query->fetch(\PDO::FETCH_OBJ)) {
+                        $model = \FreeFW\DI\DI::get($clName);
+                        $model
+                            ->init()
+                            ->setFromArray($row, $aliases, '@')
+                        ;
+                        $result[] = $model;
+                    }
                 }
             } else {
                 $this->logger->debug('PDOStorage.select.error : ' . print_r($query->errorInfo(), true));
@@ -494,6 +523,35 @@ class PDOStorage extends \FreeFW\Storage\Storage
             var_dump($ex);
         }
         return $result;
+    }
+
+    /**
+     * Count
+     *
+     * @param \FreeFW\Core\StorageModel $p_model
+     * @param \FreeFW\Model\Conditions  $p_conditions
+     *
+     * @return \FreeFW\Model\ResultSet
+     */
+    public function count(
+        \FreeFW\Core\StorageModel &$p_model,
+        \FreeFW\Model\Conditions $p_conditions = null,
+        array $p_relations = [],
+        int $p_from = 0,
+        int $p_length = 0,
+        array $p_sort = []
+    ) {
+        $result = $this->select(
+            $p_model,
+            $p_conditions,
+            $p_relations,
+            $p_from,
+            $p_length,
+            $p_sort,
+            'COUNT(*) AS MONTOT'
+        );
+        var_dump($result);
+        die;
     }
 
     /**
@@ -614,7 +672,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 return $this->renderValueField($value, $p_model);
             } else {
                 throw new \FreeFW\Core\FreeFWStorageException(
-                    sprintf('Unknown condition objecte !')
+                    sprintf('Unknown condition object !')
                 );
             }
         }

@@ -1,3 +1,8 @@
+# 1.*.* : ...
+
+* Start count in StorageInterface
+* Where in relations
+
 # 1.0.4 : Autologin & bugs
 
 * AutoLogin via FreeSSO and AuthNegociator

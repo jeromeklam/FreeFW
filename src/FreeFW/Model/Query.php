@@ -17,7 +17,8 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
     const QUERY_DISTINCT = 'DISTINCT';
     const QUERY_UPDATE   = 'UPDATE';
     const QUERY_DELETE   = 'DELETE';
-    
+    const QUERY_COUNT    = 'COUNT';
+
     /**
      * Joins
      * @var string
@@ -73,6 +74,12 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
      * @var integer
      */
     protected $length = 0;
+
+    /**
+     * Sort by
+     * @var array
+     */
+    protected $sort = [];
 
     /**
      * Constructor
@@ -274,6 +281,17 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
     {
         $this->result_set = new \FreeFW\Model\ResultSet();
         switch ($this->type) {
+            case self::QUERY_COUNT:
+                $model            = \FreeFW\DI\DI::get($this->main_model);
+                $this->result_set = $this->strategy->count(
+                    $model,
+                    $this->conditions,
+                    $this->relations,
+                    $this->from,
+                    $this->length,
+                    $this->sort
+                );
+                return true;
             case self::QUERY_SELECT:
                 $model            = \FreeFW\DI\DI::get($this->main_model);
                 $this->result_set = $this->strategy->select(
@@ -281,14 +299,13 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
                     $this->conditions,
                     $this->relations,
                     $this->from,
-                    $this->length
+                    $this->length,
+                    $this->sort
                 );
                 return true;
-                break;
             case self::QUERY_DELETE:
                 $model = \FreeFW\DI\DI::get($this->main_model);
                 return $this->strategy->delete($model, $this->conditions);
-                break;
             default:
                 var_dump('error query execute');
                 die;
@@ -349,5 +366,18 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
     public function init()
     {
         $this->result_set = false;
+    }
+
+    /**
+     * Set sort fields
+     * 
+     * @param array $p_sort
+     * 
+     * @return \FreeFW\Model\Query
+     */
+    public function setSort($p_sort)
+    {
+        $this->sort = $p_sort;
+        return $this;
     }
 }

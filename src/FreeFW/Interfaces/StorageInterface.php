@@ -62,7 +62,8 @@ interface StorageInterface
         \FreeFW\Model\Conditions $p_conditions = null,
         array $p_relations = [],
         int $p_from = 0,
-        int $p_length = 0
+        int $p_length = 0,
+        array $p_sort = []
     );
 
     /**
