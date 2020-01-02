@@ -1,6 +1,8 @@
 <?php
 namespace FreeFW\JsonApi\V1\Model;
 
+use \FreeFW\Constants as FFCST;
+
 /**
  * Attributes object
  *
@@ -90,7 +92,27 @@ class AttributesObject implements \Countable, \JsonSerializable
         foreach ($this->attributes as $idx => $attribute) {
             if (!$attribute->getJsonIgnore()) {
                 $attName = $attribute->getJsonName();
-                $obj->$attName = $attribute->getValue();
+                switch ($attribute->getType()) {
+                    case FFCST::TYPE_BLOB:
+                        $obj->$attName = base64_encode($attribute->getValue());
+                        break;
+                    case FFCST::TYPE_TEXT:
+                    case FFCST::TYPE_STRING:
+                    case FFCST::TYPE_SELECT:
+                    case FFCST::TYPE_BIGINT:
+                    case FFCST::TYPE_BOOLEAN:
+                    case FFCST::TYPE_TEXT_HTML:
+                    case FFCST::TYPE_INTEGER:
+                        $obj->$attName = $attribute->getValue();
+                        break;
+                    default:
+                        if (strpos($attName, 'blob') === false) {
+                            $obj->$attName = $attribute->getValue();
+                        } else {
+                            $obj->$attName = base64_encode($attribute->getValue());
+                        }
+                        break;
+                }
             }
         }
         return $obj;

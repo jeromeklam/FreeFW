@@ -204,6 +204,7 @@ abstract class Model implements
                     $oneAttribute->setJsonIgnore(true);
                 }
             }
+            $oneAttribute->setType($property[FFCST::PROPERTY_TYPE]);
             $attributes[] = $oneAttribute;
         }
         return $attributes;
