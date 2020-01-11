@@ -45,7 +45,7 @@ class JsonApi implements
             if (isset($json->data)) {
                 $decoder  = new \FreeFW\JsonApi\V1\Decoder();
                 $document = new \FreeFW\JsonApi\V1\Model\Document($json);
-                $body    = $decoder->decode($document);
+                $body     = $decoder->decode($document);
                 $apiParams->setData($body);
             } else {
                 // @todo

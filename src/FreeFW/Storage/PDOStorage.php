@@ -373,22 +373,6 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $loadModels   = [];
         $whereBroker  = '';
         /**
-         * 
-         */
-        $sort = '';
-        foreach ($p_sort as $column => $order) {
-            if ($sort == '') {
-                $sort = ' ORDER BY ';
-            } else {
-                $sort = $sort . ', ';
-            }
-            if ($order == '+') {
-                $sort = $sort . $crtAlias . '.' . $column;
-            } else {
-                $sort = $sort . $crtAlias . '.' . $column . ' DESC';
-            }
-        }
-        /**
          * Check specific properties
          */
         foreach ($properties as $name => $property) {
@@ -412,6 +396,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
             $crtFKs    = $fks;
             $getter    = '';
             $baseAlias = '@';
+            $newModel  = null;
             while ($onePart != '') {
                 if (array_key_exists($onePart, $crtFKs) && !array_key_exists($onePart, $joins)) {
                     $joins[$onePart] = $crtFKs[$onePart]['right'];
@@ -446,7 +431,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 }
                 $baseAlias = $baseAlias . '.' . $onePart;
                 $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($onePart, true);
-                if (count($parts) > 0) {
+                if ($newModel && count($parts) > 0) {
                     $onePart    = array_shift($parts);
                     $properties = $newModel::getProperties();
                     $crtFKs     = [];
@@ -485,6 +470,30 @@ class PDOStorage extends \FreeFW\Storage\Storage
         if ($p_force_select !== '') {
             $select = $p_force_select;
         }
+        // Sort
+        $sort = '';
+        foreach ($p_sort as $column => $order) {
+            if ($sort == '') {
+                $sort = ' ORDER BY ';
+            } else {
+                $sort = $sort . ', ';
+            }
+            $myColumn = $aliases['@'] . '.' . $column;
+            if (strpos($column, '.') !== false) {
+                $parts = explode('.', $column);
+                $col   = array_pop($parts);
+                $find  = '@.' . implode('.', $parts);
+                if (array_key_exists($find, $aliases)) {
+                    $myColumn = $aliases[$find] . '.' . $col;
+                }
+            }
+            if ($order == '+') {
+                $sort = $sort . $myColumn;
+            } else {
+                $sort = $sort . $myColumn . ' DESC';
+            }
+        }
+        // Build query
         $sql = 'SELECT ' . $select . ' FROM ' . $from . ' WHERE ( ' . $where . ' ) ' . $whereBroker . ' ' . $sort . ' ' . $limit;
         $this->logger->debug('PDOStorage.select : ' . $sql);
         // I got all, run query...
@@ -772,12 +781,22 @@ class PDOStorage extends \FreeFW\Storage\Storage
         array $p_aliases = [],
         $p_crtAlias = '@'
     ) {
+        $alias = false;
+        if (array_key_exists($p_crtAlias, $p_aliases)) {
+            $alias = $p_aliases[$p_crtAlias];
+        }
         $parts = explode('.', $p_field);
         if (count($parts) > 1) {
             $class = $parts[0];
             $field = $parts[1];
             if (!array_key_exists($class, self::$models)) {
                 self::$models[$class] = \FreeFW\DI\DI::get($class);
+            } else {
+                if (strpos($class, ':') === false) {
+                    if (array_key_exists($p_crtAlias . '.' . $class, $p_aliases)) {
+                        $alias = $p_aliases[$p_crtAlias . '.' . $class];
+                    }
+                }
             }
             $model      = self::$models[$class];
             $source     = $model::getSource();
@@ -787,9 +806,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
             $properties = $p_model::getProperties();
             $field      = $parts[0];
         }
-        if (array_key_exists($p_crtAlias, $p_aliases)) {
-            $alias = $p_aliases[$p_crtAlias];
-        } else {
+        if ($alias === false) {
             $alias = $source;
         }
         $type  = \FreeFW\Constants::TYPE_STRING;

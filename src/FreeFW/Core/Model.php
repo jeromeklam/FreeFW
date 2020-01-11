@@ -236,10 +236,11 @@ abstract class Model implements
          * One to Many, we use the id field
          */
         if (method_exists($this, 'getRelationships')) {
-            foreach ($this->getRelationships() as $name => $oneRelation) {
+            foreach ($this->getRelationships() as $name => $oneRelationDes) {
                 $oneRelation = new \FreeFW\JsonApi\V1\Model\RelationshipObject($name);
                 $oneRelation->setType(\FreeFW\JsonApi\V1\Model\RelationshipObject::ONE_TO_MANY);
                 $oneRelation->setPropertyName($name);
+                $oneRelation->setModel($oneRelationDes['model']);
                 $relations[] = $oneRelation;
             }
         }

@@ -21,7 +21,8 @@ class Encoder
         \FreeFW\JsonApi\V1\Model\IncludedObject $p_included,
         \FreeFW\Http\ApiParams $p_api_params
     ) : \FreeFW\JsonApi\V1\Model\ResourceObject {
-        $includes = '@@' . implode('@@', $p_api_params->getInclude()) . '@@';
+        $incTab   = $p_api_params->getInclude();
+        $includes = '@@' . implode('@@', $incTab) . '@@';
         $includes = str_replace('.', '@@', $includes);
         $resource = new \FreeFW\JsonApi\V1\Model\ResourceObject(
             $p_api_response->getApiType(),
@@ -38,49 +39,65 @@ class Encoder
             $relationShips = new \FreeFW\JsonApi\V1\Model\RelationshipsObject();
             foreach ($relations as $relation) {
                 $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relation->getName(), true);
-                $model  = $p_api_response->$getter();
-                if ($model && $model instanceof \FreeFW\Interfaces\ApiResponseInterface) {
-                    if ($model->isSingleElement()) {
-                        if (strpos($includes, '@@' . $relation->getName() . '@@') !== false) {
-                            $resourceRel = new \FreeFW\JsonApi\V1\Model\ResourceObject(
-                                $model->getApiType(),
-                                $model->getApiId(),
-                                $model->isSingleElement()
-                            );
-                            $relationShips->addRelation($relation->getName(), $resourceRel);
-                            $included = $this->encodeSingleResource($model, $p_included, $p_api_params);
-                            $p_included->addIncluded($included);
-                        }
-                    } else {
-                        if (strpos($includes, '@@' . $relation->getName() . '@@') !== false) {
-                            foreach ($model as $oneModel) {
+                if (method_exists($p_api_response, $getter)) {
+                    $model  = $p_api_response->$getter();
+                    if ($model && $model instanceof \FreeFW\Interfaces\ApiResponseInterface) {
+                        if ($model->isSingleElement()) {
+                            if (strpos($includes, '@@' . $relation->getName() . '@@') !== false) {
+                                unset($incTab[$relation->getName()]);
                                 $resourceRel = new \FreeFW\JsonApi\V1\Model\ResourceObject(
-                                    $oneModel->getApiType(),
-                                    $oneModel->getApiId(),
-                                    $oneModel->isSingleElement()
+                                    $model->getApiType(),
+                                    $model->getApiId(),
+                                    $model->isSingleElement()
                                 );
                                 $relationShips->addRelation($relation->getName(), $resourceRel);
-                                $included = $this->encodeSingleResource($oneModel, $p_included, $p_api_params);
+                                $included = $this->encodeSingleResource($model, $p_included, $p_api_params);
                                 $p_included->addIncluded($included);
+                            }
+                        } else {
+                            if (strpos($includes, '@@' . $relation->getName() . '@@') !== false) {
+                                unset($incTab[$relation->getName()]);
+                                foreach ($model as $oneModel) {
+                                    $resourceRel = new \FreeFW\JsonApi\V1\Model\ResourceObject(
+                                        $oneModel->getApiType(),
+                                        $oneModel->getApiId(),
+                                        $oneModel->isSingleElement()
+                                    );
+                                    $relationShips->addRelation($relation->getName(), $resourceRel);
+                                    $included = $this->encodeSingleResource($oneModel, $p_included, $p_api_params);
+                                    $p_included->addIncluded($included);
+                                }
+                            }
+                        }
+                    } else {
+                        if ($relation->getPropertyName() != '' && $relation->getModel() != '') {
+                            $relModel = \FreeFW\DI\DI::get($relation->getModel());
+                            $getter   = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relation->getPropertyName(), true);
+                            if (method_exists($p_api_response, $getter)) {
+                                $resourceRel = new \FreeFW\JsonApi\V1\Model\ResourceObject(
+                                    $relModel->getApiType(),
+                                    $p_api_response->$getter(),
+                                    $relModel->isSingleElement()
+                                );
+                                $relationShips->addRelation($relation->getName(), $resourceRel);
                             }
                         }
                     }
                 } else {
-                    if ($relation->getPropertyName() != '' && $relation->getModel() != '') {
-                        $relModel = \FreeFW\DI\DI::get($relation->getModel());
-                        $getter   = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relation->getPropertyName(), true);
-                        if (method_exists($p_api_response, $getter)) {
-                            $resourceRel = new \FreeFW\JsonApi\V1\Model\ResourceObject(
-                                $relModel->getApiType(),
-                                $p_api_response->$getter(),
-                                $relModel->isSingleElement()
-                            );
-                            $relationShips->addRelation($relation->getName(), $resourceRel);
-                        }
-                    }
+                    // Auto getters....
                 }
             }
             $resource->setRelationShips($relationShips);
+        }
+        foreach ($incTab as $include) {
+            $parts = explode('.', $include);
+            while (count($parts)>0) {
+                $elem   = array_shift($parts);
+                $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($elem, true);
+                if (method_exists($p_api_response, $getter)) {
+                    $result = $p_api_response->$getter();
+                }
+            }
         }
         return $resource;
     }
