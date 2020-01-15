@@ -108,7 +108,7 @@ class Constants
      * Regex
      * @var string
      */
-    const PARAM_REGEX = '[0-9a-z_\-\.\@\%]*';
+    const PARAM_REGEX = '[0-9A-Za-z_\-\.\@\%]*';
 
     /**
      * Errors types
