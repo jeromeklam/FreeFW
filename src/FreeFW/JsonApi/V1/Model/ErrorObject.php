@@ -91,7 +91,10 @@ class ErrorObject
         $this->title   = $p_message;
         $this->code    = $p_code;
         if ($p_field != '') {
-            $this->source = ['pointer' => '/data/attributes/' . $p_field];
+            $this->source = [
+                'pointer' => '/data/attributes/' . $p_field,
+                'parameter' => $p_field
+            ];
         }
     }
 

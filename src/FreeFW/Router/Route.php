@@ -45,6 +45,7 @@ class Route implements \Psr\Log\LoggerAwareInterface
      */
     const RESULT_LIST   = 'list';
     const RESULT_OBJECT = 'object';
+    const RESULT_DATA   = 'data';
 
     /**
      * Method

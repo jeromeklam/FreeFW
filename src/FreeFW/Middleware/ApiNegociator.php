@@ -162,6 +162,9 @@ class ApiNegociator implements
                 $mid       = \FreeFW\DI\DI::get($class);
                 $apiParams = $mid->decodeRequest($p_request);
                 $response  = $p_handler->handle($p_request->withAttribute('api_params', $apiParams));
+                if ($response instanceof \FreeFW\Psr7\Response) {
+                    return $response;
+                }
                 return $mid->encodeResponse(
                     $response, $apiParams
                 );

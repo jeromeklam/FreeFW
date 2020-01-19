@@ -363,6 +363,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $crtAlias     = 'A';
         $aliases      = [];
         $aliases['@'] = $crtAlias;
+        $ids          = [];
         $select       = $p_model->getFieldsForSelect($crtAlias);
         $from         = $p_model::getSource() . ' AS ' . $crtAlias;
         $properties   = $p_model::getProperties();
@@ -370,13 +371,15 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $result       = \FreeFW\DI\DI::get('FreeFW::Model::ResultSet');
         $fks          = [];
         $joins        = [];
-        $loadModels   = [];
         $whereBroker  = '';
         /**
          * Check specific properties
          */
         foreach ($properties as $name => $property) {
             if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
+                if (in_array(FFCST::OPTION_PK, $property[FFCST::PROPERTY_OPTIONS])) {
+                    $ids['@'] = $name;
+                }
                 if (in_array(FFCST::OPTION_BROKER, $property[FFCST::PROPERTY_OPTIONS])) {
                     $whereBroker = ' AND ( ' . $crtAlias . '.' . $name . ' = ' . $p_model->getMainBroker() . ')';
                 }
@@ -394,7 +397,6 @@ class PDOStorage extends \FreeFW\Storage\Storage
             $parts     = explode('.', $shortcut);
             $onePart   = array_shift($parts);
             $crtFKs    = $fks;
-            $getter    = '';
             $baseAlias = '@';
             $newModel  = null;
             while ($onePart != '') {
@@ -423,14 +425,8 @@ class PDOStorage extends \FreeFW\Storage\Storage
                             $from = $from . $alias1 . '.' . $crtFKs[$onePart]['left'];
                             break;
                     }
-                    $loadModels[] = [
-                        'model'  => $crtFKs[$onePart]['right']['model'],
-                        'setter' => 'set' . \FreeFW\Tools\PBXString::toCamelCase($onePart, true),
-                        'getter' => $getter
-                    ];
                 }
                 $baseAlias = $baseAlias . '.' . $onePart;
-                $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($onePart, true);
                 if ($newModel && count($parts) > 0) {
                     $onePart    = array_shift($parts);
                     $properties = $newModel::getProperties();
@@ -477,6 +473,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $sort = ' ORDER BY ';
             } else {
                 $sort = $sort . ', ';
+            }
+            if ($column === 'id' || $column === '+id' || $column === '-id') {
+                $column = str_replace('id',  $ids['@'], $column);
             }
             $myColumn = $aliases['@'] . '.' . $column;
             if (strpos($column, '.') !== false) {
