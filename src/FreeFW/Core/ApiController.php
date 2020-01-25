@@ -37,7 +37,6 @@ class ApiController extends \FreeFW\Core\Controller
         $data    = $model->find(
             [
                 $model->getAutocompleteField() => [\FreeFW\Storage\Storage::COND_LIKE => $p_search]
-                
             ]
         );
         $this->logger->debug('FreeFW.ApiController.autocomplete.end');
