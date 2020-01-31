@@ -9,6 +9,35 @@ namespace FreeFW\Core;
 class ApiController extends \FreeFW\Core\Controller
 {
 
+    protected function getModelById($p_params, $p_model, $p_id)
+    {
+        $filters  = new \FreeFW\Model\Conditions();
+        $pk_field = $p_model->getPkField();
+        $aField   = new \FreeFW\Model\ConditionMember();
+        $aValue   = new \FreeFW\Model\ConditionValue();
+        $aValue->setValue($p_id);
+        $aField->setValue($pk_field);
+        $aCondition = \FreeFW\Model\SimpleCondition::getNew();
+        $aCondition->setLeftMember($aField);
+        $aCondition->setOperator(\FreeFW\Storage\Storage::COND_EQUAL);
+        $aCondition->setRightMember($aValue);
+        $filters->add($aCondition);
+        /**
+         * @var \FreeFW\Model\Query $query
+         */
+        $query = $p_model->getQuery();
+        $query
+            ->addConditions($filters)
+            ->addRelations($p_params->getInclude())
+            ->setLimit(0, 1)
+        ;
+        $data = null;
+        if ($query->execute()) {
+            $data = $query->getResult();
+        }
+        return $data;
+    }
+
     /**
      * AutoComplete
      * 
@@ -157,6 +186,9 @@ class ApiController extends \FreeFW\Core\Controller
                 return $this->createResponse(409, $data);
             }
             $data->create();
+            if (!$data->hasErrors()) {
+                $data = $this->getModelById($apiParams, $data, $data->getApiId());
+            }
             $this->logger->debug('FreeFW.ApiController.createOne.end');
             return $this->createResponse(201, $data);
         } else {
@@ -182,6 +214,9 @@ class ApiController extends \FreeFW\Core\Controller
                 $data = $apiParams->getData();
                 if ($data->isValid()) {
                     $data->save();
+                    if (!$data->hasErrors()) {
+                        $data = $this->getModelById($apiParams, $data, $data->getApiId());
+                    }
                 }
                 $this->logger->debug('FreeFW.ApiController.updateOne.end');
                 return $this->createResponse(200, $data);

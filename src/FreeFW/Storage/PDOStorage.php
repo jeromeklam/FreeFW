@@ -112,6 +112,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     $lastId = $this->provider->lastInsertId();
                     $p_model->$setter($lastId);
                 }
+                if (method_exists($p_model, 'afterCreate')) {
+                    if (!$p_model->afterCreate()) {
+                        return false;
+                    }
+                }
                 try {
                     $this->forwardRawEvent(FFCST::EVENT_STORAGE_CREATE, $p_model);
                 } catch (\Exception $ex) {
@@ -313,6 +318,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
             // Get PDO and execute
             $query = $this->provider->prepare($sql, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
             if ($query->execute($fields)) {
+                if (method_exists($p_model, 'afterSave')) {
+                    if (!$p_model->afterSave()) {
+                        return false;
+                    }
+                }
                 $code = '';
                 try {
                     $this->forwardRawEvent(FFCST::EVENT_STORAGE_UPDATE, $p_model);
