@@ -1,3 +1,7 @@
+# 1.0.6 : 01/02/2020
+
+* * ApiController, reread after create or update
+
 # 1.0.5 : 20/01/2020
 
 * MediaResponse

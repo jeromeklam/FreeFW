@@ -101,6 +101,7 @@ class ApiController extends \FreeFW\Core\Controller
             ->setLimit($apiParams->getStart(), $apiParams->getlength())
             ->setSort($apiParams->getSort())
         ;
+        $data = new \FreeFW\Model\ResultSet();
         if ($query->execute()) {
             $data = $query->getResult();
         }
