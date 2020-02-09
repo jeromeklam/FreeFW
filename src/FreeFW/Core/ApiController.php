@@ -251,11 +251,11 @@ class ApiController extends \FreeFW\Core\Controller
              * @var \FreeFW\Core\StorageModel $data
              */
             $data = $model->findFirst([$model->getPkField() => $p_id]);
-            $data->remove();
-            $this->logger->debug('FreeFW.ApiController.removeOne.end');
-            return $this->createResponse(204);
-        } else {
-            return $this->createResponse(409);
+            if ($data->remove()) {
+                $this->logger->debug('FreeFW.ApiController.removeOne.end');
+                return $this->createResponse(204);
+            }
         }
+        return $this->createResponse(409);
     }
 }
