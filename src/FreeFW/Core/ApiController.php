@@ -1,6 +1,8 @@
 <?php
 namespace FreeFW\Core;
 
+use \FreeFW\Constants as FFCST;
+
 /**
  * Base controller
  *
@@ -70,6 +72,79 @@ class ApiController extends \FreeFW\Core\Controller
         );
         $this->logger->debug('FreeFW.ApiController.autocomplete.end');
         return $this->createResponse(200, $data);
+    }
+
+    /**
+     * Get children
+     * 
+     * @param \Psr\Http\Message\ServerRequestInterface $p_request
+     * @param number                                   $p_id
+     * 
+     * @throws \FreeFW\Core\FreeFWStorageException
+     * 
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function getChildren(\Psr\Http\Message\ServerRequestInterface $p_request, $p_id = null)
+    {
+        $this->logger->debug('FreeFW.ApiController.getChildren.start');
+        /**
+         * @var \FreeFW\Http\ApiParams $apiParams
+         */
+        $apiParams = $p_request->getAttribute('api_params', false);
+        if (!isset($p_request->default_model)) {
+            throw new \FreeFW\Core\FreeFWStorageException(
+                sprintf('No default model for route !')
+                );
+        }
+        $default = $p_request->default_model;
+        $model   = \FreeFW\DI\DI::get($default);
+        /**
+         * Id
+         */
+        if ($p_id > 0) {
+            $filters  = new \FreeFW\Model\Conditions();
+            $pk_field = $model->getPkField();
+            $aField   = new \FreeFW\Model\ConditionMember();
+            $aValue   = new \FreeFW\Model\ConditionValue();
+            $aValue->setValue($p_id);
+            $aField->setValue($pk_field);
+            $aCondition = \FreeFW\Model\SimpleCondition::getNew();
+            $aCondition->setLeftMember($aField);
+            $aCondition->setOperator(\FreeFW\Storage\Storage::COND_EQUAL);
+            $aCondition->setRightMember($aValue);
+            $filters->add($aCondition);
+            /**
+             * @var \FreeFW\Model\Query $query
+             */
+            $query = $model->getQuery();
+            $query
+                ->addConditions($filters)
+                ->addRelations($apiParams->getInclude())
+                ->setLimit(0, 1)
+            ;
+            $data = null;
+            if ($query->execute()) {
+                $data = $query->getResult();
+            }
+            $this->logger->debug('FreeFW.ApiController.getChildren.end');
+            if (count($data) > 0) {
+                $children = $model->find(
+                    [
+                        $model->getFieldNameByOption(FFCST::OPTION_NESTED_PARENT_ID) => $data[0]->getApiId()
+                    ]
+                );
+                return $this->createResponse(200, $children);
+            } else {
+                return $this->createResponse(404);
+            }
+        } else {
+            $children = $model->find(
+                [
+                    $model->getFieldNameByOption(FFCST::OPTION_NESTED_LEVEL) => 1
+                ]
+            );
+            return $this->createResponse(200, $children);
+        }
     }
 
     /**

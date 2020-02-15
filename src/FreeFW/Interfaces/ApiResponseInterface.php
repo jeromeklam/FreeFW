@@ -10,6 +10,15 @@ interface ApiResponseInterface
 {
 
     /**
+     * Get field name by option
+     * 
+     * @param string $p_option
+     * 
+     * @return string
+     */
+    public function getFieldNameByOption($p_option) : string;
+
+    /**
      * Return id
      *
      * @return string
@@ -22,6 +31,41 @@ interface ApiResponseInterface
      * @param mixed $p_id
      */
     public function setApiId($p_id);
+
+    /**
+     * Return parent id
+     *
+     * @return string
+     */
+    public function getApiNestedId() : string;
+
+    /**
+     * Return position in parent
+     *
+     * @return string
+     */
+    public function getApiNestedPosition() : string;
+
+    /**
+     * Return nested left field
+     *
+     * @return string
+     */
+    public function getApiNestedLeft() : string;
+
+    /**
+     * Return nested right field
+     *
+     * @return string
+     */
+    public function getApiNestedRight() : string;
+
+    /**
+     * Return nested level field
+     *
+     * @return string
+     */
+    public function getApiNestedLevel() : string;
 
     /**
      * Return type

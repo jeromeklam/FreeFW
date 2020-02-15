@@ -95,6 +95,11 @@ class Constants
     const OPTION_LOCAL            = 'LOCAL';
     const OPTION_UNIQ             = 'UNIQ';
     const OPTION_BROKER           = 'BROKER';
+    const OPTION_NESTED_PARENT_ID = 'NPARENT';
+    const OPTION_NESTED_POSITION  = 'NPOSITION';
+    const OPTION_NESTED_LEFT      = 'NLEFT';
+    const OPTION_NESTED_RIGHT     = 'NRIGHT';
+    const OPTION_NESTED_LEVEL     = 'NLEVEL';
 
     /**
      * Default constants

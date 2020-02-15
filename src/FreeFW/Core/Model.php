@@ -136,6 +136,23 @@ abstract class Model implements
     }
 
     /**
+     * 
+     * {@inheritDoc}
+     * @see \FreeFW\Interfaces\ApiResponseInterface::getFieldNameByOption()
+     */
+    public function getFieldNameByOption($p_option) : string
+    {
+        foreach ($this->getProperties() as $name => $property) {
+            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
+                if (in_array($p_option, $property[FFCST::PROPERTY_OPTIONS])) {
+                   return $name;
+                }
+            }
+        }
+        return '';
+    }
+
+    /**
      *
      * @see \FreeFW\Interfaces\ApiResponseInterface
      */
@@ -168,7 +185,92 @@ abstract class Model implements
         }
         return $this;
     }
-    
+
+    /**
+     *
+     * @see \FreeFW\Interfaces\ApiResponseInterface
+     */
+    public function getApiNestedId() : string
+    {
+        foreach ($this->getProperties() as $name => $property) {
+            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
+                if (in_array(FFCST::OPTION_NESTED_PARENT_ID, $property[FFCST::PROPERTY_OPTIONS])) {
+                    $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                    return (string)$this->$getter();
+                }
+            }
+        }
+        return '';
+    }
+
+    /**
+     *
+     * @see \FreeFW\Interfaces\ApiResponseInterface
+     */
+    public function getApiNestedPosition() : string
+    {
+        foreach ($this->getProperties() as $name => $property) {
+            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
+                if (in_array(FFCST::OPTION_NESTED_POSITION, $property[FFCST::PROPERTY_OPTIONS])) {
+                    $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                    return (string)$this->$getter();
+                }
+            }
+        }
+        return '';
+    }
+
+    /**
+     *
+     * @see \FreeFW\Interfaces\ApiResponseInterface
+     */
+    public function getApiNestedLeft() : string
+    {
+        foreach ($this->getProperties() as $name => $property) {
+            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
+                if (in_array(FFCST::OPTION_NESTED_LEFT, $property[FFCST::PROPERTY_OPTIONS])) {
+                    $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                    return (string)$this->$getter();
+                }
+            }
+        }
+        return '';
+    }
+
+    /**
+     *
+     * @see \FreeFW\Interfaces\ApiResponseInterface
+     */
+    public function getApiNestedRight() : string
+    {
+        foreach ($this->getProperties() as $name => $property) {
+            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
+                if (in_array(FFCST::OPTION_NESTED_RIGHT, $property[FFCST::PROPERTY_OPTIONS])) {
+                    $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                    return (string)$this->$getter();
+                }
+            }
+        }
+        return '';
+    }
+
+    /**
+     *
+     * @see \FreeFW\Interfaces\ApiResponseInterface
+     */
+    public function getApiNestedLevel() : string
+    {
+        foreach ($this->getProperties() as $name => $property) {
+            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
+                if (in_array(FFCST::OPTION_NESTED_LEVEL, $property[FFCST::PROPERTY_OPTIONS])) {
+                    $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                    return (string)$this->$getter();
+                }
+            }
+        }
+        return '';
+    }
+
     /**
      *
      * @see \FreeFW\Interfaces\ApiResponseInterface
