@@ -40,8 +40,11 @@ class Conditions extends \FreeFW\Core\Model implements
     /**
      * Constructor
      */
-    public function initFromArray(array $p_conditions, string $p_oper = \FreeFW\Storage\Storage::COND_AND)
-    {
+    public function initFromArray(
+        array $p_conditions, 
+        string $p_oper = \FreeFW\Storage\Storage::COND_AND,
+        string $p_cond = \FreeFW\Storage\Storage::COND_LIKE
+    ) {
         $this->operator   = $p_oper;
         $this->conditions = [];
         foreach ($p_conditions as $idx => $value) {
@@ -57,7 +60,7 @@ class Conditions extends \FreeFW\Core\Model implements
                  */
                 $aCondition = \FreeFW\Model\SimpleCondition::getNew();
                 $aCondition->setLeftMember($aField);
-                $aCondition->setOperator(\FreeFW\Storage\Storage::COND_LIKE);
+                $aCondition->setOperator($p_cond);
                 if (is_array($value)) {
                     foreach ($value as $idx2 => $value2) {
                         // Verify oper...

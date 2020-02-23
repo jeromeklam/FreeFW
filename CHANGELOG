@@ -1,3 +1,7 @@
+# 1.0.8 : 23/02/2020
+
+* Greater or equal or null condition
+
 # 1.0.7 : 09/02/2020
 
 * Error on remove API call

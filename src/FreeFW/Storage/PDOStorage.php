@@ -722,12 +722,16 @@ class PDOStorage extends \FreeFW\Storage\Storage
             case \FreeFW\Storage\Storage::COND_LOWER:
                 $realOper = '<';
                 break;
+            case \FreeFW\Storage\Storage::COND_LOWER_EQUAL_OR_NULL:
+                $nullable = true;
             case \FreeFW\Storage\Storage::COND_LOWER_EQUAL:
                 $realOper = '<=';
                 break;
             case \FreeFW\Storage\Storage::COND_GREATER:
                 $realOper = '>';
                 break;
+            case \FreeFW\Storage\Storage::COND_GREATER_EQUAL_OR_NULL:
+                $nullable = true;
             case \FreeFW\Storage\Storage::COND_GREATER_EQUAL:
                 $realOper = '>=';
                 break;
