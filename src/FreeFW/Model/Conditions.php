@@ -70,6 +70,7 @@ class Conditions extends \FreeFW\Core\Model implements
                         } else {
                             $aValue = new \FreeFW\Model\ConditionValue();
                             $aValue->setValue($value2);
+                            $aCondition->setOperator($idx2);
                             $aCondition->setRightMember($aValue);
                         }
                     }

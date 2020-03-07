@@ -456,6 +456,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 }
             }
         }
+        //var_export($p_conditions);
         $parts  = $this->renderConditions($p_conditions, $p_model, $aliases, '@');
         $where  = $parts['sql'];
         $values = $parts['values'];
@@ -504,6 +505,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         }
         // Build query
         $sql = 'SELECT ' . $select . ' FROM ' . $from . ' WHERE ( ' . $where . ' ) ' . $whereBroker . ' ' . $sort . ' ' . $limit;
+        //var_export($sql);
         $this->logger->debug('PDOStorage.select : ' . $sql);
         // I got all, run query...
         try {
