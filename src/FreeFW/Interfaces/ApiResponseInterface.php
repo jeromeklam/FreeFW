@@ -37,7 +37,7 @@ interface ApiResponseInterface
      *
      * @return string
      */
-    public function getApiNestedId() : string;
+    public function getApiNestedParentId() : string;
 
     /**
      * Return position in parent

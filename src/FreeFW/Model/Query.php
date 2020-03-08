@@ -277,7 +277,7 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
      *
      * @return boolean
      */
-    public function execute()
+    public function execute(array $p_fields = [])
     {
         $this->result_set = new \FreeFW\Model\ResultSet();
         switch ($this->type) {
@@ -303,6 +303,9 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
                     $this->sort
                 );
                 return true;
+            case self::QUERY_UPDATE:
+                $model = \FreeFW\DI\DI::get($this->main_model);
+                return $this->strategy->update($model, $p_fields, $this->conditions);
             case self::QUERY_DELETE:
                 $model = \FreeFW\DI\DI::get($this->main_model);
                 return $this->strategy->delete($model, $this->conditions);

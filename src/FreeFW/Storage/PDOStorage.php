@@ -210,6 +210,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $fields     = [];
         $source     = $p_model::getSource();
         $properties = $p_model::getProperties();
+        if (method_exists($p_model, 'beforeRemove')) {
+            if (!$p_model->beforeRemove()) {
+                return false;
+            }
+        }
         foreach ($properties as $name => $oneProperty) {
             if (array_key_exists(FFCST::PROPERTY_OPTIONS, $oneProperty)) {
                 if (in_array(FFCST::OPTION_PK, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
@@ -228,6 +233,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
             // Get PDO and execute
             $query = $this->provider->prepare($sql, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
             if ($query->execute($fields)) {
+                if (method_exists($p_model, 'afterRemove')) {
+                    if (!$p_model->afterRemove()) {
+                        return false;
+                    }
+                }
                 $code = '';
                 $ok   = true;
                 try {
@@ -572,6 +582,96 @@ class PDOStorage extends \FreeFW\Storage\Storage
         );
         var_dump($result);
         die;
+    }
+
+    /**
+     * Update the model
+     *
+     * @param \FreeFW\Core\StorageModel $p_model
+     * @param array                     $p_fields
+     * @param \FreeFW\Model\Conditions  $p_conditions
+     *
+     * @return boolean
+     */
+    public function update(
+        \FreeFW\Core\StorageModel &$p_model,
+        array $p_fields,
+        \FreeFW\Model\Conditions $p_conditions = null
+    ) {
+        $source     = $p_model::getSource();
+        $properties = $p_model::getProperties();
+        $values     = [];
+        $ok         = false;
+        /**
+         * @var \FreeFW\Model\Condition $oneCondition
+         */
+        $parts  = $this->renderConditions($p_conditions, $p_model);
+        $where  = $parts['sql'];
+        $values = $parts['values'];
+        // Build set
+        $set = '';
+        $fields = [];
+        foreach ($p_fields as $name => $value) {
+            $dtz = false;
+            if (array_key_exists($name, $properties)) {
+                $oneProperty = $properties[$name];
+                if (!is_array($value)) {
+                    if ($oneProperty[FFCST::PROPERTY_TYPE] == FFCST::TYPE_DATETIMETZ) {
+                        $dtz = true;
+                    }
+                    // Compute getter
+                    $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                    // Get data
+                    $val = $p_model->$getter();
+                    if ($val === false) {
+                        $val = 0;
+                    }
+                    if ($dtz && $val != '') {
+                        $val = \FreeFW\Tools\Date::stringToMysql($val);
+                    }
+                    $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $val;
+                    if ($set != '') {
+                        $set .= ', ';
+                    }
+                    $set = $set . $oneProperty[FFCST::PROPERTY_PRIVATE] . ' = :' . $oneProperty[FFCST::PROPERTY_PRIVATE];
+                } else {
+                    foreach ($value as $idx2 => $value2) {
+                        if ($idx2 === 'noescape') {
+                            if ($set != '') {
+                                $set .= ', ';
+                            }
+                            $set = $set . $oneProperty[FFCST::PROPERTY_PRIVATE] . ' = ' . $value2;
+                        }
+                    }
+                }
+            } else {
+                // @todo : exception
+            }
+        }
+        // Build query
+        $sql = 'UPDATE ' . $source . ' SET ' . $set . ' WHERE ' . $where;
+        $this->logger->debug('PDOStorage.update : ' . $sql);
+        // I got all, run query...
+        try {
+            // Get PDO and execute
+            $query = $this->provider->prepare($sql, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
+            if ($query->execute(array_merge($values, $fields))) {
+                $ok = true;
+            } else {
+                $this->logger->debug('PDOStorage.update.error : ' . print_r($query->errorInfo(), true));
+                $localErr = $query->errorInfo();
+                $code     = 0;
+                $message  = 'PDOStorage.update.error : ' . print_r($query->errorInfo(), true);
+                if (is_array($localErr) && count($localErr) > 1) {
+                    $code    = intval($localErr[0]);
+                    $message = $localErr[2];
+                }
+                $p_model->addError($code, $message);
+            }
+        } catch (\Exception $ex) {
+            var_dump($ex);
+        }
+        return $ok;
     }
 
     /**

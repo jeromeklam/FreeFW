@@ -190,7 +190,7 @@ abstract class Model implements
      *
      * @see \FreeFW\Interfaces\ApiResponseInterface
      */
-    public function getApiNestedId() : string
+    public function getApiNestedParentId() : string
     {
         foreach ($this->getProperties() as $name => $property) {
             if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {

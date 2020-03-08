@@ -67,6 +67,21 @@ interface StorageInterface
     );
 
     /**
+     * Update the model
+     *
+     * @param \FreeFW\Core\StorageModel $p_model
+     * @param array                     $p_fields
+     * @param \FreeFW\Model\Conditions  $p_conditions
+     *
+     * @return boolean
+     */
+    public function update(
+        \FreeFW\Core\StorageModel &$p_model,
+        array $p_fields,
+        \FreeFW\Model\Conditions $p_conditions = null
+    );
+
+    /**
      * Remove the model
      *
      * @param \FreeFW\Core\StorageModel $p_model
