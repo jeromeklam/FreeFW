@@ -297,7 +297,7 @@ class ApiController extends \FreeFW\Core\Controller
                 $this->logger->debug('FreeFW.ApiController.updateOne.end');
                 return $this->createResponse(200, $data);
             } else {
-                return $this->createResponse(409);
+                return $this->createResponse(409, 'no data');
             }
         } else {
             return $this->createResponse(409, 'Id is mantarory');
