@@ -53,4 +53,15 @@ class Email extends \FreeFW\Model\Base\Email implements
     {
         return $this->lang;
     }
+
+    /**
+     * Merge datas in fields
+     * 
+     * @param array $p_datas
+     */
+    public function mergeDatas($p_datas)
+    {
+        $this->email_subject = \FreeFW\Tools\PBXString::parse($this->email_subject, $p_datas);
+        $this->email_body    = \FreeFW\Tools\PBXString::parse($this->email_body, $p_datas);
+    }
 }

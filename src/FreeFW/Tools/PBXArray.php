@@ -24,4 +24,28 @@ class PBXArray
         }
         return implode('&', $result);
     }
+
+    /**
+     * 
+     * @param array $array
+     * 
+     * @return array
+     */
+    public static function reduceKeys(array $array, $add = '')
+    {
+        $ret = [];
+        foreach ($array as $key => $value) {
+            $newKey = $key;
+            if ($add != '') {
+                $newKey = $add . '.' . $newKey;
+            }
+            if (is_array($value)) {
+                $ret2 = self::reduceKeys($value, $newKey);
+                $ret = array_merge($ret, $ret2);
+            } else {
+                $ret[$newKey] = $value;
+            }
+        }
+        return $ret;
+    }
 }
