@@ -83,6 +83,29 @@ abstract class Model implements
     }
 
     /**
+     * Get base64 src format
+     *
+     * @param mixed $p_data
+     *
+     * @return boolean|string
+     */
+    protected function decode_chunk($p_data)
+    {
+        if (strpos($p_data, ';base64,') >= 0) {
+            $data = explode(';base64,', $p_data);
+            if (!is_array($data) || !isset($data[1])) {
+                return false;
+            }
+            $data = base64_decode($data[1]);
+            if (!$data) {
+                return false;
+            }
+            return $data;
+        }
+        return $p_data;
+    }
+
+    /**
      * Init object with datas
      *
      * @param array $p_datas
@@ -100,8 +123,16 @@ abstract class Model implements
                     $test = $property[FFCST::PROPERTY_PUBLIC];
                 }
                 if ($test == $name) {
+                    $type   = $property[FFCST::PROPERTY_TYPE];
                     $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
-                    $this->$setter($value);
+                    switch ($type) {
+                        case FFCST::TYPE_BLOB:
+                            $this->$setter($this->decode_chunk($value));
+                            break;
+                        default:
+                            $this->$setter($value);
+                            break;
+                    }
                     break;
                 }
             }

@@ -105,6 +105,19 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
     }
 
     /**
+     * Set operator
+     * 
+     * @param string $p_operator
+     * 
+     * @return \FreeFW\Model\Query
+     */
+    public function setOperator($p_operator)
+    {
+        $this->conditions->setOperator($p_operator);
+        return $this;
+    }
+
+    /**
      * Set type
      *
      * @param string $p_type
@@ -197,12 +210,18 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
                 $right->setValue($p_right);
             }
         }
-        $condition
-            ->setLeftMember($left)
-            ->setOperator($p_operator)
-        ;
+        $condition->setOperator($p_operator);
+        if ($left !== null) {
+            $condition->setLeftMember($left);
+        } else {
+            // @todo : strange...
+        }
         if ($right !== null) {
             $condition->setRightMember($right);
+        } else {
+            if ($p_operator === \FreeFW\Storage\Storage::COND_EQUAL) {
+                $condition->setOperator(\FreeFW\Storage\Storage::COND_EMPTY);
+            }
         }
         return $this->addCondition($condition);
     }

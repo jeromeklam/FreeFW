@@ -65,11 +65,16 @@ class ApiController extends \FreeFW\Core\Controller
         }
         $default = $p_request->default_model;
         $model   = \FreeFW\DI\DI::get($default);
-        $data    = $model->find(
-            [
-                $model->getAutocompleteField() => [\FreeFW\Storage\Storage::COND_LIKE => $p_search]
-            ]
-        );
+        $fields  = $model->getAutocompleteField();
+        $filters = [];
+        if (is_array($fields)) {
+            foreach ($fields as $oneField) {
+                $filters[$oneField] = [\FreeFW\Storage\Storage::COND_LIKE => $p_search];
+            }
+        } else {
+            $filters[$fields] = [\FreeFW\Storage\Storage::COND_LIKE => $p_search];
+        }
+        $data = $model->find($filters, \FreeFW\Storage\Storage::COND_OR);
         $this->logger->debug('FreeFW.ApiController.autocomplete.end');
         return $this->createResponse(200, $data);
     }

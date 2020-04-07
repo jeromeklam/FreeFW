@@ -2,6 +2,9 @@
 
 * PBXArray
 * Email
+* OR sur find
+* eq NULL transformé en ISNULL
+* autocomplete multi champs de recherche
 
 # 1.0.9 : 08/03/2020
 

@@ -413,6 +413,14 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 }
             }
         }
+        if (method_exists($p_model, 'getRelationships')) {
+            foreach ($p_model->getRelationships() as $name => $rel) {
+                $fks[$name] = [
+                    'left'  => $rel['field'],
+                    'right' => $rel
+                ];
+            }
+        }
         foreach ($p_relations as $idx => $shortcut) {
             $parts     = explode('.', $shortcut);
             $onePart   = array_shift($parts);
@@ -849,30 +857,45 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $realOper = '=';
                 $nullable = true;
                 break;
+            case \FreeFW\Storage\Storage::COND_EMPTY:
+                $realOper = ' IS NULL';
+                break;
+            case \FreeFW\Storage\Storage::COND_NOT_EMPTY:
+                $realOper = ' IS NOT NULL';
+                break;
         }
-        if ($left !== null && $right !== null) {
+        if ($left !== null ) {
             $leftDatas  = $this->renderConditionField($left, $p_model, $p_aliases, $p_crtAlias);
-            $rightDatas = $this->renderConditionField($right, $p_model, $p_aliases, $p_crtAlias);
-            $result     = [
-                'values' => [],
-                'type'   => false
-            ];
-            if ($nullable) {
-                $result['sql'] = '(' .
-                    $leftDatas['id'] . $realOper . $rightDatas['id'] . ' OR ' .
-                    $leftDatas['id'] . ' IS NULL)';
+            if ($right !== null) {
+                $rightDatas = $this->renderConditionField($right, $p_model, $p_aliases, $p_crtAlias);
+                $result     = [
+                    'values' => [],
+                    'type'   => false
+                ];
+                if ($nullable) {
+                    $result['sql'] = '(' .
+                        $leftDatas['id'] . $realOper . $rightDatas['id'] . ' OR ' .
+                        $leftDatas['id'] . ' IS NULL)';
+                } else {
+                    $result['sql'] = $leftDatas['id'] . ' ' . $realOper . ' ' . $rightDatas['id'];
+                }
+                if ($leftDatas['type'] === false) {
+                    $result['values'][$leftDatas['id']] = $leftDatas['value'];
+                } else {
+                    $result['type'] = $leftDatas['type'];
+                }
+                if ($rightDatas['type'] === false) {
+                    $result['values'][$rightDatas['id']] = $addL . $rightDatas['value'] . $addR;
+                } else {
+                    $result['type'] = $rightDatas['type'];
+                }
             } else {
-                $result['sql'] = $leftDatas['id'] . ' ' . $realOper . ' ' . $rightDatas['id'];
-            }
-            if ($leftDatas['type'] === false) {
-                $result['values'][$leftDatas['id']] = $leftDatas['value'];
-            } else {
-                $result['type'] = $leftDatas['type'];
-            }
-            if ($rightDatas['type'] === false) {
-                $result['values'][$rightDatas['id']] = $addL . $rightDatas['value'] . $addR;
-            } else {
-                $result['type'] = $rightDatas['type'];
+                $result['sql'] = $leftDatas['id'] . ' ' . $realOper;
+                if ($leftDatas['type'] === false) {
+                    $result['values'][$leftDatas['id']] = $leftDatas['value'];
+                } else {
+                    $result['type'] = $leftDatas['type'];
+                }
             }
         } else {
             throw new \FreeFW\Core\FreeFWStorageException(

@@ -86,6 +86,19 @@ class Conditions extends \FreeFW\Core\Model implements
     }
 
     /**
+     * Set operator
+     * 
+     * @param string $p_oper
+     * 
+     * @return \FreeFW\Model\Conditions
+     */
+    public function setOperator($p_oper)
+    {
+        $this->operator = $p_oper;
+        return $this;
+    }
+
+    /**
      * Get operator
      *
      * @return string

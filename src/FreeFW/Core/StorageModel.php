@@ -131,7 +131,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\StorageStrategyInterface::find()
      */
-    public static function find(array $p_filters = [])
+    public static function find(array $p_filters = [], $p_oper = \FreeFW\Storage\Storage::COND_AND)
     {
         $cls   = get_called_class();
         $cls   = rtrim(ltrim($cls, '\\'), '\\');
@@ -142,6 +142,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
         $query
             ->setType(\FreeFW\Model\Query::QUERY_SELECT)
             ->setMainModel(str_replace('\\', '::', $cls))
+            ->setOperator($p_oper)
             ->addFromFilters($p_filters)
         ;
         $model = new \FreeFW\Model\ResultSet();
@@ -436,7 +437,6 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
              * @var \FreeFW\Model\ResultSet $result
              */
             $results = $query->getResult();
-            var_export($results);die;
         }
         return $total;
     }

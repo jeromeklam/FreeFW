@@ -123,9 +123,9 @@ class Router
                 }
             }
             $currentDir = rtrim($this->base_path, '/');
-            $this->logger->debug('router.findRoute.request : ' . $requestUrl);
+            //$this->logger->debug('router.findRoute.request : ' . $requestUrl);
             foreach ($this->routes->getRoutes() as $idx => $oneRoute) {
-                $this->logger->debug('router.findRoute.test : ' . $oneRoute->getUrl());
+                //$this->logger->debug('router.findRoute.test : ' . $oneRoute->getUrl());
                 if (strtoupper($p_request->getMethod()) == strtoupper($oneRoute->getMethod())) {
                     if ($currentDir != '/') {
                         $requestUrl = str_replace($currentDir, '', $requestUrl);
