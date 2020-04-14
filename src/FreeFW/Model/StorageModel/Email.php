@@ -49,7 +49,7 @@ abstract class Email extends \FreeFW\Core\StorageModel
     ];
     protected static $PRP_EMAIL_BODY = [
         FFCST::PROPERTY_PRIVATE => 'email_body',
-        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BLOB,
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_TEXT,
         FFCST::PROPERTY_OPTIONS => []
     ];
     protected static $PRP_EMAIL_FROM = [

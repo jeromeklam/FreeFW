@@ -73,7 +73,12 @@ class DI
                     if ($broker) {
                         $obj->setMainBroker(intval($broker));
                     } else {
-                        $obj->setMainBroker(0);
+                        $sso = \FreeFW\DI\DI::getShared('sso');
+                        if ($sso) {
+                            $obj->setMainBroker($sso->getBrokerId());
+                        } else {
+                            $obj->setMainBroker(0);
+                        }
                     }
                 }
                 return $obj;

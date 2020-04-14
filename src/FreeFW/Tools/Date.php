@@ -52,7 +52,7 @@ class Date
         if ($p_plus !== null) {
             $datetime->add(new \DateInterval('PT'.$p_plus.'M'));
         }
-        return $datetime->format('Y-m-d H:i:s');
+        return $datetime;
     }
 
     /**
@@ -163,16 +163,20 @@ class Date
     {
         $date = null;
         if ($p_date !== null && $p_date != '') {
-            $format = 'Y-m-d H:i:s';
+            $format = 'Y-m-d\TH:i:sP';
             $date = \DateTime::createFromFormat($format, $p_date);
             if ($date === false) {
-                $format = 'Y-m-d H:i';
+                $format = 'Y-m-d H:i:s';
                 $date = \DateTime::createFromFormat($format, $p_date);
                 if ($date === false) {
-                    $format = 'Y-m-d';
+                    $format = 'Y-m-d H:i';
                     $date = \DateTime::createFromFormat($format, $p_date);
                     if ($date === false) {
-                        $date = null;
+                        $format = 'Y-m-d';
+                        $date = \DateTime::createFromFormat($format, $p_date);
+                        if ($date === false) {
+                            $date = null;
+                        }
                     }
                 }
             }

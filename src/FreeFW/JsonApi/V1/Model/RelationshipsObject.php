@@ -52,20 +52,20 @@ class RelationshipsObject implements \Countable, \JsonSerializable
      * 
      * @return \FreeFW\JsonApi\V1\Model\RelationshipsObject
      */
-    public function addRelation($p_name, $p_relation)
+    public function addRelation($p_name, $p_relation, $p_array = false)
     {
         if ($this->relationships === null) {
             $this->relationships = [];
         }
-        if (array_key_exists($p_name, $this->relationships)) {
-            if (!is_array($this->relationships[$p_name])) {
-                $temp = $this->relationships[$p_name];
+        if ($p_array) {
+            if (!array_key_exists($p_name, $this->relationships)) {
                 $this->relationships[$p_name] = [];
-                $this->relationships[$p_name][] = $temp;
             }
             $this->relationships[$p_name][] = $p_relation;
         } else {
-            $this->relationships[$p_name] = $p_relation;
+            if (!array_key_exists($p_name, $this->relationships)) {
+                $this->relationships[$p_name] = $p_relation;
+            }
         }
         return $this;
     }
@@ -96,18 +96,17 @@ class RelationshipsObject implements \Countable, \JsonSerializable
         foreach ($this->relationships as $name => $relation) {
             if (is_array($relation)) {
                 $rels[$name] = [];
+                $rels[$name]['data'] = [];
                 foreach ($relation as $rel) {
-                    $rels[$name][] = [
-                        'data' => [
-                            'id'   => $rel->getId(),
-                            'type' => $rel->getType()
-                        ]
+                    $rels[$name]['data'][] = [
+                        'id'   => '' . $rel->getId(),
+                        'type' => $rel->getType()
                     ];
                 }
             } else {
                 $rels[$name] = [
                     'data' => [
-                        'id'   => $relation->getId(),
+                        'id'   => '' . $relation->getId(),
                         'type' => $relation->getType()
                     ]
                 ];

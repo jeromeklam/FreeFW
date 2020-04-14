@@ -150,7 +150,7 @@ class ResourceObject implements \JsonSerializable
     {
         $obj       = new \stdClass();
         $obj->type = $this->getType();
-        $obj->id   = $this->getId();
+        $obj->id   = "" . $this->getId();
         if ($this->attributes && count($this->attributes) > 0) {
             $obj->attributes = $this->attributes;
         }

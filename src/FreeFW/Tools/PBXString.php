@@ -371,4 +371,17 @@ class PBXString
         );
         return str_replace($a, $b, $p_string);
     }
+
+    /**
+     * Clean strange characters
+     * 
+     * @param string $p_text
+     * 
+     * @return string
+     */
+    public static function clean($p_text)
+    {
+        $p_text = str_replace("\'", "'", $p_text);
+        return $p_text;
+    }
 }

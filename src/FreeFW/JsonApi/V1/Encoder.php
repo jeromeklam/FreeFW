@@ -63,7 +63,7 @@ class Encoder
                                         $oneModel->getApiId(),
                                         $oneModel->isSingleElement()
                                     );
-                                    $relationShips->addRelation($relation->getName(), $resourceRel);
+                                    $relationShips->addRelation($relation->getName(), $resourceRel, true);
                                     $included = $this->encodeSingleResource($oneModel, $p_included, $p_api_params);
                                     $p_included->addIncluded($included);
                                 }

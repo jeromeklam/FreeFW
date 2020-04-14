@@ -30,6 +30,16 @@ abstract class Lang extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
         FFCST::PROPERTY_OPTIONS => []
     ];
+    protected static $PRP_LANG_ISO = [
+        FFCST::PROPERTY_PRIVATE => 'lang_iso',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+        FFCST::PROPERTY_OPTIONS => []
+    ];
+    protected static $PRP_LANG_FLAG = [
+        FFCST::PROPERTY_PRIVATE => 'lang_flag',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+        FFCST::PROPERTY_OPTIONS => []
+    ];
 
     /**
      * get properties
@@ -41,7 +51,9 @@ abstract class Lang extends \FreeFW\Core\StorageModel
         return [
             'lang_id'   => self::$PRP_LANG_ID,
             'lang_name' => self::$PRP_LANG_NAME,
-            'lang_code' => self::$PRP_LANG_CODE
+            'lang_code' => self::$PRP_LANG_CODE,
+            'lang_iso'  => self::$PRP_LANG_ISO,
+            'lang_flag' => self::$PRP_LANG_FLAG
         ];
     }
 

@@ -63,7 +63,9 @@ interface StorageInterface
         array $p_relations = [],
         int $p_from = 0,
         int $p_length = 0,
-        array $p_sort = []
+        array $p_sort = [],
+        string $p_force_select = '',
+        $p_function = null
     );
 
     /**

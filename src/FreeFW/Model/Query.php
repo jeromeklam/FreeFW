@@ -296,7 +296,7 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
      *
      * @return boolean
      */
-    public function execute(array $p_fields = [])
+    public function execute(array $p_fields = [], $p_function = null)
     {
         $this->result_set = new \FreeFW\Model\ResultSet();
         switch ($this->type) {
@@ -319,7 +319,9 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
                     $this->relations,
                     $this->from,
                     $this->length,
-                    $this->sort
+                    $this->sort,
+                    '',
+                    $p_function
                 );
                 return true;
             case self::QUERY_UPDATE:
@@ -399,7 +401,23 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
      */
     public function setSort($p_sort)
     {
-        $this->sort = $p_sort;
+        if (is_array($p_sort)) {
+            $this->sort = $p_sort;
+        } else {
+            $this->sort = [];
+            $sorts = explode(',', $p_sort);
+            foreach ($sorts as $idx => $field) {
+                if ($field[0] == '-') {
+                    $this->sort[substr($field, 1)] = '-';
+                } else {
+                    if ($field[0] == '-') {
+                        $this->sort[substr($field, 1)] = '+';
+                    } else {
+                        $this->sort[$field] = '+';
+                    }
+                }
+            }
+        }
         return $this;
     }
 }

@@ -5,6 +5,10 @@
 * OR sur find
 * eq NULL transformé en ISNULL
 * autocomplete multi champs de recherche
+* JsonApi optimizations (Encoder / Decoder)
+* Date functions updates
+* Monetary
+* Query addons
 
 # 1.0.9 : 08/03/2020
 

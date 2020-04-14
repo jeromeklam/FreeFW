@@ -84,7 +84,7 @@ class SimpleCondition extends \FreeFW\Core\Model
     {
         if (!in_array($p_operator, \FreeFW\Storage\Storage::getAllOperators())) {
             throw new \FreeFW\Core\FreeFWStorageException(
-                sprinf('Unknown %s operator !', $p_operator)
+                sprintf('Unknown %s operator !', $p_operator)
             );
         }
         $this->operator = $p_operator;

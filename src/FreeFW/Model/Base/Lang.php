@@ -28,6 +28,18 @@ abstract class Lang extends \FreeFW\Model\StorageModel\Lang
     protected $lang_code = null;
 
     /**
+     * lang_iso
+     * @var string
+     */
+    protected $lang_iso = null;
+
+    /**
+     * lang_flag
+     * @var string
+     */
+    protected $lang_flag = null;
+
+    /**
      * Set lang_id
      *
      * @param int $p_value
@@ -94,5 +106,51 @@ abstract class Lang extends \FreeFW\Model\StorageModel\Lang
     public function getLangCode()
     {
         return $this->lang_code;
+    }
+
+    /**
+     * Set lang_iso
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\Lang
+     */
+    public function setLangIso($p_value)
+    {
+        $this->lang_iso = $p_value;
+        return $this;
+    }
+    
+    /**
+     * Get lang_iso
+     *
+     * @return string
+     */
+    public function getLangIso()
+    {
+        return $this->lang_iso;
+    }
+
+    /**
+     * Set lang_flag
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\Lang
+     */
+    public function setLangFlag($p_value)
+    {
+        $this->lang_flag = $p_value;
+        return $this;
+    }
+    
+    /**
+     * Get lang_flag
+     *
+     * @return string
+     */
+    public function getLangFlag()
+    {
+        return $this->lang_flag;
     }
 }

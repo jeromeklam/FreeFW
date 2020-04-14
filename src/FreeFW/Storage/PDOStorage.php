@@ -378,7 +378,8 @@ class PDOStorage extends \FreeFW\Storage\Storage
         int $p_from = 0,
         int $p_length = 0,
         array $p_sort = [],
-        string $p_force_select = ''
+        string $p_force_select = '',
+        $p_function = null
     ) {
         $crtAlias     = 'A';
         $aliases      = [];
@@ -525,6 +526,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $sql = 'SELECT ' . $select . ' FROM ' . $from . ' WHERE ( ' . $where . ' ) ' . $whereBroker . ' ' . $sort . ' ' . $limit;
         //var_export($sql);
         $this->logger->debug('PDOStorage.select : ' . $sql);
+        $this->logger->debug('PDOStorage.fields : ' . print_r($values, true));
         // I got all, run query...
         try {
             // Get PDO and execute
@@ -533,7 +535,13 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 if ($p_force_select !== '') {
                     $result = [];
                     while ($row = $query->fetch(\PDO::FETCH_OBJ)) {
-                        $result[] = $row;
+                        if ($p_function) {
+                            if (!$p_function($row)) {
+                                break;
+                            }
+                        } else {
+                            $result[] = $row;
+                        }
                     }
                 } else {
                     $clName = str_replace('\\', '::', get_class($p_model));
@@ -543,7 +551,17 @@ class PDOStorage extends \FreeFW\Storage\Storage
                             ->init()
                             ->setFromArray($row, $aliases, '@')
                         ;
-                        $result[] = $model;
+                        if ($p_function) {
+                            if (is_string($p_function) && method_exists($model, $p_function)) {
+                                $model->$p_function();
+                            } else {
+                                if (!$p_function($model)) {
+                                    break;
+                                }
+                            }
+                        } else {
+                            $result[] = $model;
+                        }
                     }
                 }
             } else {
@@ -756,19 +774,27 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $parts = $this->renderCondition($oneCondition, $p_model, $p_aliases, $p_crtAlias);
                 if ($result['sql'] == '') {
                     $result['sql']    = $parts['sql'];
-                    $result['values'] = $parts['values'];
+                    if (is_array($parts['values'])) {
+                        $result['values'] = $parts['values'];
+                    }
                 } else {
                     $result['sql']    = $result['sql'] . $oper . $parts['sql'];
-                    $result['values'] = array_merge($result['values'], $parts['values']);
+                    if (is_array($parts['values'])) {
+                        $result['values'] = array_merge($result['values'], $parts['values']);
+                    }
                 }
             } else {
                 $parts = $this->renderConditions($oneCondition, $p_model, $p_aliases, $p_crtAlias);
                 if ($result['sql'] == '') {
                     $result['sql']    = $parts['sql'];
-                    $result['values'] = $parts['values'];
+                    if (is_array($parts['values'])) {
+                        $result['values'] = $parts['values'];
+                    }
                 } else {
                     $result['sql']    = $result['sql'] . $oper . $parts['sql'];
-                    $result['values'] = array_merge($result['values'], $parts['values']);
+                    if (is_array($parts['values'])) {
+                        $result['values'] = array_merge($result['values'], $parts['values']);
+                    }
                 }
             }
         }
