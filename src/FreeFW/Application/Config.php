@@ -17,7 +17,7 @@ class Config
 
     /**
      *
-     * @var unknown
+     * @var static
      */
     protected static $factory = null;
 

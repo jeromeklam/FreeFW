@@ -25,8 +25,6 @@
         "psr/http-factory"                     : "*",
         "guzzlehttp/guzzle"                    : "*",
         "guzzlehttp/psr7"                      : "*",
-        "neomerx/json-api"                     : "*",
-        "neomerx/cors-psr7"                    : "*",
         "firebase/php-jwt"                     : "*",
         "bshaffer/oauth2-server-php"           : "*"
     },

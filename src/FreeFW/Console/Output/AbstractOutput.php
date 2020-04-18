@@ -29,7 +29,7 @@ abstract class AbstractOutput
     /**
      * Stream
      *
-     * @var unknown
+     * @var mixed
      */
     protected $stream = null;
 

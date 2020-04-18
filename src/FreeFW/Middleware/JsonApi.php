@@ -32,7 +32,7 @@ class JsonApi implements
     /**
      *
      * {@inheritDoc}
-     * @see \FreeFW\Middleware\ApiAdapter::decodeRequest()
+     * @see \FreeFW\Interfaces\ApiAdapterInterface::decodeRequest()
      */
     public function decodeRequest(ServerRequestInterface $p_request): \FreeFW\Http\ApiParams
     {
@@ -119,7 +119,7 @@ class JsonApi implements
     /**
      *
      * {@inheritDoc}
-     * @see \FreeFW\Middleware\ApiAdapter::encodeResponse()
+     * @see \FreeFW\Interfaces\ApiAdapterInterface::encodeResponse()
      */
     public function encodeResponse(ResponseInterface $p_response, \FreeFW\Http\ApiParams $p_api_params): ResponseInterface
     {

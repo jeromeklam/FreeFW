@@ -17,7 +17,7 @@ abstract class AbstractLoader
 
     /**
      * Instane de la classe
-     * @var \Static
+     * @var static
      */
     protected static $instance = null;
 

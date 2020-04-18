@@ -273,7 +273,7 @@ class BigInteger
      * ?&gt;
      * </code>
      *
-     * @param optional $x
+     * @param mixed $x
      *            base-10 number or base-$base number if $base set.
      * @param
      *            optional integer $base

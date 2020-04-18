@@ -51,11 +51,18 @@ class Console extends \FreeFW\Core\Console
     {
         $this->logger->debug('Application.handle.start');
         try {
-            $input   = \FreeFW\Console\Input\Input::getFromGlobals();
             $cfg     = $this->getConfig();
             $ssoBrk  = $cfg->get('sso');
-            $broker  = \FreeSSO\Model\Broker::findFirst(['brk_key' => $ssoBrk['broker']]);
-            $sso     = new \FreeFW\Console\SsoMock($broker->getBrkId());
+            $input   = \FreeFW\Console\Input\Input::getFromGlobals();
+            $brkKey  = $input->getAttribute('broker', $ssoBrk['broker']);
+            // User first, mandatory
+            $userId = $input->getAttribute('user', 1);
+            $user   = \FreeSSO\Model\User::findFirst(['user_id' => $userId]);
+            // Broker instance
+            $broker = \FreeSSO\Model\Broker::findFirst(['brk_key' => $brkKey]);
+            $sso    = new \FreeFW\Console\SsoMock($broker->getBrkId());
+            $sso->setUser($user);
+            // Inject in SSO
             \FreeFW\DI\DI::setShared('sso', $sso);
             $output  = new \FreeFW\Console\Output\ConsoleOutput();
             $command = $this->router->findCommand($input);

@@ -292,8 +292,8 @@ class PBXString
      * Converti une chaine en NS
      * NS.NS::Class
      *
-     * @param $p_str  la chaine à convertir
-     * @param $p_type le type de classe
+     * @param string $p_str  Chaine à convertir
+     * @param string $p_type Type de classe
      *
      * @return string
      */

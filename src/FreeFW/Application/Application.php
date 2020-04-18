@@ -82,7 +82,7 @@ class Application extends \FreeFW\Core\Application
     /**
      * Send route for http code
      * 
-     * @param unknown $p_http_code
+     * @param mixed $p_http_code
      */
     public function sendHttpCode($p_http_code)
     {

@@ -1,13 +1,7 @@
 <?php
 namespace FreeFW\Tools;
 
-use FreeFW\Stream\PumpStream;
-use Psr\Http\Message\MessageInterface;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
-use Psr\Http\Message\UriInterface;
 
 /**
  *
@@ -38,11 +32,11 @@ class Stream
                 fwrite($stream, $resource);
                 fseek($stream, 0);
             }
-            return new \FreeFW\Stream\Stream($stream, $options);
+            return new \GuzzleHttp\Psr7\Stream($stream, $options);
         }
         switch (gettype($resource)) {
             case 'resource':
-                return new \FreeFW\Stream\Stream($resource, $options);
+                return new \GuzzleHttp\Psr7\Stream($resource, $options);
             case 'object':
                 if ($resource instanceof StreamInterface) {
                     return $resource;
@@ -53,10 +47,10 @@ class Stream
                 }
                 break;
             case 'NULL':
-                return new \FreeFW\Stream\Stream(fopen('php://temp', 'r+'), $options);
+                return new \GuzzleHttp\Psr7\Stream(fopen('php://temp', 'r+'), $options);
         }
         if (is_callable($resource)) {
-            return new \FreeFW\Stream\PumpStream($resource, $options);
+            return new \GuzzleHttp\Psr7\PumpStream($resource, $options);
         }
         throw new \InvalidArgumentException('Invalid resource type: ' . gettype($resource));
     }

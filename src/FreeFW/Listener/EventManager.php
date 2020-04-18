@@ -37,7 +37,7 @@ class EventManager
     /**
      * Retourne le singleton
      *
-     * @return \FreeFW\EventManager
+     * @return \FreeFW\Listener\EventManager
      */
     public static function getInstance()
     {
@@ -53,7 +53,7 @@ class EventManager
      * @param string $event_name
      * @param mixed  $data
      *
-     * @return \FreeFW\EventManager
+     * @return \FreeFW\Listener\EventManager
      */
     public function notify($event_name, $data = null)
     {
@@ -74,7 +74,7 @@ class EventManager
      * @param mixed $callback
      * @param int   $priority
      *
-     * @return \FreeFW\EventManager
+     * @return \FreeFW\Listener\EventManager
      */
     public function bind($event, $callback, $priority = 1)
     {
@@ -106,7 +106,7 @@ class EventManager
      * @param mixed  $callback
      * @param int    $priority
      *
-     * @return \FreeFW\EventManager
+     * @return \FreeFW\Listener\EventManager
      */
     final public function registerEvent($event_name, $callback, $priority)
     {
@@ -131,7 +131,7 @@ class EventManager
      *
      * @param string $event_name
      *
-     * @return \FreeFW\EventManager
+     * @return \FreeFW\Listener\EventManager
      */
     final public function deRegisterEvent($event_name)
     {

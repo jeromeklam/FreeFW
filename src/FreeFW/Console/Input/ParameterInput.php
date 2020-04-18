@@ -35,7 +35,7 @@ class ParameterInput extends \FreeFW\Console\Input\AbstractInput
      *
      * @param array $p_params
      *
-     * @return \static
+     * @return static
      */
     public function setParams($p_params = array())
     {

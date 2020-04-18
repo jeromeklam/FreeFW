@@ -174,10 +174,12 @@ class Encoding
     }
 
     /**
-     * 
-     * @param unknown $text
-     * @param unknown $option
-     * @return unknown|string|string
+     * Convert to Win1252
+     *
+     * @param string $text
+     * @param mixed $option
+     *
+     * @return string
      */
     static function toWin1252($text, $option = self::WITHOUT_ICONV)
     {
@@ -194,10 +196,12 @@ class Encoding
     }
 
     /**
+     * Convert to ISO 8859
      * 
-     * @param unknown $text
-     * @param unknown $option
-     * @return \FreeFW\Tools\unknown|string
+     * @param string $text
+     * @param mixed  $option
+     * 
+     * @return string
      */
     static function toISO8859($text, $option = self::WITHOUT_ICONV)
     {
@@ -205,10 +209,12 @@ class Encoding
     }
 
     /**
+     * Convert to Latin1
      * 
-     * @param unknown $text
-     * @param unknown $option
-     * @return \FreeFW\Tools\unknown|string
+     * @param string $text
+     * @param mixed  $option
+     * 
+     * @return string
      */
     static function toLatin1($text, $option = self::WITHOUT_ICONV)
     {
@@ -216,10 +222,12 @@ class Encoding
     }
 
     /**
+     * Fix UTF-8
      * 
-     * @param unknown $text
-     * @param unknown $option
-     * @return unknown|\FreeFW\Tools\unknown|string|\FreeFW\Tools\unknown|string
+     * @param string $text
+     * @param mixed  $option
+     * 
+     * @return string
      */
     static function fixUTF8($text, $option = self::WITHOUT_ICONV)
     {
@@ -242,8 +250,10 @@ class Encoding
     }
 
     /**
+     * Fix Win 1252 characters
      * 
-     * @param unknown $text
+     * @param string $text
+     * 
      * @return mixed
      */
     static function UTF8FixWin1252Chars($text)
@@ -255,8 +265,10 @@ class Encoding
     }
 
     /**
+     * Remov BOM
      * 
      * @param string $str
+     * 
      * @return string
      */
     static function removeBOM($str = "")
@@ -268,8 +280,10 @@ class Encoding
     }
 
     /**
+     * strlen
      * 
-     * @param unknown $text
+     * @param string $text
+     * 
      * @return number
      */
     protected static function strlen($text)
@@ -278,8 +292,10 @@ class Encoding
     }
 
     /**
+     * Normalize encoding
      * 
-     * @param unknown $encodingLabel
+     * @param string $encodingLabel
+     * 
      * @return string
      */
     public static function normalizeEncoding($encodingLabel)
@@ -304,10 +320,12 @@ class Encoding
     }
 
     /**
+     * Encode
      * 
-     * @param unknown $encodingLabel
-     * @param unknown $text
-     * @return \FreeFW\Tools\unknown|string
+     * @param string $encodingLabel
+     * @param string $text
+     * 
+     * @return string
      */
     public static function encode($encodingLabel, $text)
     {
@@ -318,9 +336,11 @@ class Encoding
     }
 
     /**
+     * UTF-8 decode
      * 
-     * @param unknown $text
-     * @param unknown $option
+     * @param string $text
+     * @param mixed  $option
+     * 
      * @return string
      */
     protected static function utf8_decode($text, $option = self::WITHOUT_ICONV)

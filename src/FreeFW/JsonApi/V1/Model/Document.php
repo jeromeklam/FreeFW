@@ -78,7 +78,7 @@ class Document implements \JsonSerializable
     /**
      * Set data
      *
-     * @param unknown $p_data
+     * @param mixed $p_data
      *
      * @return \FreeFW\JsonApi\V1\Model\Document
      */
@@ -101,7 +101,7 @@ class Document implements \JsonSerializable
     /**
      * Add one element to data
      *
-     * @param unknown $p_data
+     * @param mixed $p_data
      *
      * @return \FreeFW\JsonApi\V1\Model\Document
      */

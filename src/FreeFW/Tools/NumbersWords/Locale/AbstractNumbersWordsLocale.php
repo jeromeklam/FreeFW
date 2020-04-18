@@ -18,7 +18,7 @@ abstract class AbstractNumbersWordsLocale
 
     /**
      * Séparateur de décimal par défaut
-     * @var unknown
+     * @var string
      */
     protected $decimal_point = null;
 
@@ -99,7 +99,7 @@ abstract class AbstractNumbersWordsLocale
      *
      * @param string $p_val
      *
-     * @return \static
+     * @return static
      */
     protected function setLocale($p_val)
     {
@@ -123,7 +123,7 @@ abstract class AbstractNumbersWordsLocale
      *
      * @param string $p_val
      *
-     * @return \static
+     * @return static
      */
     protected function setDecimalPoint($p_val)
     {
@@ -147,7 +147,7 @@ abstract class AbstractNumbersWordsLocale
      *
      * @param string $p_val
      *
-     * @return \static
+     * @return static
      */
     protected function setLang($p_val)
     {
@@ -171,7 +171,7 @@ abstract class AbstractNumbersWordsLocale
      *
      * @param string $p_val
      *
-     * @return \static
+     * @return static
      */
     protected function setNativeLang($p_val)
     {
@@ -195,7 +195,7 @@ abstract class AbstractNumbersWordsLocale
      *
      * @param string $p_val
      *
-     * @return \static
+     * @return static
      */
     protected function setMinus($p_val)
     {
@@ -219,7 +219,7 @@ abstract class AbstractNumbersWordsLocale
      *
      * @param string $p_val
      *
-     * @return \static
+     * @return static
      */
     protected function setAnd($p_val)
     {
@@ -243,7 +243,7 @@ abstract class AbstractNumbersWordsLocale
      *
      * @param string $p_val
      *
-     * @return \static
+     * @return static
      */
     protected function setPlural($p_val)
     {
@@ -267,7 +267,7 @@ abstract class AbstractNumbersWordsLocale
      *
      * @param string $p_val
      *
-     * @return \static
+     * @return static
      */
     protected function setDash($p_val)
     {
@@ -315,7 +315,7 @@ abstract class AbstractNumbersWordsLocale
      *
      * @param string $p_val
      *
-     * @return \static
+     * @return static
      */
     protected function setDefaultCurrency($p_val)
     {
@@ -341,7 +341,7 @@ abstract class AbstractNumbersWordsLocale
      * @param string $p_monnaie
      * @param string $p_cent
      *
-     * @retuen \static
+     * @retuen static
      */
     protected function addCurrency($p_code, $p_monnaie, $p_cent)
     {
@@ -384,7 +384,7 @@ abstract class AbstractNumbersWordsLocale
      *
      * @param array $p_digits
      *
-     * @return \static
+     * @return static
      */
     protected function setDigits($p_digits)
     {
@@ -406,7 +406,7 @@ abstract class AbstractNumbersWordsLocale
     /**
      * Retourne la traduction d'un chiffre
      *
-     * @param unknown $p_digit
+     * @param mixed $p_digit
      *
      * @throws NumbersWordsException
      *
@@ -427,7 +427,7 @@ abstract class AbstractNumbersWordsLocale
      * @param number $p_exp
      * @param string $p_trad
      *
-     * @return \static
+     * @return static
      */
     protected function addExponent($p_exp, $p_trad)
     {
@@ -441,7 +441,7 @@ abstract class AbstractNumbersWordsLocale
      *
      * @param array $p_arr
      *
-     * @return \static
+     * @return static
      */
     protected function setExponents($p_arr)
     {
@@ -481,7 +481,7 @@ abstract class AbstractNumbersWordsLocale
     /**
      * Exposant existe ?
      *
-     * @param unknown $p_exp
+     * @param string $p_exp
      *
      * @return boolean
      */
@@ -523,7 +523,7 @@ abstract class AbstractNumbersWordsLocale
      *
      * @param array $p_numbers
      *
-     * @return \static
+     * @return static
      */
     protected function setMiscNumbers($p_numbers)
     {

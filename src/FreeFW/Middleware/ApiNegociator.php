@@ -70,7 +70,7 @@ class ApiNegociator implements
      *
      * @param array $p_methods
      *
-     * @return \FreeFW\Middleware\ApiAdapter
+     * @return \FreeFW\Interfaces\ApiNegociatorInterface
      */
     public function setMethods(array $p_methods)
     {
@@ -83,7 +83,7 @@ class ApiNegociator implements
      *
      * @param bool $p_override
      *
-     * @return \FreeFW\Middleware\ApiAdapter
+     * @return \FreeFW\Interfaces\ApiNegociatorInterface
      */
     public function setOverride(bool $p_override = true) : self
     {
@@ -95,7 +95,7 @@ class ApiNegociator implements
     /**
      *
      * {@inheritDoc}
-     * @see \FreeFW\Middleware\ApiAdapter::createUnsupportedRequestResponse()
+     * @see \FreeFW\Interfaces\ApiNegociatorInterface::createUnsupportedRequestResponse()
      */
     public function createUnsupportedRequestResponse(): ResponseInterface
     {
@@ -105,7 +105,7 @@ class ApiNegociator implements
     /**
      *
      * {@inheritDoc}
-     * @see \FreeFW\Middleware\ApiAdapter::createErrorResponse()
+     * @see \FreeFW\Interfaces\ApiNegociatorInterface::createErrorResponse()
      */
     public function createErrorResponse(\Exception $p_ex): ResponseInterface
     {
@@ -176,7 +176,7 @@ class ApiNegociator implements
         }
         return $this->createUnsupportedRequestResponse();
     }
-    
+
     /**
      *
      * {@inheritDoc}
@@ -186,7 +186,7 @@ class ApiNegociator implements
     {
         return $this->override;
     }
-    
+
     /**
      *
      * {@inheritDoc}
@@ -194,6 +194,5 @@ class ApiNegociator implements
      */
     public function checkRequest(ServerRequestInterface $p_request) : bool
     {
-
     }
 }

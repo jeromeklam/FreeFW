@@ -21,7 +21,7 @@ class Application implements
 
     /**
      * Router
-     * @var \FreeFW\Router\Router
+     * @var \FreeFW\Http\Router
      */
     protected $router = null;
 

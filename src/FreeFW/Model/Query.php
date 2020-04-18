@@ -202,12 +202,17 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
         }
         $right = null;
         if ($p_right !== null) {
-            if (strpos($p_right, '::Model::') !== false) {
-                $right = new \FreeFW\Model\ConditionMember();
-                $right->setValue($p_right);
-            } else {
+            if (is_array($p_right)) {
                 $right = new \FreeFW\Model\ConditionValue();
                 $right->setValue($p_right);
+            } else {
+                if (strpos($p_right, '::Model::') !== false) {
+                    $right = new \FreeFW\Model\ConditionMember();
+                    $right->setValue($p_right);
+                } else {
+                    $right = new \FreeFW\Model\ConditionValue();
+                    $right->setValue($p_right);
+                }
             }
         }
         $condition->setOperator($p_operator);

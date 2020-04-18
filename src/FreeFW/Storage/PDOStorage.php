@@ -883,6 +883,12 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $realOper = '=';
                 $nullable = true;
                 break;
+            case \FreeFW\Storage\Storage::COND_IN:
+                $realOper = ' IN ';
+                break;
+            case \FreeFW\Storage\Storage::COND_NOT_IN:
+                $realOper = ' NOT IN ';
+                break;
             case \FreeFW\Storage\Storage::COND_EMPTY:
                 $realOper = ' IS NULL';
                 break;
@@ -898,22 +904,33 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     'values' => [],
                     'type'   => false
                 ];
+                if (!is_array($rightDatas['id'])) {
+                    $rightId = $rightDatas['id'];
+                } else {
+                    $rightId = ' ( ' . implode(', ', $rightDatas['id']) . ' ) ';
+                }
                 if ($nullable) {
                     $result['sql'] = '(' .
-                        $leftDatas['id'] . $realOper . $rightDatas['id'] . ' OR ' .
+                        $leftDatas['id'] . $realOper . $rightId . ' OR ' .
                         $leftDatas['id'] . ' IS NULL)';
                 } else {
-                    $result['sql'] = $leftDatas['id'] . ' ' . $realOper . ' ' . $rightDatas['id'];
+                    $result['sql'] = $leftDatas['id'] . ' ' . $realOper . ' ' . $rightId;
                 }
                 if ($leftDatas['type'] === false) {
                     $result['values'][$leftDatas['id']] = $leftDatas['value'];
                 } else {
                     $result['type'] = $leftDatas['type'];
                 }
-                if ($rightDatas['type'] === false) {
-                    $result['values'][$rightDatas['id']] = $addL . $rightDatas['value'] . $addR;
+                if (!is_array($rightDatas['id'])) {
+                    if ($rightDatas['type'] === false) {
+                        $result['values'][$rightDatas['id']] = $addL . $rightDatas['value'] . $addR;
+                    } else {
+                        $result['type'] = $rightDatas['type'];
+                    }
                 } else {
-                    $result['type'] = $rightDatas['type'];
+                    foreach ($rightDatas['id'] as $idx => $id) {
+                        $result['values'][$id] = $addL . $rightDatas['value'][$idx];
+                    }
                 }
             } else {
                 $result['sql'] = $leftDatas['id'] . ' ' . $realOper;
@@ -999,12 +1016,27 @@ class PDOStorage extends \FreeFW\Storage\Storage
      */
     protected function renderValueField($p_value, \FreeFW\Core\StorageModel $p_model)
     {
-        self::$uniqid = self::$uniqid + 1;
-        return [
-            'id'    => ':i' . rand(10, 99) . '_' . self::$uniqid,
-            'value' => $p_value,
-            'type'  => false
-        ];
+        if (!is_array($p_value)) {
+            self::$uniqid = self::$uniqid + 1;
+            return [
+                'id'    => ':i' . rand(10, 99) . '_' . self::$uniqid,
+                'value' => $p_value,
+                'type'  => false
+            ];
+        } else {
+            $ii  = 0;
+            $ret = [
+                'id'    => [],
+                'value' => [],
+                'type'  => false
+            ];
+            foreach ($p_value as $oneValue) {
+                $ii++;
+                $ret['id'][]    = ':i' . $ii . rand(10, 99) . '_' . self::$uniqid;
+                $ret['value'][] = $oneValue;
+            }
+            return $ret;
+        }
     }
 
     /**

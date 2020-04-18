@@ -43,7 +43,6 @@ class ImageResizer
      * Create instance from a strng
      *
      * @param  string $image_data
-     * @return ImageResize
      * @throws \exception
      *
      * @return string
@@ -51,7 +50,6 @@ class ImageResizer
     public static function createFromString($image_data)
     {
         $resize = new self('data://application/octet-stream;base64,' . base64_encode($image_data));
-        
         return $resize;
     }
 
@@ -59,7 +57,6 @@ class ImageResizer
      * Loads image source and its properties to the instanciated object
      *
      * @param  string $filename
-     * @return ImageResize
      * @throws \Exception
      *
      * @return string
@@ -134,7 +131,7 @@ class ImageResizer
      * @param  integer $quality
      * @param  integer $permissions
      *
-     * @return \static
+     * @return static
      */
     public function save($filename, $image_type = null, $quality = null, $permissions = null)
     {
@@ -255,7 +252,7 @@ class ImageResizer
      * @param integer $height
      * @param boolean $allow_enlarge
      *
-     * @return \static
+     * @return static
      */
     public function resizeToHeight($height, $allow_enlarge = false)
     {
@@ -272,7 +269,7 @@ class ImageResizer
      * @param integer $width
      * @param boolean $allow_enlarge
      *
-     * @return \static
+     * @return static
      */
     public function resizeToWidth($width, $allow_enlarge = false)
     {
@@ -291,7 +288,7 @@ class ImageResizer
      * @param boolean $allow_enlarge
      * @param boolean $allow_centered
      *
-     * @return \static
+     * @return static
      */
     public function resizeToBestFit($max_width, $max_height, $allow_enlarge = false, $allow_centered = false)
     {
@@ -319,14 +316,13 @@ class ImageResizer
      *
      * @param integer|float $scale
      *
-     * @return \Eventviva\ImageResize
+     * @returnstatic
      */
     public function scale($scale)
     {
         $width  = $this->getSourceWidth() * $scale / 100;
         $height = $this->getSourceHeight() * $scale / 100;
         $this->resize($width, $height, true);
-        
         return $this;
     }
 
@@ -337,7 +333,7 @@ class ImageResizer
      * @param integer $height
      * @param boolean $allow_enlarge
      *
-     * @return \static
+     * @return static
      */
     protected function resizeCentered($dest_width, $dest_height, $width, $height, $allow_enlarge = false)
     {
@@ -357,7 +353,6 @@ class ImageResizer
                 $this->dest_y = ($dest_height-$this->dest_h)/2;
             }
         }
-        
         return $this;
     }
     
@@ -368,7 +363,7 @@ class ImageResizer
      * @param integer $height
      * @param boolean $allow_enlarge
      *
-     * @return \static
+     * @return static
      */
     public function resize($width, $height, $allow_enlarge = false)
     {
@@ -401,7 +396,7 @@ class ImageResizer
      * @param boolean $allow_enlarge
      * @param integer $position
      *
-     * @return \static
+     * @return static
      */
     public function crop($width, $height, $allow_enlarge = false, $position = self::CROPCENTER)
     {

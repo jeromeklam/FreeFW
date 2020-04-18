@@ -123,16 +123,17 @@ class Input extends \FreeFW\Console\Input\AbstractInput
      * Retour le parametres souhaité
      *
      * @param string $p_id
+     * @param mixed  $p_default
      *
      * @return mixed
      */
-    public function getAttribute($id)
+    public function getAttribute($p_id, $p_default = false)
     {
         $params = $this->getAttributes();
-        if (array_key_exists($id, $params)) {
-            return $params[$id];
+        if (array_key_exists($p_id, $params)) {
+            return $params[$p_id];
         }
-        return false;
+        return $p_default;
     }
 
     /**

@@ -8,6 +8,5 @@ namespace FreeFW\JsonApi\V1\Model;
  */
 class LinkObject
 {
-
-    protected $name
+    protected $name;
 }
