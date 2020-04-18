@@ -5,6 +5,7 @@
 	<buildpathentry kind="src" path=""/>
 	<buildpathentry combineaccessrules="false" kind="prj" path="/guzzle"/>
 	<buildpathentry combineaccessrules="false" kind="prj" path="/php-jwt"/>
+	<buildpathentry combineaccessrules="false" kind="prj" path="/PHPMailer"/>
 	<buildpathentry combineaccessrules="false" kind="prj" path="/http-server-middleware"/>
 	<buildpathentry kind="con" path="org.eclipse.php.core.LANGUAGE"/>
 	<buildpathentry combineaccessrules="false" kind="prj" path="/log"/>

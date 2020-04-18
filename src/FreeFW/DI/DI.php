@@ -83,6 +83,18 @@ class DI
                 }
                 return $obj;
             }
+        } else {
+            switch ($p_object) {
+                case 'sso':
+                    return self::getShared('sso');
+                case 'mailer':
+                    $mailer = self::getShared('emailMailer');
+                    if (!$mailer) {
+                        $mailer = \FreeFW\Message\SenderFactory::getDefaultEmailSender();
+                        self::setShared('emailMailer', $mailer);
+                    }
+                    return $mailer;
+            }
         }
         throw new \FreeFW\Core\FreeFWException(sprintf('DI : Nothing to handle %s', $p_object));
     }
