@@ -144,7 +144,7 @@ class ResultSet extends \FreeFW\Core\Model implements
      *
      * @return \FreeFW\Model\ResultSet
      */
-    public function add($value)
+    public function add($p_value)
     {
         $this->var[]    = $p_value;
         $this->my_count = count($this->var);
@@ -218,8 +218,7 @@ class ResultSet extends \FreeFW\Core\Model implements
     public function __toArray()
     {
         $result = array();
-        $idx = 0;
-        foreach ($this->var as $idx => $line) {
+        foreach ($this->var as $line) {
             $result[] = $line->__toArray();
         }
         return $result;
@@ -235,7 +234,7 @@ class ResultSet extends \FreeFW\Core\Model implements
     public function __toJsonApi($p_version)
     {
         $result = array();
-        foreach ($this->var as $idx => $line) {
+        foreach ($this->var as $line) {
             if (is_object($line) && method_exists($line, '__toJsonApi')) {
                 $result[] = $line->__toJsonApi($p_version);
             } else {
