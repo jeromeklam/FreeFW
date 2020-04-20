@@ -74,7 +74,22 @@ class ApiController extends \FreeFW\Core\Controller
         } else {
             $filters[$fields] = [\FreeFW\Storage\Storage::COND_LIKE => $p_search];
         }
-        $data = $model->find($filters, \FreeFW\Storage\Storage::COND_OR);
+        /**
+         * 
+         * @var \FreeFW\Model\Query $query
+         */
+        $query = $model->getQuery();
+        $query
+            ->addFromFilters($filters)
+            ->setOperator(\FreeFW\Storage\Storage::COND_OR)
+            ->addRelations($apiParams->getInclude())
+            ->setLimit(0, 30)
+            ->setSort($apiParams->getSort())
+        ;
+        $data = new \FreeFW\Model\ResultSet();
+        if ($query->execute()) {
+            $data = $query->getResult();
+        }
         $this->logger->debug('FreeFW.ApiController.autocomplete.end');
         return $this->createResponse(200, $data);
     }

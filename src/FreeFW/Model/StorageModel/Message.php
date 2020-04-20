@@ -117,6 +117,11 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_TEXT,
         FFCST::PROPERTY_OPTIONS => []
     ];
+    protected static $PRP_MSG_FROM = [
+        FFCST::PROPERTY_PRIVATE => 'msg_from',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_TEXT,
+        FFCST::PROPERTY_OPTIONS => []
+    ];
     protected static $PRP_MSG_REPLY_TO = [
         FFCST::PROPERTY_PRIVATE => 'msg_reply_to',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_TEXT,
@@ -150,6 +155,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
             'msg_pj4'         => self::$PRP_MSG_PJ4,
             'msg_send_ts'     => self::$PRP_MSG_SEND_TS,
             'msg_send_error'  => self::$PRP_MSG_SEND_ERROR,
+            'msg_from'        => self::$PRP_MSG_FROM,
             'msg_reply_to'    => self::$PRP_MSG_REPLY_TO
         ];
     }

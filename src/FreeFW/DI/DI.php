@@ -87,7 +87,7 @@ class DI
             switch ($p_object) {
                 case 'sso':
                     return self::getShared('sso');
-                case 'mailer':
+                case 'emailMailer':
                     $mailer = self::getShared('emailMailer');
                     if (!$mailer) {
                         $mailer = \FreeFW\Message\SenderFactory::getDefaultEmailSender();

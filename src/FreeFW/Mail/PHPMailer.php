@@ -32,6 +32,12 @@ class PHPMailer implements
     protected $mailer = null;
 
     /**
+     * Error
+     * @var string
+     */
+    protected $error = false;
+
+    /**
      * 
      * @param array $p_config
      */
@@ -50,19 +56,55 @@ class PHPMailer implements
      */
     public function send(\FreeFW\Model\Message $p_message) : bool
     {
-        $forceEmail   = false;
+        $this->error = false;
         if ($this->mailer !== null) {
-            $bcc = false;
+            $bcc = [];
             if (array_key_exists('bcc', $this->config) && $this->config['bcc'] != '') {
                 $bcc = $this->config['bcc'];
             }
-            $replyEmail = false;
-            if (array_key_exists('replyEmail', $this->config) && $this->config['replyEmail'] != '') {
-                $replyEmail = $this->config['replyEmail'];
+            // From
+            $fromEmail = '';
+            $fromName  = '';
+            $from      = $p_message->getFrom();
+            if (!$from) {
+                if (array_key_exists('fromName', $this->config) && $this->config['fromEmail'] != '') {
+                    $fromEmail = $this->config['fromEmail'];
+                }
+                if (array_key_exists('fromName', $this->config) && $this->config['fromName'] != '') {
+                    $fromName = $this->config['fromName'];
+                }
+            } else {
+                if ($from->address) {
+                    $fromEmail = $from->address;
+                    if ($from->name) {
+                        $fromName = $from->name;
+                    }
+                }
             }
-            $replyName = '';
-            if (array_key_exists('replyName', $this->config) && $this->config['replyName'] != '') {
-                $replyName = $this->config['replyName'];
+            if ($fromEmail == '') {
+                return false;
+            }
+            // ReplyTo
+            $replyEmail = '';
+            $replyName  = '';
+            $replyTo    = $p_message->getReplyTo();
+            if (!$replyTo) {
+                if (array_key_exists('replyEmail', $this->config) && $this->config['replyEmail'] != '') {
+                    $replyEmail = $this->config['replyEmail'];
+                }
+                if (array_key_exists('replyName', $this->config) && $this->config['replyName'] != '') {
+                    $replyName = $this->config['replyName'];
+                }
+            } else {
+                if ($replyTo->address) {
+                    $replyEmail = $replyTo->address;
+                    if ($replyTo->name) {
+                        $replyName = $replyTo->name;
+                    }
+                }
+            }
+            if ($replyEmail == '') {
+                return false;
             }
             switch (strtoupper($this->config['mode'])) {
                 case 'SMTP':
@@ -75,9 +117,7 @@ class PHPMailer implements
                         $this->mailer->Username   = $this->config['username'];
                         $this->mailer->Password   = $this->config['password'];
                         $this->mailer->SMTPSecure = $this->config['secure'];
-                        $forceEmail               = $this->config['username'];
                     }
-                    self::debug(print_r($this->config, true));
                     break;
                 case 'MAIL':
                     $this->mailer->isMail();
@@ -95,56 +135,56 @@ class PHPMailer implements
             $this->mailer->clearAllRecipients();
             $this->mailer->clearCustomHeaders();
             $this->mailer->ClearReplyTos();
-            if ($replyEmail !== false) {
-                $this->mailer->addReplyTo($replyEmail, $replyName);
-            }
+            // ReplyTo
+            $this->mailer->addReplyTo($replyEmail, $replyName);
             // Emetteur, en authentifié on utilise forcément le username...
-            if ($forceEmail !== false) {
-                $this->mailer->setFrom($forceEmail, $p_message->getMailFromName());
-            } else {
-                $this->mailer->setFrom($p_message->getMailFromEmail(), $p_message->getMailFromName());
-            }
+            $this->mailer->setFrom($fromEmail, $fromName);
             // Destinataires
-            foreach ($p_message->getMailToAsArray() as $email => $name) {
-                $this->mailer->addAddress($email);
+            foreach ($p_message->getDest() as $dest) {
+                $this->mailer->addAddress($dest->address);
             }
-            foreach ($p_message->getMailCcAsArray() as $email => $name) {
-                $this->mailer->addCC($email);
+            foreach ($p_message->getCC() as $cc) {
+                $this->mailer->addCC($cc->address);
             }
-            foreach ($p_message->getMailBccAsArray() as $email => $name) {
-                $this->mailer->addBCC($email);
+            foreach ($p_message->getBCC() as $bcc) {
+                $this->mailer->addBCC($bcc->address);
             }
             if ($bcc !== false) {
                 if (is_array($bcc)) {
-                    foreach ($bcc as $email => $name) {
-                        $this->mailer->addBCC($email);
+                    foreach ($bcc as $bcc) {
+                        $this->mailer->addBCC($bcc->address);
                     }
-                } else {
-                    $this->mailer->addBCC($bcc);
                 }
             }
-            foreach ($p_message->getMailAttachmentsAsArray() as $idx => $file) {
-                $this->mailer->addAttachment($file);
-            }
+            //foreach ($p_message->getMailAttachmentsAsArray() as $idx => $file) {
+            //    $this->mailer->addAttachment($file);
+            //}
             $this->mailer->isHTML(true);
             $this->mailer->CharSet = 'UTF-8';
-            $this->mailer->Subject = $p_message->getMailSubject();
-            $htmlBody = $p_message->getMailBodyHtml();
-            if ($htmlBody === null || $htmlBody == '') {
-                $this->mailer->Body = nl2br($p_message->getMailBodyText());
-            } else {
-                $this->mailer->Body = '<html><body>' . $htmlBody . '</body></html>';
-            }
-            $this->mailer->Text = $p_message->getMailBodyText();
+            $this->mailer->Subject = $p_message->getMsgSubject();
+            $htmlBody = $p_message->getMsgBody();
+            $this->mailer->Body = '<html><body>' . $htmlBody . '</body></html>';
+            $this->mailer->Text = strip_tags(str_replace("<br />", "\n", $htmlBody));
             // Petite pause avant l'envoi...
             sleep(1);
             $result = $this->mailer->send();
             if ($result === false || $this->mailer->isError()) {
-                self::error(print_r($this->mailer->ErrorInfo, true));
-                return $this->mailer->ErrorInfo;
+                //$this->logger->debug(print_r($this->mailer->ErrorInfo, true));
+                $this->error = $this->mailer->ErrorInfo;
+                return false;
             }
             return $result;
         }
         return false;
+    }
+
+    /**
+     * Get error
+     *
+     * @return string
+     */
+    public function getError() : string
+    {
+        return sprintf($this->error, true);
     }
 }

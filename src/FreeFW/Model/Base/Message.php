@@ -124,6 +124,12 @@ abstract class Message extends \FreeFW\Model\StorageModel\Message
     protected $msg_send_error = null;
 
     /**
+     * msg_from
+     * @var mixed
+     */
+    protected $msg_from = null;
+
+    /**
      * msg_reply_to
      * @var mixed
      */
@@ -564,6 +570,29 @@ abstract class Message extends \FreeFW\Model\StorageModel\Message
     public function getMsgSendError()
     {
         return $this->msg_send_error;
+    }
+
+    /**
+     * Set msg_from
+     *
+     * @param mixed $p_value
+     *
+     * @return \FreeFW\Model\Message
+     */
+    public function setMsgFrom($p_value)
+    {
+        $this->msg_from = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get msg_from
+     *
+     * @return mixed
+     */
+    public function getMsgFrom()
+    {
+        return $this->msg_from;
     }
 
     /**

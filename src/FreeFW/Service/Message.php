@@ -24,22 +24,17 @@ class Message extends \FreeFW\Core\Service
         $query = $message->getQuery();
         $query->addFromFilters(
             [
-                'msg_type'   => \FreeFW\Model\Message::TYPE_EMAIL,
                 'msg_status' => \FreeFW\Model\Message::STATUS_WAITING
             ]
         );
         if ($query->execute()) {
-            /**
-             * @var \FreeFW\Interfaces\MessageSenderInterface $sender
-             */
-            $sender = \FreeFW\DI\DI::get('mailer');
             /**
              * @var \FreeFW\Model\ResultSet $results
              */
             $results = $query->getResult();
             if ($results->count() > 0) {
                 foreach ($results as $message) {
-                    
+                    $message->send();
                 }
             }
         }

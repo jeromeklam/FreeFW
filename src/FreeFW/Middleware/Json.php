@@ -4,6 +4,7 @@ namespace FreeFW\Middleware;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
+use function GuzzleHttp\json_encode;
 
 /**
  * JsonApi Middleware

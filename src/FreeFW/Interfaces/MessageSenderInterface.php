@@ -17,4 +17,11 @@ interface MessageSenderInterface
      * @return bool
      */
     public function send(\FreeFW\Model\Message $p_message) : bool;
+
+    /**
+     * Get error
+     *
+     * @return string
+     */
+    public function getError() : string;
 }
