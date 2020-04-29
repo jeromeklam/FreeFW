@@ -293,6 +293,9 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
                 }
             }
         }
+        if (method_exists($this, 'afterRead')) {
+            $this->afterRead();
+        }
     }
 
     /**

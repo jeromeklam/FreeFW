@@ -258,6 +258,9 @@ class ApiController extends \FreeFW\Core\Controller
                 return $this->createResponse(404);
             }
         } else {
+            if (method_exists($model, 'afterRead')) {
+                $model->afterRead();
+            }
             return $this->createResponse(200, $model);
         }
     }
