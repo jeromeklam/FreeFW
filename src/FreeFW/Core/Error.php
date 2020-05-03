@@ -105,6 +105,9 @@ class Error
      */
     public function getMessage()
     {
+        if ($this->message === null) {
+            $this->message = '';
+        }
         return $this->message;
     }
 
@@ -151,6 +154,9 @@ class Error
      */
     public function getField()
     {
+        if ($this->field === null) {
+            $this->field = '';
+        }
         return $this->field;
     }
 }

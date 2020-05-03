@@ -352,6 +352,8 @@ class ApiController extends \FreeFW\Core\Controller
             if ($data->remove()) {
                 $this->logger->debug('FreeFW.ApiController.removeOne.end');
                 return $this->createResponse(204);
+            } else {
+                return $this->createResponse(409, $data);
             }
         }
         return $this->createResponse(409);

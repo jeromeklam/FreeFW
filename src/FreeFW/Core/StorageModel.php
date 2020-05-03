@@ -202,9 +202,9 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\StorageStrategyInterface::remove()
      */
-    public function remove()
+    public function remove(bool $p_with_transaction = true) : bool
     {
-        return $this->strategy->remove($this);
+        return $this->strategy->remove($this, $p_with_transaction);
     }
 
     /**

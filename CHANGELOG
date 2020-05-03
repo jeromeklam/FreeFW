@@ -11,6 +11,8 @@
 * Query addons
 * Jobqueue & Notifications
 * Mailer / Messages / Json response
+* Transaction on create, save ou remove
+* Basic errors for foreign-keys, uniq keys
 
 # 1.0.9 : 08/03/2020
 

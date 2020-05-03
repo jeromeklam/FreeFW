@@ -45,17 +45,13 @@ class PDOStorage extends \FreeFW\Storage\Storage
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\StorageStrategyInterface::create()
      */
-    public function create(\FreeFW\Core\StorageModel &$p_model)
+    public function create(\FreeFW\Core\StorageModel &$p_model, bool $p_with_transaction = true) : bool
     {
         $fields     = [];
+        $brkField   = '';
         $source     = $p_model::getSource();
         $properties = $p_model::getProperties();
         $sso        = \FreeFW\DI\DI::getShared('sso');
-        if (method_exists($p_model, 'beforeCreate')) {
-            if (!$p_model->beforeCreate()) {
-                return false;
-            }
-        }
         $setter = false;
         foreach ($properties as $name => $oneProperty) {
             $add = true;
@@ -84,6 +80,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
                 } else {
                     if ($brk) {
+                        $brkField = $oneProperty[FFCST::PROPERTY_PRIVATE];
                         $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $sso->getBrokerId();
                     } else {
                         // Compute getter
@@ -101,6 +98,50 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 }
             }
         }
+        // Uniq fields...
+        $next = true;
+        if (method_exists($p_model, 'getUniqIndexes')) {
+            $indexes = $p_model->getUniqIndexes();
+            foreach ($indexes as $ixName => $oneIndex) {
+                $cFields = explode(',', $oneIndex['fields']);
+                $filters = [];
+                foreach ($cFields as $name) {
+                    $filters[$name] = $p_model->get($name);
+                }
+                if ($brk) {
+                    $filters[$brkField] = $sso->getBrokerId();
+                }
+                $others = $p_model->find($filters);
+                if ($others->count() > 0) {
+                    $code = \FreeFW\Constants::ERROR_UNIQINDEX;
+                    if (array_key_exists('exists', $oneIndex)) {
+                        $code = $oneIndex['exists'];
+                    }
+                    $p_model->addError(
+                        $code,
+                        $ixName . ' allready exists !',
+                        \FreeFW\Core\Error::TYPE_PRECONDITION,
+                        $oneIndex['fields']
+                    );
+                    $next = false;
+                }
+            }
+        }
+        if (!$next) {
+            return false;
+        }
+        // Next
+        if ($p_with_transaction) {
+            $this->provider->startTransaction();
+        }
+        if (method_exists($p_model, 'beforeCreate')) {
+            if (!$p_model->beforeCreate()) {
+                if ($p_with_transaction) {
+                    $this->provider->rollbackTransaction();
+                }
+                return false;
+            }
+        }
         // Build query
         $sql = \FreeFW\Tools\Sql::makeInsertQuery($source, $fields);
         $this->logger->debug('PDOStorage.create : ' . $sql);
@@ -114,12 +155,18 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 }
                 if (method_exists($p_model, 'afterCreate')) {
                     if (!$p_model->afterCreate()) {
+                        if ($p_with_transaction) {
+                            $this->provider->rollbackTransaction();
+                        }
                         return false;
                     }
                 }
                 try {
                     $this->forwardRawEvent(FFCST::EVENT_STORAGE_CREATE, $p_model);
                 } catch (\Exception $ex) {
+                }
+                if ($p_with_transaction) {
+                    $this->provider->commitTransaction();
                 }
             } else {
                 $this->logger->debug('PDOStorage.create.error : ' . print_r($query->errorInfo(), true));
@@ -131,10 +178,16 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     $message = $localErr[2];
                 }
                 $p_model->addError($code, $message);
+                if ($p_with_transaction) {
+                    $this->provider->rollbackTransaction();
+                }
             }
         } catch (\Exception $ex) {
             $this->logger->debug('PDOStorage.create.error : ' . print_r($ex->getMessage(), true));
             $p_model->addError($ex->getCode(), $ex->getMessage());
+            if ($p_with_transaction) {
+                $this->provider->rollbackTransaction();
+            }
         }
         return !$p_model->hasErrors();
     }
@@ -205,16 +258,13 @@ class PDOStorage extends \FreeFW\Storage\Storage
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\StorageStrategyInterface::remove()
      */
-    public function remove(\FreeFW\Core\StorageModel &$p_model)
+    public function remove(\FreeFW\Core\StorageModel &$p_model, bool $p_with_transaction = true) : bool
     {
         $fields     = [];
         $source     = $p_model::getSource();
         $properties = $p_model::getProperties();
-        if (method_exists($p_model, 'beforeRemove')) {
-            if (!$p_model->beforeRemove()) {
-                return false;
-            }
-        }
+        $getter     = '';
+        // Get PK and verify generic FK
         foreach ($properties as $name => $oneProperty) {
             if (array_key_exists(FFCST::PROPERTY_OPTIONS, $oneProperty)) {
                 if (in_array(FFCST::OPTION_PK, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
@@ -222,7 +272,75 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
                     // Get data
                     $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $p_model->$getter();
+                    break; // Only one PKField...
                 }
+            }
+        }
+        // @TODO : Error if no getter for PK
+        if ($p_with_transaction) {
+            $this->provider->startTransaction();
+        }
+        $next = true;
+        try {
+            if (method_exists($p_model, 'getRelationships')) {
+                $rels = $p_model->getRelationships();
+                foreach ($rels as $oneRelation) {
+                    if (array_key_exists('remove', $oneRelation)) {
+                        $cascade = false;
+                        if ($oneRelation['remove'] == 'cascade') {
+                            $cascade = true;
+                        }
+                        /**
+                         * @var \FreeFW\Core\StorageModel $class
+                         */
+                        $class = \FreeFW\DI\DI::get($oneRelation['model']);
+                        $children = $class->find(
+                            [
+                                $oneRelation['field'] => $p_model->$getter()
+                            ]
+                        );
+                        foreach ($children as $oneChild) {
+                            if ($cascade) {
+                                if (!$oneChild->remove(false)) {
+                                    $next = false;
+                                    break;
+                                }
+                            } else {
+                                $next = false;
+                                $code = \FreeFW\Constants::ERROR_FOREIGNKEY;
+                                if (array_key_exists('exists', $oneRelation)) {
+                                    $code = $oneRelation['exists'];
+                                }
+                                $p_model->addError(
+                                    $code,
+                                    'Used in ' . $oneRelation['model'] . '.' . $oneRelation['field'],
+                                    \FreeFW\Core\Error::TYPE_PRECONDITION
+                                );
+                                break; // Or check All First ?? to get all errors in one call...
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $ex) {
+            $p_model->addError($ex->getCode(), $ex->getMessage());
+            if ($p_with_transaction) {
+                $this->provider->rollbackTransaction();
+            }
+            return false;
+        }
+        if (!$next) {
+            if ($p_with_transaction) {
+                $this->provider->rollbackTransaction();
+            }
+            return false;
+        }
+        if (method_exists($p_model, 'beforeRemove')) {
+            if (!$p_model->beforeRemove()) {
+                if ($p_with_transaction) {
+                    $this->provider->rollbackTransaction();
+                }
+                return false;
             }
         }
         // Build query
@@ -235,6 +353,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
             if ($query->execute($fields)) {
                 if (method_exists($p_model, 'afterRemove')) {
                     if (!$p_model->afterRemove()) {
+                        if ($p_with_transaction) {
+                            $this->provider->rollbackTransaction();
+                        }
                         return false;
                     }
                 }
@@ -244,7 +365,13 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     $this->forwardRawEvent(FFCST::EVENT_STORAGE_DELETE, $p_model);
                 } catch (\Exception $ex) {
                 }
+                if ($p_with_transaction) {
+                    $this->provider->commitTransaction();
+                }
             } else {
+                if ($p_with_transaction) {
+                    $this->provider->rollbackTransaction();
+                }
                 $this->logger->debug('PDOStorage.remove.error : ' . print_r($query->errorInfo(), true));
                 $localErr = $query->errorInfo();
                 $code     = 0;
@@ -256,7 +383,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $p_model->addError($code, $message);
             }
         } catch (\Exception $ex) {
-            var_dump($ex);
+            $p_model->addError($ex->getCode(), $ex->getMessage());
+            if ($p_with_transaction) {
+                $this->provider->rollbackTransaction();
+            }
+            $ok = false;
         }
         return $ok;
     }
@@ -266,18 +397,15 @@ class PDOStorage extends \FreeFW\Storage\Storage
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\StorageInterface::save()
      */
-    public function save(\FreeFW\Core\StorageModel &$p_model)
+    public function save(\FreeFW\Core\StorageModel &$p_model, bool $p_with_transaction = true) : bool
     {
+        $brkField   = '';
+        $pkField    = '';
         $pks        = [];
         $fields     = [];
         $source     = $p_model::getSource();
         $properties = $p_model::getProperties();
         $sso        = \FreeFW\DI\DI::getShared('sso');
-        if (method_exists($p_model, 'beforeSave')) {
-            if (!$p_model->beforeSave()) {
-                return false;
-            }
-        }
         foreach ($properties as $name => $oneProperty) {
             $add = true;
             $pk  = false;
@@ -302,10 +430,12 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
                 if ($pk) {
                     // Get data
+                    $pkField = $oneProperty[FFCST::PROPERTY_PRIVATE];
                     $pks[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]]    = $p_model->$getter();
                     $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $p_model->$getter();
                 } else {
                     if ($brk) {
+                        $brkField = $oneProperty[FFCST::PROPERTY_PRIVATE];
                         $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $sso->getBrokerId();
                     } else {
                         // Get data
@@ -321,6 +451,46 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 }
             }
         }
+        // Uniq fields...
+        $next = true;
+        if (method_exists($p_model, 'getUniqIndexes')) {
+            $indexes = $p_model->getUniqIndexes();
+            foreach ($indexes as $ixName => $oneIndex) {
+                $cFields = explode(',', $oneIndex['fields']);
+                $filters = [];
+                foreach ($cFields as $name) {
+                    $filters[$name] = $p_model->get($name);
+                }
+                if ($brk) {
+                    $filters[$brkField] = $sso->getBrokerId();
+                }
+                $filters[$pkField] = [\FreeFW\Storage\Storage::COND_NOT_EQUAL => $p_model->get($pkField)];
+                $others = $p_model->find($filters);
+                if ($others->count() > 0) {
+                    $code = \FreeFW\Constants::ERROR_UNIQINDEX;
+                    if (array_key_exists('exists', $oneIndex)) {
+                        $code = $oneIndex['exists'];
+                    }
+                    $p_model->addError(
+                        $code,
+                        $ixName . ' allready exists !',
+                        \FreeFW\Core\Error::TYPE_PRECONDITION
+                    );
+                    $next = false;
+                }
+            }
+        }
+        if (!$next) {
+            return false;
+        }
+        if ($p_with_transaction) {
+            $this->provider->startTransaction();
+        }
+        if (method_exists($p_model, 'beforeSave')) {
+            if (!$p_model->beforeSave()) {
+                return false;
+            }
+        }
         // Build query
         $sql = \FreeFW\Tools\Sql::makeUpdateQuery($source, $fields, $pks);
         $this->logger->debug('PDOStorage.save : ' . $sql);
@@ -330,6 +500,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
             if ($query->execute($fields)) {
                 if (method_exists($p_model, 'afterSave')) {
                     if (!$p_model->afterSave()) {
+                        if ($p_with_transaction) {
+                            $this->provider->rollbackTransaction();
+                        }
                         return false;
                     }
                 }
@@ -338,7 +511,13 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     $this->forwardRawEvent(FFCST::EVENT_STORAGE_UPDATE, $p_model);
                 } catch (\Exception $ex) {
                 }
+                if ($p_with_transaction) {
+                    $this->provider->commitTransaction();
+                }
             } else {
+                if ($p_with_transaction) {
+                    $this->provider->rollbackTransaction();
+                }
                 $this->logger->debug('PDOStorage.save.error : ' . print_r($query->errorInfo(), true));
                 $localErr = $query->errorInfo();
                 $code     = 0;
@@ -350,6 +529,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $p_model->addError($code, $message);
             }
         } catch (\Exception $ex) {
+            if ($p_with_transaction) {
+                $this->provider->rollbackTransaction();
+            }
             $this->logger->debug('PDOStorage.save.error : ' . print_r($query->errorInfo(), true));
             $localErr = $query->errorInfo();
             $code     = 0;

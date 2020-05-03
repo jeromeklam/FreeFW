@@ -47,7 +47,7 @@ interface StorageInterface
      *
      * @return boolean
      */
-    public function remove(\FreeFW\Core\StorageModel &$p_model);
+    public function remove(\FreeFW\Core\StorageModel &$p_model, bool $p_with_transaction = true) : bool;
 
     /**
      * Select the model

@@ -120,4 +120,6 @@ class Constants
      * @var string
      */
     const ERROR_REQUIRED     = 666001;
+    const ERROR_FOREIGNKEY   = 666002;
+    const ERROR_UNIQINDEX    = 666003;
 }
