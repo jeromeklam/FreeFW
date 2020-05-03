@@ -102,6 +102,14 @@ class Constants
     const REL_EXISTS = 'exists';
 
     /**
+     * Foreign Key
+     * @var string
+     */
+    const FOREIGN_MODEL = 'model';
+    const FOREIGN_FIELD = 'field';
+    const FOREIGN_TYPE  = 'type';
+    
+    /**
      * Options
      * @var string
      */

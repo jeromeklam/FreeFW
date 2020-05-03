@@ -110,9 +110,9 @@ Les autres champs, en fonction de leur type, STRING, NUMBER, BOOLEAN, TEXT, BLOB
         FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_FK],
         FFCST::PROPERTY_FK      => ['tab2' =>
             [
-                'model' => 'NS1::Model::Tab2',
-                'field' => 'tab2_id',
-                'type'  => \FreeFW\Model\Query::JOIN_LEFT
+                FFCST::FOREIGN_MODEL => 'NS1::Model::Tab2',
+                FFCST::FOREIGN_FIELD => 'tab2_id',
+                FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT
             ]
         ]
     ];
