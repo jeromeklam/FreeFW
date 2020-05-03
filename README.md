@@ -15,5 +15,5 @@ Just read composer.json...
 
 1. [Structurer un projet](docs/structure.md)
 1. Les modèles
-    1. [La structure des modèles](docx/model.md)
-    1. [Opération CRUD basiques](docx/crud.md)
+    1. [La structure des modèles](docs/model.md)
+    1. [Opération CRUD basiques](docs/crud.md)

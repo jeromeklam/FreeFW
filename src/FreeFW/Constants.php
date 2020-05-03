@@ -83,6 +83,23 @@ class Constants
     const PROPERTY_PUBLIC  = 'public';
     const PROPERTY_DEFAULT = 'default';
     const PROPERTY_FK      = 'fk';
+    
+    /**
+     * Index
+     * @var string
+     */
+    const INDEX_FIELDS = 'fields';
+    const INDEX_EXISTS = 'exists';
+
+    /**
+     * Relation
+     * @var string
+     */
+    const REL_MODEL  = 'model';
+    const REL_FIELD  = 'field';
+    const REL_TYPE   = 'type';
+    const REL_REMOVE = 'remove';
+    const REL_EXISTS = 'exists';
 
     /**
      * Options

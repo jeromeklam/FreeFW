@@ -136,11 +136,11 @@ Les relations peuvent être utile pour les vérifications lors des suppressions,
     {
         return [
             'sons' => [
-                'model'  => 'NS1::Model::Tab3',
-                'field'  => 'tab_id',
-                'type'   => \FreeFW\Model\Query::JOIN_LEFT,
-                'remove' => 'check',
-                'exists' => '6680001',
+                FFCST::REL_MODEL  => 'NS1::Model::Tab3',
+                FFCST::REL_FIELD  => 'tab_id',
+                FFCST::REL_TYPE   => \FreeFW\Model\Query::JOIN_LEFT,
+                FFCST::REL_REMOVE => 'check',
+                FFCST::REL_EXISTS => '6680001',
             ],
         ];
     ]
@@ -183,8 +183,8 @@ Nous allons ici retourner l'ensemble des indexes uniques afin de pouvoir contrô
     {
         return [
             'name' => [
-                'fields' => 'tab_name',
-                'exists' => '6690001',
+                FFCST::INDEX_FIELDS => 'tab_name',
+                FFCST::INDEX_EXISTS => '6690001',
             ]
         ];
     }
