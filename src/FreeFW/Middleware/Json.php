@@ -11,7 +11,7 @@ use function GuzzleHttp\json_encode;
  *
  * @author jeromeklam
  */
-class Json implements 
+class Json implements
     \FreeFW\Interfaces\ApiAdapterInterface,
     \Psr\Log\LoggerAwareInterface
 {
@@ -23,13 +23,13 @@ class Json implements
     use \FreeFW\Behaviour\EventManagerAwareTrait;
     use \FreeFW\Behaviour\ConfigAwareTrait;
     use \FreeFW\Behaviour\HttpFactoryTrait;
-    
+
     /**
      * Allowed types
      * @var array
      */
     protected $contentTypes = ['application/json'];
-    
+
     /**
      *
      * {@inheritDoc}
@@ -43,7 +43,7 @@ class Json implements
         $this->logger->debug(sprintf('FreeFW.Middleware.Json.decode.end'));
         return $apiParams;
     }
-    
+
     /**
      *
      * {@inheritDoc}

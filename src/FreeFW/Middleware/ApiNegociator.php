@@ -17,7 +17,7 @@ class ApiNegociator implements
     \FreeFW\Interfaces\ConfigAwareTraitInterface,
     \FreeFW\Interfaces\ApiNegociatorInterface
 {
-    
+
     /**
      * comportements
      */
@@ -25,13 +25,13 @@ class ApiNegociator implements
     use \FreeFW\Behaviour\EventManagerAwareTrait;
     use \FreeFW\Behaviour\ConfigAwareTrait;
     use \FreeFW\Behaviour\HttpFactoryTrait;
-    
+
     /**
      * Can override type ?
      * @var bool
      */
     protected $override = false;
-    
+
     /**
      * Accepted methods
      * @var string[]
@@ -64,7 +64,7 @@ class ApiNegociator implements
             $this->formats = $p_formats;
         }
     }
-    
+
     /**
      * Set methods
      *
@@ -77,7 +77,7 @@ class ApiNegociator implements
         $this->methods = $p_methods;
         return $this;
     }
-    
+
     /**
      * Set override
      *
@@ -90,8 +90,8 @@ class ApiNegociator implements
         $this->override = $p_override;
         return $this;
     }
-    
-    
+
+
     /**
      *
      * {@inheritDoc}
@@ -101,7 +101,7 @@ class ApiNegociator implements
     {
         return $this->createResponse(415);
     }
-    
+
     /**
      *
      * {@inheritDoc}

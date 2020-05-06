@@ -54,7 +54,7 @@ class Router implements
      * @var array
      */
     protected $params = [];
-    
+
     /**
      * Constructor
      *

@@ -18,7 +18,20 @@ $localRoutes = [
         'function'   => 'createModel',
         'auth'       => \FreeFW\Router\Route::AUTH_NONE,
         'middleware' => []
-    ]
+    ],
+    /**
+     * ########################################################################
+     * Génération de la documentation
+     * ########################################################################
+     */
+    'freefw.model.document' => [
+        'method'     => \FreeFW\Router\Route::METHOD_POST,
+        'url'        => '/v1/dev/model/document',
+        'controller' => 'FreeFW::Controller::Model',
+        'function'   => 'documentModel',
+        'auth'       => \FreeFW\Router\Route::AUTH_NONE,
+        'middleware' => []
+    ],
 ];
 $localRoutes = array_merge(
     $localRoutes,

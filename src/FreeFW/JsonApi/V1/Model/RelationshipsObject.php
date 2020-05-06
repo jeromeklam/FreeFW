@@ -30,7 +30,19 @@ class RelationshipsObject implements \Countable, \JsonSerializable
                 if (is_object($value) && array_key_exists('data', $value)) {
                     $data = $value->data;
                     if (is_array($data)) {
-                        var_export('decoder . @todo');die;
+                        $relation = new \FreeFW\JsonApi\V1\Model\RelationshipObject($key);
+                        $relation->setType(\FreeFW\JsonApi\V1\Model\RelationshipObject::ONE_TO_MANY);
+                        foreach ($data as $oneRel) {
+                            $cls   = $oneRel->type;
+                            $class = str_replace('_', '::Model::', $cls);
+                            $relation->setModel($class);
+                            $relation->addValue($oneRel->id);
+                        }
+                        $this->addRelation($key, $relation);
+                        //var_export($key);
+                        //var_export($relation);
+                        //die;
+                        //var_export('decoder . @todo');die;
                     } else {
                         $relation = new \FreeFW\JsonApi\V1\Model\RelationshipObject($key);
                         $cls   = $data->type;

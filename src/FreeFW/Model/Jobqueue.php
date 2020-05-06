@@ -69,26 +69,49 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
     }
 
     /**
+     * Set user
      *
-     * {@inheritDoc}
-     * @see \FreeFW\Core\Model::init()
+     * @param \FreeSSO\Model\User $p_user
+     *
+     * @return \FreeFW\Model\Jobqueue
      */
-    public function init()
+    public function setUser($p_user)
     {
-        $sso  = \FreeFW\DI\DI::getShared('sso');
-        $user = $sso->getUser();
-        $this->jobq_id           = 0;
-        $this->brk_id            = 0;
-        $this->user_id           = $user->getUserId();
-        $this->grp_id            = null;
-        $this->jobq_ts           = \FreeFW\Tools\Date::getCurrentTimestamp();
-        $this->jobq_type         = self::TYPE_ONCE;
-        $this->jobq_status       = self::STATUS_WAITING;
-        $this->jobq_max_retry    = 1;
-        $this->jobq_nb_retry     = 0;
-        $this->jobq_next_minutes = 0;
-        $this->jobq_next_retry   = \FreeFW\Tools\Date::getCurrentTimestamp();
+        $this->user = $p_user;
         return $this;
+    }
+
+    /**
+     * Get user
+     *
+     * @return \FreeSSO\Model\User
+     */
+    public function getuser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * Set group
+     *
+     * @param \FreeSSO\Model\Group $p_group
+     *
+     * @return \FreeFW\Model\Jobqueue
+     */
+    public function setGroup($p_group)
+    {
+        $this->group = $p_group;
+        return $this;
+    }
+
+    /**
+     * Get group
+     *
+     * @return \FreeSSO\Model\Group
+     */
+    public function getGroup()
+    {
+        return $this->group;
     }
 
     /**
@@ -99,7 +122,7 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
         if (is_array($this->logs) && count($this->logs) > 0) {
             $text = '';
             foreach ($this->logs as $oneLog) {
-                $text .= $oneLog['message'] . PHP_EOL; 
+                $text .= $oneLog['message'] . PHP_EOL;
             }
             $this
                 ->setJobqLastReport($text)
@@ -111,9 +134,9 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
 
     /**
      * Increment nb try
-     * 
+     *
      * @param number $p_nb
-     * 
+     *
      * @return \FreeFW\Model\Jobqueue
      */
     public function incrementTry($p_nb = 1)
@@ -125,7 +148,7 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
 
     /**
      * Can continue ?
-     * 
+     *
      * @return boolean
      */
     public function canContinue()
@@ -135,7 +158,7 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
 
     /**
      * Set finished
-     * 
+     *
      * @return \FreeFW\Model\Jobqueue
      */
     public function finished()
@@ -165,7 +188,7 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
                 ->save()
             ;
             /**
-             * 
+             *
              * @var \FreeFW\Core\Service $service
              */
             $service = \FreeFW\DI\DI::get($this->getJobqService());
@@ -226,7 +249,7 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
 
     /**
      * Reset jobqueue
-     * 
+     *
      * @return \FreeFW\Model\Jobqueue
      */
     public function reset()
@@ -243,7 +266,7 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
     }
 
     /**
-     * 
+     *
      * @return boolean
      */
     public function beforeSave()
@@ -251,9 +274,9 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
         $this->setJobqLastTs(\FreeFW\Tools\Date::getCurrentTimestamp());
         return true;
     }
-    
+
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see \Psr\Log\LoggerInterface::critical()
      */
@@ -263,7 +286,7 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see \Psr\Log\LoggerInterface::log()
      */
@@ -279,7 +302,7 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see \Psr\Log\LoggerInterface::emergency()
      */
@@ -289,7 +312,7 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see \Psr\Log\LoggerInterface::error()
      */
@@ -299,7 +322,7 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see \Psr\Log\LoggerInterface::alert()
      */
@@ -309,7 +332,7 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see \Psr\Log\LoggerInterface::warning()
      */
@@ -319,7 +342,7 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see \Psr\Log\LoggerInterface::notice()
      */
@@ -329,7 +352,7 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see \Psr\Log\LoggerInterface::info()
      */
@@ -339,7 +362,7 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see \Psr\Log\LoggerInterface::debug()
      */
@@ -350,13 +373,13 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
 
     /**
      * Add to history
-     * 
+     *
      * @return \FreeFW\Model\Jobqueue
      */
     public function addToHistory()
     {
         /**
-         * 
+         *
          * @var \FreeFW\Model\JobqueueHisto $histo
          */
         $histo = \FreeFW\DI\DI::get('FreeFW::Model::JobqueueHisto');

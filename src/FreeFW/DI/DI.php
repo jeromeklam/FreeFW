@@ -94,6 +94,26 @@ class DI
                         self::setShared('emailMailer', $mailer);
                     }
                     return $mailer;
+                default:
+                    $parts = explode('\\', ltrim($p_object, '\\'));
+                    if (count($parts) > 1 && class_exists($p_object)) {
+                        $di  = self::$containers[$parts[0]];
+                        $obj = $di->getClass($p_object);
+                        if (method_exists($obj, 'setMainBroker')) {
+                            $broker = \FreeFw\DI\DI::getShared('broker');
+                            if ($broker) {
+                                $obj->setMainBroker(intval($broker));
+                            } else {
+                                $sso = \FreeFW\DI\DI::getShared('sso');
+                                if ($sso) {
+                                    $obj->setMainBroker($sso->getBrokerId());
+                                } else {
+                                    $obj->setMainBroker(0);
+                                }
+                            }
+                        }
+                        return $obj;
+                    }
             }
         }
         throw new \FreeFW\Core\FreeFWException(sprintf('DI : Nothing to handle %s', $p_object));

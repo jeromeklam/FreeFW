@@ -21,6 +21,30 @@ class Route implements \Psr\Log\LoggerAwareInterface
     use \FreeFW\Behaviour\ConfigAwareTrait;
 
     /**
+     * Routes constants
+     * @var string
+     */
+    const ROUTE_COLLECTION     = 'collection';
+    const ROUTE_COMMENT        = 'comment';
+    const ROUTE_METHOD         = 'method';
+    const ROUTE_MODEL          = 'model';
+    const ROUTE_URL            = 'url';
+    const ROUTE_CONTROLLER     = 'controller';
+    const ROUTE_FUNCTION       = 'function';
+    const ROUTE_AUTH           = 'auth';
+    const ROUTE_MIDDLEWARE     = 'middleware';
+    const ROUTE_RESULTS        = 'results';
+    const ROUTE_INCLUDE        = 'include';
+    const ROUTE_ADD_PROPERTIES = 'default';
+
+    /**
+     * Résultat
+     * @var string
+     */
+    const ROUTE_RESULTS_TYPE  = 'type';
+    const ROUTE_RESULTS_MODEL = 'model';
+
+    /**
      * Methods constants
      * @var string
      */
@@ -235,9 +259,9 @@ class Route implements \Psr\Log\LoggerAwareInterface
 
     /**
      * Set params
-     * 
+     *
      * @param array $p_params
-     * 
+     *
      * @return \FreeFW\Router\Route
      */
     public function setParams($p_params)
@@ -250,7 +274,7 @@ class Route implements \Psr\Log\LoggerAwareInterface
 
     /**
      * Get Params
-     * 
+     *
      * @return array|boolean
      */
     public function getParams()
@@ -260,9 +284,9 @@ class Route implements \Psr\Log\LoggerAwareInterface
 
     /**
      * Set include
-     * 
+     *
      * @param array $p_include
-     * 
+     *
      * @return \FreeFW\Router\Route
      */
     public function setInclude($p_include)
@@ -275,7 +299,7 @@ class Route implements \Psr\Log\LoggerAwareInterface
 
     /**
      * Get include
-     * 
+     *
      * @return array
      */
     public function getInclude() : array

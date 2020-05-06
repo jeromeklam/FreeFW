@@ -59,7 +59,6 @@ class JwtAuth implements
      */
     protected function decodeJwtToken($token)
     {
-        $public = $this->getConfigValue('publicKey');
         try {
             $decoded = FireJWT::decode($token, $this->getConfigValue('publicKey'), array('RS256'));
         } catch (\Exception $ex) {
@@ -88,7 +87,7 @@ class JwtAuth implements
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\AuthAdapterInterface::getAuthorizationHeader()
      */
@@ -104,7 +103,7 @@ class JwtAuth implements
         }
         return 'JWT id="' . $header . '"';
     }
-    
+
     /**
      * Verify Auth header and log user in
      *

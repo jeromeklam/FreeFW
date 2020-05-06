@@ -61,6 +61,30 @@ class DependencyInjector extends \FreeFW\Core\DI implements \FreeFW\Interfaces\D
     /**
      *
      * {@inheritDoc}
+     * @see \FreeFW\Interfaces\DependencyInjectorInterface::getModel()
+     */
+    public function getClass($p_name)
+    {
+        $class_name = $p_name;
+        if (class_exists($class_name)) {
+            $cls = new $class_name();
+            if ($cls instanceof \Psr\Log\LoggerAwareInterface) {
+                $cls->setLogger($this->logger);
+            }
+            if ($cls instanceof \FreeFW\Interfaces\ConfigAwareTraitInterface) {
+                $cls->setConfig($this->config);
+            }
+            if (method_exists($cls, 'init')) {
+                $cls->init();
+            }
+            return $cls;
+        }
+        throw new \FreeFW\Core\FreeFWException(sprintf('Class %s not found !', $class_name));
+    }
+
+    /**
+     *
+     * {@inheritDoc}
      * @see \FreeFW\Interfaces\DependencyInjectorInterface::getController()
      */
     public function getController($p_name)
@@ -113,7 +137,6 @@ class DependencyInjector extends \FreeFW\Core\DI implements \FreeFW\Interfaces\D
             \FreeFW\Tools\PBXString::toCamelCase($p_name, true);
         if (class_exists($class_name)) {
             $cls = new $class_name();
-            $cls->init();
             if ($cls instanceof \Psr\Log\LoggerAwareInterface) {
                 $cls->setLogger($this->logger);
             }
@@ -123,6 +146,12 @@ class DependencyInjector extends \FreeFW\Core\DI implements \FreeFW\Interfaces\D
             }
             if ($cls instanceof \FreeFW\Interfaces\ConfigAwareTraitInterface) {
                 $cls->setConfig($this->config);
+            }
+            if (method_exists($cls, 'initModel')) {
+                $cls->initModel();
+            }
+            if (method_exists($cls, 'init')) {
+                $cls->init();
             }
             return $cls;
         }

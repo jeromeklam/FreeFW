@@ -105,25 +105,31 @@ class PDOStorage extends \FreeFW\Storage\Storage
             foreach ($indexes as $ixName => $oneIndex) {
                 $cFields = explode(',', $oneIndex['fields']);
                 $filters = [];
+                $existF  = false;
                 foreach ($cFields as $name) {
-                    $filters[$name] = $p_model->get($name);
-                }
-                if ($brk) {
-                    $filters[$brkField] = $sso->getBrokerId();
-                }
-                $others = $p_model->find($filters);
-                if ($others->count() > 0) {
-                    $code = \FreeFW\Constants::ERROR_UNIQINDEX;
-                    if (array_key_exists('exists', $oneIndex)) {
-                        $code = $oneIndex['exists'];
+                    if ($p_model->get($name) != '') {
+                        $filters[$name] = $p_model->get($name);
+                        $existF = true;
                     }
-                    $p_model->addError(
-                        $code,
-                        $ixName . ' allready exists !',
-                        \FreeFW\Core\Error::TYPE_PRECONDITION,
-                        $oneIndex['fields']
-                    );
-                    $next = false;
+                }
+                if ($existF) {
+                    if ($brk) {
+                        $filters[$brkField] = $sso->getBrokerId();
+                    }
+                    $others = $p_model->find($filters);
+                    if ($others->count() > 0) {
+                        $code = \FreeFW\Constants::ERROR_UNIQINDEX;
+                        if (array_key_exists('exists', $oneIndex)) {
+                            $code = $oneIndex['exists'];
+                        }
+                        $p_model->addError(
+                            $code,
+                            $ixName . ' allready exists !',
+                            \FreeFW\Core\Error::TYPE_PRECONDITION,
+                            $oneIndex['fields']
+                        );
+                        $next = false;
+                    }
                 }
             }
         }
@@ -458,25 +464,31 @@ class PDOStorage extends \FreeFW\Storage\Storage
             foreach ($indexes as $ixName => $oneIndex) {
                 $cFields = explode(',', $oneIndex['fields']);
                 $filters = [];
+                $existF = false;
                 foreach ($cFields as $name) {
-                    $filters[$name] = $p_model->get($name);
-                }
-                if ($brk) {
-                    $filters[$brkField] = $sso->getBrokerId();
-                }
-                $filters[$pkField] = [\FreeFW\Storage\Storage::COND_NOT_EQUAL => $p_model->get($pkField)];
-                $others = $p_model->find($filters);
-                if ($others->count() > 0) {
-                    $code = \FreeFW\Constants::ERROR_UNIQINDEX;
-                    if (array_key_exists('exists', $oneIndex)) {
-                        $code = $oneIndex['exists'];
+                    if ($p_model->get($name) != '') {
+                        $filters[$name] = $p_model->get($name);
+                        $existF = true;
                     }
-                    $p_model->addError(
-                        $code,
-                        $ixName . ' allready exists !',
-                        \FreeFW\Core\Error::TYPE_PRECONDITION
-                    );
-                    $next = false;
+                }
+                if ($existF) {
+                    if ($brk) {
+                        $filters[$brkField] = $sso->getBrokerId();
+                    }
+                    $filters[$pkField] = [\FreeFW\Storage\Storage::COND_NOT_EQUAL => $p_model->get($pkField)];
+                    $others = $p_model->find($filters);
+                    if ($others->count() > 0) {
+                        $code = \FreeFW\Constants::ERROR_UNIQINDEX;
+                        if (array_key_exists('exists', $oneIndex)) {
+                            $code = $oneIndex['exists'];
+                        }
+                        $p_model->addError(
+                            $code,
+                            $ixName . ' allready exists !',
+                            \FreeFW\Core\Error::TYPE_PRECONDITION
+                        );
+                        $next = false;
+                    }
                 }
             }
         }
@@ -730,7 +742,6 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     while ($row = $query->fetch(\PDO::FETCH_OBJ)) {
                         $model = \FreeFW\DI\DI::get($clName);
                         $model
-                            ->init()
                             ->setFromArray($row, $aliases, '@')
                         ;
                         if ($p_function) {
@@ -956,12 +967,12 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $parts = $this->renderCondition($oneCondition, $p_model, $p_aliases, $p_crtAlias);
                 if ($result['sql'] == '') {
                     $result['sql']    = $parts['sql'];
-                    if (is_array($parts['values'])) {
+                    if (array_key_exists('values', $parts) && is_array($parts['values'])) {
                         $result['values'] = $parts['values'];
                     }
                 } else {
                     $result['sql']    = $result['sql'] . $oper . $parts['sql'];
-                    if (is_array($parts['values'])) {
+                    if (array_key_exists('values', $parts) && is_array($parts['values'])) {
                         $result['values'] = array_merge($result['values'], $parts['values']);
                     }
                 }
@@ -969,12 +980,12 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $parts = $this->renderConditions($oneCondition, $p_model, $p_aliases, $p_crtAlias);
                 if ($result['sql'] == '') {
                     $result['sql']    = $parts['sql'];
-                    if (is_array($parts['values'])) {
+                    if (array_key_exists('values', $parts) && is_array($parts['values'])) {
                         $result['values'] = $parts['values'];
                     }
                 } else {
                     $result['sql']    = $result['sql'] . $oper . $parts['sql'];
-                    if (is_array($parts['values'])) {
+                    if (array_key_exists('values', $parts) && is_array($parts['values'])) {
                         $result['values'] = array_merge($result['values'], $parts['values']);
                     }
                 }
@@ -996,7 +1007,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
     protected function renderConditionField(
         \FreeFW\Interfaces\ConditionInterface $p_field,
         \FreeFW\Core\StorageModel $p_model,
-        array $p_aliases = [], 
+        array $p_aliases = [],
         $p_crtAlias = '@'
     ) {
         if ($p_field instanceof \FreeFW\Model\ConditionMember) {
@@ -1055,6 +1066,13 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 break;
             case \FreeFW\Storage\Storage::COND_EQUAL:
                 $realOper = '=';
+                break;
+            case \FreeFW\Storage\Storage::COND_NOT_EQUAL:
+                $realOper = '!=';
+                break;
+            case \FreeFW\Storage\Storage::COND_NOT_EQUAL_OR_NULL:
+                $realOper = '!=';
+                $nullable = true;
                 break;
             case \FreeFW\Storage\Storage::COND_LIKE:
                 $realOper = 'like';
@@ -1240,7 +1258,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
 
     /**
      * Get provider
-     * 
+     *
      * @return \FreeFW\Interfaces\StorageProviderInterface
      */
     public function getProvider()

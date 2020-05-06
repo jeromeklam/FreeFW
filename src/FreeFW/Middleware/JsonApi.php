@@ -10,7 +10,7 @@ use Psr\Http\Message\StreamInterface;
  *
  * @author jeromeklam
  */
-class JsonApi implements 
+class JsonApi implements
     \FreeFW\Interfaces\ApiAdapterInterface,
     \Psr\Log\LoggerAwareInterface
 {
@@ -22,7 +22,7 @@ class JsonApi implements
     use \FreeFW\Behaviour\EventManagerAwareTrait;
     use \FreeFW\Behaviour\ConfigAwareTrait;
     use \FreeFW\Behaviour\HttpFactoryTrait;
-    
+
     /**
      * Allowed types
      * @var array
@@ -130,7 +130,6 @@ class JsonApi implements
                 if ($body instanceof StreamInterface) {
                     $content = $body->getContents();
                     $object  = unserialize($content);
-                    $single  = false;
                     if ($object instanceof \FreeFW\Interfaces\ApiResponseInterface) {
                         if ($object->isSingleElement()) {
                             $encoder    = new \FreeFW\JsonApi\V1\Encoder();

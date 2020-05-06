@@ -9,6 +9,10 @@
         {
             "name"  : "KLAM Jérôme",
             "email" : "jeromeklam@free.fr"
+        },
+        {
+            "name"  : "KUSTER Fanny",
+            "email" : "fannykuster@free.fr"
         }
     ],
     "minimum-stability": "dev",

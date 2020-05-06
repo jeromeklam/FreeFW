@@ -11,6 +11,14 @@ use \FreeFW\Constants as FFCST;
 class ApiController extends \FreeFW\Core\Controller
 {
 
+    /**
+     * 
+     * @param unknown $p_params
+     * @param unknown $p_model
+     * @param unknown $p_id
+     * 
+     * @return NULL|\FreeFW\Model\ResultSet
+     */
     protected function getModelById($p_params, $p_model, $p_id)
     {
         $filters  = new \FreeFW\Model\Conditions();

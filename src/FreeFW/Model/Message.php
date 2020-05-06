@@ -34,23 +34,6 @@ class Message extends \FreeFW\Model\Base\Message
     protected $lang = null;
 
     /**
-     *
-     * {@inheritDoc}
-     * @see \FreeFW\Core\Model::init()
-     */
-    public function init()
-    {
-        $this->msg_id     = 0;
-        $this->brk_id     = 0;
-        $this->lang_id    = 0;
-        $this->msg_type   = self::TYPE_EMAIL;
-        $this->msg_status = self::STATUS_WAITING;
-        $this->msg_ts     = \FreeFW\Tools\Date::getCurrentTimestamp();
-        $this->msg_dest   = [];
-        return $this;
-    }
-
-    /**
      * Set lang
      *
      * @param \FreeFW\Model\Lang $p_lang
@@ -75,10 +58,10 @@ class Message extends \FreeFW\Model\Base\Message
 
     /**
      * Add new dest
-     * 
+     *
      * @param string $p_address
      * @param string $p_name
-     * 
+     *
      * @return \FreeFW\Model\Message
      */
     public function addDest($p_address, $p_name = null)
@@ -99,7 +82,7 @@ class Message extends \FreeFW\Model\Base\Message
 
     /**
      * Get dest
-     * 
+     *
      * @return array
      */
     public function getDest()
@@ -218,10 +201,10 @@ class Message extends \FreeFW\Model\Base\Message
 
     /**
      * Set reply to
-     * 
+     *
      * @param string $p_address
      * @param string $p_name
-     * 
+     *
      * @return \FreeFW\Model\Message
      */
     public function setReplyTo($p_address, $p_name = null)
@@ -237,7 +220,7 @@ class Message extends \FreeFW\Model\Base\Message
 
     /**
      * Get reply to
-     * 
+     *
      * @return string
      */
     public function getReplyTo()

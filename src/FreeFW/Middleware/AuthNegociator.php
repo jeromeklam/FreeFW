@@ -63,9 +63,9 @@ class AuthNegociator implements
 
     /**
      * Login with cookie
-     * 
+     *
      * @param ServerRequestInterface $p_request
-     * 
+     *
      * @return boolean
      */
     protected function checkAutoLogin(ServerRequestInterface $p_request)
@@ -187,10 +187,10 @@ class AuthNegociator implements
     {
         return $this->identity;
     }
-    
+
     /**
      * Request identity ?
-     * 
+     *
      * @return bool
      */
     public function requestIdentity() : bool

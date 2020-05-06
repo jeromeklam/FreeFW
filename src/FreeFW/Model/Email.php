@@ -19,23 +19,10 @@ class Email extends \FreeFW\Model\Base\Email implements
     protected $lang = null;
 
     /**
-     *
-     * {@inheritDoc}
-     * @see \FreeFW\Core\Model::init()
-     */
-    public function init()
-    {
-        $this->email_id = 0;
-        $this->brk_id   = 0;
-        $this->lang_id  = 0;
-        return $this;
-    }
-
-    /**
      * Set lang
-     * 
+     *
      * @param \FreeFW\Model\Lang $p_lang
-     * 
+     *
      * @return \FreeFW\Model\Email
      */
     public function setLang($p_lang)
@@ -46,7 +33,7 @@ class Email extends \FreeFW\Model\Base\Email implements
 
     /**
      * Get lang
-     * 
+     *
      * @return \FreeFW\Model\Lang
      */
     public function getLang()
@@ -56,7 +43,7 @@ class Email extends \FreeFW\Model\Base\Email implements
 
     /**
      * Merge datas in fields
-     * 
+     *
      * @param array $p_datas
      */
     public function mergeDatas($p_datas)

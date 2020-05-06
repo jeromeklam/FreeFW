@@ -8,6 +8,12 @@ class Constants
 {
 
     /**
+     * Regex
+     * @var string
+     */
+    const PARAM_REGEX = '[0-9A-Za-z_\-\.\@\%]*';
+
+    /**
      * Langues
      * @var string
      */
@@ -76,14 +82,19 @@ class Constants
      * Properties
      * @var unknown
      */
-    const PROPERTY_NAME    = 'name';
-    const PROPERTY_PRIVATE = 'private';
-    const PROPERTY_TYPE    = 'type';
-    const PROPERTY_OPTIONS = 'options';
-    const PROPERTY_PUBLIC  = 'public';
-    const PROPERTY_DEFAULT = 'default';
-    const PROPERTY_FK      = 'fk';
-    
+    const PROPERTY_PRIVATE    = 'private';
+    const PROPERTY_TYPE       = 'type';
+    const PROPERTY_ENUM       = 'enum';
+    const PROPERTY_OPTIONS    = 'options';
+    const PROPERTY_PUBLIC     = 'public';
+    const PROPERTY_DEFAULT    = 'default';
+    const PROPERTY_COMMENT    = 'comment';
+    const PROPERTY_SAMPLE     = 'sample';
+    const PROPERTY_MIN        = 'min';
+    const PROPERTY_MAX        = 'max';
+    const PROPERTY_FK         = 'fk';
+    const PROPERTY_DEPRECATED = 'deprecated';
+
     /**
      * Index
      * @var string
@@ -95,11 +106,12 @@ class Constants
      * Relation
      * @var string
      */
-    const REL_MODEL  = 'model';
-    const REL_FIELD  = 'field';
-    const REL_TYPE   = 'type';
-    const REL_REMOVE = 'remove';
-    const REL_EXISTS = 'exists';
+    const REL_MODEL   = 'model';
+    const REL_FIELD   = 'field';
+    const REL_TYPE    = 'type';
+    const REL_REMOVE  = 'remove';
+    const REL_EXISTS  = 'exists';
+    const REL_COMMENT = 'comment';
 
     /**
      * Foreign Key
@@ -108,7 +120,7 @@ class Constants
     const FOREIGN_MODEL = 'model';
     const FOREIGN_FIELD = 'field';
     const FOREIGN_TYPE  = 'type';
-    
+
     /**
      * Options
      * @var string
@@ -130,15 +142,11 @@ class Constants
      * Default constants
      * @var string
      */
-    const DEFAULT_NOW   = 'NOW';
-    const DEFAULT_TRUE  = 1;
-    const DEFAULT_FALSE = 0;
-
-    /**
-     * Regex
-     * @var string
-     */
-    const PARAM_REGEX = '[0-9A-Za-z_\-\.\@\%]*';
+    const DEFAULT_NOW           = 'NOW';
+    const DEFAULT_TRUE          = 'TRUE';
+    const DEFAULT_FALSE         = 'FALSE';
+    const DEFAULT_CURRENT_USER  = 'USER';
+    const DEFAULT_CURRENT_GROUP = 'GROUP';
 
     /**
      * Errors types
@@ -147,4 +155,16 @@ class Constants
     const ERROR_REQUIRED     = 666001;
     const ERROR_FOREIGNKEY   = 666002;
     const ERROR_UNIQINDEX    = 666003;
+    const ERROR_VALUES       = 666004;
+    const ERROR_MAXLENGTH    = 666005;
+
+    /**
+     * Models error codes
+     * @var integer
+     */
+    const ERROR_COUNTRY_NAME_EXISTS = 6700001;
+    const ERROR_COUNTRY_CODE_EXISTS = 6700002;
+    const ERROR_LANG_NAME_EXISTS    = 6700003;
+    const ERROR_LANG_CODE_EXISTS    = 6700004;
+    const ERROR_LANG_ISO_EXISTS     = 6700005;
 }

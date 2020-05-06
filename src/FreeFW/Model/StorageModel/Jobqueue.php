@@ -11,39 +11,51 @@ use \FreeFW\Constants as FFCST;
 abstract class Jobqueue extends \FreeFW\Core\StorageModel
 {
 
-/**
- * Field properties as static arrays
- * @var array
- */
+    /**
+     * Field properties as static arrays
+     * @var array
+     */
     protected static $PRP_JOBQ_ID = [
         FFCST::PROPERTY_PRIVATE => 'jobq_id',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
-        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED, FFCST::OPTION_PK]
+        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED, FFCST::OPTION_PK],
+        FFCST::PROPERTY_COMMENT => 'Identifiant de la tâche',
+        FFCST::PROPERTY_SAMPLE  => 123,
     ];
     protected static $PRP_BRK_ID = [
         FFCST::PROPERTY_PRIVATE => 'brk_id',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
-        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_BROKER]
+        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_BROKER],
+        FFCST::PROPERTY_COMMENT => 'Identifiant du broker, pour restriction',
+        FFCST::PROPERTY_SAMPLE  => 123,
     ];
     protected static $PRP_JOBQ_NAME = [
         FFCST::PROPERTY_PRIVATE => 'jobq_name',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
-        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED]
+        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED],
+        FFCST::PROPERTY_COMMENT => 'Le nom de la tâche',
+        FFCST::PROPERTY_SAMPLE  => 'Mon job 1',
+        FFCST::PROPERTY_MAX     => 255,
     ];
     protected static $PRP_JOBQ_DESC = [
         FFCST::PROPERTY_PRIVATE => 'jobq_desc',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_TEXT,
-        FFCST::PROPERTY_OPTIONS => []
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Description de la tâche',
+        FFCST::PROPERTY_SAMPLE  => 'Tâche pour test',
     ];
     protected static $PRP_GRP_ID = [
         FFCST::PROPERTY_PRIVATE => 'grp_id',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
         FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_FK],
+        FFCST::PROPERTY_DEFAULT => FFCST::DEFAULT_CURRENT_GROUP,
+        FFCST::PROPERTY_COMMENT => 'Identifiant du groupe déclencheur',
+        FFCST::PROPERTY_SAMPLE  => 123,
         FFCST::PROPERTY_FK      => ['group' =>
             [
-                'model' => 'FreeSSO::Model::Group',
-                'field' => 'grp_id',
-                'type'  => \FreeFW\Model\Query::JOIN_LEFT
+                FFCST::FOREIGN_MODEL => 'FreeSSO::Model::Group',
+                FFCST::FOREIGN_FIELD => 'grp_id',
+                FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT
             ]
         ]
     ];
@@ -51,73 +63,112 @@ abstract class Jobqueue extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'user_id',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
         FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_FK],
+        FFCST::PROPERTY_DEFAULT => FFCST::DEFAULT_CURRENT_USER,
+        FFCST::PROPERTY_COMMENT => 'Identifiant de l\'utilisateur déclencheur',
+        FFCST::PROPERTY_SAMPLE  => 123,
         FFCST::PROPERTY_FK      => ['user' =>
             [
-                'model' => 'FreeSSO::Model::User',
-                'field' => 'user_id',
-                'type'  => \FreeFW\Model\Query::JOIN_LEFT
+                FFCST::FOREIGN_MODEL => 'FreeSSO::Model::User',
+                FFCST::FOREIGN_FIELD => 'user_id',
+                FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT
             ]
         ]
     ];
     protected static $PRP_JOBQ_TYPE = [
         FFCST::PROPERTY_PRIVATE => 'jobq_type',
-        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
-        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED]
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_SELECT,
+        FFCST::PROPERTY_ENUM    => ['LOOP','ONCE'],
+        FFCST::PROPERTY_DEFAULT => 'ONCE',
+        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED],
+        FFCST::PROPERTY_COMMENT => 'Type de tâche',
+        FFCST::PROPERTY_SAMPLE  => 'ONCE',
     ];
     protected static $PRP_JOBQ_STATUS = [
         FFCST::PROPERTY_PRIVATE => 'jobq_status',
-        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
-        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED]
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_SELECT,
+        FFCST::PROPERTY_ENUM    => ['WAITING','FINISHED','ERROR','PENDING','RETRY'],
+        FFCST::PROPERTY_DEFAULT => 'WAITING',
+        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED],
+        FFCST::PROPERTY_COMMENT => 'Statut de tâche',
+        FFCST::PROPERTY_SAMPLE  => 'ERROR',
     ];
     protected static $PRP_JOBQ_TS = [
         FFCST::PROPERTY_PRIVATE => 'jobq_ts',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_DATETIMETZ,
-        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED]
+        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED],
+        FFCST::PROPERTY_DEFAULT => FFCST::DEFAULT_NOW,
+        FFCST::PROPERTY_COMMENT => 'Date heure de création',
+        FFCST::PROPERTY_SAMPLE  => '2020-01-01 15:00:12',
     ];
     protected static $PRP_JOBQ_LAST_REPORT = [
         FFCST::PROPERTY_PRIVATE => 'jobq_last_report',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_TEXT,
-        FFCST::PROPERTY_OPTIONS => []
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Rapport du dernier lancement',
+        FFCST::PROPERTY_SAMPLE  => 'Tout est ok',
     ];
     protected static $PRP_JOBQ_LAST_TS = [
         FFCST::PROPERTY_PRIVATE => 'jobq_last_ts',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_DATETIMETZ,
-        FFCST::PROPERTY_OPTIONS => []
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_DEFAULT => FFCST::DEFAULT_NOW,
+        FFCST::PROPERTY_COMMENT => 'Date heure de dernière mise à jour',
+        FFCST::PROPERTY_SAMPLE  => '2020-04-01 15:00:12',
     ];
     protected static $PRP_JOBQ_SERVICE = [
         FFCST::PROPERTY_PRIVATE => 'jobq_service',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
-        FFCST::PROPERTY_OPTIONS => []
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Service à exécuter',
+        FFCST::PROPERTY_SAMPLE  => 'FreeFW::Service::Message',
+        FFCST::PROPERTY_MAX     => 80,
     ];
     protected static $PRP_JOBQ_METHOD = [
         FFCST::PROPERTY_PRIVATE => 'jobq_method',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
-        FFCST::PROPERTY_OPTIONS => []
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Méthode du service à exécuter',
+        FFCST::PROPERTY_SAMPLE  => 'sendEmails',
+        FFCST::PROPERTY_MAX     => 80,
     ];
     protected static $PRP_JOBQ_PARAMS = [
         FFCST::PROPERTY_PRIVATE => 'jobq_params',
-        FFCST::PROPERTY_TYPE    => FFCST::TYPE_TEXT,
-        FFCST::PROPERTY_OPTIONS => []
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_JSON,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Paramètres de la méthode à exécuter',
+        FFCST::PROPERTY_SAMPLE  => '{}',
     ];
     protected static $PRP_JOBQ_MAX_RETRY = [
         FFCST::PROPERTY_PRIVATE => 'jobq_max_retry',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_INTEGER,
-        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED]
+        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED],
+        FFCST::PROPERTY_DEFAULT => 1,
+        FFCST::PROPERTY_COMMENT => 'Nombre maximum d\'essais',
+        FFCST::PROPERTY_SAMPLE  => 3,
     ];
     protected static $PRP_JOBQ_NB_RETRY = [
         FFCST::PROPERTY_PRIVATE => 'jobq_nb_retry',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_INTEGER,
-        FFCST::PROPERTY_OPTIONS => []
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_DEFAULT => 0,
+        FFCST::PROPERTY_COMMENT => 'Nombre d\'essais',
+        FFCST::PROPERTY_SAMPLE  => 0,
     ];
     protected static $PRP_JOBQ_NEXT_MINUTES = [
         FFCST::PROPERTY_PRIVATE => 'jobq_next_minutes',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_INTEGER,
-        FFCST::PROPERTY_OPTIONS => []
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_DEFAULT => 0,
+        FFCST::PROPERTY_COMMENT => 'Nombre de minutes entre chaque appel',
+        FFCST::PROPERTY_SAMPLE  => 3600,
     ];
     protected static $PRP_JOBQ_NEXT_RETRY = [
         FFCST::PROPERTY_PRIVATE => 'jobq_next_retry',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_DATETIMETZ,
-        FFCST::PROPERTY_OPTIONS => []
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_DEFAULT => FFCST::DEFAULT_NOW,
+        FFCST::PROPERTY_COMMENT => 'Date heure du prochain lancement',
+        FFCST::PROPERTY_SAMPLE  => '2020-05-01 23:00:00',
     ];
 
     /**
@@ -157,5 +208,23 @@ abstract class Jobqueue extends \FreeFW\Core\StorageModel
     public static function getSource()
     {
         return 'sys_jobqueue';
+    }
+
+    /**
+     * Retourne une explication de la table
+     */
+    public static function getSourceComments()
+    {
+        return 'Gestion des tâches planifiées, ponctuelles, différées';
+    }
+
+    /**
+     * Get autocomplete field
+     *
+     * @return string
+     */
+    public static function getAutocompleteField()
+    {
+        return 'jobq_name';
     }
 }

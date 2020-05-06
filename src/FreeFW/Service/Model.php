@@ -1,6 +1,8 @@
 <?php
 namespace FreeFW\Service;
 
+use \FreeFW\Constants as FFCST;
+
 /**
  * Model
  *
@@ -8,6 +10,176 @@ namespace FreeFW\Service;
  */
 class Model extends \FreeFW\Core\Service
 {
+
+    /**
+     * To OpenApi V3
+     *
+     * @param \FreeFW\Core\Model $p_model
+     * @param boolean            $p_asJsonApi
+     *
+     * @return \FreeFW\OpenApi\V3\Schema
+     */
+    public function modelToOpenApiV3(\FreeFW\Core\Model $p_model, $p_asJsonApi = true)
+    {
+        /**
+         * @var \FreeFW\OpenApi\V3\Schema $schema
+         */
+        $schema = \FreeFW\DI\DI::get('\FreeFW\OpenApi\V3\Schema');
+        $schema->setType(\FreeFW\OpenApi\V3\Schema::TYPE_OBJECT);
+        foreach ($p_model->getProperties() as $propName => $propValue) {
+            /**
+             * @var \FreeFW\OpenApi\V3\Schema $property
+             */
+            $property = \FreeFW\DI\DI::get('\FreeFW\OpenApi\V3\Schema');
+            $inlinePr = $propValue[FFCST::PROPERTY_OPTIONS];
+            if ($p_asJsonApi) {
+                if (in_array(FFCST::OPTION_PK, $inlinePr)) {
+                    // Primary keys aren't an attribute
+                    continue;
+                }
+                if (in_array(FFCST::OPTION_FK, $inlinePr)) {
+                    // Foreign keys are Object, not properties
+                    continue;
+                }
+                if (in_array(FFCST::OPTION_JSONIGNORE, $inlinePr)) {
+                    // Information non retournée...
+                    continue;
+                }
+            }
+            if (in_array(FFCST::OPTION_BROKER, $inlinePr)) {
+                // Broker not in result
+                continue;
+            }
+            switch ($propValue[FFCST::PROPERTY_TYPE]) {
+                case FFCST::TYPE_BIGINT:
+                    $property->setFormat(\FreeFW\OpenApi\V3\Schema::FORMAT_INT64);
+                    break;
+                case FFCST::TYPE_INTEGER:
+                    $property->setFormat(\FreeFW\OpenApi\V3\Schema::FORMAT_INT32);
+                    break;
+                case FFCST::TYPE_DECIMAL:
+                    $property->setFormat(\FreeFW\OpenApi\V3\Schema::FORMAT_FLOAT);
+                    break;
+                case FFCST::TYPE_DATE:
+                    $property->setFormat(\FreeFW\OpenApi\V3\Schema::FORMAT_DATETIME);
+                    break;
+                case FFCST::TYPE_DATETIME:
+                case FFCST::TYPE_DATETIMETZ:
+                    $property->setFormat(\FreeFW\OpenApi\V3\Schema::FORMAT_DATETIME);
+                    break;
+                case FFCST::TYPE_BOOLEAN:
+                    $property->setFormat(\FreeFW\OpenApi\V3\Schema::FORMAT_BOOLEAN);
+                    break;
+                case FFCST::TYPE_BLOB:
+                    $property->setFormat(\FreeFW\OpenApi\V3\Schema::FORMAT_BINARY);
+                    break;
+                default:
+                    $property->setFormat(\FreeFW\OpenApi\V3\Schema::FORMAT_STRING);
+                    break;
+            }
+            if (!in_array(FFCST::OPTION_REQUIRED, $inlinePr)) {
+                if ($propValue[FFCST::PROPERTY_TYPE] != FFCST::TYPE_BOOLEAN) {
+                    $property->setNullable(true);
+                }
+            }
+            if (array_key_exists(FFCST::PROPERTY_COMMENT, $propValue)) {
+                $property->setDescription($propValue[FFCST::PROPERTY_COMMENT]);
+            }
+            if (array_key_exists(FFCST::PROPERTY_DEFAULT, $propValue)) {
+                $property->setDefault($propValue[FFCST::PROPERTY_DEFAULT]);
+            } else {
+                if ($propValue[FFCST::PROPERTY_TYPE] == FFCST::TYPE_BOOLEAN) {
+                    $property->setDefault(false);
+                }
+            }
+            if (array_key_exists(FFCST::PROPERTY_MIN, $propValue)) {
+                $property->setMinLength($propValue[FFCST::PROPERTY_MIN]);
+            }
+            if (array_key_exists(FFCST::PROPERTY_MAX, $propValue)) {
+                $property->setMaxLength($propValue[FFCST::PROPERTY_MAX]);
+            }
+            if (array_key_exists(FFCST::PROPERTY_SAMPLE, $propValue)) {
+                $property->setExample($propValue[FFCST::PROPERTY_SAMPLE]);
+            }
+            if (array_key_exists(FFCST::PROPERTY_ENUM, $propValue)) {
+                $property->setEnum($propValue[FFCST::PROPERTY_ENUM]);
+            }
+            $schema->addProperty($propName, $property);
+        }
+        return $schema;
+    }
+
+    /**
+     *
+     * @param \FreeFW\Model\Model $p_model
+     *
+     * @return \FreeFW\OpenApi\V3\Schema
+     */
+    protected function getJsonApiStandardObject($p_model)
+    {
+        $type = $p_model->getApiType();
+        /**
+         * @var \FreeFW\OpenApi\V3\Schema $schema
+         */
+        $schema = \FreeFW\DI\DI::get('\FreeFW\OpenApi\V3\Schema');
+        $schema->setType(\FreeFW\OpenApi\V3\Schema::TYPE_OBJECT);
+        /**
+         * @var \FreeFW\OpenApi\V3\Schema $schema
+         */
+        $prpType = \FreeFW\DI\DI::get('\FreeFW\OpenApi\V3\Schema');
+        $prpType->setFormat(\FreeFW\OpenApi\V3\Schema::FORMAT_STRING);
+        $prpType->setDefault($type);
+        $prpType->setReadOnly(true);
+        $schema->addProperty('type', $prpType);
+        /**
+         * @var \FreeFW\OpenApi\V3\Schema $schema
+         */
+        $prpId = \FreeFW\DI\DI::get('\FreeFW\OpenApi\V3\Schema');
+        $prpId->setFormat(\FreeFW\OpenApi\V3\Schema::FORMAT_INT64);
+        $schema->addProperty('id', $prpId);
+        /**
+         * @var \FreeFW\OpenApi\V3\Schema $schema
+         */
+        $prpAttr = \FreeFW\DI\DI::get('\FreeFW\OpenApi\V3\Schema');
+        $prpAttr->setRef('#/components/Schemas/' . $type . '_Attributes');
+        $schema->addProperty('attributes', $prpAttr);
+        //
+        if (method_exists($p_model, 'getSourceComments')) {
+            $schema->setDescription($p_model->getSourceComments());
+        }
+        return $schema;
+    }
+
+    /**
+     *
+     * @param \FreeFW\Model\Model $p_model
+     * @param boolean             $p_asJsonApi
+     *
+     * @return \FreeFW\OpenApi\V3\OpenApi
+     */
+    public function generateDocumentation(\FreeFW\Model\Model &$p_model, $p_asJsonApi = true)
+    {
+        $doc = \FreeFW\DI\DI::get('\FreeFW\OpenApi\V3\OpenApi');
+        $cls = rtrim(ltrim($p_model->getMdNs(), '\\'), '\\') . '\\' . $p_model->getMdClass();
+        $cls = str_replace('\\', '::', $cls);
+        /**
+         * @var \FreeFW\Core\Model $obj
+         */
+        $obj = \FreeFW\DI\DI::get($cls);
+        if ($obj) {
+            $add = '';
+            if ($p_asJsonApi) {
+                // Main object + attributes
+                $doc->addComponentsSchema($obj->getApiType(), $this->getJsonApiStandardObject($obj));
+                // Attributes
+                $doc->addComponentsSchema($obj->getApiType() . '_Attributes', $this->modelToOpenApiV3($obj, $p_asJsonApi));
+            } else {
+                $doc->addComponentsSchema($obj->getApiType(), $this->modelToOpenApiV3($obj, $p_asJsonApi));
+            }
+        }
+        echo json_encode($doc);die;
+        return $doc;
+    }
 
     /**
      * Generate model
