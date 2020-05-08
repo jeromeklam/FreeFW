@@ -268,6 +268,9 @@ class Field extends \FreeFW\Core\Model
             case FFCST::TYPE_BIGINT:
                 $type = 'TYPE_BIGINT';
                 break;
+            case FFCST::TYPE_DATETIMETZ:
+                $type = 'TYPE_DATETIMETZ';
+                break;
             case FFCST::TYPE_DATETIME:
                 $type = 'TYPE_DATETIME';
                 break;
@@ -288,6 +291,21 @@ class Field extends \FreeFW\Core\Model
     }
 
     /**
+     * Is a foreign key ?
+     *
+     * @return boolean
+     */
+    public function isForeignkey()
+    {
+        if (!$this->fld_primary) {
+            if ($this->fld_name != 'brk_id' && substr($this->fld_name, -3) == '_id') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Get field options
      *
      * @return string
@@ -298,8 +316,16 @@ class Field extends \FreeFW\Core\Model
         if ($this->getFldRequired()) {
             $options[] = 'FFCST::OPTION_REQUIRED';
         }
-        if ($this->getFldPrimary()) {
-            $options[] = 'FFCST::OPTION_PK';
+        if (!$this->getFldPrimary() && $this->fld_name == 'brk_id') {
+            $options[] = 'FFCST::OPTION_BROKER';
+        } else {
+            if ($this->getFldPrimary()) {
+                $options[] = 'FFCST::OPTION_PK';
+            } else {
+                if ($this->isForeignkey()) {
+                    $options[] = 'FFCST::OPTION_FK';
+                }
+            }
         }
         return implode(', ', $options);
     }
@@ -315,6 +341,7 @@ class Field extends \FreeFW\Core\Model
     {
         $me = self::getNew();
         if (is_array($p_pdo_description)) {
+            //var_export($p_pdo_description);
             if (array_key_exists('name', $p_pdo_description)) {
                 $me->setFldName($p_pdo_description['name']);
             }
@@ -330,14 +357,30 @@ class Field extends \FreeFW\Core\Model
                     case 'LONGLONG':
                         $me->setFldType(FFCST::TYPE_BIGINT);
                         break;
-                    case 'TINY':
+                    case 'LONG':
                         $me->setFldType(FFCST::TYPE_INTEGER);
+                        break;
+                    case 'TINY':
+                        if (array_key_exists('len', $p_pdo_description) && $p_pdo_description['len'] == 1) {
+                            $me->setFldType(FFCST::TYPE_BOOLEAN);
+                        } else {
+                            $me->setFldType(FFCST::TYPE_INTEGER);
+                        }
                         break;
                     case 'BLOB':
                         $me->setFldType(FFCST::TYPE_BLOB);
                         break;
                     case 'TIMESTAMP':
-                        $me->setFldType(FFCST::TYPE_DATETIME);
+                        $me->setFldType(FFCST::TYPE_DATETIMETZ);
+                        break;
+                    case 'NEWDECIMAL' :
+                        $me->setFldType(FFCST::TYPE_DECIMAL);
+                        break;
+                    case 'STRING':
+                    case 'VAR_STRING':
+                        if (array_key_exists('len', $p_pdo_description)) {
+                            $me->setFldLength(floor(intval($p_pdo_description['len']) / 3));
+                        }
                         break;
                 }
             }

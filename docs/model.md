@@ -151,7 +151,7 @@ Les relations peuvent être utile pour les vérifications lors des suppressions,
                 FFCST::REL_FIELD   => 'tab_id',
                 FFCST::REL_TYPE    => \FreeFW\Model\Query::JOIN_LEFT,
                 FFCST::REL_COMMENT => 'Les fils de la table 1',
-                FFCST::REL_REMOVE  => 'check',
+                FFCST::REL_REMOVE  => FFCST::REL_REMOVE_CHECK,
                 FFCST::REL_EXISTS  => '6680001',
             ],
         ];
@@ -160,7 +160,7 @@ Les relations peuvent être utile pour les vérifications lors des suppressions,
 
 On indique la table, la jointure et on peut également préciser :
 
-* remove : "check" pour interdire une suppression d'un parent, "cascade" pour supprimer les éléments avec le parent.
+* remove : REL_REMOVE_CHECK pour interdire une suppression d'un parent, REL_REMOVE_CASCADE pour supprimer les éléments avec le parent.
 * exists : le code d'erreur à retourner en cas d'élément parent trouvé.
 
 ## L'autocomplete

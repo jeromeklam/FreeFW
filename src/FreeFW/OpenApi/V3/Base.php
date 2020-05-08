@@ -28,14 +28,14 @@ class Base implements \FreeFW\Interfaces\ConfigAwareTraitInterface, \Psr\Log\Log
      */
     public function __call($p_methodName, $p_args)
     {
-        if (preg_match('~^(add|set|get)([A-Z])(.*)$~', $p_methodName, $matches)) {
+        if (preg_match('~^(add|has|set|get)([A-Z])(.*)$~', $p_methodName, $matches)) {
             $property = \FreeFW\Tools\PBXString::fromCamelCase($matches[2] . $matches[3]);
             if (!property_exists($this, $property)) {
-                if ($matches[1] == 'add') {
+                if ($matches[1] == 'add' || $matches[1] == 'has') {
                     if (substr($property, -1) == 'y') {
                         $property = substr($property, 0, -1) . 'ies';
                     } else {
-                        $property = substr($property, 0, -1) . 's';
+                        $property = $property . 's';
                     }
                     if (!property_exists($this, $property)) {
                         throw new \FreeFW\Core\FreeFWMemberAccessException(
@@ -49,6 +49,11 @@ class Base implements \FreeFW\Interfaces\ConfigAwareTraitInterface, \Psr\Log\Log
                 }
             }
             switch ($matches[1]) {
+                case 'has':
+                    if (array_key_exists($p_args[0], $this->$property)) {
+                        return true;
+                    }
+                    return false;
                 case 'add':
                     if (count($p_args) > 1) {
                         return $this->add($property, $p_args[1], $p_args[0]);
@@ -129,9 +134,11 @@ class Base implements \FreeFW\Interfaces\ConfigAwareTraitInterface, \Psr\Log\Log
         $arr = [];
         foreach ($serializable as $name => $oneProp) {
             if ($name !== 'logger' && $name !== config && $oneProp !== null) {
-                $name = \FreeFW\Tools\PBXString::toCamelCase($name);
-                if ($name == 'ref') {
-                    $name = '$ref';
+                if (strpos($name, '/') === false) {
+                    $name = \FreeFW\Tools\PBXString::toCamelCase($name);
+                    if ($name == 'ref') {
+                        $name = '$ref';
+                    }
                 }
                 if (is_object($oneProp)) {
                     if (method_exists($oneProp, '__toArray')) {

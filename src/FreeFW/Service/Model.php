@@ -115,7 +115,7 @@ class Model extends \FreeFW\Core\Service
      *
      * @return \FreeFW\OpenApi\V3\Schema
      */
-    protected function getJsonApiStandardObject($p_model)
+    protected function getJsonApiStandardObject($p_model, $p_cls)
     {
         $type = $p_model->getApiType();
         /**
@@ -160,21 +160,81 @@ class Model extends \FreeFW\Core\Service
     public function generateDocumentation(\FreeFW\Model\Model &$p_model, $p_asJsonApi = true)
     {
         $doc = \FreeFW\DI\DI::get('\FreeFW\OpenApi\V3\OpenApi');
-        $cls = rtrim(ltrim($p_model->getMdNs(), '\\'), '\\') . '\\' . $p_model->getMdClass();
+        $cls = rtrim(ltrim($p_model->getMdNs(), '\\'), '\\') . '\Model\\' . $p_model->getMdClass();
         $cls = str_replace('\\', '::', $cls);
         /**
          * @var \FreeFW\Core\Model $obj
          */
         $obj = \FreeFW\DI\DI::get($cls);
         if ($obj) {
-            $add = '';
             if ($p_asJsonApi) {
                 // Main object + attributes
-                $doc->addComponentsSchema($obj->getApiType(), $this->getJsonApiStandardObject($obj));
+                $doc->addComponentsSchema($obj->getApiType(), $this->getJsonApiStandardObject($obj, $cls));
                 // Attributes
                 $doc->addComponentsSchema($obj->getApiType() . '_Attributes', $this->modelToOpenApiV3($obj, $p_asJsonApi));
             } else {
                 $doc->addComponentsSchema($obj->getApiType(), $this->modelToOpenApiV3($obj, $p_asJsonApi));
+            }
+            /**
+             * @var \FreeFW\Http\Router $router
+             */
+            $router  = \FreeFW\DI\DI::getShared('router');
+            $collect = $router->getRoutes();
+            /**
+             * @var \FreeFW\Router\Route $route
+             */
+            foreach ($collect->getRoutes() as $route) {
+                if ($route->getDefaultModel() == $cls) {
+                    $path = \FreeFW\DI\DI::get('\FreeFW\OpenApi\V3\Path');
+                    $url  = $route->getUrl();
+                    $url  = preg_replace_callback("/\/(:\w+)/", array(&$this, 'substituteFilter'), $url);
+                    $oper = \FreeFW\DI\DI::get('\FreeFW\OpenApi\V3\Operation');
+                    $oper->setDescription($route->getComment());
+                    $oper->setOperationId($route->getId());
+                    foreach ($route->getParameters() as $name => $properties) {
+                        $param = \FreeFW\DI\DI::get('\FreeFW\OpenApi\V3\Parameter');
+                        $param->setIn($properties[\FreeFW\Router\Route::ROUTE_PARAMETER_ORIGIN]);
+                        $param->setDescription($properties[\FreeFW\Router\Route::ROUTE_PARAMETER_COMMENT]);
+                        if (array_key_exists(\FreeFW\Router\Route::ROUTE_PARAMETER_REQUIRED, $properties)) {
+                            if ($properties[\FreeFW\Router\Route::ROUTE_PARAMETER_REQUIRED]) {
+                                $param->setRequired(true);
+                            }
+                        }
+                        if (array_key_exists(\FreeFW\Router\Route::ROUTE_PARAMETER_TYPE, $properties)) {
+                            $schema = \FreeFW\DI\DI::get('\FreeFW\OpenApi\V3\Schema');
+                            switch ($properties[\FreeFW\Router\Route::ROUTE_PARAMETER_TYPE]) {
+                                case FFCST::TYPE_BIGINT:
+                                    $schema->setFormat(\FreeFW\OpenApi\V3\Schema::FORMAT_INT64);
+                                    break;
+                                case FFCST::TYPE_INTEGER:
+                                    $schema->setFormat(\FreeFW\OpenApi\V3\Schema::FORMAT_INT32);
+                                    break;
+                                case FFCST::TYPE_DECIMAL:
+                                    $schema->setFormat(\FreeFW\OpenApi\V3\Schema::FORMAT_FLOAT);
+                                    break;
+                                case FFCST::TYPE_DATE:
+                                    $schema->setFormat(\FreeFW\OpenApi\V3\Schema::FORMAT_DATETIME);
+                                    break;
+                                case FFCST::TYPE_DATETIME:
+                                case FFCST::TYPE_DATETIMETZ:
+                                    $schema->setFormat(\FreeFW\OpenApi\V3\Schema::FORMAT_DATETIME);
+                                    break;
+                                case FFCST::TYPE_BOOLEAN:
+                                    $schema->setFormat(\FreeFW\OpenApi\V3\Schema::FORMAT_BOOLEAN);
+                                    break;
+                                case FFCST::TYPE_BLOB:
+                                    $schema->setFormat(\FreeFW\OpenApi\V3\Schema::FORMAT_BINARY);
+                                    break;
+                                default:
+                                    $schema->setFormat(\FreeFW\OpenApi\V3\Schema::FORMAT_STRING);
+                                    break;
+                            }
+                            $param->setSchema($schema);
+                        }
+                        $oper->addParameter($name, $param);
+                    }
+                    $doc->addPathsPathOrOperation($url, $path, $route->getMethod(), $oper);
+                }
             }
         }
         echo json_encode($doc);die;
@@ -200,24 +260,72 @@ class Model extends \FreeFW\Core\Service
         }
         $ns = rtrim(ltrim($p_model->getMdNs(), '\\'), '\\');
         $p_model->setMdNs($ns);
-        $addp = str_replace('\\', '/', $ns);
+        // Base path
+        $addp = rtrim(str_replace('\\', '/', $ns), '/');
         $path = rtrim($p_model->getMdPath(), '/');
         if (!is_dir($path . '/' . $addp)) {
-            $p_model->addError(
-                \FreeFW\Core\Error::TYPE_PRECONDITION,
-                sprintf('Model::generate, %s is not a directory !', $path . '/' . $addp)
-            );
+            \FreeFW\Tools\Dir::mkpath($path . '/' . $addp);
+            if (!is_dir($path . '/' . $addp)) {
+                $p_model->addError(
+                    \FreeFW\Core\Error::TYPE_PRECONDITION,
+                    sprintf('Model::generate, %s is not a directory !', $path . '/' . $addp)
+                );
+            }
         }
+        // Model path
+        $modelPath = $path . '/' . $addp . '/Model';
+        if (!is_dir($modelPath)) {
+            \FreeFW\Tools\Dir::mkpath($modelPath);
+            if (!is_dir($modelPath)) {
+                $p_model->addError(
+                    \FreeFW\Core\Error::TYPE_PRECONDITION,
+                    sprintf('Model::generate, %s is not a directory !', $modelPath)
+                );
+            }
+        }
+        if (!is_dir($modelPath . '/Base')) {
+            \FreeFW\Tools\Dir::mkpath($modelPath . '/Base');
+            if (!is_dir($modelPath . '/Base')) {
+                $p_model->addError(
+                    \FreeFW\Core\Error::TYPE_PRECONDITION,
+                    sprintf('Model::generate, %s is not a directory !', $modelPath . '/Base')
+                );
+            }
+        }
+        if (!is_dir($modelPath . '/StorageModel')) {
+            \FreeFW\Tools\Dir::mkpath($modelPath . '/StorageModel');
+            if (!is_dir($modelPath . '/StorageModel')) {
+                $p_model->addError(
+                    \FreeFW\Core\Error::TYPE_PRECONDITION,
+                    sprintf('Model::generate, %s is not a directory !', $modelPath . '/StorageModel')
+                );
+            }
+        }
+        // Controller path
+        $ctrlPath = $path . '/' . $addp . '/Controller';
+        if (!is_dir($ctrlPath)) {
+            \FreeFW\Tools\Dir::mkpath($ctrlPath);
+            if (!is_dir($ctrlPath)) {
+                $p_model->addError(
+                    \FreeFW\Core\Error::TYPE_PRECONDITION,
+                    sprintf('Model::generate, %s is not a directory !', $ctrlPath)
+                );
+            }
+        }
+        // Routes path
+        $routePath = $path . '/' . $addp . '/resource/routes/restful';
+        if (!is_dir($routePath)) {
+            \FreeFW\Tools\Dir::mkpath($routePath);
+            if (!is_dir($routePath)) {
+                $p_model->addError(
+                    \FreeFW\Core\Error::TYPE_PRECONDITION,
+                    sprintf('Model::generate, %s is not a directory !', $routePath)
+                );
+            }
+        }
+        //
         if ($p_model->hasErrors()) {
             return false;
-        }
-        $addBase = false;
-        if (is_dir($path . '/' . $addp . '/Base')) {
-            $addBase = true;
-        }
-        $addStorage = false;
-        if (is_dir($path . '/' . $addp . '/StorageModel')) {
-            $addStorage = true;
         }
         // Check fields if empty.
         if ($p_model->getMdSource() != '') {
@@ -235,22 +343,227 @@ class Model extends \FreeFW\Core\Service
             $storage = \FreeFW\DI\DI::getShared('Storage::' . $stName);
             $p_model->setMdFields($storage->getFields($source));
         }
-        if ($addStorage) {
-            $filename = $path . '/' . $addp . '/StorageModel/' . $p_model->getMdClass() . '.php';
-            if (!is_file($filename)) {
-                $this->createStorageModelClass($p_model, $filename);
-            }
+        $filename = $modelPath . '/StorageModel/' . $p_model->getMdClass() . '.php';
+        if (!is_file($filename)) {
+            // @todo : read existing to update
+            $this->createStorageModelClass($p_model, $filename);
         }
-        if ($addBase) {
-            $filename = $path . '/' . $addp . '/Base/' . $p_model->getMdClass() . '.php';
-            if (!is_file($filename)) {
-                $this->createBaseModelClass($p_model, $filename);
-            }
+        $filename = $modelPath . '/Base/' . $p_model->getMdClass() . '.php';
+        @unlink($filename);
+        if (!is_file($filename)) {
+            $this->createBaseModelClass($p_model, $filename);
         }
-        $filename = $path . '/' . $addp . '/' . $p_model->getMdClass() . '.php';
+        $filename = $modelPath . '/' . $p_model->getMdClass() . '.php';
         if (!is_file($filename)) {
             $this->createModelClass($p_model, $filename);
         }
+        $filename = $ctrlPath . '/' . $p_model->getMdClass() . '.php';
+        if (!is_file($filename)) {
+            $this->createControllerClass($p_model, $filename);
+        }
+        $filename = $routePath . '/' . \FreeFW\Tools\PBXString::fromCamelCase($p_model->getMdClass()) . '.php';
+        @unlink($filename);
+        if (!is_file($filename)) {
+            // @todo : read existing to update
+            $this->createRoutes($p_model, $filename);
+        }
+        return true;
+    }
+
+    /*
+     * Create routes for model class
+     *
+     * @param \FreeFW\Model\Model $p_model
+     * @param string $p_filename
+     *
+     * @return boolean
+     */
+    protected function createRoutes(\FreeFW\Model\Model &$p_model, string $p_filename)
+    {
+        $nsSnake = \FreeFW\Tools\PBXString::fromCamelCase($p_model->getMdNs());
+        $clSnake = \FreeFW\Tools\PBXString::fromCamelCase($p_model->getMdClass());
+        $modelCl = $p_model->getMdNs() . '::Model::' . $p_model->getMdClass();
+        $modelCt = $p_model->getMdNs() . '::Controller::' . $p_model->getMdClass();
+        $collPth = trim($p_model->getMdCollPath(), '/');
+        $collect = rtrim($p_model->getMdNs() . '/' . \FreeFW\Tools\PBXString::toCamelCase($collPth, true), '/') . '/' . $p_model->getMdClass();
+        $lines   = [];
+        $lines[] = '<?php';
+        $lines[] = 'use \FreeFW\Constants as FFCST;';
+        $lines[] = 'use \FreeFW\Router\Route as FFCSTRT;';
+        $lines[] = '/**';
+        $lines[] = ' * Routes for ' . $p_model->getMdClass();
+        $lines[] = ' *';
+        $lines[] = ' * @author jeromeklam';
+        $lines[] = ' */';
+        $lines[] = '$routes_' . $clSnake . ' = [';
+        $lines[] = '    \'' . $nsSnake . '.' . $clSnake . '.autocomplete\' => [';
+        $lines[] = '        FFCSTRT::ROUTE_COLLECTION => \'' . $collect . '\',';
+        $lines[] = '        FFCSTRT::ROUTE_COMMENT    => \'Autocomplete.\',';
+        $lines[] = '        FFCSTRT::ROUTE_METHOD     => FFCSTRT::METHOD_GET,';
+        $lines[] = '        FFCSTRT::ROUTE_MODEL      => \'' . $modelCl . '\',';
+        $lines[] = '        FFCSTRT::ROUTE_URL        => \'/' . $p_model->getMdVers() . '/' . $collPth . '/' . $clSnake . '/autocomplete/:search\',';
+        $lines[] = '        FFCSTRT::ROUTE_CONTROLLER => \'' . $modelCt . '\',';
+        $lines[] = '        FFCSTRT::ROUTE_FUNCTION   => \'autocomplete\',';
+        $lines[] = '        FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,';
+        $lines[] = '        FFCSTRT::ROUTE_MIDDLEWARE => [],';
+        $lines[] = '        FFCSTRT::ROUTE_INCLUDE    => [],';
+        $lines[] = '        FFCSTRT::ROUTE_PARAMETERS => [';
+        $lines[] = '            \'search\' => [';
+        $lines[] = '                FFCSTRT::ROUTE_PARAMETER_ORIGIN   => FFCSTRT::ROUTE_PARAMETER_ORIGIN_PATH,';
+        $lines[] = '                FFCSTRT::ROUTE_PARAMETER_TYPE     => FFCST::TYPE_STRING,';
+        $lines[] = '                FFCSTRT::ROUTE_PARAMETER_REQUIRED => true,';
+        $lines[] = '                FFCSTRT::ROUTE_PARAMETER_COMMENT  => \'Chaine de recherche\'';
+        $lines[] = '            ],';
+        $lines[] = '        ],';
+        $lines[] = '        FFCSTRT::ROUTE_RESULTS    => [';
+        $lines[] = '            \'200\' => [';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_TYPE  => FFCSTRT::RESULT_LIST,';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_MODEL => \'' . $modelCl . '\',';
+        $lines[] = '            ],';
+        $lines[] = '        ]';
+        $lines[] = '    ],';
+        $lines[] = '    \'' . $nsSnake . '.' . $clSnake . '.getall\' => [';
+        $lines[] = '        FFCSTRT::ROUTE_COLLECTION => \'' . $collect . '\',';
+        $lines[] = '        FFCSTRT::ROUTE_COMMENT    => \'Retourne une liste filtrée, triée et paginée.\',';
+        $lines[] = '        FFCSTRT::ROUTE_METHOD     => FFCSTRT::METHOD_GET,';
+        $lines[] = '        FFCSTRT::ROUTE_MODEL      => \'' . $modelCl . '\',';
+        $lines[] = '        FFCSTRT::ROUTE_URL        => \'/' . $p_model->getMdVers() . '/' . $collPth . '/' . $clSnake . '\',';
+        $lines[] = '        FFCSTRT::ROUTE_CONTROLLER => \'' . $modelCt . '\',';
+        $lines[] = '        FFCSTRT::ROUTE_FUNCTION   => \'getAll\',';
+        $lines[] = '        FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,';
+        $lines[] = '        FFCSTRT::ROUTE_MIDDLEWARE => [],';
+        $lines[] = '        FFCSTRT::ROUTE_INCLUDE    => [],';
+        $lines[] = '        FFCSTRT::ROUTE_RESULTS    => [';
+        $lines[] = '            \'200\' => [';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_TYPE  => FFCSTRT::RESULT_LIST,';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_MODEL => \'' . $modelCl . '\',';
+        $lines[] = '            ],';
+        $lines[] = '        ]';
+        $lines[] = '    ],';
+        $lines[] = '    \'' . $nsSnake . '.' . $clSnake . '.getone\' => [';
+        $lines[] = '        FFCSTRT::ROUTE_COLLECTION => \'' . $collect . '\',';
+        $lines[] = '        FFCSTRT::ROUTE_COMMENT    => \'Retourne un objet selon son identifiant\',';
+        $lines[] = '        FFCSTRT::ROUTE_METHOD     => FFCSTRT::METHOD_GET,';
+        $lines[] = '        FFCSTRT::ROUTE_MODEL      => \'' . $modelCl . '\',';
+        $lines[] = '        FFCSTRT::ROUTE_URL        => \'/' . $p_model->getMdVers() . '/' . $collPth . '/' . $clSnake . '/:' . $p_model->getPrimaryFieldName() . '\',';
+        $lines[] = '        FFCSTRT::ROUTE_CONTROLLER => \'' . $modelCt . '\',';
+        $lines[] = '        FFCSTRT::ROUTE_FUNCTION   => \'getOne\',';
+        $lines[] = '        FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,';
+        $lines[] = '        FFCSTRT::ROUTE_MIDDLEWARE => [],';
+        $lines[] = '        FFCSTRT::ROUTE_INCLUDE    => [],';
+        $lines[] = '        FFCSTRT::ROUTE_PARAMETERS => [';
+        $lines[] = '            \'' . $p_model->getPrimaryFieldName() . '\' => [';
+        $lines[] = '                FFCSTRT::ROUTE_PARAMETER_ORIGIN   => FFCSTRT::ROUTE_PARAMETER_ORIGIN_PATH,';
+        $lines[] = '                FFCSTRT::ROUTE_PARAMETER_TYPE     => FFCST::TYPE_BIGINT,';
+        $lines[] = '                FFCSTRT::ROUTE_PARAMETER_REQUIRED => true,';
+        $lines[] = '                FFCSTRT::ROUTE_PARAMETER_COMMENT  => \'Identifiant de l\\\'objet\'';
+        $lines[] = '            ],';
+        $lines[] = '        ],';
+        $lines[] = '        FFCSTRT::ROUTE_RESULTS    => [';
+        $lines[] = '            \'200\' => [';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_TYPE  => FFCSTRT::RESULT_OBJECT,';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_MODEL => \'' . $modelCl . '\',';
+        $lines[] = '            ],';
+        $lines[] = '        ]';
+        $lines[] = '    ],';
+        $lines[] = '    \'' . $nsSnake . '.' . $clSnake . '.createone\' => [';
+        $lines[] = '        FFCSTRT::ROUTE_COLLECTION => \'' . $collect . '\',';
+        $lines[] = '        FFCSTRT::ROUTE_COMMENT    => \'Créé un objet\',';
+        $lines[] = '        FFCSTRT::ROUTE_METHOD     => FFCSTRT::METHOD_POST,';
+        $lines[] = '        FFCSTRT::ROUTE_MODEL      => \'' . $modelCl . '\',';
+        $lines[] = '        FFCSTRT::ROUTE_URL        => \'/' . $p_model->getMdVers() . '/' . $collPth . '/' . $clSnake . '\',';
+        $lines[] = '        FFCSTRT::ROUTE_CONTROLLER => \'' . $modelCt . '\',';
+        $lines[] = '        FFCSTRT::ROUTE_FUNCTION   => \'createOne\',';
+        $lines[] = '        FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,';
+        $lines[] = '        FFCSTRT::ROUTE_MIDDLEWARE => [],';
+        $lines[] = '        FFCSTRT::ROUTE_INCLUDE    => [],';
+        $lines[] = '        FFCSTRT::ROUTE_RESULTS    => [';
+        $lines[] = '            \'201\' => [';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_TYPE  => FFCSTRT::RESULT_OBJECT,';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_MODEL => \'' . $modelCl . '\',';
+        $lines[] = '            ],';
+        $lines[] = '        ]';
+        $lines[] = '    ],';
+        $lines[] = '    \'' . $nsSnake . '.' . $clSnake . '.updateone\' => [';
+        $lines[] = '        FFCSTRT::ROUTE_COLLECTION => \'' . $collect . '\',';
+        $lines[] = '        FFCSTRT::ROUTE_COMMENT    => \'Modifie un objet\',';
+        $lines[] = '        FFCSTRT::ROUTE_METHOD     => FFCSTRT::METHOD_PUT,';
+        $lines[] = '        FFCSTRT::ROUTE_MODEL      => \'' . $modelCl . '\',';
+        $lines[] = '        FFCSTRT::ROUTE_URL        => \'/' . $p_model->getMdVers() . '/' . $collPth . '/' . $clSnake . '/:' . $p_model->getPrimaryFieldName() . '\',';
+        $lines[] = '        FFCSTRT::ROUTE_CONTROLLER => \'' . $modelCt . '\',';
+        $lines[] = '        FFCSTRT::ROUTE_FUNCTION   => \'updateOne\',';
+        $lines[] = '        FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,';
+        $lines[] = '        FFCSTRT::ROUTE_MIDDLEWARE => [],';
+        $lines[] = '        FFCSTRT::ROUTE_INCLUDE    => [],';
+        $lines[] = '        FFCSTRT::ROUTE_PARAMETERS => [';
+        $lines[] = '            \'' . $p_model->getPrimaryFieldName() . '\' => [';
+        $lines[] = '                FFCSTRT::ROUTE_PARAMETER_ORIGIN   => FFCSTRT::ROUTE_PARAMETER_ORIGIN_PATH,';
+        $lines[] = '                FFCSTRT::ROUTE_PARAMETER_TYPE     => FFCST::TYPE_BIGINT,';
+        $lines[] = '                FFCSTRT::ROUTE_PARAMETER_REQUIRED => true,';
+        $lines[] = '                FFCSTRT::ROUTE_PARAMETER_COMMENT  => \'Identifiant de l\\\'objet\'';
+        $lines[] = '            ],';
+        $lines[] = '        ],';
+        $lines[] = '        FFCSTRT::ROUTE_RESULTS    => [';
+        $lines[] = '            \'201\' => [';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_TYPE  => FFCSTRT::RESULT_OBJECT,';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_MODEL => \'' . $modelCl . '\',';
+        $lines[] = '            ],';
+        $lines[] = '        ]';
+        $lines[] = '    ],';
+        $lines[] = '    \'' . $nsSnake . '.' . $clSnake . '.removeone\' => [';
+        $lines[] = '        FFCSTRT::ROUTE_COLLECTION => \'' . $collect . '\',';
+        $lines[] = '        FFCSTRT::ROUTE_COMMENT    => \'Supprime un objet\',';
+        $lines[] = '        FFCSTRT::ROUTE_METHOD     => FFCSTRT::METHOD_DELETE,';
+        $lines[] = '        FFCSTRT::ROUTE_MODEL      => \'' . $modelCl . '\',';
+        $lines[] = '        FFCSTRT::ROUTE_URL        => \'/' . $p_model->getMdVers() . '/' . $collPth . '/' . $clSnake . '/:' . $p_model->getPrimaryFieldName() . '\',';
+        $lines[] = '        FFCSTRT::ROUTE_CONTROLLER => \'' . $modelCt . '\',';
+        $lines[] = '        FFCSTRT::ROUTE_FUNCTION   => \'removeOne\',';
+        $lines[] = '        FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,';
+        $lines[] = '        FFCSTRT::ROUTE_MIDDLEWARE => [],';
+        $lines[] = '        FFCSTRT::ROUTE_INCLUDE    => [],';
+        $lines[] = '        FFCSTRT::ROUTE_PARAMETERS => [';
+        $lines[] = '            \'' . $p_model->getPrimaryFieldName() . '\' => [';
+        $lines[] = '                FFCSTRT::ROUTE_PARAMETER_ORIGIN   => FFCSTRT::ROUTE_PARAMETER_ORIGIN_PATH,';
+        $lines[] = '                FFCSTRT::ROUTE_PARAMETER_TYPE     => FFCST::TYPE_BIGINT,';
+        $lines[] = '                FFCSTRT::ROUTE_PARAMETER_REQUIRED => true,';
+        $lines[] = '                FFCSTRT::ROUTE_PARAMETER_COMMENT  => \'Identifiant de l\\\'objet\'';
+        $lines[] = '            ],';
+        $lines[] = '        ],';
+        $lines[] = '        FFCSTRT::ROUTE_RESULTS    => [';
+        $lines[] = '            \'204\' => [],';
+        $lines[] = '        ]';
+        $lines[] = '    ],';
+        $lines[] = '];';
+        $lines[] = '';
+        file_put_contents($p_filename, implode(PHP_EOL, $lines));
+        return true;
+    }
+
+   /*
+    * Create Controller model class
+    *
+    * @param \FreeFW\Model\Model $p_model
+    * @param string $p_filename
+    *
+    * @return boolean
+    */
+    protected function createControllerClass(\FreeFW\Model\Model &$p_model, string $p_filename)
+    {
+        $addNS   = '';
+        $lines   = [];
+        $lines[] = '<?php';
+        $lines[] = 'namespace ' . $p_model->getMdNs() . '\Controller' . $addNS . ';';
+        $lines[] = '';
+        $lines[] = '/**';
+        $lines[] = ' * Controller ' . $p_model->getMdClass();
+        $lines[] = ' *';
+        $lines[] = ' * @author jeromeklam';
+        $lines[] = ' */';
+        $lines[] = 'class ' . $p_model->getMdClass() . ' extends \FreeFW\Core\ApiController';
+        $lines[] = '{';
+        $lines[] = '}';
+        $lines[] = '';
+        file_put_contents($p_filename, implode(PHP_EOL, $lines));
         return true;
     }
 
@@ -264,19 +577,20 @@ class Model extends \FreeFW\Core\Service
      */
     protected function createModelClass(\FreeFW\Model\Model &$p_model, string $p_filename)
     {
+        $addNS   = '';
         $lines   = [];
         $lines[] = '<?php';
-        $lines[] = 'namespace ' . $p_model->getMdNs() . ';';
+        $lines[] = 'namespace ' . $p_model->getMdNs() . '\Model' . $addNS . ';';
         $lines[] = '';
         $lines[] = 'use \FreeFW\Constants as FFCST;';
         $lines[] = '';
         $lines[] = '/**';
-        $lines[] = ' * ' . $p_model->getMdClass();
+        $lines[] = ' * Model ' . $p_model->getMdClass();
         $lines[] = ' *';
         $lines[] = ' * @author jeromeklam';
         $lines[] = ' */';
         $lines[] = 'class ' . $p_model->getMdClass() . ' extends \\' .
-            $p_model->getMdNs() . '\\Base\\' . $p_model->getMdClass();
+            $p_model->getMdNs() . '\Model' . $addNS . '\Base\\' . $p_model->getMdClass();
         $lines[] = '{';
         $lines[] = '}';
         $lines[] = '';
@@ -294,9 +608,10 @@ class Model extends \FreeFW\Core\Service
      */
     protected function createStorageModelClass(\FreeFW\Model\Model &$p_model, string $p_filename)
     {
+        $addNS   = '';
         $lines   = [];
         $lines[] = '<?php';
-        $lines[] = 'namespace ' . $p_model->getMdNs() . '\StorageModel;';
+        $lines[] = 'namespace ' . $p_model->getMdNs() . '\Model' . $addNS . '\StorageModel;';
         $lines[] = '';
         $lines[] = 'use \FreeFW\Constants as FFCST;';
         $lines[] = '';
@@ -308,19 +623,46 @@ class Model extends \FreeFW\Core\Service
         $lines[] = 'abstract class ' . $p_model->getMdClass() . ' extends \FreeFW\Core\StorageModel';
         $lines[] = '{';
         $lines[] = '';
-        $lines[] = '/**';
-        $lines[] = ' * Field properties as static arrays';
-        $lines[] = ' * @var array';
-        $lines[] = ' */';
+        $lines[] = '    /**';
+        $lines[] = '     * Field properties as static arrays';
+        $lines[] = '     * @var array';
+        $lines[] = '     */';
         // fields
         $fields = $p_model->getMdFields();
         $nbre   = count($fields);
         for ($i=0; $i<$nbre; $i++) {
+            /**
+             * @var \FreeFW\Model\Field $oneField
+             */
             $oneField = $fields[$i];
             $lines[] = '    protected static $PRP_' . strtoupper($oneField->getFldName()) . ' = [';
             $lines[] = '        FFCST::PROPERTY_PRIVATE => \'' . $oneField->getFldName() . '\',';
             $lines[] = '        FFCST::PROPERTY_TYPE    => FFCST::' . $oneField->getFldTypeForClass() . ',';
-            $lines[] = '        FFCST::PROPERTY_OPTIONS => [' . $oneField->getFldOptionsForClass() . ']';
+            $lines[] = '        FFCST::PROPERTY_OPTIONS => [' . $oneField->getFldOptionsForClass() . '],';
+            $lines[] = '        FFCST::PROPERTY_COMMENT => \'\',';
+            switch ($oneField->getFldType()) {
+                case FFCST::TYPE_INTEGER:
+                case FFCST::TYPE_BIGINT:
+                    $lines[] = '        FFCST::PROPERTY_SAMPLE  => 123,';
+                    break;
+                case FFCST::TYPE_BOOLEAN:
+                    $lines[] = '        FFCST::PROPERTY_SAMPLE  => true,';
+                    break;
+                case FFCST::TYPE_STRING:
+                    $lines[] = '        FFCST::PROPERTY_MAX     => ' . $oneField->getFldLength() . ',';
+                default:
+                    $lines[] = '        FFCST::PROPERTY_SAMPLE  => \'\',';
+                    break;
+            }
+            if ($oneField->isForeignkey()) {
+                $lines[] = '        FFCST::PROPERTY_FK      => [\'' . $oneField->getFldName() . '\' => ';
+                $lines[] = '            [';
+                $lines[] = '                FFCST::FOREIGN_MODEL => \'NS::Model::ModelName\',';
+                $lines[] = '                FFCST::FOREIGN_FIELD => \'' . $oneField->getFldName() . '\',';
+                $lines[] = '                FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT,';
+                $lines[] = '            ]';
+                $lines[] = '        ],';
+            }
             $lines[] = '    ];';
         }
         $lines[] = '';
@@ -362,6 +704,26 @@ class Model extends \FreeFW\Core\Service
         $lines[] = '    {';
         $lines[] = '        return \'' . $p_model->getMdSource() . '\';';
         $lines[] = '    }';
+        $lines[] = '';
+        $lines[] = '    /**';
+        $lines[] = '     * Get object short description';
+        $lines[] = '     *';
+        $lines[] = '     * @return string';
+        $lines[] = '     */';
+        $lines[] = '    public static function getSourceComments()';
+        $lines[] = '    {';
+        $lines[] = '        return \'\';';
+        $lines[] = '    }';
+        $lines[] = '';
+        $lines[] = '    /**';
+        $lines[] = '     * Get autocomplete field';
+        $lines[] = '     *';
+        $lines[] = '     * @return string';
+        $lines[] = '     */';
+        $lines[] = '    public static function getAutocompleteField()';
+        $lines[] = '    {';
+        $lines[] = '        return \'\';';
+        $lines[] = '    }';
         $lines[] = '}';
         $lines[] = '';
         file_put_contents($p_filename, implode(PHP_EOL, $lines));
@@ -378,9 +740,10 @@ class Model extends \FreeFW\Core\Service
      */
     protected function createBaseModelClass(\FreeFW\Model\Model &$p_model, string $p_filename)
     {
+        $addNS   = '';
         $lines   = [];
         $lines[] = '<?php';
-        $lines[] = 'namespace ' . $p_model->getMdNs() . '\Base;';
+        $lines[] = 'namespace ' . $p_model->getMdNs() . '\Model' . $addNS . '\Base;';
         $lines[] = '';
         $lines[] = '/**';
         $lines[] = ' * ' . $p_model->getMdClass();
@@ -388,12 +751,12 @@ class Model extends \FreeFW\Core\Service
         $lines[] = ' * @author jeromeklam';
         $lines[] = ' */';
         $lines[] = 'abstract class ' . $p_model->getMdClass() . ' extends \\' .
-            $p_model->getMdNs() . '\\StorageModel\\' . $p_model->getMdClass();
+            $p_model->getMdNs() . '\Model' . $addNS . '\StorageModel\\' . $p_model->getMdClass();
         $lines[] = '{';
         /**
          * @var \FreeFW\Model\Field $oneField
          */
-        foreach ($p_model->getMdFields() as $idx => $oneField) {
+        foreach ($p_model->getMdFields() as $oneField) {
             $lines[] = '';
             $lines[] = '    /**';
             $lines[] = '     * ' . $oneField->getFldName();
@@ -404,7 +767,7 @@ class Model extends \FreeFW\Core\Service
         /**
          * @var \FreeFW\Model\Field $oneField
          */
-        foreach ($p_model->getMdFields() as $idx => $oneField) {
+        foreach ($p_model->getMdFields() as $oneField) {
             $camel   = \FreeFW\Tools\PBXString::toCamelCase($oneField->getFldName(), true);
             $lines[] = '';
             $lines[] = '    /**';
@@ -412,7 +775,7 @@ class Model extends \FreeFW\Core\Service
             $lines[] = '     *';
             $lines[] = '     * @param ' . $oneField->getFldTypeForPhp() . ' $p_value';
             $lines[] = '     *';
-            $lines[] = '     * @return \\' . $p_model->getMdNs() . '\\' . $p_model->getMdClass();
+            $lines[] = '     * @return \\' . $p_model->getMdNs() . '\Model' . $addNS . '\\' . $p_model->getMdClass();
             $lines[] = '     */';
             $lines[] = '    public function set' . $camel . '($p_value)';
             $lines[] = '    {';
@@ -434,5 +797,25 @@ class Model extends \FreeFW\Core\Service
         $lines[] = '';
         file_put_contents($p_filename, implode(PHP_EOL, $lines));
         return true;
+    }
+
+    /**
+     * Filters for regexp
+     *
+     * @return string
+     */
+    private function substituteFilter($matches)
+    {
+        return '/{' . ltrim($matches[1], ':') . '}';
+    }
+
+    /**
+     * Filters for regexp
+     *
+     * @return string
+     */
+    private function removeFilter($matches)
+    {
+        return '';
     }
 }

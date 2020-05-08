@@ -77,10 +77,20 @@ class Router
     }
 
     /**
+     * Get all routes
+     *
+     * @return \FreeFW\Router\RouteCollection
+     */
+    public function getRoutes()
+    {
+        return $this->routes;
+    }
+
+    /**
      * Find specific route
-     * 
+     *
      * @param string $p_http_code
-     * 
+     *
      * @return boolean|array
      */
     public function findSpecificRoute($p_http_code)

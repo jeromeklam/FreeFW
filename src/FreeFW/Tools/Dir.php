@@ -29,9 +29,12 @@ class Dir
         } else {
             if (@mkdir($path)) {
                 return true;
+            } else {
+                self::mkpath(dirname($path));
+                return @mkdir($path);
             }
         }
-        return (self::mkpath(dirname($path)));
+        return true;
     }
 
     /**

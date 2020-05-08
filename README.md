@@ -4,6 +4,8 @@ Un Framework PHP simpliste pour réaliser des services web rapidement tout en ay
 
 Services web JsonApi, mais aussi web socket Wamp2 le tout compatible LoadBalancer avec partage de sessions, cache, ...
 
+Documentation sur GitBook : [https://jeromeklam.gitbook.io/freefw/](https://jeromeklam.gitbook.io/freefw/)
+
 ## Composer
 
 Consulter le fichier composer.json...

@@ -42,6 +42,7 @@ class Application implements
         if ($bp !== false) {
             $this->router->setBasePath($bp);
         }
+        \FreeFW\DI\DI::setShared('router', $this->router);
     }
 
     /**

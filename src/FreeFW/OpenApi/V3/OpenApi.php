@@ -34,6 +34,12 @@ class OpenApi extends \FreeFW\OpenApi\V3\Base
     protected $servers = null;
 
     /**
+     * Paths
+     * @var \FreeFW\OpenApi\V3\Paths
+     */
+    protected $paths = null;
+
+    /**
      * Components
      * @var \FreeFW\OpenApi\V3\Components
      */
@@ -47,7 +53,7 @@ class OpenApi extends \FreeFW\OpenApi\V3\Base
         $config = $this->getConfig();
         /**
          * La partie information
-         */ 
+         */
         $info = \FreeFW\DI\DI::get('\FreeFW\OpenApi\V3\Info');
         // Titre
         $info->setTitle($config->get('name', null));
@@ -112,11 +118,33 @@ class OpenApi extends \FreeFW\OpenApi\V3\Base
     }
 
     /**
+     * Add one path
+     *
+     * @param string                       $p_url
+     * @param \FreeFW\OpenApi\V3\Schema    $p_path
+     * @param string                       $p_method
+     * @param \FreeFW\OpenApi\V3\Operation $p_operation
+     *
+     * @return \FreeFW\OpenApi\V3\OpenApi
+     */
+    public function addPathsPathOrOperation($p_url, $p_path, $p_method = null, $p_operation = null)
+    {
+        if (!is_array($this->paths)) {
+            $this->paths = [];
+        }
+        if (!array_key_exists($p_url, $this->paths)) {
+            $this->paths[$p_url] = $p_path;
+        }
+        $this->paths[$p_url]->addOperation($p_method, $p_operation);
+        return $this;
+    }
+
+    /**
      * Add one schema to components
-     * 
+     *
      * @param string                    $p_name
      * @param \FreeFW\OpenApi\V3\Schema $p_schema
-     * 
+     *
      * @return \FreeFW\OpenApi\V3\OpenApi
      */
     public function addComponentsSchema($p_name, $p_schema)

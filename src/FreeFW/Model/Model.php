@@ -36,10 +36,22 @@ class Model extends \FreeFW\Core\Model
     protected $md_path =  null;
 
     /**
+     * Default version
+     * @var string
+     */
+    protected $md_vers = null;
+
+    /**
      * Fields
      * @var [\FreeFW\Model\Field]
      */
     protected $md_fields = [];
+
+    /**
+     * Collection path
+     * @var string
+     */
+    protected $md_coll_path = null;
 
     /**
      * Set classname
@@ -157,6 +169,68 @@ class Model extends \FreeFW\Core\Model
     }
 
     /**
+     * Set version
+     *
+     * @param string $p_vers
+     */
+    public function setMdVers($p_vers)
+    {
+        $this->md_vers = $p_vers;
+        return $this;
+    }
+
+    /**
+     * Get version
+     *
+     * @return string
+     */
+    public function getMdVers()
+    {
+        return $this->md_vers;
+    }
+
+    /**
+     * Set collection path
+     *
+     * @param string $p_path
+     *
+     * @return \FreeFW\Model\Model
+     */
+    public function setMdCollPath($p_path)
+    {
+        $this->md_coll_path = $p_path;
+        return $this;
+    }
+
+    /**
+     * Get collection path
+     *
+     * @return string
+     */
+    public function getMdCollPath()
+    {
+        return $this->md_coll_path;
+    }
+
+    /**
+     * Get primary key field name
+     *
+     * @return string
+     */
+    public function getPrimaryFieldName()
+    {
+        /**
+         * @var \FreeFW\Model\Field $field
+         */
+        foreach ($this->md_fields as $field) {
+            if ($field->getFldPrimary()) {
+                return $field->getFldName();
+            }
+        }
+        return '';
+    }
+
+    /**
      *
      * {@inheritDoc}
      * @see \FreeFW\Core\Model::getProperties()
@@ -176,6 +250,16 @@ class Model extends \FreeFW\Core\Model
             ],
             'md_ns' => [
                 FFCST::PROPERTY_PRIVATE => 'md_ns',
+                FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+                FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED]
+            ],
+            'md_vers' => [
+                FFCST::PROPERTY_PRIVATE => 'md_vers',
+                FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+                FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED]
+            ],
+            'md_coll_path' => [
+                FFCST::PROPERTY_PRIVATE => 'md_coll_path',
                 FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
                 FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED]
             ],

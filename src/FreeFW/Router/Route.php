@@ -33,6 +33,7 @@ class Route implements \Psr\Log\LoggerAwareInterface
     const ROUTE_FUNCTION       = 'function';
     const ROUTE_AUTH           = 'auth';
     const ROUTE_MIDDLEWARE     = 'middleware';
+    const ROUTE_PARAMETERS     = 'parameters';
     const ROUTE_RESULTS        = 'results';
     const ROUTE_INCLUDE        = 'include';
     const ROUTE_ADD_PROPERTIES = 'default';
@@ -43,6 +44,25 @@ class Route implements \Psr\Log\LoggerAwareInterface
      */
     const ROUTE_RESULTS_TYPE  = 'type';
     const ROUTE_RESULTS_MODEL = 'model';
+
+    /**
+     * Parameter position
+     * @var string
+     */
+    const ROUTE_PARAMETER_ORIGIN_BODY   = 'body';
+    const ROUTE_PARAMETER_ORIGIN_PATH   = 'path';
+    const ROUTE_PARAMETER_ORIGIN_QUERY  = 'query';
+    const ROUTE_PARAMETER_ORIGIN_COOKIE = 'cookie';
+    const ROUTE_PARAMETER_ORIGIN_HEADER = 'header';
+
+    /**
+     * Options des paramètres
+     * @var string
+     */
+    const ROUTE_PARAMETER_TYPE     = 'type';
+    const ROUTE_PARAMETER_COMMENT  = 'comment';
+    const ROUTE_PARAMETER_REQUIRED = 'required';
+    const ROUTE_PARAMETER_ORIGIN   = 'origin';
 
     /**
      * Methods constants
@@ -70,6 +90,12 @@ class Route implements \Psr\Log\LoggerAwareInterface
     const RESULT_LIST   = 'list';
     const RESULT_OBJECT = 'object';
     const RESULT_DATA   = 'data';
+
+    /**
+     * Uniq id
+     * @var string
+     */
+    protected $id = null;
 
     /**
      * Method
@@ -118,6 +144,53 @@ class Route implements \Psr\Log\LoggerAwareInterface
      * @var array
      */
     protected $include = [];
+
+    /**
+     * Collection
+     * @var string
+     */
+    protected $collection = null;
+
+    /**
+     * Comment
+     * @var string
+     */
+    protected $comment = null;
+
+    /**
+     * Parameters
+     * @var array
+     */
+    protected $parameters = null;
+
+    /**
+     * Responses
+     * @var array
+     */
+    protected $responses = null;
+
+    /**
+     * Set uniq id
+     *
+     * @param string $p_id
+     *
+     * @return \FreeFW\Router\Route
+     */
+    public function setId($p_id)
+    {
+        $this->id = $p_id;
+        return $this;
+    }
+
+    /**
+     * Get uniq id
+     *
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
     /**
      * Set HTTP method
@@ -305,6 +378,98 @@ class Route implements \Psr\Log\LoggerAwareInterface
     public function getInclude() : array
     {
         return $this->include;
+    }
+
+    /**
+     * Set collection
+     *
+     * @param string $p_collection
+     *
+     * @return \FreeFW\Router\Route
+     */
+    public function setCollection($p_collection)
+    {
+        $this->collection = $p_collection;
+        return $this;
+    }
+
+    /**
+     * Get collection
+     *
+     * @return string
+     */
+    public function getCollection()
+    {
+        return $this->collection;
+    }
+
+    /**
+     * Set comment
+     *
+     * @param string $p_comment
+     *
+     * @return \FreeFW\Router\Route
+     */
+    public function setComment($p_comment)
+    {
+        $this->comment = $p_comment;
+        return $this;
+    }
+
+    /**
+     * Get comment
+     *
+     * @return string
+     */
+    public function getComment()
+    {
+        return $this->comment;
+    }
+
+    /**
+     * Set responses
+     *
+     * @param array $p_responses
+     *
+     * @return \FreeFW\Router\Route
+     */
+    public function setResponses($p_responses)
+    {
+        $this->responses = $p_responses;
+        return $this;
+    }
+
+    /**
+     * Get responses
+     *
+     * @return array
+     */
+    public function getResponses()
+    {
+        return $this->responses;
+    }
+
+    /**
+     * Set parameters
+     *
+     * @param array $p_parameters
+     *
+     * @return \FreeFW\Router\Route
+     */
+    public function setParameters($p_parameters)
+    {
+        $this->parameters = $p_parameters;
+        return $this;
+    }
+
+    /**
+     * Get parameters
+     *
+     * @return array
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
     }
 
     /**
