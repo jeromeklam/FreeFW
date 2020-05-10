@@ -286,6 +286,7 @@ class Tab1 extends \NS1\Model\Base\Tab1  implements
 * PROPERTY_MAX        : Longueur maximale
 * PROPERTY_FK         : Données de la clef étrangère
 * PROPERTY_DEPRECATED : à Vrai si champ déprécié
+* PROPERTY_SCOPE      : Tableau des extensions autorisées, vide pour toutes, (cf scopes des routes, utilisateurs)
 
 ## Les types
 

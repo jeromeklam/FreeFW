@@ -59,7 +59,7 @@ abstract class Jobqueue extends \FreeFW\Model\StorageModel\Jobqueue
 
     /**
      * jobq_ts
-     * @var string
+     * @var mixed
      */
     protected $jobq_ts = null;
 
@@ -71,7 +71,7 @@ abstract class Jobqueue extends \FreeFW\Model\StorageModel\Jobqueue
 
     /**
      * jobq_last_ts
-     * @var string
+     * @var mixed
      */
     protected $jobq_last_ts = null;
 
@@ -95,13 +95,13 @@ abstract class Jobqueue extends \FreeFW\Model\StorageModel\Jobqueue
 
     /**
      * jobq_max_retry
-     * @var string
+     * @var int
      */
     protected $jobq_max_retry = null;
 
     /**
      * jobq_nb_retry
-     * @var string
+     * @var int
      */
     protected $jobq_nb_retry = null;
 
@@ -113,7 +113,7 @@ abstract class Jobqueue extends \FreeFW\Model\StorageModel\Jobqueue
 
     /**
      * jobq_next_retry
-     * @var string
+     * @var mixed
      */
     protected $jobq_next_retry = null;
 
@@ -304,7 +304,7 @@ abstract class Jobqueue extends \FreeFW\Model\StorageModel\Jobqueue
     /**
      * Set jobq_ts
      *
-     * @param string $p_value
+     * @param mixed $p_value
      *
      * @return \FreeFW\Model\Jobqueue
      */
@@ -317,7 +317,7 @@ abstract class Jobqueue extends \FreeFW\Model\StorageModel\Jobqueue
     /**
      * Get jobq_ts
      *
-     * @return string
+     * @return mixed
      */
     public function getJobqTs()
     {
@@ -350,7 +350,7 @@ abstract class Jobqueue extends \FreeFW\Model\StorageModel\Jobqueue
     /**
      * Set jobq_last_ts
      *
-     * @param string $p_value
+     * @param mixed $p_value
      *
      * @return \FreeFW\Model\Jobqueue
      */
@@ -363,7 +363,7 @@ abstract class Jobqueue extends \FreeFW\Model\StorageModel\Jobqueue
     /**
      * Get jobq_last_ts
      *
-     * @return string
+     * @return mixed
      */
     public function getJobqLastTs()
     {
@@ -442,7 +442,7 @@ abstract class Jobqueue extends \FreeFW\Model\StorageModel\Jobqueue
     /**
      * Set jobq_max_retry
      *
-     * @param string $p_value
+     * @param int $p_value
      *
      * @return \FreeFW\Model\Jobqueue
      */
@@ -455,7 +455,7 @@ abstract class Jobqueue extends \FreeFW\Model\StorageModel\Jobqueue
     /**
      * Get jobq_max_retry
      *
-     * @return string
+     * @return int
      */
     public function getJobqMaxRetry()
     {
@@ -465,7 +465,7 @@ abstract class Jobqueue extends \FreeFW\Model\StorageModel\Jobqueue
     /**
      * Set jobq_nb_retry
      *
-     * @param string $p_value
+     * @param int $p_value
      *
      * @return \FreeFW\Model\Jobqueue
      */
@@ -478,7 +478,7 @@ abstract class Jobqueue extends \FreeFW\Model\StorageModel\Jobqueue
     /**
      * Get jobq_nb_retry
      *
-     * @return string
+     * @return int
      */
     public function getJobqNbRetry()
     {
@@ -511,7 +511,7 @@ abstract class Jobqueue extends \FreeFW\Model\StorageModel\Jobqueue
     /**
      * Set jobq_next_retry
      *
-     * @param string $p_value
+     * @param mixed $p_value
      *
      * @return \FreeFW\Model\Jobqueue
      */
@@ -524,7 +524,7 @@ abstract class Jobqueue extends \FreeFW\Model\StorageModel\Jobqueue
     /**
      * Get jobq_next_retry
      *
-     * @return string
+     * @return mixed
      */
     public function getJobqNextRetry()
     {

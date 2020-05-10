@@ -115,7 +115,7 @@ class Model extends \FreeFW\Core\Service
      *
      * @return \FreeFW\OpenApi\V3\Schema
      */
-    protected function getJsonApiStandardObject($p_model, $p_cls)
+    public function getJsonApiStandardObject($p_model, $p_cls)
     {
         $type = $p_model->getApiType();
         /**
@@ -386,10 +386,23 @@ class Model extends \FreeFW\Core\Service
         $modelCt = $p_model->getMdNs() . '::Controller::' . $p_model->getMdClass();
         $collPth = trim($p_model->getMdCollPath(), '/');
         $collect = rtrim($p_model->getMdNs() . '/' . \FreeFW\Tools\PBXString::toCamelCase($collPth, true), '/') . '/' . $p_model->getMdClass();
+        $scope   = '';
+        if (is_array($p_model->getMdScope())) {
+            foreach ($p_model->getMdScope() as $oneScope) {
+                if (trim($oneScope) != '') {
+                    if ($scope == '') {
+                        $scope = '\'' . trim($oneScope) . '\'';
+                    } else {
+                        $scope = $scope . ',' . '\'' . trim($oneScope) . '\'';
+                    }
+                }
+            }
+        }
         $lines   = [];
         $lines[] = '<?php';
         $lines[] = 'use \FreeFW\Constants as FFCST;';
         $lines[] = 'use \FreeFW\Router\Route as FFCSTRT;';
+        $lines[] = '';
         $lines[] = '/**';
         $lines[] = ' * Routes for ' . $p_model->getMdClass();
         $lines[] = ' *';
@@ -407,6 +420,7 @@ class Model extends \FreeFW\Core\Service
         $lines[] = '        FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,';
         $lines[] = '        FFCSTRT::ROUTE_MIDDLEWARE => [],';
         $lines[] = '        FFCSTRT::ROUTE_INCLUDE    => [],';
+        $lines[] = '        FFCSTRT::ROUTE_SCOPE      => [' . $scope . '],';
         $lines[] = '        FFCSTRT::ROUTE_PARAMETERS => [';
         $lines[] = '            \'search\' => [';
         $lines[] = '                FFCSTRT::ROUTE_PARAMETER_ORIGIN   => FFCSTRT::ROUTE_PARAMETER_ORIGIN_PATH,';
@@ -417,8 +431,9 @@ class Model extends \FreeFW\Core\Service
         $lines[] = '        ],';
         $lines[] = '        FFCSTRT::ROUTE_RESULTS    => [';
         $lines[] = '            \'200\' => [';
-        $lines[] = '                FFCSTRT::ROUTE_RESULTS_TYPE  => FFCSTRT::RESULT_LIST,';
-        $lines[] = '                FFCSTRT::ROUTE_RESULTS_MODEL => \'' . $modelCl . '\',';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_TYPE    => FFCSTRT::RESULT_LIST,';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_MODEL   => \'' . $modelCl . '\',';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_COMMENT => \'Réponse ok\',';
         $lines[] = '            ],';
         $lines[] = '        ]';
         $lines[] = '    ],';
@@ -433,10 +448,12 @@ class Model extends \FreeFW\Core\Service
         $lines[] = '        FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,';
         $lines[] = '        FFCSTRT::ROUTE_MIDDLEWARE => [],';
         $lines[] = '        FFCSTRT::ROUTE_INCLUDE    => [],';
+        $lines[] = '        FFCSTRT::ROUTE_SCOPE      => [' . $scope . '],';
         $lines[] = '        FFCSTRT::ROUTE_RESULTS    => [';
         $lines[] = '            \'200\' => [';
-        $lines[] = '                FFCSTRT::ROUTE_RESULTS_TYPE  => FFCSTRT::RESULT_LIST,';
-        $lines[] = '                FFCSTRT::ROUTE_RESULTS_MODEL => \'' . $modelCl . '\',';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_TYPE    => FFCSTRT::RESULT_LIST,';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_MODEL   => \'' . $modelCl . '\',';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_COMMENT => \'Réponse ok\',';
         $lines[] = '            ],';
         $lines[] = '        ]';
         $lines[] = '    ],';
@@ -451,6 +468,7 @@ class Model extends \FreeFW\Core\Service
         $lines[] = '        FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,';
         $lines[] = '        FFCSTRT::ROUTE_MIDDLEWARE => [],';
         $lines[] = '        FFCSTRT::ROUTE_INCLUDE    => [],';
+        $lines[] = '        FFCSTRT::ROUTE_SCOPE      => [' . $scope . '],';
         $lines[] = '        FFCSTRT::ROUTE_PARAMETERS => [';
         $lines[] = '            \'' . $p_model->getPrimaryFieldName() . '\' => [';
         $lines[] = '                FFCSTRT::ROUTE_PARAMETER_ORIGIN   => FFCSTRT::ROUTE_PARAMETER_ORIGIN_PATH,';
@@ -461,8 +479,9 @@ class Model extends \FreeFW\Core\Service
         $lines[] = '        ],';
         $lines[] = '        FFCSTRT::ROUTE_RESULTS    => [';
         $lines[] = '            \'200\' => [';
-        $lines[] = '                FFCSTRT::ROUTE_RESULTS_TYPE  => FFCSTRT::RESULT_OBJECT,';
-        $lines[] = '                FFCSTRT::ROUTE_RESULTS_MODEL => \'' . $modelCl . '\',';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_TYPE    => FFCSTRT::RESULT_OBJECT,';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_MODEL   => \'' . $modelCl . '\',';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_COMMENT => \'Réponse ok\',';
         $lines[] = '            ],';
         $lines[] = '        ]';
         $lines[] = '    ],';
@@ -477,10 +496,12 @@ class Model extends \FreeFW\Core\Service
         $lines[] = '        FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,';
         $lines[] = '        FFCSTRT::ROUTE_MIDDLEWARE => [],';
         $lines[] = '        FFCSTRT::ROUTE_INCLUDE    => [],';
+        $lines[] = '        FFCSTRT::ROUTE_SCOPE      => [' . $scope . '],';
         $lines[] = '        FFCSTRT::ROUTE_RESULTS    => [';
         $lines[] = '            \'201\' => [';
-        $lines[] = '                FFCSTRT::ROUTE_RESULTS_TYPE  => FFCSTRT::RESULT_OBJECT,';
-        $lines[] = '                FFCSTRT::ROUTE_RESULTS_MODEL => \'' . $modelCl . '\',';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_TYPE    => FFCSTRT::RESULT_OBJECT,';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_MODEL   => \'' . $modelCl . '\',';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_COMMENT => \'Objet créé\',';
         $lines[] = '            ],';
         $lines[] = '        ]';
         $lines[] = '    ],';
@@ -495,6 +516,7 @@ class Model extends \FreeFW\Core\Service
         $lines[] = '        FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,';
         $lines[] = '        FFCSTRT::ROUTE_MIDDLEWARE => [],';
         $lines[] = '        FFCSTRT::ROUTE_INCLUDE    => [],';
+        $lines[] = '        FFCSTRT::ROUTE_SCOPE      => [' . $scope . '],';
         $lines[] = '        FFCSTRT::ROUTE_PARAMETERS => [';
         $lines[] = '            \'' . $p_model->getPrimaryFieldName() . '\' => [';
         $lines[] = '                FFCSTRT::ROUTE_PARAMETER_ORIGIN   => FFCSTRT::ROUTE_PARAMETER_ORIGIN_PATH,';
@@ -504,9 +526,10 @@ class Model extends \FreeFW\Core\Service
         $lines[] = '            ],';
         $lines[] = '        ],';
         $lines[] = '        FFCSTRT::ROUTE_RESULTS    => [';
-        $lines[] = '            \'201\' => [';
-        $lines[] = '                FFCSTRT::ROUTE_RESULTS_TYPE  => FFCSTRT::RESULT_OBJECT,';
-        $lines[] = '                FFCSTRT::ROUTE_RESULTS_MODEL => \'' . $modelCl . '\',';
+        $lines[] = '            \'200\' => [';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_TYPE    => FFCSTRT::RESULT_OBJECT,';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_MODEL   => \'' . $modelCl . '\',';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_COMMENT => \'Objet modifié\',';
         $lines[] = '            ],';
         $lines[] = '        ]';
         $lines[] = '    ],';
@@ -521,6 +544,7 @@ class Model extends \FreeFW\Core\Service
         $lines[] = '        FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,';
         $lines[] = '        FFCSTRT::ROUTE_MIDDLEWARE => [],';
         $lines[] = '        FFCSTRT::ROUTE_INCLUDE    => [],';
+        $lines[] = '        FFCSTRT::ROUTE_SCOPE      => [' . $scope . '],';
         $lines[] = '        FFCSTRT::ROUTE_PARAMETERS => [';
         $lines[] = '            \'' . $p_model->getPrimaryFieldName() . '\' => [';
         $lines[] = '                FFCSTRT::ROUTE_PARAMETER_ORIGIN   => FFCSTRT::ROUTE_PARAMETER_ORIGIN_PATH,';
@@ -530,7 +554,9 @@ class Model extends \FreeFW\Core\Service
         $lines[] = '            ],';
         $lines[] = '        ],';
         $lines[] = '        FFCSTRT::ROUTE_RESULTS    => [';
-        $lines[] = '            \'204\' => [],';
+        $lines[] = '            \'204\' => [';
+        $lines[] = '                FFCSTRT::ROUTE_RESULTS_COMMENT => \'Objet supprimé\',';
+        $lines[] = '            ]';
         $lines[] = '        ]';
         $lines[] = '    ],';
         $lines[] = '];';

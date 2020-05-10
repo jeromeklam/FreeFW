@@ -53,7 +53,7 @@ abstract class Notification extends \FreeFW\Model\StorageModel\Notification
 
     /**
      * notif_ts
-     * @var string
+     * @var mixed
      */
     protected $notif_ts = null;
 
@@ -65,13 +65,13 @@ abstract class Notification extends \FreeFW\Model\StorageModel\Notification
 
     /**
      * notif_read
-     * @var string
+     * @var int
      */
     protected $notif_read = null;
 
     /**
      * notif_read_ts
-     * @var string
+     * @var mixed
      */
     protected $notif_read_ts = null;
 
@@ -245,7 +245,7 @@ abstract class Notification extends \FreeFW\Model\StorageModel\Notification
     /**
      * Set notif_ts
      *
-     * @param string $p_value
+     * @param mixed $p_value
      *
      * @return \FreeFW\Model\Notification
      */
@@ -258,7 +258,7 @@ abstract class Notification extends \FreeFW\Model\StorageModel\Notification
     /**
      * Get notif_ts
      *
-     * @return string
+     * @return mixed
      */
     public function getNotifTs()
     {
@@ -291,7 +291,7 @@ abstract class Notification extends \FreeFW\Model\StorageModel\Notification
     /**
      * Set notif_read
      *
-     * @param string $p_value
+     * @param int $p_value
      *
      * @return \FreeFW\Model\Notification
      */
@@ -304,7 +304,7 @@ abstract class Notification extends \FreeFW\Model\StorageModel\Notification
     /**
      * Get notif_read
      *
-     * @return string
+     * @return int
      */
     public function getNotifRead()
     {
@@ -314,7 +314,7 @@ abstract class Notification extends \FreeFW\Model\StorageModel\Notification
     /**
      * Set notif_read_ts
      *
-     * @param string $p_value
+     * @param mixed $p_value
      *
      * @return \FreeFW\Model\Notification
      */
@@ -327,7 +327,7 @@ abstract class Notification extends \FreeFW\Model\StorageModel\Notification
     /**
      * Get notif_read_ts
      *
-     * @return string
+     * @return mixed
      */
     public function getNotifReadTs()
     {

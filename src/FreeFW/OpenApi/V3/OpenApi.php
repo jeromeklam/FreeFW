@@ -35,7 +35,7 @@ class OpenApi extends \FreeFW\OpenApi\V3\Base
 
     /**
      * Paths
-     * @var \FreeFW\OpenApi\V3\Paths
+     * @var array
      */
     protected $paths = null;
 
@@ -152,7 +152,7 @@ class OpenApi extends \FreeFW\OpenApi\V3\Base
         if (!$this->components instanceof \FreeFW\OpenApi\V3\Components) {
             $this->components = \FreeFW\DI\DI::get('\FreeFW\OpenApi\V3\Components');
         }
-        $this->components->add($p_name, $p_schema);
+        $this->components->addSchema($p_name, $p_schema);
         return $this;
     }
 }

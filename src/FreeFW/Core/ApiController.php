@@ -12,11 +12,12 @@ class ApiController extends \FreeFW\Core\Controller
 {
 
     /**
-     * 
-     * @param unknown $p_params
-     * @param unknown $p_model
-     * @param unknown $p_id
-     * 
+     * get Model by Id
+     *
+     * @param \FreeFW\Http\ApiParams $p_params
+     * @param \FreeFW\Core\Model     $p_model
+     * @param string                 $p_id
+     *
      * @return NULL|\FreeFW\Model\ResultSet
      */
     protected function getModelById($p_params, $p_model, $p_id)
@@ -50,12 +51,12 @@ class ApiController extends \FreeFW\Core\Controller
 
     /**
      * AutoComplete
-     * 
+     *
      * @param \Psr\Http\Message\ServerRequestInterface $p_request
      * @param string $p_search
-     * 
+     *
      * @throws \FreeFW\Core\FreeFWStorageException
-     * 
+     *
      * @return \Psr\Http\Message\ResponseInterface
      */
     public function autocomplete(\Psr\Http\Message\ServerRequestInterface $p_request, $p_search = '')
@@ -83,7 +84,7 @@ class ApiController extends \FreeFW\Core\Controller
             $filters[$fields] = [\FreeFW\Storage\Storage::COND_LIKE => $p_search];
         }
         /**
-         * 
+         *
          * @var \FreeFW\Model\Query $query
          */
         $query = $model->getQuery();
@@ -104,12 +105,12 @@ class ApiController extends \FreeFW\Core\Controller
 
     /**
      * Get children
-     * 
+     *
      * @param \Psr\Http\Message\ServerRequestInterface $p_request
      * @param number                                   $p_id
-     * 
+     *
      * @throws \FreeFW\Core\FreeFWStorageException
-     * 
+     *
      * @return \Psr\Http\Message\ResponseInterface
      */
     public function getChildren(\Psr\Http\Message\ServerRequestInterface $p_request, $p_id = null)
@@ -272,7 +273,7 @@ class ApiController extends \FreeFW\Core\Controller
             return $this->createResponse(200, $model);
         }
     }
-    
+
     /**
      * Add new single element
      *

@@ -120,7 +120,7 @@ abstract class Lang extends \FreeFW\Model\StorageModel\Lang
         $this->lang_iso = $p_value;
         return $this;
     }
-    
+
     /**
      * Get lang_iso
      *
@@ -143,7 +143,7 @@ abstract class Lang extends \FreeFW\Model\StorageModel\Lang
         $this->lang_flag = $p_value;
         return $this;
     }
-    
+
     /**
      * Get lang_flag
      *

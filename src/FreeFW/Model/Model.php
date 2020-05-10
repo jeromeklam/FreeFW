@@ -54,6 +54,12 @@ class Model extends \FreeFW\Core\Model
     protected $md_coll_path = null;
 
     /**
+     * Scope
+     * @var string
+     */
+    protected $md_scope = null;
+
+    /**
      * Set classname
      *
      * @param string $p_class
@@ -213,6 +219,36 @@ class Model extends \FreeFW\Core\Model
     }
 
     /**
+     * Set scope
+     *
+     * @param mixed $p_scope
+     *
+     * @return \FreeFW\Model\Model
+     */
+    public function setMdScope($p_scope)
+    {
+        $this->md_scope = null;
+        if (is_array($p_scope)) {
+            $this->md_scope = $p_scope;
+        } else {
+            if (trim($p_scope) != '') {
+                $this->md_scope = explode(',', $p_scope);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * get Scope
+     *
+     * @return array
+     */
+    public function getMdScope()
+    {
+        return $this->md_scope;
+    }
+
+    /**
      * Get primary key field name
      *
      * @return string
@@ -241,33 +277,53 @@ class Model extends \FreeFW\Core\Model
             'md_class' => [
                 FFCST::PROPERTY_PRIVATE => 'md_class',
                 FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
-                FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED]
+                FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED],
+                FFCST::PROPERTY_COMMENT => 'Le nom de la classe, sans ns, en camelcase',
+                FFCST::PROPERTY_SAMPLE  => 'User'
             ],
             'md_source' => [
                 FFCST::PROPERTY_PRIVATE => 'md_source',
                 FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
-                FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED]
+                FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED],
+                FFCST::PROPERTY_COMMENT => 'Le nom de la source, nom de la table pour une BdD',
+                FFCST::PROPERTY_SAMPLE  => 'sso_user'
             ],
             'md_ns' => [
                 FFCST::PROPERTY_PRIVATE => 'md_ns',
                 FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
-                FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED]
+                FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED],
+                FFCST::PROPERTY_COMMENT => 'L\'espace de nom',
+                FFCST::PROPERTY_SAMPLE  => 'FreeSSO'
             ],
             'md_vers' => [
                 FFCST::PROPERTY_PRIVATE => 'md_vers',
                 FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
-                FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED]
+                FFCST::PROPERTY_OPTIONS => [],
+                FFCST::PROPERTY_COMMENT => 'La version éventuelle',
+                FFCST::PROPERTY_SAMPLE  => 'v1'
             ],
             'md_coll_path' => [
                 FFCST::PROPERTY_PRIVATE => 'md_coll_path',
                 FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
-                FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED]
+                FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED],
+                FFCST::PROPERTY_COMMENT => 'Le chemin pour une gestion de collection',
+                FFCST::PROPERTY_SAMPLE  => 'sso/broker'
             ],
             'md_path' => [
                 FFCST::PROPERTY_PRIVATE => 'md_path',
                 FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
-                FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED]
-            ]
+                FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED],
+                FFCST::PROPERTY_COMMENT => 'Le chemin vers le répertoire src',
+                FFCST::PROPERTY_SAMPLE  => '/var/www/html/src'
+            ],
+            'md_scope' => [
+                FFCST::PROPERTY_PRIVATE => 'md_scope',
+                FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+                FFCST::PROPERTY_OPTIONS => [],
+                FFCST::PROPERTY_COMMENT => 'role par défaut pour toutes les routes',
+                FFCST::PROPERTY_SAMPLE  => 'ADMIN,USER',
+                FFCST::PROPERTY_DEFAULT => null,
+            ],
         ];
     }
 }

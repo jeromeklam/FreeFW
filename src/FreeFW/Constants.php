@@ -94,6 +94,7 @@ class Constants
     const PROPERTY_MAX        = 'max';
     const PROPERTY_FK         = 'fk';
     const PROPERTY_DEPRECATED = 'deprecated';
+    const PROPERTY_SCOPE      = 'scope';
 
     /**
      * Index

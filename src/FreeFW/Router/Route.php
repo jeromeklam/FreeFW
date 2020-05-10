@@ -36,14 +36,25 @@ class Route implements \Psr\Log\LoggerAwareInterface
     const ROUTE_PARAMETERS     = 'parameters';
     const ROUTE_RESULTS        = 'results';
     const ROUTE_INCLUDE        = 'include';
+    const ROUTE_SCOPE          = 'scope';
+    const ROUTE_CACHE          = 'cache';
     const ROUTE_ADD_PROPERTIES = 'default';
+
+    /**
+     * Include constants
+     * @var string
+     */
+    const ROUTE_INCLUDE_DEFAULT  = 'default';
+    const ROUTE_INCLUDE_REQJIRED = 'required';
+    const ROUTE_INCLUDE_LIST     = 'list';
 
     /**
      * Résultat
      * @var string
      */
-    const ROUTE_RESULTS_TYPE  = 'type';
-    const ROUTE_RESULTS_MODEL = 'model';
+    const ROUTE_RESULTS_TYPE    = 'type';
+    const ROUTE_RESULTS_MODEL   = 'model';
+    const ROUTE_RESULTS_COMMENT = 'comment';
 
     /**
      * Parameter position
@@ -168,6 +179,12 @@ class Route implements \Psr\Log\LoggerAwareInterface
      * @var array
      */
     protected $responses = null;
+
+    /**
+     * Scopes
+     * @var array
+     */
+    protected $scope = null;
 
     /**
      * Set uniq id
@@ -469,7 +486,40 @@ class Route implements \Psr\Log\LoggerAwareInterface
      */
     public function getParameters()
     {
+        if (!is_array($this->parameters)) {
+            $this->parameters = [];
+        }
         return $this->parameters;
+    }
+
+    /**
+     * Set scope
+     *
+     * @param mixed $p_scope
+     *
+     * @return \FreeFW\Router\Route
+     */
+    public function setScope($p_scope)
+    {
+        if (is_array($p_scope)) {
+            $this->scope = $p_scope;
+        } else {
+            $this->scope = explode(',', $p_scope);
+        }
+        return $this;
+    }
+
+    /**
+     * Get scope
+     *
+     * @return array
+     */
+    public function getScope()
+    {
+        if (!is_array($this->scope)) {
+            $this->scope = [];
+        }
+        return $this->scope;
     }
 
     /**

@@ -30,11 +30,11 @@ abstract class Storage implements
     const COND_LOWER_EQUAL           = 'lte';
     const COND_LOWER_EQUAL_OR_NULL   = 'lten';
     const COND_LIKE                  = 'contains';
-    const COND_IN                    = 'IN';
-    const COND_NOT_IN                = 'NIN';
-    const COND_EMPTY                 = 'EMPTY';
-    const COND_NOT_EMPTY             = 'NEMPTY';
-    const COND_BETWEEN               = 'BETWEEN';
+    const COND_IN                    = 'in';
+    const COND_NOT_IN                = 'nin';
+    const COND_EMPTY                 = 'empty';
+    const COND_NOT_EMPTY             = 'nempty';
+    const COND_BETWEEN               = 'between';
     const COND_BEGIN_WITH            = '%*';
     const COND_END_WITH              = '*>';
     const COND_AND                   = 'and';

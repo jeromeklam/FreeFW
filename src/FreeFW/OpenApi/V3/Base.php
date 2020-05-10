@@ -133,7 +133,7 @@ class Base implements \FreeFW\Interfaces\ConfigAwareTraitInterface, \Psr\Log\Log
         $serializable = get_object_vars($this);
         $arr = [];
         foreach ($serializable as $name => $oneProp) {
-            if ($name !== 'logger' && $name !== config && $oneProp !== null) {
+            if ($name !== 'logger' && $name !== 'config' && $oneProp !== null) {
                 if (strpos($name, '/') === false) {
                     $name = \FreeFW\Tools\PBXString::toCamelCase($name);
                     if ($name == 'ref') {
