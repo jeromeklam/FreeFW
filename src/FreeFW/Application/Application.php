@@ -81,19 +81,19 @@ class Application extends \FreeFW\Core\Application
 
     /**
      * Send route for http code
-     * 
+     *
      * @param mixed $p_http_code
      */
     public function sendHttpCode($p_http_code)
     {
         $this->logger->debug('Application.sendHttpCode.start');
         try {
-            $request = \FreeFW\Http\ApiServerRequest::fromGlobals();
-            $route   = $this->router->findSpecificRoute($p_http_code);
-            if ($route) {
-                $route->setLogger($this->logger);
-                $route->setConfig($this->config);
-                $this->send($route->render($request));
+            $request     = \FreeFW\Http\ApiServerRequest::fromGlobals();
+            $this->route = $this->router->findSpecificRoute($p_http_code);
+            if ($this->route) {
+                $this->route->setLogger($this->logger);
+                $this->route->setConfig($this->config);
+                $this->send($this->route->render($request));
             } else {
                 // @todo
                 $response = $this->createResponse(404, 'Not found');
@@ -115,12 +115,12 @@ class Application extends \FreeFW\Core\Application
     {
         $this->logger->debug('Application.handle.start');
         try {
-            $request = \FreeFW\Http\ApiServerRequest::fromGlobals();
-            $route   = $this->router->findRoute($request);
-            if ($route) {
-                $route->setLogger($this->logger);
-                $route->setConfig($this->config);
-                $this->send($route->render($request));
+            $request     = \FreeFW\Http\ApiServerRequest::fromGlobals();
+            $this->route = $this->router->findRoute($request);
+            if ($this->route) {
+                $this->route->setLogger($this->logger);
+                $this->route->setConfig($this->config);
+                $this->send($this->route->render($request));
             } else {
                 $this->fireEvent(\FreeFW\Constants::EVENT_ROUTE_NOT_FOUND);
             }

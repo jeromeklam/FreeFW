@@ -26,6 +26,18 @@ class Application implements
     protected $router = null;
 
     /**
+     * Route
+     * @var \FreeFW\Router\Route
+     */
+    protected $route = null;
+
+    /**
+     * Rendered ?
+     * @var boolean
+     */
+    protected $rendered = false;
+
+    /**
      * Constructor
      *
      * @param \FreeFW\Application\Config $p_config
@@ -52,10 +64,13 @@ class Application implements
      */
     protected function afterRender()
     {
-        $this->logger->debug('application.afterRender.start');
-        $manager = $this->getEventManager();
-        $manager->notify(\FreeFW\Constants::EVENT_AFTER_RENDER);
-        $this->logger->debug('application.afterRender.end');
+        if (!$this->rendered) {
+            $this->logger->debug('application.afterRender.start');
+            $manager = $this->getEventManager();
+            $manager->notify(\FreeFW\Constants::EVENT_AFTER_RENDER);
+            $this->logger->debug('application.afterRender.end');
+            $this->rendered = true;
+        }
         return $this;
     }
 
