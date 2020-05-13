@@ -51,7 +51,7 @@ class Console extends \FreeFW\Core\Console
     {
         $this->logger->debug('Application.handle.start');
         try {
-            $cfg     = $this->getConfig();
+            $cfg     = $this->getAppConfig();
             $ssoBrk  = $cfg->get('sso');
             $input   = \FreeFW\Console\Input\Input::getFromGlobals();
             $brkKey  = $input->getAttribute('broker', $ssoBrk['broker']);

@@ -564,10 +564,10 @@ class Route implements \Psr\Log\LoggerAwareInterface
         );
         // Middleware pipeline
         $pipeline = new \FreeFW\Middleware\Pipeline();
-        $pipeline->setConfig($this->config);
+        $pipeline->setAppConfig($this->getAppConfig());
         $pipeline->setLogger($this->logger);
         // Pipe default config middleware
-        $midCfg  = $this->config->get('middleware');
+        $midCfg  = $this->getAppConfig()->get('middleware');
         $authMid = false;
         if (is_array($midCfg)) {
             foreach ($midCfg as $idx => $middleware) {

@@ -280,6 +280,11 @@ class Tab1 extends \NS1\Model\Base\Tab1  implements
 * PROPERTY_ENUM       : Dans le cas d'un type SELECT, la liste des valeurs dans un tableau
 * PROPERTY_OPTIONS    : Les options, cf ci-dessous
 * PROPERTY_DEFAULT    : Valeur par défaut du champ
+     * DEFAULT_COUNTRY : pays par défaut défini dans la configuration 
+     * DEFAULT_LANG : Langue par défaut définie dans la configuration
+     * DEFAULT_NOW : Date heure du serveur
+     * DEFAULT_CURRENT_USER : Utilisateutr connecté
+     * DEFAULT_CURRENT_GROUP : Groupe du broker
 * PROPERTY_COMMENT    : Commentaire
 * PROPERTY_SAMPLE     : Exemple de valeur
 * PROPERTY_MIN        : Longueur minimale

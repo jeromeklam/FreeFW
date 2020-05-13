@@ -92,7 +92,7 @@ class Application extends \FreeFW\Core\Application
             $this->route = $this->router->findSpecificRoute($p_http_code);
             if ($this->route) {
                 $this->route->setLogger($this->logger);
-                $this->route->setConfig($this->config);
+                $this->route->setAppConfig($this->getAppConfig());
                 $this->send($this->route->render($request));
             } else {
                 // @todo
@@ -119,7 +119,7 @@ class Application extends \FreeFW\Core\Application
             $this->route = $this->router->findRoute($request);
             if ($this->route) {
                 $this->route->setLogger($this->logger);
-                $this->route->setConfig($this->config);
+                $this->route->setAppConfig($this->getAppConfig());
                 $this->send($this->route->render($request));
             } else {
                 $this->fireEvent(\FreeFW\Constants::EVENT_ROUTE_NOT_FOUND);

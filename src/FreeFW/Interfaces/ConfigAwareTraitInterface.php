@@ -16,5 +16,12 @@ interface ConfigAwareTraitInterface
      *
      * @return \FreeFW\Interfaces\ConfigAwareTraitInterface
      */
-    public function setConfig(\FreeFW\Application\Config $p_config);
+    public function setAppConfig(\FreeFW\Application\Config $p_config);
+
+    /**
+     * Get config
+     *
+     * @return \FreeFW\Application\Config
+     */
+    public function getAppConfig();
 }

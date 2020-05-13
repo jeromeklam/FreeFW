@@ -32,7 +32,19 @@ class AuthNegociator implements
      */
     protected $formats = [
         'JWT' => [
-            'class'   => 'FreeFW::Middleware::JwtAuth',
+            'class'   => '\FreeFW\Middleware\Auth\JwtAuth',
+            'default' => false
+        ],
+        'HAWK' => [
+            'class'   => '\FreeFW\Middleware\Auth\HawkAuth',
+            'default' => false
+        ],
+        'BASIC' => [
+            'class'   => '\FreeFW\Middleware\Auth\BasicAuth',
+            'default' => false
+        ],
+        'DIGEST' => [
+            'class'   => '\FreeFW\Middleware\Auth\DigestAuth',
             'default' => false
         ]
     ];
@@ -104,27 +116,26 @@ class AuthNegociator implements
             $class      = false;
             $allowed    = false;
             $response   = false;
-            if ($authString != '') {
-                $parts      = explode(' ', $authString);
-                $authType   = strtoupper($parts[0]);
-                if (array_key_exists($authType, $this->formats)) {
-                    $class = $this->formats[$authType]['class'];
-                } else {
-                    foreach ($this->formats as $name => $format) {
-                        if ($format['default']) {
-                            $class = $format['class'];
-                        }
+            $authHeader = new \FreeFW\Middleware\Auth\AuthorizationHeader($authString);
+            $authType   = strtoupper($authHeader->getType());
+            if (array_key_exists($authType, $this->formats)) {
+                $class = $this->formats[$authType]['class'];
+            } else {
+                foreach ($this->formats as $format) {
+                    if ($format['default']) {
+                        $class = $format['class'];
                     }
                 }
             }
-            if ($class) {
+            $authorized = $p_request->getAttribute('broker_auth_methods', []);
+            if ($class && in_array($authType, $authorized)) {
                 // Ok, encode, decode, ...
                 $this->logger->debug(sprintf('FreeFW.Middleware.AuthNegociator %s', $class));
                 $mid = \FreeFW\DI\DI::get($class);
                 // verify interface, ...
                 $allowed = true;
                 if ($this->secured) {
-                    $allowed = $mid->verifyAuthorizationHeader($p_request);
+                    $allowed = $mid->verifyAuthorizationHeader($p_request, $authHeader);
                     if (!$allowed) {
                         $allowed = $this->checkAutoLogin($p_request);
                     }
@@ -132,7 +143,7 @@ class AuthNegociator implements
                 if ($allowed) {
                     $response = $p_handler->handle($p_request);
                     if ($this->requestIdentity()) {
-                        $authHeader = $mid->getAuthorizationHeader($p_request);
+                        $authHeader = $mid->getAuthorizationHeader($p_request, $authHeader);
                         $response   = $response->withHeader('Authorization', $authHeader);
                     }
                 } else {

@@ -13,7 +13,7 @@ trait ConfigAwareTrait
      * Config
      * @var \FreeFW\Application\Config
      */
-    protected $config = null;
+    protected $app_config = null;
 
     /**
      * Set config
@@ -22,9 +22,9 @@ trait ConfigAwareTrait
      *
      * @return \FreeFW\Behaviour\ConfigAwareTrait
      */
-    public function setConfig(\FreeFW\Application\Config $p_config)
+    public function setAppConfig(\FreeFW\Application\Config $p_config)
     {
-        $this->config = $p_config;
+        $this->app_config = $p_config;
         return $this;
     }
 
@@ -33,8 +33,8 @@ trait ConfigAwareTrait
      *
      * @return \FreeFW\Application\Config
      */
-    public function getConfig()
+    public function getAppConfig()
     {
-        return $this->config;
+        return $this->app_config;
     }
 }

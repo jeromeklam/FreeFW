@@ -146,6 +146,8 @@ class Constants
      * Default constants
      * @var string
      */
+    const DEFAULT_COUNTRY       = 'COUNTRY';
+    const DEFAULT_LANG          = 'LANG';
     const DEFAULT_NOW           = 'NOW';
     const DEFAULT_TRUE          = 'TRUE';
     const DEFAULT_FALSE         = 'FALSE';

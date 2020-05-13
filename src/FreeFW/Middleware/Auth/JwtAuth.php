@@ -1,11 +1,9 @@
 <?php
-namespace FreeFW\Middleware;
+namespace FreeFW\Middleware\Auth;
 
-use \Psr\Http\Server\MiddlewareInterface;
-use \Psr\Http\Server\RequestHandlerInterface;
 use \Psr\Http\Message\ServerRequestInterface;
-use \Psr\Http\Message\ResponseInterface;
 use \Firebase\JWT\JWT as FireJWT;
+use \FreeFW\Middleware\Auth\AuthorizationHeader;
 
 /**
  * JWT Auth
@@ -46,6 +44,7 @@ class JwtAuth implements
             'iat' => time(),
             'exp' => time() + intval($this->getConfigValue('duration'))
         );
+        FireJWT::$leeway = 20;
         $jwt = FireJWT::encode($token, $this->getConfigValue('privateKey'), 'RS256');
         return $jwt;
     }
@@ -60,6 +59,7 @@ class JwtAuth implements
     protected function decodeJwtToken($token)
     {
         try {
+            FireJWT::$leeway = 20;
             $decoded = FireJWT::decode($token, $this->getConfigValue('publicKey'), array('RS256'));
         } catch (\Exception $ex) {
             return null;
@@ -79,7 +79,7 @@ class JwtAuth implements
      */
     protected function getConfigValue($p_key)
     {
-        $config = $this->getConfig()->get('jwt');
+        $config = $this->getAppConfig()->get('jwt');
         if (is_array($config) && array_key_exists($p_key, $config)) {
             return $config[$p_key];
         }
@@ -91,7 +91,7 @@ class JwtAuth implements
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\AuthAdapterInterface::getAuthorizationHeader()
      */
-    public function getAuthorizationHeader(ServerRequestInterface $p_request)
+    public function getAuthorizationHeader(ServerRequestInterface $p_request, AuthorizationHeader $p_header)
     {
         $header = '';
         $sso    = \FreeFW\DI\Di::getShared('sso');
@@ -101,30 +101,27 @@ class JwtAuth implements
                 $header = $this->generateJwtToken($p_request, $user);
             }
         }
-        return 'JWT id="' . $header . '"';
+        $authHeader = new \FreeFW\Middleware\Auth\AuthorizationHeader();
+        $authHeader
+            ->setType('JWT')
+            ->addParameter('id', $header)
+        ;
+        return $authHeader->__toString();
     }
 
     /**
-     * Verify Auth header and log user in
      *
-     * @param \Psr\Http\Message\ServerRequestInterface $p_request
-     *
-     * @return boolean
+     * {@inheritDoc}
+     * @see \FreeFW\Interfaces\AuthAdapterInterface::verifyAuthorizationHeader()
      */
-    public function verifyAuthorizationHeader(ServerRequestInterface $p_request)
+    public function verifyAuthorizationHeader(ServerRequestInterface $p_request, AuthorizationHeader $p_header)
     {
-        $user = false;
-        if ($p_request->hasHeader('Authorization')) {
-            $parts = explode(' ', $p_request->getHeader('Authorization')[0]);
-            if (count($parts) > 1 && $parts[0] == 'JWT') {
-                $token = str_replace('"', '', $parts[1]);
-                $token = str_replace('id=', '', $token);
-                $jUser = $this->decodeJwtToken($token);
-                if ($jUser !== null && $jUser !== false) {
-                    $sso  = \FreeFW\DI\DI::getShared('sso');
-                    $user = $sso->signinByIdAndLogin($jUser['aud']['id'], $jUser['aud']['login']);
-                }
-            }
+        $user   = false;
+        $token  = $p_header->getParameter('id');
+        $jUser  = $this->decodeJwtToken($token);
+        if ($jUser !== null && $jUser !== false) {
+            $sso  = \FreeFW\DI\DI::getShared('sso');
+            $user = $sso->signinByIdAndLogin($jUser['aud']['id'], $jUser['aud']['login']);
         }
         return $user;
     }

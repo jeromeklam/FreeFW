@@ -50,7 +50,7 @@ class OpenApi extends \FreeFW\OpenApi\V3\Base
      */
     public function init()
     {
-        $config = $this->getConfig();
+        $config = $this->getAppConfig();
         /**
          * La partie information
          */

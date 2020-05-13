@@ -11,6 +11,7 @@ use \FreeFW\Constants as FFCST;
 abstract class Model implements
     \FreeFW\Interfaces\ApiResponseInterface,
     \FreeFW\Interfaces\ValidatorInterface,
+    \FreeFW\Interfaces\ConfigAwareTraitInterface,
     \Serializable
 {
 
@@ -18,6 +19,7 @@ abstract class Model implements
      * Behaviour
      */
     use \FreeFW\Behaviour\ValidatorTrait;
+    use \FreeFW\Behaviour\ConfigAwareTrait;
 
     /**
      * Magic call
@@ -447,6 +449,9 @@ abstract class Model implements
     public function serialize()
     {
         $serializable = get_object_vars($this);
+        unset($serializable['strategy']);
+        unset($serializable['logger']);
+        unset($serializable['config']);
         return serialize($serializable);
     }
 
@@ -520,6 +525,7 @@ abstract class Model implements
                                 foreach ($oneProperty[FFCST::PROPERTY_FK] as $relName => $rel) {
                                     $setter2 = 'set' . \FreeFW\Tools\PBXString::toCamelCase($relName, true);
                                     $this->$setter2($user);
+                                    break;
                                 }
                             }
                         } else {
@@ -531,10 +537,43 @@ abstract class Model implements
                                     foreach ($oneProperty[FFCST::PROPERTY_FK] as $relName => $rel) {
                                         $setter3 = 'set' . \FreeFW\Tools\PBXString::toCamelCase($relName, true);
                                         $this->$setter3($group);
+                                        break;
                                     }
                                 }
                             } else {
-                                $this->$setter($value);
+                                if ($value == FFCST::DEFAULT_LANG) {
+                                    $cfg    = $this->getAppConfig();
+                                    $langId = $cfg->get('default:lang_id', 0);
+                                    if ($langId > 0) {
+                                        $langModel = \FreeFW\Model\Lang::findFirst(['lang_id' => $langId]);
+                                        if ($langModel) {
+                                            $this->$setter($langModel->getLangId());
+                                            foreach ($oneProperty[FFCST::PROPERTY_FK] as $relName => $rel) {
+                                                $setter4 = 'set' . \FreeFW\Tools\PBXString::toCamelCase($relName, true);
+                                                $this->$setter4($group);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    if ($value == FFCST::DEFAULT_COUNTRY) {
+                                        $cfg    = $this->getAppConfig();
+                                        $cntyId = $cfg->get('default:cnty_id', 0);
+                                        if ($cntyId > 0) {
+                                            $cntyModel = \FreeFW\Model\Country::findFirst(['cnty_id' => $cntyId]);
+                                            if ($cntyModel) {
+                                                $this->$setter($cntyModel->getCntyId());
+                                                foreach ($oneProperty[FFCST::PROPERTY_FK] as $relName => $rel) {
+                                                    $setter5 = 'set' . \FreeFW\Tools\PBXString::toCamelCase($relName, true);
+                                                    $this->$setter5($group);
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        $this->$setter($value);
+                                    }
+                                }
                             }
                         }
                         break;

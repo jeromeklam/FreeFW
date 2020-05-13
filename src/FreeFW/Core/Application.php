@@ -46,7 +46,7 @@ class Application implements
         \FreeFW\Application\Config $p_config,
         \Psr\Log\LoggerInterface $p_logger
     ) {
-        $this->setConfig($p_config);
+        $this->setAppConfig($p_config);
         $this->setLogger($p_logger);
         $this->router = new \FreeFW\Http\Router();
         $this->router->setLogger($this->logger);

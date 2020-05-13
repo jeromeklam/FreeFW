@@ -37,7 +37,7 @@ class DependencyInjector extends \FreeFW\Core\DI implements \FreeFW\Interfaces\D
         string $p_default_storage = 'default'
     ) {
         $this->base_ns = $p_base_ns;
-        $this->setConfig($p_config);
+        $this->setAppConfig($p_config);
         $this->setLogger($p_logger);
     }
 
@@ -72,7 +72,7 @@ class DependencyInjector extends \FreeFW\Core\DI implements \FreeFW\Interfaces\D
                 $cls->setLogger($this->logger);
             }
             if ($cls instanceof \FreeFW\Interfaces\ConfigAwareTraitInterface) {
-                $cls->setConfig($this->config);
+                $cls->setAppConfig($this->getAppConfig());
             }
             if (method_exists($cls, 'init')) {
                 $cls->init();
@@ -97,7 +97,7 @@ class DependencyInjector extends \FreeFW\Core\DI implements \FreeFW\Interfaces\D
                 $cls->setLogger($this->logger);
             }
             if ($cls instanceof \FreeFW\Interfaces\ConfigAwareTraitInterface) {
-                $cls->setConfig($this->config);
+                $cls->setAppConfig($this->getAppConfig());
             }
             return $cls;
         }
@@ -119,7 +119,7 @@ class DependencyInjector extends \FreeFW\Core\DI implements \FreeFW\Interfaces\D
                 $cls->setLogger($this->logger);
             }
             if ($cls instanceof \FreeFW\Interfaces\ConfigAwareTraitInterface) {
-                $cls->setConfig($this->config);
+                $cls->setAppConfig($this->getAppConfig());
             }
             return $cls;
         }
@@ -145,7 +145,7 @@ class DependencyInjector extends \FreeFW\Core\DI implements \FreeFW\Interfaces\D
                 $cls->setStrategy($storage);
             }
             if ($cls instanceof \FreeFW\Interfaces\ConfigAwareTraitInterface) {
-                $cls->setConfig($this->config);
+                $cls->setAppConfig($this->getAppConfig());
             }
             if (method_exists($cls, 'initModel')) {
                 $cls->initModel();
@@ -173,7 +173,7 @@ class DependencyInjector extends \FreeFW\Core\DI implements \FreeFW\Interfaces\D
                 $cls->setLogger($this->logger);
             }
             if ($cls instanceof \FreeFW\Interfaces\ConfigAwareTraitInterface) {
-                $cls->setConfig($this->config);
+                $cls->setAppConfig($this->getAppConfig());
             }
             return $cls;
         }
@@ -195,7 +195,7 @@ class DependencyInjector extends \FreeFW\Core\DI implements \FreeFW\Interfaces\D
                 $cls->setLogger($this->logger);
             }
             if ($cls instanceof \FreeFW\Interfaces\ConfigAwareTraitInterface) {
-                $cls->setConfig($this->config);
+                $cls->setAppConfig($this->getAppConfig());
             }
             return $cls;
         }
@@ -217,7 +217,7 @@ class DependencyInjector extends \FreeFW\Core\DI implements \FreeFW\Interfaces\D
                 $cls->setLogger($this->logger);
             }
             if ($cls instanceof \FreeFW\Interfaces\ConfigAwareTraitInterface) {
-                $cls->setConfig($this->config);
+                $cls->setAppConfig($this->getAppConfig());
             }
             return $cls;
         }
