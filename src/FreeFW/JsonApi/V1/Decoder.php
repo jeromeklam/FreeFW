@@ -37,7 +37,6 @@ class Decoder
             $obj->setApiId($resource->getId());
             return $obj;
         }
-        die('decoder');
         return null;
     }
 }

@@ -13,6 +13,8 @@ class Encoder
      * Encode single resource
      *
      * @param \FreeFW\Interfaces\ApiResponseInterface $p_api_response
+     * @param \FreeFW\JsonApi\V1\Model\IncludedObject $p_included
+     * @param \FreeFW\Http\ApiParams                  $p_api_params
      *
      * @return \FreeFW\JsonApi\V1\Model\ResourceObject
      */
@@ -106,6 +108,7 @@ class Encoder
      * Encode a ApiResponseInterface
      *
      * @param \FreeFW\Interfaces\ApiResponseInterface $p_api_response
+     * @param \FreeFW\Http\ApiParams                  $p_api_params
      *
      * @return \FreeFW\JsonApi\V1\Model\Document
      */
@@ -141,7 +144,8 @@ class Encoder
     /**
      * Encode multiple objects
      *
-     * @param \Iterator $p_api_response
+     * @param \Iterator              $p_api_response
+     * @param \FreeFW\Http\ApiParams $p_api_params
      *
      * @return \FreeFW\JsonApi\V1\Model\Document
      */
