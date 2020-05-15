@@ -497,10 +497,10 @@ abstract class Model implements
                     $pk = true;
                 }
             }
-            $value = null;
+            $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+            $value  = null;
             if (array_key_exists(FFCST::PROPERTY_DEFAULT, $oneProperty)) {
                 $value = $oneProperty[FFCST::PROPERTY_DEFAULT];
-                $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
                 switch ($oneProperty[FFCST::PROPERTY_TYPE]) {
                     case FFCST::TYPE_BOOLEAN:
                         // boolean can't be null !
@@ -581,6 +581,10 @@ abstract class Model implements
                         $this->$setter($value);
                         break;
                 }
+            } else {
+                if ($pk) {
+                    $this->$setter(0);
+                }
             }
         }
         return $this;
@@ -624,7 +628,9 @@ abstract class Model implements
                     );
                 }
             }
-            if (in_array(FFCST::OPTION_REQUIRED, $options) && !in_array(FFCST::OPTION_PK, $options)) {
+            if (in_array(FFCST::OPTION_REQUIRED, $options) &&
+                !in_array(FFCST::OPTION_PK, $options) &&
+                !in_array(FFCST::OPTION_BROKER, $options)) {
                 if (array_key_exists(FFCST::PROPERTY_PUBLIC, $oneProperty)) {
                     $public = $oneProperty[FFCST::PROPERTY_PUBLIC];
                 }
