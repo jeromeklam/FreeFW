@@ -59,6 +59,10 @@ class JsonApi implements
         if (array_key_exists('fields', $params)) {
 
         }
+        // Include
+        if (array_key_exists('include', $params)) {
+            $apiParams->setInclude($params);
+        }
         // Filters
         if (array_key_exists('filter', $params)) {
             $filters = $params['filter'];

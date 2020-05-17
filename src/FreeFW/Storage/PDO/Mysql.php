@@ -1,12 +1,20 @@
 <?php
 namespace FreeFW\Storage\PDO;
 
+use \freeFW\Constants as FFCST;
+
 /**
  * ...
  * @author jeromeklam
  */
 class Mysql extends \PDO implements \FreeFW\Interfaces\StorageProviderInterface
 {
+
+    /**
+     * comportements
+     */
+    use \Psr\Log\LoggerAwareTrait;
+    use \FreeFW\Behaviour\EventManagerAwareTrait;
 
     /**
      * Transaction
@@ -43,6 +51,7 @@ class Mysql extends \PDO implements \FreeFW\Interfaces\StorageProviderInterface
         if (!$this->transaction) {
             if ($this->levels <= 0) {
                 $this->transaction = $this->beginTransaction();
+                $this->forwardRawEvent(FFCST::EVENT_STORAGE_BEGIN);
             }
             if ($this->transaction) {
                 $this->levels = 1;
@@ -67,6 +76,9 @@ class Mysql extends \PDO implements \FreeFW\Interfaces\StorageProviderInterface
                 if (self::inTransaction()) {
                     // No data modified or error... not normal...
                     $this->rollBack();
+                    $this->forwardRawEvent(FFCST::EVENT_STORAGE_ROLLBACK);
+                } else {
+                    $this->forwardRawEvent(FFCST::EVENT_STORAGE_COMMIT);
                 }
                 $this->transaction = false;
             }
@@ -85,6 +97,7 @@ class Mysql extends \PDO implements \FreeFW\Interfaces\StorageProviderInterface
             $this->levels = $this->levels - 1;
             if ($this->levels <= 0) {
                 $this->rollBack();
+                $this->forwardRawEvent(FFCST::EVENT_STORAGE_ROLLBACK);
                 $this->transaction = false;
             }
         }

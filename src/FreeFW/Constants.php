@@ -51,6 +51,9 @@ class Constants
     const EVENT_STORAGE_CREATE     = 'storage_create';
     const EVENT_STORAGE_UPDATE     = 'storage_update';
     const EVENT_STORAGE_DELETE     = 'storage_delete';
+    const EVENT_STORAGE_BEGIN      = 'begin_transaction';
+    const EVENT_STORAGE_COMMIT     = 'commit_transaction';
+    const EVENT_STORAGE_ROLLBACK   = 'rollback_transaction';
 
     /**
      * Types d'objets

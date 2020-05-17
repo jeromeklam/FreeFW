@@ -46,7 +46,9 @@ $routes_email = [
         FFCSTRT::ROUTE_FUNCTION   => 'getAll',
         FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,
         FFCSTRT::ROUTE_MIDDLEWARE => [],
-        FFCSTRT::ROUTE_INCLUDE    => [],
+        FFCSTRT::ROUTE_INCLUDE    => [
+            FFCSTRT::ROUTE_INCLUDE_DEFAULT => ['lang']
+        ],
         FFCSTRT::ROUTE_SCOPE      => [],
         FFCSTRT::ROUTE_RESULTS    => [
             '200' => [
@@ -66,7 +68,9 @@ $routes_email = [
         FFCSTRT::ROUTE_FUNCTION   => 'getOne',
         FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,
         FFCSTRT::ROUTE_MIDDLEWARE => [],
-        FFCSTRT::ROUTE_INCLUDE    => [],
+        FFCSTRT::ROUTE_INCLUDE    => [
+            FFCSTRT::ROUTE_INCLUDE_DEFAULT => ['lang']
+        ],
         FFCSTRT::ROUTE_SCOPE      => [],
         FFCSTRT::ROUTE_PARAMETERS => [
             'email_id' => [
@@ -94,7 +98,9 @@ $routes_email = [
         FFCSTRT::ROUTE_FUNCTION   => 'createOne',
         FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,
         FFCSTRT::ROUTE_MIDDLEWARE => [],
-        FFCSTRT::ROUTE_INCLUDE    => [],
+        FFCSTRT::ROUTE_INCLUDE    => [
+            FFCSTRT::ROUTE_INCLUDE_DEFAULT => ['lang']
+        ],
         FFCSTRT::ROUTE_SCOPE      => [],
         FFCSTRT::ROUTE_RESULTS    => [
             '201' => [
@@ -114,7 +120,9 @@ $routes_email = [
         FFCSTRT::ROUTE_FUNCTION   => 'updateOne',
         FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,
         FFCSTRT::ROUTE_MIDDLEWARE => [],
-        FFCSTRT::ROUTE_INCLUDE    => [],
+        FFCSTRT::ROUTE_INCLUDE    => [
+            FFCSTRT::ROUTE_INCLUDE_DEFAULT => ['lang']
+        ],
         FFCSTRT::ROUTE_SCOPE      => [],
         FFCSTRT::ROUTE_PARAMETERS => [
             'email_id' => [

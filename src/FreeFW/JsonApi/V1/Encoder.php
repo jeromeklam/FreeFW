@@ -91,6 +91,7 @@ class Encoder
             }
             $resource->setRelationShips($relationShips);
         }
+        /*
         foreach ($incTab as $include) {
             $parts = explode('.', $include);
             while (count($parts)>0) {
@@ -100,7 +101,7 @@ class Encoder
                     $result = $p_api_response->$getter();
                 }
             }
-        }
+        }*/
         return $resource;
     }
 

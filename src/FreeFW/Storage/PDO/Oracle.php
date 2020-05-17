@@ -1,12 +1,20 @@
 <?php
 namespace FreeFW\Storage\PDO;
 
+use \FreeFW\COnstants as FFCST;
+
 /**
  * ...
  * @author jeromeklam
  */
 class Oracle extends \PDO implements \FreeFW\Interfaces\StorageProviderInterface
 {
+
+    /**
+     * comportements
+     */
+    use \Psr\Log\LoggerAwareTrait;
+    use \FreeFW\Behaviour\EventManagerAwareTrait;
 
     /**
      * Transaction
@@ -45,6 +53,7 @@ class Oracle extends \PDO implements \FreeFW\Interfaces\StorageProviderInterface
         if (!$this->transaction) {
             if ($this->levels <= 0) {
                 $this->transaction = $this->beginTransaction();
+                $this->forwardRawEvent(FFCST::EVENT_STORAGE_BEGIN);
             }
             if ($this->transaction) {
                 $this->levels = 1;
@@ -66,6 +75,7 @@ class Oracle extends \PDO implements \FreeFW\Interfaces\StorageProviderInterface
             $this->levels = $this->levels - 1;
             if ($this->levels <= 0) {
                 $this->commit();
+                $this->forwardRawEvent(FFCST::EVENT_STORAGE_COMMIT);
                 $this->transaction = false;
             }
         }
@@ -83,6 +93,7 @@ class Oracle extends \PDO implements \FreeFW\Interfaces\StorageProviderInterface
             $this->levels = $this->levels - 1;
             if ($this->levels <= 0) {
                 $this->rollBack();
+                $this->forwardRawEvent(FFCST::EVENT_STORAGE_ROLLBACK);
                 $this->transaction = false;
             }
         }

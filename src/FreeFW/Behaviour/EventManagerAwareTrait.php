@@ -65,7 +65,7 @@ trait EventManagerAwareTrait
         $evtManager->notify($p_name, (array)$p_data);
         return $this;
     }
-    
+
     /**
      * Lance un événement
      *
