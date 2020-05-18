@@ -164,7 +164,8 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     if (!$p_model->afterCreate()) {
                         if ($p_with_transaction) {
                             $this->provider->rollbackTransaction();
-                        }$this->forwardRawEvent(FFCST::EVENT_STORAGE_CREATE, $p_model);
+                        }
+                        $this->forwardRawEvent(FFCST::EVENT_STORAGE_CREATE, $p_model);
                         return false;
                     }
                 }

@@ -16,10 +16,16 @@ class IncludedObject implements \Countable
     protected $resources = [];
 
     /**
+     * Incomings
+     * @var array
+     */
+    protected $incoming = [];
+
+    /**
      * Add resource
-     * 
+     *
      * @param \FreeFW\JsonApi\V1\Model\ResourceObject $p_resource
-     * 
+     *
      * @return \FreeFW\JsonApi\V1\Model\IncludedObject
      */
     public function addIncluded(\FreeFW\JsonApi\V1\Model\ResourceObject $p_resource)
@@ -30,8 +36,22 @@ class IncludedObject implements \Countable
     }
 
     /**
+     * Add resource
+     *
+     * @param \FreeFW\JsonApi\V1\Model\ResourceObject $p_resource
+     *
+     * @return \FreeFW\JsonApi\V1\Model\IncludedObject
+     */
+    public function addIncoming(\FreeFW\JsonApi\V1\Model\ResourceObject $p_resource)
+    {
+        $key = $p_resource->getType() . '.' . $p_resource->getId();
+        $this->incoming[$key] = $p_resource;
+        return $this;
+    }
+
+    /**
      * Get included resources
-     * 
+     *
      * @return array
      */
     public function getIncluded()
@@ -40,7 +60,22 @@ class IncludedObject implements \Countable
     }
 
     /**
-     * 
+     *
+     * @param \FreeFW\JsonApi\V1\Model\ResourceObject $p_resource
+     *
+     * @return boolean
+     */
+    public function incomingExists($p_resource)
+    {
+        $key = $p_resource->getType() . '.' . $p_resource->getId();
+        if (array_key_exists($key, $this->incoming)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     *
      * {@inheritDoc}
      * @see \Countable::count()
      */

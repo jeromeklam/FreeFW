@@ -132,4 +132,56 @@ class Application extends \FreeFW\Core\Application
         }
         $this->logger->debug('Application.handle.end');
     }
+
+    public function listen($p_object, $myQueue, $myQueueCfg) {
+        // Only Core Models
+        if ($p_object instanceof \FreeFW\Core\Model) {
+            // Only if requested
+            $class = get_class($p_object);
+            $archive = false;
+            if (strpos($class, 'FreeAsso') !== false) {
+                $archive = true;
+            }
+            if ($archive) {
+                try {
+                    $history = \FreeFW\DI\DI::get('FreeFW::Model::History');
+                    $history
+                        ->setHistObjectName($p_object->getApiType())
+                        ->setHistObjectId($p_object->getApiId())
+                        ->setHistTs(\FreeFW\Tools\Date::getCurrentTimestamp())
+                        ->setHistObject($p_object->toHistory())
+                    ;
+                    $history->create();
+                } catch (\Exception $ex) {
+                    // @todo
+                    var_dump($ex);
+                }
+            }
+            try {
+                if ($p_object->forwardStorageEvent()) {
+                    // First to RabbitMQ
+                    $properties = [
+                        'content_type' => 'application/json',
+                        'delivery_mode' => \PhpAmqpLib\Message\AMQPMessage::DELIVERY_MODE_PERSISTENT
+                    ];
+                    $channel = $myQueue->channel();
+                    // Exchange as fanout, only to connected consumers
+                    $channel->exchange_declare($myQueueCfg['name'], 'fanout', false, false, false);
+                    $msg = new \PhpAmqpLib\Message\AMQPMessage(
+                        serialize($p_object),
+                        $properties
+                    );
+                    $channel->basic_publish($msg, $myQueueCfg['name']);
+                    $channel->close();
+                    // And then send Event to webSocket...
+                    $context = new \ZMQContext();
+                    $socket = $context->getSocket(\ZMQ::SOCKET_PUSH, 'my event');
+                    $socket->connect("tcp://localhost:5555");
+                    $socket->send(serialize($p_object));
+                }
+            } catch (\Exception $ex) {
+                // @todo...
+            }
+        }
+    }
 }

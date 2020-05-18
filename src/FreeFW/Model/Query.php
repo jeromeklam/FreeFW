@@ -31,7 +31,7 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
      * Storage strategy
      * @var \FreeFW\Interfaces\StorageInterface
      */
-    protected $stategy = null;
+    protected $strategy = null;
 
     /**
      * Type
@@ -106,9 +106,9 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
 
     /**
      * Set operator
-     * 
+     *
      * @param string $p_operator
-     * 
+     *
      * @return \FreeFW\Model\Query
      */
     public function setOperator($p_operator)
@@ -285,9 +285,9 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
 
     /**
      * Add relations
-     * 
+     *
      * @param array $p_relations
-     * 
+     *
      * @return \FreeFW\Model\Query
      */
     public function addRelations($p_relations)
@@ -399,9 +399,9 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
 
     /**
      * Set sort fields
-     * 
+     *
      * @param array $p_sort
-     * 
+     *
      * @return \FreeFW\Model\Query
      */
     public function setSort($p_sort)

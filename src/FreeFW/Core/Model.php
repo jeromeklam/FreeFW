@@ -452,6 +452,22 @@ abstract class Model implements
         unset($serializable['strategy']);
         unset($serializable['logger']);
         unset($serializable['config']);
+        unset($serializable['app_config']);
+        return serialize($serializable);
+    }
+
+    /**
+     *
+     * {@inheritDoc}
+     * @see \Serializable::serialize()
+     */
+    public function toHistory()
+    {
+        $serializable = get_object_vars($this);
+        unset($serializable['strategy']);
+        unset($serializable['logger']);
+        unset($serializable['config']);
+        unset($serializable['app_config']);
         return serialize($serializable);
     }
 
@@ -550,7 +566,7 @@ abstract class Model implements
                                             $this->$setter($langModel->getLangId());
                                             foreach ($oneProperty[FFCST::PROPERTY_FK] as $relName => $rel) {
                                                 $setter4 = 'set' . \FreeFW\Tools\PBXString::toCamelCase($relName, true);
-                                                $this->$setter4($group);
+                                                $this->$setter4($langModel);
                                                 break;
                                             }
                                         }
@@ -565,7 +581,7 @@ abstract class Model implements
                                                 $this->$setter($cntyModel->getCntyId());
                                                 foreach ($oneProperty[FFCST::PROPERTY_FK] as $relName => $rel) {
                                                     $setter5 = 'set' . \FreeFW\Tools\PBXString::toCamelCase($relName, true);
-                                                    $this->$setter5($group);
+                                                    $this->$setter5($cntyModel);
                                                     break;
                                                 }
                                             }

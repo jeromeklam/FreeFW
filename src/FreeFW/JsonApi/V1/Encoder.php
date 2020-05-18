@@ -37,7 +37,9 @@ class Encoder
             $resource->setAttributes($attributes);
         }
         $relations = $p_api_response->getApiRelationShips();
-        if ($relations) {
+        $continue  = !$p_included->incomingExists($resource);
+        if ($relations && $continue) {
+            $p_included->addIncoming($resource);
             $relationShips = new \FreeFW\JsonApi\V1\Model\RelationshipsObject();
             foreach ($relations as $relation) {
                 $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relation->getName(), true);

@@ -17,14 +17,14 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
      * Storage strategy
      * @var \FreeFW\Interfaces\StorageInterface
      */
-    protected $stategy = null;
+    protected $strategy = null;
 
     /**
      * Main broker id
      * @var number
      */
     protected $main_broker = null;
-    
+
     /**
      * Constructor
      *
@@ -37,9 +37,9 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
 
     /**
      * Set main broker
-     * 
+     *
      * @param number $p_id
-     * 
+     *
      * @return \FreeFW\Core\StorageModel
      */
     public function setMainBroker($p_id)
@@ -47,17 +47,17 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
         $this->main_broker = $p_id;
         return $this;
     }
-    
+
     /**
      * Get main broker
-     * 
+     *
      * @return number
      */
     public function getMainBroker()
     {
         return $this->main_broker;
     }
-    
+
     /**
      *
      * {@inheritDoc}
@@ -330,7 +330,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
     }
 
     /**
-     * 
+     *
      * @return array
      */
     public function __toArray()
@@ -366,7 +366,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
 
     /**
      * Return pk field getter function
-     * 
+     *
      * @return string
      */
     public function getPkGetter() : string
