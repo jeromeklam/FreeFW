@@ -100,7 +100,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\StorageStrategyInterface::findFirst()
      */
-    public static function findFirst(array $p_filters = [])
+    public static function findFirst(array $p_filters = [], $p_force = false)
     {
         $cls   = get_called_class();
         $cls   = rtrim(ltrim($cls, '\\'), '\\');

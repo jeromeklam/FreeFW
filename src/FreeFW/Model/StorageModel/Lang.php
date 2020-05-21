@@ -8,7 +8,7 @@ use \FreeFW\Constants as FFCST;
  *
  * @author jeromeklam
  */
-abstract class Lang extends \FreeFW\Core\StorageModel
+abstract class Lang extends \FreeFW\Core\StorageCacheModel
 {
 
     /**

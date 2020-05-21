@@ -42,12 +42,12 @@ class Encoder
             $p_included->addIncoming($resource);
             $relationShips = new \FreeFW\JsonApi\V1\Model\RelationshipsObject();
             foreach ($relations as $relation) {
-                $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relation->getName(), true);
-                if (method_exists($p_api_response, $getter)) {
-                    $model  = $p_api_response->$getter();
-                    if ($model && $model instanceof \FreeFW\Interfaces\ApiResponseInterface) {
-                        if ($model->isSingleElement()) {
-                            if (strpos($includes, '@@' . $relation->getName() . '@@') !== false) {
+                if (strpos($includes, '@@' . $relation->getName() . '@@') !== false) {
+                    $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relation->getName(), true);
+                    if (method_exists($p_api_response, $getter)) {
+                        $model  = $p_api_response->$getter();
+                        if ($model && $model instanceof \FreeFW\Interfaces\ApiResponseInterface) {
+                            if ($model->isSingleElement()) {
                                 unset($incTab[$relation->getName()]);
                                 $resourceRel = new \FreeFW\JsonApi\V1\Model\ResourceObject(
                                     $model->getApiType(),
@@ -57,9 +57,7 @@ class Encoder
                                 $relationShips->addRelation($relation->getName(), $resourceRel);
                                 $included = $this->encodeSingleResource($model, $p_included, $p_api_params);
                                 $p_included->addIncluded($included);
-                            }
-                        } else {
-                            if (strpos($includes, '@@' . $relation->getName() . '@@') !== false) {
+                            } else {
                                 unset($incTab[$relation->getName()]);
                                 foreach ($model as $oneModel) {
                                     $resourceRel = new \FreeFW\JsonApi\V1\Model\ResourceObject(
@@ -72,18 +70,18 @@ class Encoder
                                     $p_included->addIncluded($included);
                                 }
                             }
-                        }
-                    } else {
-                        if ($relation->getPropertyName() != '' && $relation->getModel() != '') {
-                            $relModel = \FreeFW\DI\DI::get($relation->getModel());
-                            $getter   = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relation->getPropertyName(), true);
-                            if (method_exists($p_api_response, $getter)) {
-                                $resourceRel = new \FreeFW\JsonApi\V1\Model\ResourceObject(
-                                    $relModel->getApiType(),
-                                    $p_api_response->$getter(),
-                                    $relModel->isSingleElement()
-                                );
-                                $relationShips->addRelation($relation->getName(), $resourceRel);
+                        } else {
+                            if ($relation->getPropertyName() != '' && $relation->getModel() != '') {
+                                $relModel = \FreeFW\DI\DI::get($relation->getModel());
+                                $getter   = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relation->getPropertyName(), true);
+                                if (method_exists($p_api_response, $getter)) {
+                                    $resourceRel = new \FreeFW\JsonApi\V1\Model\ResourceObject(
+                                        $relModel->getApiType(),
+                                        $p_api_response->$getter(),
+                                        $relModel->isSingleElement()
+                                    );
+                                    $relationShips->addRelation($relation->getName(), $resourceRel);
+                                }
                             }
                         }
                     }

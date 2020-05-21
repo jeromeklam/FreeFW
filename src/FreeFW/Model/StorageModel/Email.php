@@ -25,7 +25,7 @@ abstract class Email extends \FreeFW\Core\StorageModel
     protected static $PRP_BRK_ID = [
         FFCST::PROPERTY_PRIVATE => 'brk_id',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
-        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED, FFCST::OPTION_BROKER],
+        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_BROKER],
         FFCST::PROPERTY_COMMENT => 'Identifiant du broker, pour restriction',
         FFCST::PROPERTY_SAMPLE  => 123,
     ];
@@ -35,6 +35,7 @@ abstract class Email extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED, FFCST::OPTION_FK],
         FFCST::PROPERTY_COMMENT => 'Identifiant de la langue',
         FFCST::PROPERTY_SAMPLE  => 123,
+        FFCST::PROPERTY_DEFAULT => FFCST::DEFAULT_LANG,
         FFCST::PROPERTY_FK      => ['lang' =>
             [
                 FFCST::FOREIGN_MODEL => 'FreeFW::Model::Lang',

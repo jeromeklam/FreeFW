@@ -968,12 +968,12 @@ class PDOStorage extends \FreeFW\Storage\Storage
             if ($oneCondition instanceof \FreeFW\Model\SimpleCondition) {
                 $parts = $this->renderCondition($oneCondition, $p_model, $p_aliases, $p_crtAlias);
                 if ($result['sql'] == '') {
-                    $result['sql']    = $parts['sql'];
+                    $result['sql'] = $parts['sql'];
                     if (array_key_exists('values', $parts) && is_array($parts['values'])) {
                         $result['values'] = $parts['values'];
                     }
                 } else {
-                    $result['sql']    = $result['sql'] . $oper . $parts['sql'];
+                    $result['sql'] = $result['sql'] . $oper . $parts['sql'];
                     if (array_key_exists('values', $parts) && is_array($parts['values'])) {
                         $result['values'] = array_merge($result['values'], $parts['values']);
                     }
@@ -1049,6 +1049,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $addR     = '';
         $realOper = '=';
         $nullable = false;
+        $notnull  = false;
         switch ($oper) {
             case \FreeFW\Storage\Storage::COND_LOWER:
                 $realOper = '<';
@@ -1092,10 +1093,12 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $realOper = ' NOT IN ';
                 break;
             case \FreeFW\Storage\Storage::COND_EMPTY:
-                $realOper = ' IS NULL';
+                $realOper = '=';
+                $nullable = true;
                 break;
             case \FreeFW\Storage\Storage::COND_NOT_EMPTY:
-                $realOper = ' IS NOT NULL';
+                $realOper = '!=';
+                $notnull  = true;
                 break;
         }
         if ($left !== null ) {
@@ -1116,7 +1119,13 @@ class PDOStorage extends \FreeFW\Storage\Storage
                         $leftDatas['id'] . $realOper . $rightId . ' OR ' .
                         $leftDatas['id'] . ' IS NULL)';
                 } else {
-                    $result['sql'] = $leftDatas['id'] . ' ' . $realOper . ' ' . $rightId;
+                    if ($notnull) {
+                        $result['sql'] = '(' .
+                            $leftDatas['id'] . $realOper . $rightId . ' AND ' .
+                            $leftDatas['id'] . ' IS NOT NULL)';
+                    } else {
+                        $result['sql'] = $leftDatas['id'] . ' ' . $realOper . ' ' . $rightId;
+                    }
                 }
                 if ($leftDatas['type'] === false) {
                     $result['values'][$leftDatas['id']] = $leftDatas['value'];
@@ -1139,7 +1148,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 if ($leftDatas['type'] === false) {
                     $result['values'][$leftDatas['id']] = $leftDatas['value'];
                 } else {
-                    $result['type'] = $leftDatas['type'];
+                    if ($leftDatas['type'] !== 'STRING') {
+                        $result['type'] = $leftDatas['type'];
+                    }
                 }
             }
         } else {

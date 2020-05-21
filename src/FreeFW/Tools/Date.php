@@ -17,9 +17,9 @@ class Date
 
     /**
      * String to mysql datetime
-     * 
+     *
      * @param string $p_str
-     * 
+     *
      * @return string
      */
     public static function stringToMysql($p_str)
@@ -29,9 +29,9 @@ class Date
 
     /**
      * datetime to ISO8601
-     * 
+     *
      * @param string $p_date
-     * 
+     *
      * @return string
      */
     public static function stringToISO8601($p_date)
