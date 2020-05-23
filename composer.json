@@ -18,7 +18,6 @@
     "minimum-stability": "dev",
     "require" : {
         "php"                                  : ">=7.0",
-        "robmorgan/phinx"                      : "*",
         "phing/phing"                          : "*",
         "phpmailer/phpmailer"                  : "*",
         "giggsey/libphonenumber-for-php"       : "*",

@@ -16,10 +16,28 @@ abstract class History extends \FreeFW\Model\StorageModel\History
     protected $hist_id = null;
 
     /**
+     * brk_id
+     * @var int
+     */
+    protected $brk_id = null;
+
+    /**
+     * user_id
+     * @var int
+     */
+    protected $user_id = null;
+
+    /**
      * hist_ts
      * @var mixed
      */
     protected $hist_ts = null;
+
+    /**
+     * hist_method
+     * @var string
+     */
+    protected $hist_method = null;
 
     /**
      * hist_object_name
@@ -28,7 +46,7 @@ abstract class History extends \FreeFW\Model\StorageModel\History
     protected $hist_object_name = null;
 
     /**
-     * hist_object_Id
+     * hist_object_id
      * @var int
      */
     protected $hist_object_id = null;
@@ -63,6 +81,52 @@ abstract class History extends \FreeFW\Model\StorageModel\History
     }
 
     /**
+     * Set brk_id
+     *
+     * @param int $p_value
+     *
+     * @return \FreeFW\Model\History
+     */
+    public function setBrkId($p_value)
+    {
+        $this->brk_id = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get brk_id
+     *
+     * @return int
+     */
+    public function getBrkId()
+    {
+        return $this->brk_id;
+    }
+
+    /**
+     * Set user_id
+     *
+     * @param int $p_value
+     *
+     * @return \FreeFW\Model\History
+     */
+    public function setUserId($p_value)
+    {
+        $this->user_id = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get user_id
+     *
+     * @return int
+     */
+    public function getUserId()
+    {
+        return $this->user_id;
+    }
+
+    /**
      * Set hist_ts
      *
      * @param mixed $p_value
@@ -83,6 +147,29 @@ abstract class History extends \FreeFW\Model\StorageModel\History
     public function getHistTs()
     {
         return $this->hist_ts;
+    }
+
+    /**
+     * Set hist_method
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\History
+     */
+    public function setHistMethod($p_value)
+    {
+        $this->hist_method = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get hist_method
+     *
+     * @return string
+     */
+    public function getHistMethod()
+    {
+        return $this->hist_method;
     }
 
     /**
@@ -109,7 +196,7 @@ abstract class History extends \FreeFW\Model\StorageModel\History
     }
 
     /**
-     * Set hist_object_Id
+     * Set hist_object_id
      *
      * @param int $p_value
      *
@@ -122,7 +209,7 @@ abstract class History extends \FreeFW\Model\StorageModel\History
     }
 
     /**
-     * Get hist_object_Id
+     * Get hist_object_id
      *
      * @return int
      */

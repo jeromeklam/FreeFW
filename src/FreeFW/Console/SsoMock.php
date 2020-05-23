@@ -10,7 +10,7 @@ class SsoMock implements
     \FreeFW\Interfaces\SSOInterface,
     \Psr\Log\LoggerAwareInterface
 {
-    
+
     /**
      * comportements
      */
@@ -29,7 +29,7 @@ class SsoMock implements
     protected $user = null;
 
     /**
-     * 
+     *
      * @param string $p_broker_id
      */
     public function __construct($p_broker_id)
@@ -46,9 +46,9 @@ class SsoMock implements
     {
         return $this->broker_id;
     }
-    
+
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\SSOInterface::registerNewUser()
      */
@@ -56,7 +56,7 @@ class SsoMock implements
     {}
 
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\SSOInterface::logout()
      */
@@ -64,7 +64,7 @@ class SsoMock implements
     {}
 
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\SSOInterface::getUserById()
      */
@@ -73,9 +73,9 @@ class SsoMock implements
 
     /**
      * Set user
-     * 
+     *
      * @param \FreeFW\Interfaces\UserInterface $p_user
-     * 
+     *
      * @return \FreeFW\Console\SsoMock
      */
     public function setUser($p_user)
@@ -85,7 +85,7 @@ class SsoMock implements
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\SSOInterface::getUser()
      */
@@ -95,7 +95,7 @@ class SsoMock implements
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\SSOInterface::getUserByLogin()
      */
@@ -103,10 +103,15 @@ class SsoMock implements
     {}
 
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\SSOInterface::signinByLoginAndPassword()
      */
     public function signinByLoginAndPassword($p_login, $p_password, $p_remember = false)
     {}
+
+    public function getBrokerGroup()
+    {
+
+    }
 }

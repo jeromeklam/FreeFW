@@ -38,6 +38,12 @@ abstract class Storage implements
     const COND_BETWEEN               = 'between';
     const COND_BEGIN_WITH            = 'containsb';
     const COND_END_WITH              = 'containse';
+    const COND_GLOBAL_MAX            = 'gmax';
+
+    /**
+     * Operators
+     * @var string
+     */
     const COND_AND                   = 'and';
     const COND_OR                    = 'or';
 
@@ -71,13 +77,15 @@ abstract class Storage implements
             self::COND_GREATER_OR_NULL,
             self::COND_IN,
             self::COND_LIKE,
+            self::COND_NOT_LIKE,
             self::COND_LOWER,
             self::COND_LOWER_EQUAL,
             self::COND_LOWER_EQUAL_OR_NULL,
             self::COND_LOWER_OR_NULL,
             self::COND_NOT_EMPTY,
             self::COND_NOT_EQUAL,
-            self::COND_NOT_EQUAL_OR_NULL
+            self::COND_NOT_EQUAL_OR_NULL,
+            self::COND_GLOBAL_MAX,
         ];
     }
 }

@@ -10,6 +10,12 @@ class JobqueueHisto extends \FreeFW\Model\Base\JobqueueHisto
 {
 
     /**
+     * Prevent from saving history
+     * @var bool
+     */
+    protected $no_history = true;
+
+    /**
      * Jobqueue
      * @var \FreeFW\Model\Jobqueue
      */

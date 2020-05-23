@@ -274,7 +274,11 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
             }
             if (is_array($condition)) {
                 foreach ($condition as $oper => $value) {
-                    $this->addSimpleCondition($oper, $field, $value);
+                    if ($oper === 0) {
+                        $this->addSimpleCondition($value, $field, null);
+                    } else {
+                        $this->addSimpleCondition($oper, $field, $value);
+                    }
                 }
             } else {
                 $this->addSimpleCondition(\FreeFW\Storage\Storage::COND_EQUAL, $field, $condition);

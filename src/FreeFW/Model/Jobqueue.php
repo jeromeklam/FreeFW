@@ -29,6 +29,12 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
     const STATUS_RETRY    = 'RETRY';
 
     /**
+     * Prevent from saving history
+     * @var bool
+     */
+    protected $no_history = true;
+
+    /**
      * User
      * @var \FreeSSO\Model\User
      */

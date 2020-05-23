@@ -139,6 +139,8 @@ class Constants
     const OPTION_LOCAL            = 'LOCAL';
     const OPTION_UNIQ             = 'UNIQ';
     const OPTION_BROKER           = 'BROKER';
+    const OPTION_USER             = 'USER';
+    const OPTION_GROUP            = 'GROUP';
     const OPTION_NESTED_PARENT_ID = 'NPARENT';
     const OPTION_NESTED_POSITION  = 'NPOSITION';
     const OPTION_NESTED_LEFT      = 'NLEFT';

@@ -1,12 +1,14 @@
 <?php
 namespace FreeFW\Model;
 
+use \FreeFW\Constants as FFCST;
+
 /**
- * Model History
+ * Model Rate
  *
  * @author jeromeklam
  */
-class History extends \FreeFW\Model\Base\History
+class Rate extends \FreeFW\Model\Base\Rate
 {
 
     /**

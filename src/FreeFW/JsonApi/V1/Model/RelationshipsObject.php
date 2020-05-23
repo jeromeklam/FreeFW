@@ -14,7 +14,7 @@ class RelationshipsObject implements \Countable, \JsonSerializable
      * @var array | null
      */
     protected $relationships = [];
-    
+
     /**
      * Constructor
      *
@@ -33,10 +33,12 @@ class RelationshipsObject implements \Countable, \JsonSerializable
                         $relation = new \FreeFW\JsonApi\V1\Model\RelationshipObject($key);
                         $relation->setType(\FreeFW\JsonApi\V1\Model\RelationshipObject::ONE_TO_MANY);
                         foreach ($data as $oneRel) {
-                            $cls   = $oneRel->type;
-                            $class = str_replace('_', '::Model::', $cls);
-                            $relation->setModel($class);
-                            $relation->addValue($oneRel->id);
+                            if (isset($oneRel->type) && isset($oneRel->id)) {
+                                $cls   = $oneRel->type;
+                                $class = str_replace('_', '::Model::', $cls);
+                                $relation->setModel($class);
+                                $relation->addValue($oneRel->id);
+                            }
                         }
                         $this->addRelation($key, $relation);
                         //var_export($key);
@@ -59,9 +61,9 @@ class RelationshipsObject implements \Countable, \JsonSerializable
 
     /**
      * Add a relation
-     * 
+     *
      * @param \FreeFW\JsonApi\V1\Model\RelationshipObject $p_relation
-     * 
+     *
      * @return \FreeFW\JsonApi\V1\Model\RelationshipsObject
      */
     public function addRelation($p_name, $p_relation, $p_array = false)
@@ -81,14 +83,14 @@ class RelationshipsObject implements \Countable, \JsonSerializable
         }
         return $this;
     }
-    
+
     public function getRelations()
     {
         return $this->relationships;
     }
-    
+
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see \Countable::count()
      */
@@ -98,7 +100,7 @@ class RelationshipsObject implements \Countable, \JsonSerializable
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see \JsonSerializable::jsonSerialize()
      */
@@ -129,7 +131,7 @@ class RelationshipsObject implements \Countable, \JsonSerializable
 
     /**
      * Convert to array
-     * 
+     *
      * @return array
      */
     public function __toArray()

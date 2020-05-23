@@ -22,6 +22,12 @@ class Notification extends \FreeFW\Model\Base\Notification
     const TYPE_OTHER       = 'OTHER';
 
     /**
+     * Prevent from saving history
+     * @var bool
+     */
+    protected $no_history = true;
+
+    /**
      * Read user
      * @var \FreeSSO\Model\User
      */
@@ -43,9 +49,9 @@ class Notification extends \FreeFW\Model\Base\Notification
 
     /**
      * Set user
-     * 
+     *
      * @param \FreeSSO\Model\User $p_user
-     * 
+     *
      * @return \FreeFW\Model\Notification
      */
     public function setUser($p_user)
@@ -56,7 +62,7 @@ class Notification extends \FreeFW\Model\Base\Notification
 
     /**
      * Get user
-     * 
+     *
      * @return \FreeSSO\Model\User
      */
     public function getUser()

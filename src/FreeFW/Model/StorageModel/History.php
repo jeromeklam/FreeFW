@@ -22,11 +22,33 @@ abstract class History extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_COMMENT => '',
         FFCST::PROPERTY_SAMPLE  => 123,
     ];
+    protected static $PRP_BRK_ID = [
+        FFCST::PROPERTY_PRIVATE => 'brk_id',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
+        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_BROKER],
+        FFCST::PROPERTY_COMMENT => '',
+        FFCST::PROPERTY_SAMPLE  => 123,
+    ];
+    protected static $PRP_USER_ID = [
+        FFCST::PROPERTY_PRIVATE => 'user_id',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
+        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_USER],
+        FFCST::PROPERTY_COMMENT => '',
+        FFCST::PROPERTY_SAMPLE  => 123,
+    ];
     protected static $PRP_HIST_TS = [
         FFCST::PROPERTY_PRIVATE => 'hist_ts',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_DATETIMETZ,
         FFCST::PROPERTY_OPTIONS => [],
         FFCST::PROPERTY_COMMENT => '',
+        FFCST::PROPERTY_SAMPLE  => '',
+    ];
+    protected static $PRP_HIST_METHOD = [
+        FFCST::PROPERTY_PRIVATE => 'hist_method',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => '',
+        FFCST::PROPERTY_MAX     => 1,
         FFCST::PROPERTY_SAMPLE  => '',
     ];
     protected static $PRP_HIST_OBJECT_NAME = [
@@ -46,7 +68,7 @@ abstract class History extends \FreeFW\Core\StorageModel
     ];
     protected static $PRP_HIST_OBJECT = [
         FFCST::PROPERTY_PRIVATE => 'hist_object',
-        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BLOB,
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_TEXT,
         FFCST::PROPERTY_OPTIONS => [],
         FFCST::PROPERTY_COMMENT => '',
         FFCST::PROPERTY_SAMPLE  => '',
@@ -61,7 +83,10 @@ abstract class History extends \FreeFW\Core\StorageModel
     {
         return [
             'hist_id'          => self::$PRP_HIST_ID,
+            'brk_id'           => self::$PRP_BRK_ID,
+            'user_id'          => self::$PRP_USER_ID,
             'hist_ts'          => self::$PRP_HIST_TS,
+            'hist_method'      => self::$PRP_HIST_METHOD,
             'hist_object_name' => self::$PRP_HIST_OBJECT_NAME,
             'hist_object_id'   => self::$PRP_HIST_OBJECT_ID,
             'hist_object'      => self::$PRP_HIST_OBJECT
@@ -85,7 +110,7 @@ abstract class History extends \FreeFW\Core\StorageModel
      */
     public static function getSourceComments()
     {
-        return '';
+        return 'Gestion des historiques';
     }
 
     /**
@@ -95,6 +120,6 @@ abstract class History extends \FreeFW\Core\StorageModel
      */
     public static function getAutocompleteField()
     {
-        return '';
+        return ['hist_object_name', 'hist_object_id', 'hist_object'];
     }
 }

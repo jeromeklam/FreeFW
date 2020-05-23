@@ -464,10 +464,11 @@ abstract class Model implements
     public function toHistory()
     {
         $serializable = get_object_vars($this);
-        unset($serializable['strategy']);
-        unset($serializable['logger']);
-        unset($serializable['config']);
-        unset($serializable['app_config']);
+        foreach ($serializable as $key => $value) {
+            if (is_array($value) || is_object($value)) {
+                unset($serializable[$key]);
+            }
+        }
         return serialize($serializable);
     }
 

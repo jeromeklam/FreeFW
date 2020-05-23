@@ -252,6 +252,12 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
                                 $this->$setter(intval($value));
                             }
                             break;
+                        case FFCST::TYPE_DECIMAL:
+                        case FFCST::TYPE_MONETARY:
+                            if ($value !== null) {
+                                $this->$setter(floatval($value));
+                            }
+                            break;
                         case FFCST::TYPE_BOOLEAN:
                             if (intval($value) > 0) {
                                 $this->$setter(true);

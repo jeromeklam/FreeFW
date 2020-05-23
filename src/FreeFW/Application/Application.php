@@ -133,30 +133,17 @@ class Application extends \FreeFW\Core\Application
         $this->logger->debug('Application.handle.end');
     }
 
+    /**
+     *
+     * @param unknown $p_object
+     * @param unknown $myQueue
+     * @param unknown $myQueueCfg
+     */
     public function listen($p_object, $myQueue, $myQueueCfg) {
         // Only Core Models
         if ($p_object instanceof \FreeFW\Core\Model) {
             // Only if requested
             $class = get_class($p_object);
-            $archive = false;
-            if (strpos($class, 'FreeAsso') !== false) {
-                $archive = true;
-            }
-            if ($archive) {
-                try {
-                    $history = \FreeFW\DI\DI::get('FreeFW::Model::History');
-                    $history
-                        ->setHistObjectName($p_object->getApiType())
-                        ->setHistObjectId($p_object->getApiId())
-                        ->setHistTs(\FreeFW\Tools\Date::getCurrentTimestamp())
-                        ->setHistObject($p_object->toHistory())
-                    ;
-                    $history->create();
-                } catch (\Exception $ex) {
-                    // @todo
-                    var_dump($ex);
-                }
-            }
             try {
                 if ($p_object->forwardStorageEvent()) {
                     // First to RabbitMQ

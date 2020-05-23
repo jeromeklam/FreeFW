@@ -76,6 +76,7 @@ class PBXString
         if (trim($p_str) == '') {
             return $p_str;
         }
+        $p_str = strtolower($p_str);
         if ($p_first) {
             $p_str[0] = strtoupper($p_str[0]);
         }
@@ -84,7 +85,8 @@ class PBXString
             function ($matches) use ($p_glue) {
                 return str_replace($p_glue, '', strtoupper($matches[0]));
             },
-            $p_str
+            $p_str,
+            24,
         );
     }
 
@@ -374,9 +376,9 @@ class PBXString
 
     /**
      * Clean strange characters
-     * 
+     *
      * @param string $p_text
-     * 
+     *
      * @return string
      */
     public static function clean($p_text)

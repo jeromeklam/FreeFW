@@ -53,11 +53,14 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $source     = $p_model::getSource();
         $properties = $p_model::getProperties();
         $sso        = \FreeFW\DI\DI::getShared('sso');
-        $setter = false;
+        $setter     = false;
+        $archive    = !property_exists($p_model, 'no_history');
         foreach ($properties as $name => $oneProperty) {
             $add = true;
             $pk  = false;
             $brk = false;
+            $usr = false;
+            $grp = false;
             $dtz = false;
             if (array_key_exists(FFCST::PROPERTY_OPTIONS, $oneProperty)) {
                 if (in_array(FFCST::OPTION_LOCAL, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
@@ -68,6 +71,12 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 }
                 if (in_array(FFCST::OPTION_BROKER, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $brk = true;
+                }
+                if (in_array(FFCST::OPTION_USER, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
+                    $usr = true;
+                }
+                if (in_array(FFCST::OPTION_GROUP, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
+                    $grp = true;
                 }
                 if ($oneProperty[FFCST::PROPERTY_TYPE] == FFCST::TYPE_DATETIMETZ) {
                     $dtz = true;
@@ -80,9 +89,27 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     // setter for id
                     $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
                 } else {
-                    if ($brk) {
-                        $brkField = $oneProperty[FFCST::PROPERTY_PRIVATE];
-                        $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $sso->getBrokerId();
+                    if ($sso && ($brk || $usr || $grp)) {
+                        if ($brk) {
+                            $brkField = $oneProperty[FFCST::PROPERTY_PRIVATE];
+                            $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $sso->getBrokerId();
+                        }
+                        if ($usr) {
+                            $user = $sso->getUser();
+                            if ($user) {
+                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $user->getUserId();
+                            } else {
+                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = O;
+                            }
+                        }
+                        if ($grp) {
+                            $group = $sso->getBrokerGroup();
+                            if ($user) {
+                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $group->getGrpId();
+                            } else {
+                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = O;
+                            }
+                        }
                     } else {
                         // Compute getter
                         $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
@@ -167,6 +194,21 @@ class PDOStorage extends \FreeFW\Storage\Storage
                         }
                         $this->forwardRawEvent(FFCST::EVENT_STORAGE_CREATE, $p_model);
                         return false;
+                    }
+                }
+                if ($archive) {
+                    try {
+                        $history = \FreeFW\DI\DI::get('FreeFW::Model::History');
+                        $history
+                            ->setHistMethod('C')
+                            ->setHistObjectName($p_model->getApiType())
+                            ->setHistObjectId($p_model->getApiId())
+                            ->setHistTs(\FreeFW\Tools\Date::getCurrentTimestamp())
+                            ->setHistObject($p_model->toHistory())
+                        ;
+                        $history->create();
+                    } catch (\Exception $ex) {
+                        // @todo
                     }
                 }
                 try {
@@ -272,6 +314,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $source     = $p_model::getSource();
         $properties = $p_model::getProperties();
         $getter     = '';
+        $archive    = !property_exists($p_model, 'no_history');
         // Get PK and verify generic FK
         foreach ($properties as $name => $oneProperty) {
             if (array_key_exists(FFCST::PROPERTY_OPTIONS, $oneProperty)) {
@@ -367,6 +410,21 @@ class PDOStorage extends \FreeFW\Storage\Storage
                         return false;
                     }
                 }
+                if ($archive) {
+                    try {
+                        $history = \FreeFW\DI\DI::get('FreeFW::Model::History');
+                        $history
+                            ->setHistMethod('D')
+                            ->setHistObjectName($p_model->getApiType())
+                            ->setHistObjectId($p_model->getApiId())
+                            ->setHistTs(\FreeFW\Tools\Date::getCurrentTimestamp())
+                            ->setHistObject($p_model->toHistory())
+                        ;
+                        $history->create();
+                    } catch (\Exception $ex) {
+                        // @todo
+                    }
+                }
                 $code = '';
                 $ok   = true;
                 try {
@@ -414,11 +472,15 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $source     = $p_model::getSource();
         $properties = $p_model::getProperties();
         $sso        = \FreeFW\DI\DI::getShared('sso');
+        $archive    = !property_exists($p_model, 'no_history');
         foreach ($properties as $name => $oneProperty) {
             $add = true;
             $pk  = false;
             $brk = false;
+            $usr = false;
+            $grp = false;
             $dtz = false;
+            $str = false;
             if (array_key_exists(FFCST::PROPERTY_OPTIONS, $oneProperty)) {
                 if (in_array(FFCST::OPTION_LOCAL, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $add = false;
@@ -428,9 +490,21 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 }
                 if (in_array(FFCST::OPTION_BROKER, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $brk = true;
+                    $add = false;
+                }
+                if (in_array(FFCST::OPTION_USER, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
+                    $usr = true;
+                    $add = false;
+                }
+                if (in_array(FFCST::OPTION_GROUP, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
+                    $grp = true;
+                    $add = false;
                 }
                 if ($oneProperty[FFCST::PROPERTY_TYPE] == FFCST::TYPE_DATETIMETZ) {
                     $dtz = true;
+                }
+                if (in_array($oneProperty[FFCST::PROPERTY_TYPE], [FFCST::TYPE_STRING, FFCST::TYPE_TEXT])) {
+                    $str = true;
                 }
             }
             if ($add) {
@@ -442,9 +516,27 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     $pks[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]]    = $p_model->$getter();
                     $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $p_model->$getter();
                 } else {
-                    if ($brk) {
-                        $brkField = $oneProperty[FFCST::PROPERTY_PRIVATE];
-                        $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $sso->getBrokerId();
+                    if ($sso && ($brk || $usr || $grp)) {
+                        if ($brk) {
+                            $brkField = $oneProperty[FFCST::PROPERTY_PRIVATE];
+                            $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $sso->getBrokerId();
+                        }
+                        if ($usr) {
+                            $user = $sso->getUser();
+                            if ($user) {
+                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $user->getUserId();
+                            } else {
+                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = O;
+                            }
+                        }
+                        if ($grp) {
+                            $group = $sso->getBrokerGroup();
+                            if ($group) {
+                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $group->getGrpId();
+                            } else {
+                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = O;
+                            }
+                        }
                     } else {
                         // Get data
                         $val = $p_model->$getter();
@@ -453,6 +545,10 @@ class PDOStorage extends \FreeFW\Storage\Storage
                         }
                         if ($dtz && $val != '') {
                             $val = \FreeFW\Tools\Date::stringToMysql($val);
+                        } else {
+                            if ($str && trim((string)$val) == '') {
+                                $val = null;
+                            }
                         }
                         $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $val;
                     }
@@ -518,6 +614,21 @@ class PDOStorage extends \FreeFW\Storage\Storage
                             $this->provider->rollbackTransaction();
                         }
                         return false;
+                    }
+                }
+                if ($archive) {
+                    try {
+                        $history = \FreeFW\DI\DI::get('FreeFW::Model::History');
+                        $history
+                            ->setHistMethod('U')
+                            ->setHistObjectName($p_model->getApiType())
+                            ->setHistObjectId($p_model->getApiId())
+                            ->setHistTs(\FreeFW\Tools\Date::getCurrentTimestamp())
+                            ->setHistObject($p_model->toHistory())
+                        ;
+                        $history->create();
+                    } catch (\Exception $ex) {
+                        // @todo
                     }
                 }
                 $code = '';
@@ -1050,6 +1161,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $realOper = '=';
         $nullable = false;
         $notnull  = false;
+        $sql      = false;
         switch ($oper) {
             case \FreeFW\Storage\Storage::COND_LOWER:
                 $realOper = '<';
@@ -1069,6 +1181,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 break;
             case \FreeFW\Storage\Storage::COND_EQUAL:
                 $realOper = '=';
+                if ($right === null) {
+                    $nullable = true;
+                }
                 break;
             case \FreeFW\Storage\Storage::COND_NOT_EQUAL:
                 $realOper = '!=';
@@ -1100,6 +1215,14 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $realOper = '!=';
                 $notnull  = true;
                 break;
+            case \FreeFW\Storage\Storage::COND_GLOBAL_MAX:
+                $realOper = '=';
+                $right    = null;
+                $sql      = 'MAX';
+                break;
+        }
+        if ($realOper == '=' && $nullable && $right === null) {
+            $realOper = ' IS NULL';
         }
         if ($left !== null ) {
             $leftDatas  = $this->renderConditionField($left, $p_model, $p_aliases, $p_crtAlias);
@@ -1145,11 +1268,17 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 }
             } else {
                 $result['sql'] = $leftDatas['id'] . ' ' . $realOper;
-                if ($leftDatas['type'] === false) {
-                    $result['values'][$leftDatas['id']] = $leftDatas['value'];
+                if ($sql !== false) {
+                    if ($sql === 'MAX') {
+                        $result['sql'] .= ' ( SELECT MAX(' . $leftDatas['id'] . ') FROM ' . $p_model->getSource() . ' )';
+                    }
                 } else {
-                    if ($leftDatas['type'] !== 'STRING') {
-                        $result['type'] = $leftDatas['type'];
+                    if ($leftDatas['type'] === false) {
+                        $result['values'][$leftDatas['id']] = $leftDatas['value'];
+                    } else {
+                        if ($leftDatas['type'] !== 'STRING') {
+                            $result['type'] = $leftDatas['type'];
+                        }
                     }
                 }
             }
