@@ -53,6 +53,6 @@ $localRoutes = array_merge(
     $routes_jobqueue,
     $routes_lang,
     $routes_notification,
-    $routes_rate,
+    $routes_rate
 );
 return $localRoutes;

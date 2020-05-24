@@ -76,7 +76,6 @@ class PBXString
         if (trim($p_str) == '') {
             return $p_str;
         }
-        $p_str = strtolower($p_str);
         if ($p_first) {
             $p_str[0] = strtoupper($p_str[0]);
         }
@@ -86,7 +85,7 @@ class PBXString
                 return str_replace($p_glue, '', strtoupper($matches[0]));
             },
             $p_str,
-            24,
+            24
         );
     }
 
