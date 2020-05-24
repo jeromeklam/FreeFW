@@ -651,23 +651,26 @@ abstract class Model implements
                 if (array_key_exists(FFCST::PROPERTY_PUBLIC, $oneProperty)) {
                     $public = $oneProperty[FFCST::PROPERTY_PUBLIC];
                 }
-                if ($value === null || (is_string($value) && $value == '')) {
-                    $this->addError(
-                        FFCST::ERROR_REQUIRED,
-                        sprintf('%s field is required !', $public),
-                        \FreeFW\Core\Error::TYPE_PRECONDITION,
-                        $public
-                    );
-                } else {
-                    if (in_array(FFCST::OPTION_FK, $options)) {
-                        if ($value <= 0) {
-                            $this->addError(
-                                FFCST::ERROR_REQUIRED,
-                                sprintf('%s relation is required !', $public),
-                                \FreeFW\Core\Error::TYPE_PRECONDITION,
-                                $public
-                            );
+                if (in_array(FFCST::OPTION_FK, $options)) {
+                    if ($value <= 0 || $value === null || (is_string($value) && $value == '')) {
+                        foreach ($oneProperty[FFCST::PROPERTY_FK] as $name => $rel) {
+                            $public = $name;
                         }
+                        $this->addError(
+                            FFCST::ERROR_REQUIRED,
+                            sprintf('%s relation is required !', $name),
+                            \FreeFW\Core\Error::TYPE_PRECONDITION,
+                            $public
+                        );
+                    }
+                } else {
+                    if ($value === null || (is_string($value) && $value == '')) {
+                        $this->addError(
+                            FFCST::ERROR_REQUIRED,
+                            sprintf('%s field is required !', $public),
+                            \FreeFW\Core\Error::TYPE_PRECONDITION,
+                            $public
+                        );
                     }
                 }
             }

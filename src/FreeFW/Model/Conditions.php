@@ -41,7 +41,7 @@ class Conditions extends \FreeFW\Core\Model implements
      * Constructor
      */
     public function initFromArray(
-        array $p_conditions, 
+        array $p_conditions,
         string $p_oper = \FreeFW\Storage\Storage::COND_AND,
         string $p_cond = \FreeFW\Storage\Storage::COND_LIKE
     ) {
@@ -64,14 +64,22 @@ class Conditions extends \FreeFW\Core\Model implements
                 if (is_array($value)) {
                     foreach ($value as $idx2 => $value2) {
                         // Verify oper...
-                        //$aCondition->setOperator($idx2);
                         if (is_array($value2)) {
-
+                            // @todo
                         } else {
-                            $aValue = new \FreeFW\Model\ConditionValue();
-                            $aValue->setValue($value2);
-                            $aCondition->setOperator($idx2);
-                            $aCondition->setRightMember($aValue);
+                            if ($value === null || $value === '') {
+                                if (in_array($idx2, [\FreeFW\Storage\Storage::COND_EMPTY, \FreeFW\Storage\Storage::COND_NOT_EMPTY])) {
+                                    $aCondition->setOperator($idx2);
+                                    $aCondition->setRightMember(null);
+                                } else {
+                                    continue;
+                                }
+                            } else {
+                                $aValue = new \FreeFW\Model\ConditionValue();
+                                $aValue->setValue($value2);
+                                $aCondition->setOperator($idx2);
+                                $aCondition->setRightMember($aValue);
+                            }
                         }
                     }
                 } else {
@@ -87,9 +95,9 @@ class Conditions extends \FreeFW\Core\Model implements
 
     /**
      * Set operator
-     * 
+     *
      * @param string $p_oper
-     * 
+     *
      * @return \FreeFW\Model\Conditions
      */
     public function setOperator($p_oper)
