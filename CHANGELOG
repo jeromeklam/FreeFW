@@ -1,3 +1,7 @@
+# 1.2.0 : --/--/2020
+
+* Database migrations light via sql
+
 # 1.1.0 : 24/05/2020
 
 * PBXArray

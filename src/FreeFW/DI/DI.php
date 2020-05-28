@@ -146,4 +146,24 @@ class DI
         }
         return false;
     }
+
+    /**
+     * Get updaters
+     *
+     * @return [\FreeFW\Storage\AbstractUpdater]
+     */
+    public static function getUpdaters()
+    {
+        $updaters = [];
+        /**
+         * @var \FreeFW\DI\DependencyInjector $di
+         */
+        foreach (self::$containers as $name => $di) {
+            $updater = $di->getUpdater($name);
+            if ($updater) {
+                $updaters[] = $updater;
+            }
+        }
+        return $updaters;
+    }
 }

@@ -18,12 +18,20 @@ class FreeFW
     {
         $commands = new \FreeFW\Console\CommandCollection();
         $paths    = [];
-        $paths[]  = __DIR__ . '/../resource/commands/v1/commands.php';
-        foreach ($paths as $idx => $onePath) {
-            $myCommands = @include($onePath);
-            if (is_array($myCommands)) {
-                foreach ($myCommands as $idx => $oneCOmmand) {
-                   
+        $paths[]  = __DIR__ . '/../resource/commands/commands.php';
+        foreach ($paths as $idx => $onePath)
+            if (is_file($onePath)) {{
+                $myCommands = @include($onePath);
+                if (is_array($myCommands)) {
+                    foreach ($myCommands as $idx => $oneCommand) {
+                        $myCommand = new \FreeFW\Console\Command();
+                        $myCommand
+                        ->setName($oneCommand['command'])
+                        ->setController($oneCommand['controller'])
+                        ->setFunction($oneCommand['function'])
+                        ;
+                        $commands->addCommand($myCommand);
+                    }
                 }
             }
         }

@@ -70,7 +70,7 @@ class Input extends \FreeFW\Console\Input\AbstractInput
 
     /**
      * Get instance
-     * 
+     *
      * @return \FreeFW\Console\Input\Input
      */
     public static function getFromGlobals()

@@ -128,6 +128,37 @@ class DependencyInjector extends \FreeFW\Core\DI implements \FreeFW\Interfaces\D
 
     /**
      *
+     * @param string $p_version
+     * @throws \FreeFW\Core\FreeFWException
+     * @return \Psr\Log\LoggerAwareInterface|\FreeFW\Interfaces\ConfigAwareTraitInterface
+     */
+    public function getMigration($p_version)
+    {
+        $class_name = '\\' . $this->base_ns . '\Storage\Migrations\\' .
+            \FreeFW\Tools\PBXString::toCamelCase($p_version, true) . '\Database';
+        if (class_exists($class_name)) {
+            /**
+             *
+             * @var \FreeFW\Interfaces\StorageInterface $strategy
+             */
+            $strategy = \FreeFW\DI\DI::getShared('Storage::' . $this->default_storage);
+            $cls = new $class_name($strategy);
+            if ($cls instanceof \Psr\Log\LoggerAwareInterface) {
+                $cls->setLogger($this->logger);
+            }
+            if ($cls instanceof \FreeFW\Interfaces\ConfigAwareTraitInterface) {
+                $cls->setAppConfig($this->getAppConfig());
+            }
+            if (method_exists($cls, 'init')) {
+                $cls->init();
+            }
+            return $cls;
+        }
+        throw new \FreeFW\Core\FreeFWException(sprintf('Class %s not found !', $class_name));
+    }
+
+    /**
+     *
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\DependencyInjectorInterface::getModel()
      */
@@ -141,8 +172,8 @@ class DependencyInjector extends \FreeFW\Core\DI implements \FreeFW\Interfaces\D
                 $cls->setLogger($this->logger);
             }
             if ($cls instanceof \FreeFW\Interfaces\StorageStrategyInterface) {
-                $storage = \FreeFW\DI\DI::getShared('Storage::' . $this->default_storage);
-                $cls->setStrategy($storage);
+                $strategy = \FreeFW\DI\DI::getShared('Storage::' . $this->default_storage);
+                $cls->setStrategy($strategy);
             }
             if ($cls instanceof \FreeFW\Interfaces\ConfigAwareTraitInterface) {
                 $cls->setAppConfig($this->getAppConfig());
@@ -222,5 +253,29 @@ class DependencyInjector extends \FreeFW\Core\DI implements \FreeFW\Interfaces\D
             return $cls;
         }
         throw new \FreeFW\Core\FreeFWException(sprintf('Class %s not found !', $class_name));
+    }
+
+    /**
+     * Get updater
+     *
+     * @param string $p_name
+     *
+     * @return \FreeFW\Storage\AbstractUpdater
+     */
+    public function getUpdater($p_name)
+    {
+        $updater = null;
+        $class   = '\\' . $p_name . '\\Storage\\Updater';
+        if (class_exists($class)) {
+            $strategy = \FreeFW\DI\DI::getShared('Storage::' . $this->default_storage);
+            /**
+             * @var \FreeFW\Storage\AbstractUpdater $updater
+             */
+            $updater = new $class();
+            $updater->setLogger($this->logger);
+            $updater->setEventManager($this->getEventManager());
+            $updater->setStrategy($strategy);
+        }
+        return $updater;
     }
 }

@@ -29,6 +29,12 @@ class SsoMock implements
     protected $user = null;
 
     /**
+     * Group
+     * @var \FreeSSO\Model\Group
+     */
+    protected $group = null;
+
+    /**
      *
      * @param string $p_broker_id
      */
@@ -110,8 +116,26 @@ class SsoMock implements
     public function signinByLoginAndPassword($p_login, $p_password, $p_remember = false)
     {}
 
+    /**
+     * Set group
+     *
+     * @param \FreeSSO\Model\Group $p_group
+     *
+     * @return \FreeFW\Console\SsoMock
+     */
+    public function setGroup($p_group)
+    {
+        $this->group = $p_group;
+        return $this;
+    }
+
+    /**
+     * Get group
+     *
+     * @return \FreeSSO\Model\Group
+     */
     public function getBrokerGroup()
     {
-
+        return $this->group;
     }
 }

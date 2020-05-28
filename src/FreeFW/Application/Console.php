@@ -55,15 +55,31 @@ class Console extends \FreeFW\Core\Console
             $ssoBrk  = $cfg->get('sso');
             $input   = \FreeFW\Console\Input\Input::getFromGlobals();
             $brkKey  = $input->getAttribute('broker', $ssoBrk['broker']);
-            // User first, mandatory
-            $userId = $input->getAttribute('user', 1);
-            $user   = \FreeSSO\Model\User::findFirst(['user_id' => $userId]);
-            // Broker instance
-            $broker = \FreeSSO\Model\Broker::findFirst(['brk_key' => $brkKey]);
-            $sso    = new \FreeFW\Console\SsoMock($broker->getBrkId());
-            $sso->setUser($user);
-            // Inject in SSO
-            \FreeFW\DI\DI::setShared('sso', $sso);
+            $force   = $input->getAttribute('force', false);
+            try {
+                // User first, mandatory
+                $userId = $input->getAttribute('user', 1);
+                $user   = \FreeSSO\Model\User::findFirst(['user_id' => $userId]);
+                // Broker instance
+                $broker = \FreeSSO\Model\Broker::findFirst(['brk_key' => $brkKey]);
+                if ($broker) {
+                    $sso    = new \FreeFW\Console\SsoMock($broker->getBrkId());
+                    $sso
+                        ->setUser($user)
+                        ->setGroup($broker->getGroup())
+                    ;
+                    // Inject in SSO
+                    \FreeFW\DI\DI::setShared('sso', $sso);
+                } else {
+                    if (!$force) {
+                        throw new \Exception('Broker not found !');
+                    }
+                }
+            } catch (\Exception $ex) {
+                if (!$force) {
+                    throw $ex;
+                }
+            }
             $output  = new \FreeFW\Console\Output\ConsoleOutput();
             $command = $this->router->findCommand($input);
             if ($command) {

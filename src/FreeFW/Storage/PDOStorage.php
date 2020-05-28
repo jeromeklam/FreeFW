@@ -37,7 +37,6 @@ class PDOStorage extends \FreeFW\Storage\Storage
     public function __construct(\FreeFW\Interfaces\StorageProviderInterface $p_provider)
     {
         $this->provider = $p_provider;
-        $this->provider->setEventManager($this->getEventManager());
         self::$uniqid   = rand(100000, 999999);
     }
 
@@ -99,15 +98,15 @@ class PDOStorage extends \FreeFW\Storage\Storage
                             if ($user) {
                                 $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $user->getUserId();
                             } else {
-                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = O;
+                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = null;
                             }
                         }
                         if ($grp) {
                             $group = $sso->getBrokerGroup();
-                            if ($user) {
+                            if ($group) {
                                 $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $group->getGrpId();
                             } else {
-                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = O;
+                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = null;
                             }
                         }
                     } else {
@@ -198,15 +197,17 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 }
                 if ($archive) {
                     try {
-                        $history = \FreeFW\DI\DI::get('FreeFW::Model::History');
-                        $history
-                            ->setHistMethod('C')
-                            ->setHistObjectName($p_model->getApiType())
-                            ->setHistObjectId($p_model->getApiId())
-                            ->setHistTs(\FreeFW\Tools\Date::getCurrentTimestamp())
-                            ->setHistObject($p_model->toHistory())
-                        ;
-                        $history->create();
+                        if (APP_HISTORY) {
+                            $history = \FreeFW\DI\DI::get('FreeFW::Model::History');
+                            $history
+                                ->setHistMethod('C')
+                                ->setHistObjectName($p_model->getApiType())
+                                ->setHistObjectId($p_model->getApiId())
+                                ->setHistTs(\FreeFW\Tools\Date::getCurrentTimestamp())
+                                ->setHistObject($p_model->toHistory())
+                            ;
+                            $history->create();
+                        }
                     } catch (\Exception $ex) {
                         // @todo
                     }
@@ -412,15 +413,17 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 }
                 if ($archive) {
                     try {
-                        $history = \FreeFW\DI\DI::get('FreeFW::Model::History');
-                        $history
-                            ->setHistMethod('D')
-                            ->setHistObjectName($p_model->getApiType())
-                            ->setHistObjectId($p_model->getApiId())
-                            ->setHistTs(\FreeFW\Tools\Date::getCurrentTimestamp())
-                            ->setHistObject($p_model->toHistory())
-                        ;
-                        $history->create();
+                        if (APP_HISTORY) {
+                            $history = \FreeFW\DI\DI::get('FreeFW::Model::History');
+                            $history
+                                ->setHistMethod('D')
+                                ->setHistObjectName($p_model->getApiType())
+                                ->setHistObjectId($p_model->getApiId())
+                                ->setHistTs(\FreeFW\Tools\Date::getCurrentTimestamp())
+                                ->setHistObject($p_model->toHistory())
+                            ;
+                            $history->create();
+                        }
                     } catch (\Exception $ex) {
                         // @todo
                     }
@@ -526,7 +529,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                             if ($user) {
                                 $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $user->getUserId();
                             } else {
-                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = O;
+                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = null;
                             }
                         }
                         if ($grp) {
@@ -534,7 +537,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                             if ($group) {
                                 $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $group->getGrpId();
                             } else {
-                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = O;
+                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = null;
                             }
                         }
                     } else {
@@ -618,15 +621,17 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 }
                 if ($archive) {
                     try {
-                        $history = \FreeFW\DI\DI::get('FreeFW::Model::History');
-                        $history
-                            ->setHistMethod('U')
-                            ->setHistObjectName($p_model->getApiType())
-                            ->setHistObjectId($p_model->getApiId())
-                            ->setHistTs(\FreeFW\Tools\Date::getCurrentTimestamp())
-                            ->setHistObject($p_model->toHistory())
-                        ;
-                        $history->create();
+                        if (APP_HISTORY) {
+                            $history = \FreeFW\DI\DI::get('FreeFW::Model::History');
+                            $history
+                                ->setHistMethod('U')
+                                ->setHistObjectName($p_model->getApiType())
+                                ->setHistObjectId($p_model->getApiId())
+                                ->setHistTs(\FreeFW\Tools\Date::getCurrentTimestamp())
+                                ->setHistObject($p_model->toHistory())
+                            ;
+                            $history->create();
+                        }
                     } catch (\Exception $ex) {
                         // @todo
                     }
@@ -879,7 +884,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     $code    = intval($localErr[0]);
                     $message = $localErr[2];
                 }
-                $p_model->addError($code, $message);
+                $result->addError($code, $message);
             }
         } catch (\Exception $ex) {
             var_dump($ex);
@@ -1403,7 +1408,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
      *
      * @return \FreeFW\Interfaces\StorageProviderInterface
      */
-    public function getProvider()
+    public function getProvider() : \FreeFW\Interfaces\StorageProviderInterface
     {
         return $this->provider;
     }

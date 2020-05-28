@@ -177,6 +177,7 @@ class PBXString
      */
     public static function splitSql($p_sqlText)
     {
+        $sqls = [];
         $p_sqlText = self::removeComments($p_sqlText);
         // Return array of ; terminated SQL statements in $sql_text.
         $re = '% # Match an SQL record ending with ";"
@@ -194,10 +195,9 @@ class PBXString
         )                                       # End $1: Trimmed SQL record.
         %x';
         if (preg_match_all($re, $p_sqlText, $matches)) {
-            return $matches[1];
+            $sqls = $matches[1];
         }
-
-        return array();
+        return array_filter($sqls, function ($val) {return trim($val) !== '';} );
     }
 
     /**

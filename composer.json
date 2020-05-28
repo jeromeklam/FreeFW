@@ -18,7 +18,6 @@
     "minimum-stability": "dev",
     "require" : {
         "php"                                  : ">=7.0",
-        "phing/phing"                          : "*",
         "phpmailer/phpmailer"                  : "*",
         "giggsey/libphonenumber-for-php"       : "*",
         "psr/log"                              : "*",
@@ -37,7 +36,7 @@
         }
     },
     "require-dev": {
-        "phpunit/phpunit": "^6.4",
-        "guzzlehttp/guzzle": "~6.0"
+        "phpunit/phpunit"                      : "^6.4",
+        "phing/phing"                          : "*"
     }
 }

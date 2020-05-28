@@ -28,18 +28,20 @@ class JwtAuth implements
      *
      * @param ServerRequestInterface           $p_request
      * @param \FreeFW\Interfaces\UserInterface $p_user
+     * @param string                           $p_sso_id
      *
      * @return string
      */
-    protected function generateJwtToken($p_request, $user)
+    protected function generateJwtToken($p_request, $p_user, $p_sso_id)
     {
         $token = array(
             'iss' => $p_request->getUri()->getHost(),
             'sub' => 'api',
             'aud' => [
-                'id'    => $user->getUserId(),
-                'login' => $user->getUserLogin(),
-                'ip'    => \FreeFW\Http\ServerRequest::getClientIp($p_request)
+                'id'    => $p_user->getUserId(),
+                'login' => $p_user->getUserLogin(),
+                'ip'    => \FreeFW\Http\ServerRequest::getClientIp($p_request),
+                'ssoid' => $p_sso_id
             ],
             'iat' => time(),
             'exp' => time() + intval($this->getConfigValue('duration'))
@@ -98,7 +100,7 @@ class JwtAuth implements
         if ($sso) {
             $user = $sso->getUser();
             if ($user) {
-                $header = $this->generateJwtToken($p_request, $user);
+                $header = $this->generateJwtToken($p_request, $user, $sso->getSSoId());
             }
         }
         $authHeader = new \FreeFW\Middleware\Auth\AuthorizationHeader();

@@ -104,4 +104,11 @@ interface StorageInterface
      * @return [\FreeFW\Model\Field]
      */
     public function getFields(string $p_object) : array;
+
+    /**
+     * Get provider
+     *
+     * @return \FreeFW\Interfaces\StorageProviderInterface
+     */
+    public function getProvider() : \FreeFW\Interfaces\StorageProviderInterface;
 }
