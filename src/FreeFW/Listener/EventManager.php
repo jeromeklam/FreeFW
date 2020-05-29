@@ -62,7 +62,7 @@ class EventManager
             return $this;
         }
         foreach ($listener as $event) {
-            call_user_func($event['callback'], $data);
+            call_user_func($event['callback'], $data, $event_name);
         }
         return $this;
     }

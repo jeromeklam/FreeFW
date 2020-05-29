@@ -35,6 +35,18 @@ class Application extends \FreeFW\Core\Application
     }
 
     /**
+     * Array of modified objects
+     * @var array
+     */
+    protected $updates = [];
+
+    /**
+     * We are in transaction
+     * @var string
+     */
+    protected $in_transaction = 0;
+
+    /**
      * Get Application instance
      *
      * @param \FreeFW\Application\Config $p_config
@@ -135,36 +147,61 @@ class Application extends \FreeFW\Core\Application
 
     /**
      *
-     * @param unknown $p_object
-     * @param unknown $myQueue
-     * @param unknown $myQueueCfg
+     * @param object $p_object
+     * @param object $p_queue
+     * @param object $p_queueCfg
+     * @param string $p_event_name
      */
-    public function listen($p_object, $myQueue, $myQueueCfg) {
+    public function listen($p_object, $p_queue, $p_queueCfg, $p_event_name = null) {
+        if ($p_event_name == '') {
+            $p_event_name = 'unknown';
+        }
+        switch ($p_event_name) {
+            case \FreeFW\Constants::EVENT_STORAGE_BEGIN:
+                $this->in_transaction += 1;
+                break;
+            case \FreeFW\Constants::EVENT_STORAGE_ROLLBACK:
+                $this->updates = [];
+            case \FreeFW\Constants::EVENT_STORAGE_COMMIT:
+                $this->in_transaction -= 1;
+                break;
+            case \FreeFW\Constants::EVENT_STORAGE_DELETE:
+            case \FreeFW\Constants::EVENT_STORAGE_UPDATE:
+            case \FreeFW\Constants::EVENT_STORAGE_CREATE:
+                if ($p_object instanceof \FreeFW\Core\Model && $p_object->forwardStorageEvent()) {
+                    $this->updates[] = [
+                        'event' => $p_event_name,
+                        'type'  => $p_object->getApiType(),
+                        'id'    => $p_object->getApiId()
+                    ];
+                }
+                break;
+        }
         // Only Core Models
-        if ($p_object instanceof \FreeFW\Core\Model) {
+        if ($this->in_transaction <= 0) {
+            $this->in_transaction = 0;
             // Only if requested
-            $class = get_class($p_object);
             try {
-                if ($p_object->forwardStorageEvent()) {
+                foreach ($this->updates as $oneUpdate) {
                     // First to RabbitMQ
                     $properties = [
                         'content_type' => 'application/json',
                         'delivery_mode' => \PhpAmqpLib\Message\AMQPMessage::DELIVERY_MODE_PERSISTENT
                     ];
-                    $channel = $myQueue->channel();
+                    $channel = $p_queue->channel();
                     // Exchange as fanout, only to connected consumers
-                    $channel->exchange_declare($myQueueCfg['name'], 'fanout', false, false, false);
+                    $channel->exchange_declare($p_queueCfg['name'], 'fanout', false, false, false);
                     $msg = new \PhpAmqpLib\Message\AMQPMessage(
-                        serialize($p_object),
+                        serialize($oneUpdate),
                         $properties
                     );
-                    $channel->basic_publish($msg, $myQueueCfg['name']);
+                    $channel->basic_publish($msg, $p_queueCfg['name']);
                     $channel->close();
                     // And then send Event to webSocket...
                     $context = new \ZMQContext();
                     $socket = $context->getSocket(\ZMQ::SOCKET_PUSH, 'my event');
                     $socket->connect("tcp://localhost:5555");
-                    $socket->send(serialize($p_object));
+                    $socket->send(serialize($oneUpdate));
                 }
             } catch (\Exception $ex) {
                 // @todo...
