@@ -6,7 +6,7 @@ namespace FreeFW\Application;
  *
  * @author jeromeklam
  */
-class WebSocket extends \FreeFW\Core\Application implements \FreeWS\Wamp2\DataproviderInterface
+class WebSocket extends \FreeFW\Core\Application implements \FreeWS\Wamp2\DataProviderInterface
 {
 
     /**
