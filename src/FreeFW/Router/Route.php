@@ -38,6 +38,7 @@ class Route implements \Psr\Log\LoggerAwareInterface
     const ROUTE_INCLUDE        = 'include';
     const ROUTE_SCOPE          = 'scope';
     const ROUTE_CACHE          = 'cache';
+    const ROUTE_ROLE           = 'role';
     const ROUTE_ADD_PROPERTIES = 'default';
 
     /**
@@ -84,6 +85,17 @@ class Route implements \Psr\Log\LoggerAwareInterface
     const METHOD_PUT    = 'put';
     const METHOD_DELETE = 'delete';
     const METHOD_ALL    = 'all';
+
+    /**
+     * Roles
+     * @var string
+     */
+    const ROLE_GET_ONE      = 'getone';
+    const ROLE_CREATE_ONE   = 'createone';
+    const ROLE_UPDATE_ONE   = 'updateone';
+    const ROLE_DELETE_ONE   = 'delete';
+    const ROLE_GET_FILTERED = 'getfiltered';
+    const ROLE_AUTOCOMPLETE = 'autocomplete';
 
     /**
      * Auth constants
@@ -185,6 +197,12 @@ class Route implements \Psr\Log\LoggerAwareInterface
      * @var array
      */
     protected $scope = null;
+
+    /**
+     * Rôle
+     * @var string
+     */
+    protected $role = null;
 
     /**
      * Set uniq id
@@ -520,6 +538,29 @@ class Route implements \Psr\Log\LoggerAwareInterface
             $this->scope = [];
         }
         return $this->scope;
+    }
+
+    /**
+     * Set role
+     *
+     * @param string $p_role
+     *
+     * @return \FreeFW\Router\Route
+     */
+    public function setRole($p_role)
+    {
+        $this->role = $p_role;
+        return $this;
+    }
+
+    /**
+     * Get role
+     *
+     * @return string
+     */
+    public function getRole()
+    {
+        return $this->role;
     }
 
     /**

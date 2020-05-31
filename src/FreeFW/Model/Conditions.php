@@ -65,7 +65,10 @@ class Conditions extends \FreeFW\Core\Model implements
                     foreach ($value as $idx2 => $value2) {
                         // Verify oper...
                         if (is_array($value2)) {
-                            // @todo
+                            $aValueArr = new \FreeFW\Model\ConditionValue();
+                            $aValueArr->setValue($value2);
+                            $aCondition->setOperator($idx2);
+                            $aCondition->setRightMember($aValueArr);
                         } else {
                             if ($value === null || $value === '') {
                                 if (in_array($idx2, [\FreeFW\Storage\Storage::COND_EMPTY, \FreeFW\Storage\Storage::COND_NOT_EMPTY])) {

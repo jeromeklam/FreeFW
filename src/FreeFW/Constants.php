@@ -43,6 +43,7 @@ class Constants
      *
      * @var string
      */
+    const EVENT_NONE               = 'none';
     const EVENT_ROUTE_NOT_FOUND    = 'not-found';
     const EVENT_COMMAND_NOT_FOUND  = 'not-found';
     const EVENT_BEFORE_FINISH      = 'app-before-finish';

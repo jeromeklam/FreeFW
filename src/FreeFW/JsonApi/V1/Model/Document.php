@@ -114,12 +114,7 @@ class Document implements \JsonSerializable
         return $this;
     }
 
-    /**
-     *
-     * {@inheritDoc}
-     * @see \JsonSerializable::jsonSerialize()
-     */
-    public function jsonSerialize()
+    public function __toJson()
     {
         $return = [];
         if ($this->jsonapi !== null) {
@@ -150,6 +145,15 @@ class Document implements \JsonSerializable
             }
         }
         return $return;
+    }
+    /**
+     *
+     * {@inheritDoc}
+     * @see \JsonSerializable::jsonSerialize()
+     */
+    public function jsonSerialize()
+    {
+        return $this->__toJson();
     }
 
     /**
@@ -183,9 +187,9 @@ class Document implements \JsonSerializable
 
     /**
      * Set included object
-     * 
+     *
      * @param \FreeFW\JsonApi\V1\Model\IncludedObject $p_inluded
-     * 
+     *
      * @return \FreeFW\JsonApi\V1\Model\Document
      */
     public function setIncluded(\FreeFW\JsonApi\V1\Model\IncludedObject $p_inluded)

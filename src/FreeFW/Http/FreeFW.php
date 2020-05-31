@@ -31,6 +31,9 @@ class FreeFW
                         ->setController($apiRoute[\FreeFW\Router\Route::ROUTE_CONTROLLER])
                         ->setFunction($apiRoute[\FreeFW\Router\Route::ROUTE_FUNCTION])
                     ;
+                    if (array_key_exists(\FreeFW\Router\Route::ROUTE_ROLE, $apiRoute)) {
+                        $myRoute->setRole($apiRoute[\FreeFW\Router\Route::ROUTE_ROLE]);
+                    }
                     if (array_key_exists(\FreeFW\Router\Route::ROUTE_AUTH, $apiRoute)) {
                         $myRoute->setAuth($apiRoute[\FreeFW\Router\Route::ROUTE_AUTH]);
                     }

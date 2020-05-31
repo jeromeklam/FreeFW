@@ -109,6 +109,31 @@ class Router
         }
         return $retRoute;
     }
+
+    /**
+     *
+     * @param string $p_object
+     * @param string $p_role
+     *
+     * @return \FreeFW\Router\Route || null
+     */
+    public function findRouteByModelAndRole($p_model, $p_role)
+    {
+        $route = null;
+        if ($this->routes instanceof \FreeFW\Router\RouteCollection) {
+            /**
+             * @var \FreeFW\Router\Route $oneRoute
+             */
+            foreach ($this->routes->getRoutes() as $oneRoute) {
+                if ($oneRoute->getDefaultModel() == $p_model && $p_role == $oneRoute->getRole()) {
+                    $route = $oneRoute;
+                    break;
+                }
+            }
+        }
+        return $route;
+    }
+
     /**
      * Find called route
      *

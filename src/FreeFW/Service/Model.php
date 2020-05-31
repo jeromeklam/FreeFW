@@ -417,6 +417,7 @@ class Model extends \FreeFW\Core\Service
         $lines[] = '        FFCSTRT::ROUTE_URL        => \'/' . $p_model->getMdVers() . '/' . $collPth . '/' . $clSnake . '/autocomplete/:search\',';
         $lines[] = '        FFCSTRT::ROUTE_CONTROLLER => \'' . $modelCt . '\',';
         $lines[] = '        FFCSTRT::ROUTE_FUNCTION   => \'autocomplete\',';
+        $lines[] = '        FFCSTRT::ROUTE_ROLE       => \FreeFW\Router\Route::ROLE_AUTOCOMPLETE,';
         $lines[] = '        FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,';
         $lines[] = '        FFCSTRT::ROUTE_MIDDLEWARE => [],';
         $lines[] = '        FFCSTRT::ROUTE_INCLUDE    => [],';
@@ -445,6 +446,7 @@ class Model extends \FreeFW\Core\Service
         $lines[] = '        FFCSTRT::ROUTE_URL        => \'/' . $p_model->getMdVers() . '/' . $collPth . '/' . $clSnake . '\',';
         $lines[] = '        FFCSTRT::ROUTE_CONTROLLER => \'' . $modelCt . '\',';
         $lines[] = '        FFCSTRT::ROUTE_FUNCTION   => \'getAll\',';
+        $lines[] = '        FFCSTRT::ROUTE_ROLE       => \FreeFW\Router\Route::ROLE_GET_FILTERED,';
         $lines[] = '        FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,';
         $lines[] = '        FFCSTRT::ROUTE_MIDDLEWARE => [],';
         $lines[] = '        FFCSTRT::ROUTE_INCLUDE    => [],';
@@ -465,6 +467,7 @@ class Model extends \FreeFW\Core\Service
         $lines[] = '        FFCSTRT::ROUTE_URL        => \'/' . $p_model->getMdVers() . '/' . $collPth . '/' . $clSnake . '/:' . $p_model->getPrimaryFieldName() . '\',';
         $lines[] = '        FFCSTRT::ROUTE_CONTROLLER => \'' . $modelCt . '\',';
         $lines[] = '        FFCSTRT::ROUTE_FUNCTION   => \'getOne\',';
+        $lines[] = '        FFCSTRT::ROUTE_ROLE       => \FreeFW\Router\Route::ROLE_GET_ONE,';
         $lines[] = '        FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,';
         $lines[] = '        FFCSTRT::ROUTE_MIDDLEWARE => [],';
         $lines[] = '        FFCSTRT::ROUTE_INCLUDE    => [],';
@@ -493,6 +496,7 @@ class Model extends \FreeFW\Core\Service
         $lines[] = '        FFCSTRT::ROUTE_URL        => \'/' . $p_model->getMdVers() . '/' . $collPth . '/' . $clSnake . '\',';
         $lines[] = '        FFCSTRT::ROUTE_CONTROLLER => \'' . $modelCt . '\',';
         $lines[] = '        FFCSTRT::ROUTE_FUNCTION   => \'createOne\',';
+        $lines[] = '        FFCSTRT::ROUTE_ROLE       => \FreeFW\Router\Route::ROLE_CREATE_ONE,';
         $lines[] = '        FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,';
         $lines[] = '        FFCSTRT::ROUTE_MIDDLEWARE => [],';
         $lines[] = '        FFCSTRT::ROUTE_INCLUDE    => [],';
@@ -513,6 +517,7 @@ class Model extends \FreeFW\Core\Service
         $lines[] = '        FFCSTRT::ROUTE_URL        => \'/' . $p_model->getMdVers() . '/' . $collPth . '/' . $clSnake . '/:' . $p_model->getPrimaryFieldName() . '\',';
         $lines[] = '        FFCSTRT::ROUTE_CONTROLLER => \'' . $modelCt . '\',';
         $lines[] = '        FFCSTRT::ROUTE_FUNCTION   => \'updateOne\',';
+        $lines[] = '        FFCSTRT::ROUTE_ROLE       => \FreeFW\Router\Route::ROLE_UPDATE_ONE,';
         $lines[] = '        FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,';
         $lines[] = '        FFCSTRT::ROUTE_MIDDLEWARE => [],';
         $lines[] = '        FFCSTRT::ROUTE_INCLUDE    => [],';
@@ -541,6 +546,7 @@ class Model extends \FreeFW\Core\Service
         $lines[] = '        FFCSTRT::ROUTE_URL        => \'/' . $p_model->getMdVers() . '/' . $collPth . '/' . $clSnake . '/:' . $p_model->getPrimaryFieldName() . '\',';
         $lines[] = '        FFCSTRT::ROUTE_CONTROLLER => \'' . $modelCt . '\',';
         $lines[] = '        FFCSTRT::ROUTE_FUNCTION   => \'removeOne\',';
+        $lines[] = '        FFCSTRT::ROUTE_ROLE       => \FreeFW\Router\Route::ROLE_DELETE_ONE,';
         $lines[] = '        FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,';
         $lines[] = '        FFCSTRT::ROUTE_MIDDLEWARE => [],';
         $lines[] = '        FFCSTRT::ROUTE_INCLUDE    => [],';

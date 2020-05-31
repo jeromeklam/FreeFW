@@ -141,6 +141,7 @@ class FileLogger extends \Psr\Log\AbstractLogger
     protected function write($message, $level = false)
     {
         $now  = \DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
+        $now->setTimeZone(new \DateTimeZone('Europe/Paris'));
         $line = array(
             'pid'  => self::$pid,
             'time' => $now->format("d/m/Y H:i:s.u")
