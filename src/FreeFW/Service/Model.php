@@ -361,8 +361,8 @@ class Model extends \FreeFW\Core\Service
         if (!is_file($filename)) {
             $this->createControllerClass($p_model, $filename);
         }
-        $filename = $routePath . '/' . \FreeFW\Tools\PBXString::fromCamelCase($p_model->getMdClass()) . '.php';
-        //@unlink($filename);
+        $filename = $routePath . '/' . \FreeFW\Tools\PBXString::fromCamelCase($p_model->getMdClass()) . '.new.php';
+        @unlink($filename);
         if (!is_file($filename)) {
             // @todo : read existing to update
             $this->createRoutes($p_model, $filename);
