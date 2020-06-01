@@ -175,6 +175,7 @@ abstract class Model implements
                         foreach ($relation['values'] as $val) {
                             $rel = \FreeFW\DI\DI::get($mRels[$name]['model']);
                             $rel->setApiId($val);
+                            $rels[] = $rel;
                         }
                         $this->$setter($rels);
                     }
