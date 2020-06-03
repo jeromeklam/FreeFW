@@ -20,6 +20,7 @@ class Decoder
         \FreeFW\JsonApi\V1\Model\Document $p_document
     ) : \FreeFW\Core\Model {
         if ($p_document->isSimpleResource()) {
+            // @todo : recursive with no loop !!
             $resource = $p_document->getData();
             $cls      = $resource->getType();
             $class    = str_replace('_', '::Model::', $cls);
@@ -30,7 +31,25 @@ class Decoder
             $attr = $resource->getAttributes();
             $rels = $resource->getRelationships();
             if ($rels) {
-                $obj->initWithJson($attr->__toArray(), $rels->__toArray());
+                $included = [];
+                foreach ($p_document->getIncluded() as $oneIncluded) {
+                    $cls   = $oneIncluded->getType();
+                    $class = str_replace('_', '::Model::', $cls);
+                    /**
+                     * @var \FreeFW\Core\Model $objI
+                     */
+                    $objI  = \FreeFW\DI\DI::get($class);
+                    $attrI = $oneIncluded->getAttributes();
+                    $relsI = $oneIncluded->getRelationships();
+                    if ($relsI) {
+                        $objI->initWithJson($attrI->__toArray(), $relsI->__toArray());
+                    } else {
+                        $objI->initWithJson($attrI->__toArray());
+                    }
+                    $objI->setApiId($oneIncluded->getId());
+                    $included[] = $objI;
+                }
+                $obj->initWithJson($attr->__toArray(), $rels->__toArray(), $included);
             } else {
                 $obj->initWithJson($attr->__toArray());
             }

@@ -12,6 +12,11 @@ class Message extends \FreeFW\Model\Base\Message
 {
 
     /**
+     * Behaviours
+     */
+    use \FreeFW\Model\Behaviour\Lang;
+
+    /**
      * Types
      * @var string
      */
@@ -26,35 +31,6 @@ class Message extends \FreeFW\Model\Base\Message
     const STATUS_PENDING = 'PENDING';
     const STATUS_OK      = 'OK';
     const STATUS_ERROR   = 'ERROR';
-
-    /**
-     * Lang
-     * @var \FreeFW\Model\Lang
-     */
-    protected $lang = null;
-
-    /**
-     * Set lang
-     *
-     * @param \FreeFW\Model\Lang $p_lang
-     *
-     * @return \FreeFW\Model\Email
-     */
-    public function setLang($p_lang)
-    {
-        $this->lang = $p_lang;
-        return $this;
-    }
-
-    /**
-     * Get lang
-     *
-     * @return \FreeFW\Model\Lang
-     */
-    public function getLang()
-    {
-        return $this->lang;
-    }
 
     /**
      * Add new dest

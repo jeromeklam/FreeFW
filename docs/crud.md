@@ -38,14 +38,14 @@ Par défaut les erreurs sont trappées et injectées dans le modèle, le tout es
 ```
      if ($model->isValid()) {
          if ($model->create(true) {
-              var_export($model->getErrors());
+              $this->addErrors($model->getErrors());
          }
      } else {
-         var_export($model->getErrors());
+         $this->addErrors($model->getErrors());
      }
 ```
 
-Les modèles implémentent églement l'interface "validator" ce qui permet de déjà gérer de manière automatique les champs obligatoires, ... Mais on peut également surcharger la méthode localement pour compléter les vérifications.
+Les modèles implémentent également l'interface "validator" ce qui permet de déjà gérer de manière automatique les champs obligatoires, ... Mais on peut également surcharger la méthode localement pour compléter les vérifications.
 
 ```
     /**

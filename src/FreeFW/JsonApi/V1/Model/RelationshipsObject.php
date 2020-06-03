@@ -19,8 +19,9 @@ class RelationshipsObject implements \Countable, \JsonSerializable
      * Constructor
      *
      * @param array $p_relations
+     * @param array $p_included
      */
-    public function __construct(array $p_relations = [])
+    public function __construct(array $p_relations = [], $p_included = [])
     {
         $this->relationships = [];
         foreach ($p_relations as $key => $value) {
@@ -41,10 +42,6 @@ class RelationshipsObject implements \Countable, \JsonSerializable
                             }
                         }
                         $this->addRelation($key, $relation);
-                        //var_export($key);
-                        //var_export($relation);
-                        //die;
-                        //var_export('decoder . @todo');die;
                     } else {
                         $relation = new \FreeFW\JsonApi\V1\Model\RelationshipObject($key);
                         $cls   = $data->type;

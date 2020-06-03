@@ -2,6 +2,7 @@
 namespace FreeFW\Core;
 
 use \FreeFW\Constants as FFCST;
+use FreeFW\JsonApi\V1\Model\IncludedObject;
 
 /**
  * Standard model
@@ -114,7 +115,7 @@ abstract class Model implements
      *
      * @return \FreeFW\Core\Model
      */
-    public function initWithJson(array $p_datas = [], array $p_relations = [])
+    public function initWithJson(array $p_datas = [], array $p_relations = [], array $p_included = [])
     {
         $props = $this->getProperties();
         $this->initModel();
@@ -149,19 +150,31 @@ abstract class Model implements
                     if (array_key_exists(FFCST::PROPERTY_FK, $property)) {
                         $fks = $property[FFCST::PROPERTY_FK];
                         if (array_key_exists($relation['name'], $fks)) {
-                            $fk     = $fks[$relation['name']];
+                            $fk = $fks[$relation['name']];
                             // Complete empty object
-                            $rel    = \FreeFW\DI\DI::get($fk['model']);
-                            $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($relation['name'], true);
+                            $id = 0;
                             foreach ($relation['values'] as $val) {
-                                $rel->setApiId($val);
+                                $id = $val;
+                                break;
                             }
-                            $this->$setter($rel);
+                            $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($relation['name'], true);
+                            $class  = '\\' . str_replace('::', '\\', $fk['model']);
+                            $found  = false;
+                            foreach ($p_included as $oneIncluded) {
+                                if ($oneIncluded instanceof $class && $oneIncluded->getApiId() == $id) {
+                                    $found = true;
+                                    $this->$setter($oneIncluded);
+                                    break;
+                                }
+                            }
+                            if (!$found) {
+                                $rel = \FreeFW\DI\DI::get($fk['model']);
+                                $rel->setApiId($id);
+                                $this->$setter($rel);
+                            }
                             // property
                             $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($test, true);
-                            foreach ($relation['values'] as $val) {
-                                $this->$setter($val);
-                            }
+                            $this->$setter($id);
                             break;
                         }
                     }
@@ -173,9 +186,21 @@ abstract class Model implements
                         $rels   = [];
                         $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
                         foreach ($relation['values'] as $val) {
-                            $rel = \FreeFW\DI\DI::get($mRels[$name]['model']);
-                            $rel->setApiId($val);
-                            $rels[] = $rel;
+                            $found = false;
+                            $class = '\\' . str_replace('::', '\\', $mRels[$name]['model']);
+                            $found = false;
+                            foreach ($p_included as $oneIncluded) {
+                                if ($oneIncluded instanceof $class && $oneIncluded->getApiId() == $val) {
+                                    $found  = true;
+                                    $rels[] = $oneIncluded;
+                                    break;
+                                }
+                            }
+                            if (!$found) {
+                                $rel = \FreeFW\DI\DI::get($mRels[$name]['model']);
+                                $rel->setApiId($val);
+                                $rels[] = $rel;
+                            }
                         }
                         $this->$setter($rels);
                     }

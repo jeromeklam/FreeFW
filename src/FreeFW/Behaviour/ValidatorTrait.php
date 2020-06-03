@@ -57,6 +57,23 @@ trait ValidatorTrait
     }
 
     /**
+     * Add errors
+     *
+     * @param array $p_errors
+     *
+     * @return \FreeFW\Behaviour\ValidatorTrait
+     */
+    public function addErrors($p_errors)
+    {
+        if (is_array($p_errors)) {
+            foreach ($p_errors as $oneError) {
+                $this->errors[] = $oneError;
+            }
+        }
+        return $this;
+    }
+
+    /**
      * Check if valid
      *
      * @return boolean

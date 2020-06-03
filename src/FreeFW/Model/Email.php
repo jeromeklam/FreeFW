@@ -13,33 +13,9 @@ class Email extends \FreeFW\Model\Base\Email implements
 {
 
     /**
-     * Lang
-     * @var \FreeFW\Model\Lang
+     * Behaviours
      */
-    protected $lang = null;
-
-    /**
-     * Set lang
-     *
-     * @param \FreeFW\Model\Lang $p_lang
-     *
-     * @return \FreeFW\Model\Email
-     */
-    public function setLang($p_lang)
-    {
-        $this->lang = $p_lang;
-        return $this;
-    }
-
-    /**
-     * Get lang
-     *
-     * @return \FreeFW\Model\Lang
-     */
-    public function getLang()
-    {
-        return $this->lang;
-    }
+    use \FreeFW\Model\Behaviour\Lang;
 
     /**
      * Merge datas in fields

@@ -99,6 +99,16 @@ class Document implements \JsonSerializable
     }
 
     /**
+     * Get included resources
+     *
+     * @return \FreeFW\JsonApi\V1\Model\ResourceObject[]
+     */
+    public function getIncluded()
+    {
+        return $this->included;
+    }
+
+    /**
      * Add one element to data
      *
      * @param mixed $p_data
@@ -160,10 +170,11 @@ class Document implements \JsonSerializable
      * Get resourceObject
      *
      * @param \StdClass $p_object
+     * @param array     $p_included
      *
      * @return \FreeFW\JsonApi\V1\Model\ResourceObject
      */
-    protected function getResourceObject(\StdClass $p_object)
+    protected function getResourceObject(\StdClass $p_object, $p_included = [])
     {
         if (isset($p_object->type)) {
             $type = $p_object->type;
@@ -177,7 +188,10 @@ class Document implements \JsonSerializable
                 $resource->setAttributes($attributes);
             }
             if (isset($p_object->relationships)) {
-                $relations = new \FreeFW\JsonApi\V1\Model\RelationshipsObject((array)$p_object->relationships);
+                $relations = new \FreeFW\JsonApi\V1\Model\RelationshipsObject(
+                    (array)$p_object->relationships,
+                    $p_included
+                );
                 $resource->setRelationShips($relations);
             }
             return $resource;
@@ -208,10 +222,16 @@ class Document implements \JsonSerializable
     protected function getFromObject(\stdClass $p_data = null)
     {
         if (isset($p_data->data)) {
-            $data = $p_data->data;
+            $data           = $p_data->data;
+            $this->included = [];
+            if (isset($p_data->included)) {
+                foreach ($p_data->included as $oneIncluded) {
+                    $this->included[] = $this->getResourceObject($oneIncluded);
+                }
+            }
             if ($data instanceof \stdClass) {
                 // Single object
-                $this->data = $this->getResourceObject($data);
+                $this->data = $this->getResourceObject($data, $this->included);
             } else {
                 if (is_array($data)) {
                     // Collection

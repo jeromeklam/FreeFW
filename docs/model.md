@@ -10,6 +10,9 @@ Les modèles, la description
     |      |      |      |---- Base
     |      |      |      |      |---- Model1
     |      |      |      |      `---- Model...
+    |      |      |      |---- Bahaviour
+    |      |      |      |      |---- Model1Trait
+    |      |      |      |      `---- Model...Trait
     |      |      |      |---- StorageModel
     |      |      |      |      |---- Model1
     |      |      |      |      `---- Model...
@@ -25,12 +28,29 @@ Les modèles, la description
 * Ce modèle de base hérite d'un modèle de stockage, répertoire StorageModel, qui décrit les champs et le mode de stockage.
 * Instancié via le DI du Framework, il sera initialisé avec un Logger, la configuration et un eventManager.
 
+# Le trait Behaviour
+
+Permet de gérer un comportement pour l'inclusion d'un modèle dans un autre. Par exemple le type de groupe sur un groupe peut être présenté sous forme de trait pour l'id et l'objet lui-même, ...
+
+```
+    protected $group_type = null;
+    protected $grpt_id = null;
+    getGroupType() {...}
+    setGroupType($p_grp_type) {...}
+    getGrptId() {...}
+    setGrptId($p_id) {...}
+    ...
+```
+
 # Le modèle StorageModel
 
 Ce modèle, classe abstraite, hérite de la classe de base \FreeFW\Core\StorageModel et doit implémenter certains fonctions.
 On pourra ainsi effectuer les opérations du CRUD (Create Read Update Delete) de manière automatique.
 
-Voici ci-dessous les méthodes à implémenter.
+Cette classe doit également contenir les constantes à utiliser, ... tout ce qui peut servir à la vie de la classe.
+Elle ne sera jamais écrasée par des outils destinés au développement.
+
+Voici ci-dessous les méthodes à implémenter :
 
 ## La source
 
@@ -130,6 +150,54 @@ Les autres champs, en fonction de leur type, STRING, NUMBER, BOOLEAN, TEXT, BLOB
 ```
 
 On indique dans ce cas la table liée. On précise le modèle, le champ de destination et le type de jointure.
+
+### Historisation
+
+Par défaut les modèles sont historisés, pour éviter ce comportement il faut ajouter une propriété sur le modèle :
+
+```
+    /**
+     * Prevent from saving history
+     * @var bool
+     */
+    protected $no_history = true;
+    
+    /**
+     * Prevent from saving history
+     *
+     * @return bool
+     */
+    public function noHistory()
+    {
+        return true;
+    }
+```
+
+On peut également créer cette propriété ou méthode à tout niveau de l'héritage, pour éviter les copier / coller et éventuellement créer des classes intermédaires.
+
+### Forward CUD 
+
+Pour envoyer un événement pour les opérations de base, il faut ajouter la méthode ou propriété suivante :
+
+```
+    /**
+     * Add to queue, websocket, ?
+     * @var bool
+     */
+    protected $forward_storage_event = true;
+    
+    /**
+     * Add to queue, websocket, ?
+     *
+     * @return bool
+     */
+    public function forwardStorageEvent()
+    {
+        return true;
+    }
+```
+
+On peut également créer cette méthode à tout niveau de l'héritage, pour éviter les copier / coller et éventuellement créer des classes intermédaires.
 
 ## Les relations
 
