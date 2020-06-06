@@ -728,10 +728,12 @@ class PDOStorage extends \FreeFW\Storage\Storage
         }
         if (method_exists($p_model, 'getRelationships')) {
             foreach ($p_model->getRelationships() as $name => $rel) {
-                $fks[$name] = [
-                    'left'  => $rel['field'],
-                    'right' => $rel
-                ];
+                if ($rel['type'] !== \FreeFW\Model\Query::JOIN_NONE) {
+                    $fks[$name] = [
+                        'left'  => $rel['field'],
+                        'right' => $rel
+                    ];
+                }
             }
         }
         foreach ($p_relations as $idx => $shortcut) {
@@ -766,6 +768,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
                             $from = $from . $alias1 . '.' . $crtFKs[$onePart]['left'];
                             break;
                     }
+                } else {
+                    $onePart = array_shift($parts);
+                    continue;
                 }
                 $baseAlias = $baseAlias . '.' . $onePart;
                 if ($newModel && count($parts) > 0) {
@@ -787,7 +792,6 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 }
             }
         }
-        //var_export($p_conditions);
         $parts  = $this->renderConditions($p_conditions, $p_model, $aliases, '@');
         $where  = $parts['sql'];
         $values = $parts['values'];
@@ -1315,20 +1319,37 @@ class PDOStorage extends \FreeFW\Storage\Storage
         }
         $parts = explode('.', $p_field);
         if (count($parts) > 1) {
-            $class = $parts[0];
-            $field = $parts[1];
-            if (!array_key_exists($class, self::$models)) {
-                self::$models[$class] = \FreeFW\DI\DI::get($class);
-            } else {
-                if (strpos($class, ':') === false) {
-                    if (array_key_exists($p_crtAlias . '.' . $class, $p_aliases)) {
-                        $alias = $p_aliases[$p_crtAlias . '.' . $class];
+            $class = array_shift($parts);
+            if (count($parts) > 1) {
+                $class = array_shift($parts);
+                $field = $parts[0];
+                if (!array_key_exists($class, self::$models)) {
+                    self::$models[$class] = \FreeFW\DI\DI::get($class);
+                } else {
+                    if (strpos($class, ':') === false) {
+                        if (array_key_exists($p_crtAlias . '.' . $class, $p_aliases)) {
+                            $alias = $p_aliases[$p_crtAlias . '.' . $class];
+                        }
                     }
                 }
+                $model      = self::$models[$class];
+                $source     = $model::getSource();
+                $properties = $model::getProperties();
+            } else {
+                $field = $parts[0];
+                if (!array_key_exists($class, self::$models)) {
+                    self::$models[$class] = \FreeFW\DI\DI::get($class);
+                } else {
+                    if (strpos($class, ':') === false) {
+                        if (array_key_exists($p_crtAlias . '.' . $class, $p_aliases)) {
+                            $alias = $p_aliases[$p_crtAlias . '.' . $class];
+                        }
+                    }
+                }
+                $model      = self::$models[$class];
+                $source     = $model::getSource();
+                $properties = $model::getProperties();
             }
-            $model      = self::$models[$class];
-            $source     = $model::getSource();
-            $properties = $model::getProperties();
         } else {
             $source     = $p_model::getSource();
             $properties = $p_model::getProperties();

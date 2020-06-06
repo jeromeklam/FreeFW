@@ -60,13 +60,13 @@ class Database extends \FreeFW\Core\Service
              * @var \FreeFW\Model\Version $oneVersion
              */
             foreach ($installedVersions as $oneVersion) {
-                if (!strpos($oneVersion->getVersVersion() . '.', $versData['vers']) === 0) {
+                if (strpos($oneVersion->getVersVersion() . '.', $versData['vers']) === 0) {
                     $found = true;
                     break;
                 }
             }
             if (!$found) {
-                echo 'Installing ' . $versData['vers'] . PHP_EOL;
+                echo 'Migrating ' . $versData['vers'] . PHP_EOL;
                 /**
                  * @var \FreeFW\Storage\AbstractUpdater $versMigration
                  */

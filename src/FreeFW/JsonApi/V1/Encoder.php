@@ -86,7 +86,15 @@ class Encoder
                         }
                     }
                 } else {
-                    // Auto getters....
+                    if ($relation->getType() == \FreeFW\JsonApi\V1\Model\RelationshipObject::ONE_TO_ONE) {
+                        $getter      = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relation->getPropertyName(), true);
+                        $resourceRel = new \FreeFW\JsonApi\V1\Model\ResourceObject(
+                            str_replace('::Model::', '_', $relation->getModel()),
+                            $p_api_response->$getter(),
+                            true
+                        );
+                        $relationShips->addRelation($relation->getName(), $resourceRel);
+                    }
                 }
             }
             $resource->setRelationShips($relationShips);

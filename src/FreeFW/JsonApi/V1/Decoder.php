@@ -42,7 +42,7 @@ class Decoder
                     $attrI = $oneIncluded->getAttributes();
                     $relsI = $oneIncluded->getRelationships();
                     if ($relsI) {
-                        $objI->initWithJson($attrI->__toArray(), $relsI->__toArray());
+                        $objI->initWithJson($attrI->__toArray(), $relsI->__toArray(), $included);
                     } else {
                         $objI->initWithJson($attrI->__toArray());
                     }
