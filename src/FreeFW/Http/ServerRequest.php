@@ -27,21 +27,37 @@ class ServerRequest
             }
         }
         //Get the forwarded IP if it exists
-        if (array_key_exists('X-Forwarded-For', $headers) &&
-            filter_var($headers['X-Forwarded-For'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-            $the_ip = $headers['X-Forwarded-For'];
+        $the_ip = '';
+        if (array_key_exists('X-Forwarded-For', $headers)) {
+            if (is_array($headers['X-Forwarded-For'])) {
+                $the_ip = $headers['X-Forwarded-For'][0];
+            } else {
+                $the_ip = $headers['X-Forwarded-For'];
+            }
         } else {
-            if (array_key_exists('HTTP_X_FORWARDED_FOR', $headers) &&
-                filter_var($headers['HTTP_X_FORWARDED_FOR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-                $the_ip = $headers['HTTP_X_FORWARDED_FOR'];
+            if (array_key_exists('HTTP_X_FORWARDED_FOR', $headers)) {
+                if (is_array($headers['HTTP_X_FORWARDED_FOR'])) {
+                    $the_ip = $headers['HTTP_X_FORWARDED_FOR'][0];
+                } else {
+                    $the_ip = $headers['HTTP_X_FORWARDED_FOR'];
+                }
             } else {
                 if (array_key_exists('X-ClientSide', $headers)) {
-                    $parts  = explode(':', $headers['X-ClientSide']);
-                    $the_ip = $parts[0];
+                    if (is_array($headers['X-ClientSide'])) {
+                        $parts  = explode(':', $headers['X-ClientSide'][0]);
+                        $the_ip = $parts[0];
+                    } else {
+                        $parts  = explode(':', $headers['X-ClientSide']);
+                        $the_ip = $parts[0];
+                    }
                 } else {
-                    $the_ip = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4);
+                    $the_ip = $_SERVER['REMOTE_ADDR'];
                 }
             }
+        }
+        $the_ip = filter_var($the_ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4);
+        if (!$the_ip) {
+            $the_ip = '127.0.0.1';
         }
         return $the_ip;
     }
@@ -49,6 +65,7 @@ class ServerRequest
     /**
      *
      * @param \Psr\Http\Message\ServerRequestInterface $p_request
+     *
      * @return \FreeFW\Http\Cookies|\FreeFW\Http\Cookie
      */
     public static function getRequestCookies(\Psr\Http\Message\ServerRequestInterface $p_request = null)
