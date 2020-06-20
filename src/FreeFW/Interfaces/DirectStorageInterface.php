@@ -46,7 +46,7 @@ interface DirectStorageInterface
      *
      * @return \FreeFW\Core\StorageModel
      */
-    public static function findFirst(array $p_filters = []);
+    public static function findFirst(array $p_filters = [], array $p_sort = []);
 
     /**
      * Count

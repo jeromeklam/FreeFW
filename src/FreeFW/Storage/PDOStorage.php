@@ -1324,7 +1324,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $class = array_shift($parts);
                 $field = $parts[0];
                 if (!array_key_exists($class, self::$models)) {
-                    self::$models[$class] = \FreeFW\DI\DI::get($class);
+                    if (strpos($class, ':') === false) {
+                        self::$models[$class] = \FreeFW\DI\DI::get($class);
+                    } else {
+                        self::$models[$class] = \FreeFW\DI\DI::get($class);
+                    }
                 } else {
                     if (strpos($class, ':') === false) {
                         if (array_key_exists($p_crtAlias . '.' . $class, $p_aliases)) {
