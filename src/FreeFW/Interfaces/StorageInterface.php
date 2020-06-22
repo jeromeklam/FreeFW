@@ -16,7 +16,7 @@ interface StorageInterface
      *
      * @return \FreeFW\Core\StorageModel
      */
-    public function create(\FreeFW\Core\StorageModel &$p_model);
+    public function create(\FreeFW\Core\StorageModel &$p_model, bool $p_with_transaction = true) : bool;
 
     /**
      * Find a model
@@ -38,7 +38,7 @@ interface StorageInterface
      *
      * @return boolean
      */
-    public function save(\FreeFW\Core\StorageModel &$p_model);
+    public function save(\FreeFW\Core\StorageModel &$p_model, bool $p_with_transaction = true) : bool;
 
     /**
      * Remove the model

@@ -70,6 +70,30 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
     }
 
     /**
+     * Start transaction helper
+     */
+    public function startTransaction()
+    {
+        $this->strategy->getProvider()->startTransaction();
+    }
+
+    /**
+     * Rollback transaction helper
+     */
+    public function rollbackTransaction()
+    {
+        $this->strategy->getProvider()->rollbackTransaction();
+    }
+
+    /**
+     * Commit transaction helper
+     */
+    public function commitTransaction()
+    {
+        $this->strategy->getProvider()->commitTransaction();
+    }
+
+    /**
      *
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\StorageStrategyInterface::create()

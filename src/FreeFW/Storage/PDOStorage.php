@@ -1180,6 +1180,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $nullable = false;
         $notnull  = false;
         $sql      = false;
+        $arrayMod = '()';
         switch ($oper) {
             case \FreeFW\Storage\Storage::COND_LOWER:
                 $realOper = '<';
@@ -1219,6 +1220,10 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $realOper = '=';
                 $nullable = true;
                 break;
+            case \FreeFW\Storage\Storage::COND_BETWEEN:
+                $realOper = ' BETWEEN ';
+                $arrayMod = 'AND';
+                break;
             case \FreeFW\Storage\Storage::COND_IN:
                 $realOper = ' IN ';
                 break;
@@ -1253,7 +1258,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 if (!is_array($rightDatas['id'])) {
                     $rightId = $rightDatas['id'];
                 } else {
-                    $rightId = ' ( ' . implode(', ', $rightDatas['id']) . ' ) ';
+                    if ($arrayMod == '()') {
+                        $rightId = ' ( ' . implode(', ', $rightDatas['id']) . ' ) ';
+                    } else {
+                        $rightId = $rightDatas['id'][0] . ' AND ' . $rightDatas['id'][1];
+                    }
                 }
                 if ($nullable) {
                     $result['sql'] = '(' .

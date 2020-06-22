@@ -10,6 +10,21 @@ interface DirectStorageInterface
 {
 
     /**
+     * Start transaction helper
+     */
+    public function startTransaction();
+
+    /**
+     * Rollback transaction helper
+     */
+    public function rollbackTransaction();
+
+    /**
+     * Commit transaction helper
+     */
+    public function commitTransaction();
+
+    /**
      * Create an object
      *
      * @return boolean
