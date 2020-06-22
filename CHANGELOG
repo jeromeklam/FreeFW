@@ -2,6 +2,8 @@
 
 * Database migrations light via sql
 * FindFirst & sort cols
+* removeOne, chez id exists and data loaded
+* beforeCreate and beforeSave call on right place
 
 # 1.1.0 : 24/05/2020
 

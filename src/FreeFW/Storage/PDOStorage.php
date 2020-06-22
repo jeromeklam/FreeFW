@@ -54,6 +54,18 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $sso        = \FreeFW\DI\DI::getShared('sso');
         $setter     = false;
         $archive    = !property_exists($p_model, 'no_history');
+        // Next
+        if ($p_with_transaction) {
+            $this->provider->startTransaction();
+        }
+        if (method_exists($p_model, 'beforeCreate')) {
+            if (!$p_model->beforeCreate()) {
+                if ($p_with_transaction) {
+                    $this->provider->rollbackTransaction();
+                }
+                return false;
+            }
+        }
         foreach ($properties as $name => $oneProperty) {
             $add = true;
             $pk  = false;
@@ -161,23 +173,15 @@ class PDOStorage extends \FreeFW\Storage\Storage
             }
         }
         if (!$next) {
-            return false;
-        }
-        // Next
-        if ($p_with_transaction) {
-            $this->provider->startTransaction();
-        }
-        if (method_exists($p_model, 'beforeCreate')) {
-            if (!$p_model->beforeCreate()) {
-                if ($p_with_transaction) {
-                    $this->provider->rollbackTransaction();
-                }
-                return false;
+            if ($p_with_transaction) {
+                $this->provider->rollbackTransaction();
             }
+            return false;
         }
         // Build query
         $sql = \FreeFW\Tools\Sql::makeInsertQuery($source, $fields);
         $this->logger->debug('PDOStorage.create : ' . $sql);
+        $this->logger->debug(print_r($fields, true));
         try {
             // Get PDO and execute
             $query = $this->provider->prepare($sql, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
@@ -191,7 +195,6 @@ class PDOStorage extends \FreeFW\Storage\Storage
                         if ($p_with_transaction) {
                             $this->provider->rollbackTransaction();
                         }
-                        $this->forwardRawEvent(FFCST::EVENT_STORAGE_CREATE, $p_model);
                         return false;
                     }
                 }
@@ -476,6 +479,17 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $properties = $p_model::getProperties();
         $sso        = \FreeFW\DI\DI::getShared('sso');
         $archive    = !property_exists($p_model, 'no_history');
+        if ($p_with_transaction) {
+            $this->provider->startTransaction();
+        }
+        if (method_exists($p_model, 'beforeSave')) {
+            if (!$p_model->beforeSave()) {
+                if ($p_with_transaction) {
+                    $this->provider->rollbackTransaction();
+                }
+                return false;
+            }
+        }
         foreach ($properties as $name => $oneProperty) {
             $add = true;
             $pk  = false;
@@ -594,15 +608,10 @@ class PDOStorage extends \FreeFW\Storage\Storage
             }
         }
         if (!$next) {
-            return false;
-        }
-        if ($p_with_transaction) {
-            $this->provider->startTransaction();
-        }
-        if (method_exists($p_model, 'beforeSave')) {
-            if (!$p_model->beforeSave()) {
-                return false;
+            if ($p_with_transaction) {
+                $this->provider->rollbackTransaction();
             }
+            return false;
         }
         // Build query
         $sql = \FreeFW\Tools\Sql::makeUpdateQuery($source, $fields, $pks);
