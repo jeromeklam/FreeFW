@@ -5,6 +5,7 @@
 * removeOne, chez id exists and data loaded
 * beforeCreate and beforeSave call on right place
 * Between and transaction
+* Core.Model : initWithJson (correction de la gestion des champs avec propriété PUBLIC)
 
 # 1.1.0 : 24/05/2020
 

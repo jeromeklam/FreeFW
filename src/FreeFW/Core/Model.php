@@ -127,7 +127,7 @@ abstract class Model implements
                 }
                 if ($test == $name) {
                     $type   = $property[FFCST::PROPERTY_TYPE];
-                    $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                    $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($prp, true);
                     switch ($type) {
                         case FFCST::TYPE_BLOB:
                             $this->$setter($this->decode_chunk($value));
