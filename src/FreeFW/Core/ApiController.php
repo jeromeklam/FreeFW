@@ -28,7 +28,7 @@ class ApiController extends \FreeFW\Core\Controller
         $aValue   = new \FreeFW\Model\ConditionValue();
         $aValue->setValue($p_id);
         $aField->setValue($pk_field);
-        $aCondition = \FreeFW\Model\SimpleCondition::getNew();
+        $aCondition = new \FreeFW\Model\SimpleCondition();
         $aCondition->setLeftMember($aField);
         $aCondition->setOperator(\FreeFW\Storage\Storage::COND_EQUAL);
         $aCondition->setRightMember($aValue);
@@ -137,7 +137,7 @@ class ApiController extends \FreeFW\Core\Controller
             $aValue   = new \FreeFW\Model\ConditionValue();
             $aValue->setValue($p_id);
             $aField->setValue($pk_field);
-            $aCondition = \FreeFW\Model\SimpleCondition::getNew();
+            $aCondition = new \FreeFW\Model\SimpleCondition();
             $aCondition->setLeftMember($aField);
             $aCondition->setOperator(\FreeFW\Storage\Storage::COND_EQUAL);
             $aCondition->setRightMember($aValue);
@@ -242,7 +242,7 @@ class ApiController extends \FreeFW\Core\Controller
             $aValue   = new \FreeFW\Model\ConditionValue();
             $aValue->setValue($p_id);
             $aField->setValue($pk_field);
-            $aCondition = \FreeFW\Model\SimpleCondition::getNew();
+            $aCondition = new \FreeFW\Model\SimpleCondition();
             $aCondition->setLeftMember($aField);
             $aCondition->setOperator(\FreeFW\Storage\Storage::COND_EQUAL);
             $aCondition->setRightMember($aValue);
@@ -262,11 +262,17 @@ class ApiController extends \FreeFW\Core\Controller
             }
             $this->logger->debug('FreeFW.ApiController.getOne.end');
             if (count($data) > 0) {
-                return $this->createResponse(200, $data[0]);
+                $model = $data[0];
+                $model->setModelBehaviour(\FreeFW\Core\Model::MODEL_BEHAVIOUR_API);
+                if (method_exists($model, 'afterRead')) {
+                    $model->afterRead();
+                }
+                return $this->createResponse(200, $model);
             } else {
                 return $this->createResponse(404);
             }
         } else {
+            $model->setModelBehaviour(\FreeFW\Core\Model::MODEL_BEHAVIOUR_API);
             if (method_exists($model, 'afterRead')) {
                 $model->afterRead();
             }
@@ -289,6 +295,7 @@ class ApiController extends \FreeFW\Core\Controller
              * @var \FreeFW\Core\StorageModel $data
              */
             $data = $apiParams->getData();
+            $data->setModelBehaviour(\FreeFW\Core\Model::MODEL_BEHAVIOUR_API);
             if (!$data->isValid()) {
                 $this->logger->debug('FreeFW.ApiController.createOne.end');
                 return $this->createResponse(409, $data);
@@ -320,6 +327,7 @@ class ApiController extends \FreeFW\Core\Controller
                  * @var \FreeFW\Core\StorageModel $data
                  */
                 $data = $apiParams->getData();
+                $data->setModelBehaviour(\FreeFW\Core\Model::MODEL_BEHAVIOUR_API);
                 if ($data->isValid()) {
                     $data->save();
                     if (!$data->hasErrors()) {
@@ -359,6 +367,7 @@ class ApiController extends \FreeFW\Core\Controller
              */
             $data = $model->findFirst([$model->getPkField() => $p_id]);
             if ($data) {
+                $data->setModelBehaviour(\FreeFW\Core\Model::MODEL_BEHAVIOUR_API);
                 if ($data->remove()) {
                     $this->logger->debug('FreeFW.ApiController.removeOne.end');
                     return $this->createResponse(204);

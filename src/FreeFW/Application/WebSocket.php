@@ -25,6 +25,8 @@ class WebSocket extends \FreeFW\Core\Application implements \FreeWS\Wamp2\DataPr
         \Psr\Log\LoggerInterface $p_logger
     ) {
         parent::__construct($p_config, $p_logger);
+        \FreeFW\DI\DI::setShared('config', $p_config);
+        \FreeFW\DI\DI::setShared('logger', $p_logger);
     }
 
     /**
@@ -133,7 +135,7 @@ class WebSocket extends \FreeFW\Core\Application implements \FreeWS\Wamp2\DataPr
                 $aValue   = new \FreeFW\Model\ConditionValue();
                 $aValue->setValue($p_id);
                 $aField->setValue($pk_field);
-                $aCondition = \FreeFW\Model\SimpleCondition::getNew();
+                $aCondition = new \FreeFW\Model\SimpleCondition();
                 $aCondition->setLeftMember($aField);
                 $aCondition->setOperator(\FreeFW\Storage\Storage::COND_EQUAL);
                 $aCondition->setRightMember($aValue);

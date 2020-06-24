@@ -6,6 +6,15 @@
 * beforeCreate and beforeSave call on right place
 * Between and transaction
 * Core.Model : initWithJson (correction de la gestion des champs avec propriété PUBLIC)
+* Core.Model : behaviour on models (standard, raw, api) for db actions
+* Adaptations DI
+
+** WARNING **
+
+* getNew on Model                   replaces by new
+* get('FreeFW::Model::ResultSet')   replaced by new
+* get('FreeFW::Model::Query')       replaced by new
+* get('FreeFW::Model::*Condition*') replaced by new
 
 # 1.1.0 : 24/05/2020
 

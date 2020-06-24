@@ -1,6 +1,8 @@
 <?php
 namespace FreeFW\Model;
 
+use FreeFW\Core\Model;
+
 /**
  * Query resultset
  *
@@ -44,6 +46,7 @@ class ResultSet extends \FreeFW\Core\Model implements
      */
     public function __construct(array $p_array = [])
     {
+        parent::__construct(\FreeFW\DI\DI::getShared('config'), \FreeFW\DI\DI::getShared('logger'));
         if (is_array($p_array)) {
             $this->var = $p_array;
         }

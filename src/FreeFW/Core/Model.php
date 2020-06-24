@@ -13,14 +13,101 @@ abstract class Model implements
     \FreeFW\Interfaces\ApiResponseInterface,
     \FreeFW\Interfaces\ValidatorInterface,
     \FreeFW\Interfaces\ConfigAwareTraitInterface,
+    \Psr\Log\LoggerAwareInterface,
     \Serializable
 {
+
+    /**
+     * Model behaviour
+     * @var string
+     */
+    const MODEL_BEHAVIOUR_RAW      = 'RAW';
+    const MODEL_BEHAVIOUR_STANDARD = 'STANDARD';
+    const MODEL_BEHAVIOUR_API      = 'API';
 
     /**
      * Behaviour
      */
     use \FreeFW\Behaviour\ValidatorTrait;
     use \FreeFW\Behaviour\ConfigAwareTrait;
+    use \Psr\Log\LoggerAwareTrait;
+
+    /**
+     * Model behaviour
+     * @var string
+     */
+    protected $model_behaviour = self::MODEL_BEHAVIOUR_STANDARD;
+
+    /**
+     * Constructor
+     */
+    public function __construct(
+        \FreeFW\Application\Config $p_config = null,
+        \Psr\Log\AbstractLogger $p_logger = null
+    ) {
+        if ($p_config) {
+            $this->setAppConfig($p_config);
+        } else {
+            $this->setAppConfig(\FreeFW\DI\DI::getShared('config'));
+        }
+        if ($p_logger) {
+            $this->setLogger($p_logger);
+        } else {
+            $this->setLogger(\FreeFW\DI\DI::getShared('logger'));
+        }
+        $this->initModel();
+        $this->init();
+    }
+
+    /**
+     * Initialisation
+     */
+    public function init()
+    {
+    }
+
+    /**
+     * Set model behaviour
+     *
+     * @param string $p_behaviour
+     *
+     * @return \FreeFW\Core\Model
+     */
+    public function setModelBehaviour($p_behaviour)
+    {
+        $this->model_behaviour = $p_behaviour;
+        return $this;
+    }
+
+    /**
+     * Get model behaviour
+     *
+     * @return string
+     */
+    public function getModelBehaviour()
+    {
+        return $this->model_behaviour;
+    }
+
+    /**
+     * Raw behaviour ?
+     *
+     * @return boolean
+     */
+    public function isRawBehaviour()
+    {
+        return $this->model_behaviour === self::MODEL_BEHAVIOUR_RAW;
+    }
+
+    /**
+     * Api behaviour ?
+     *
+     * @return boolean
+     */
+    public function isApiBehaviour()
+    {
+        return $this->model_behaviour === self::MODEL_BEHAVIOUR_API;
+    }
 
     /**
      * Magic call

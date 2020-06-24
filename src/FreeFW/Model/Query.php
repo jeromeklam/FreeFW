@@ -1,6 +1,8 @@
 <?php
 namespace FreeFW\Model;
 
+use FreeFW\Core\Model;
+
 /**
  * Storage model
  *
@@ -83,15 +85,24 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
     protected $sort = [];
 
     /**
-     * Constructor
+     * Get default storage
      *
-     * @param \FreeFW\Interfaces\StorageInterface $p_strategy
+     * @return string
      */
-    public function __construct(\FreeFW\Interfaces\StorageInterface $p_strategy = null)
+    protected static function getDefaultStorage()
     {
-        $this->result_set = \FreeFW\DI\DI::get('FreeFW::Model::ResultSet');
-        $this->conditions = \FreeFW\DI\DI::get('FreeFW::Model::Conditions');
-        $this->strategy   = $p_strategy;
+        return 'default';
+    }
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->result_set = new \FreeFW\Model\ResultSet();
+        $this->conditions = new \FreeFW\Model\Conditions();
+        $this->strategy = \FreeFW\DI\DI::getShared('Storage::' . self::getDefaultStorage());
     }
 
     /**
@@ -192,8 +203,8 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
          * condition
          * @var \FreeFW\Model\Condition $condition
          */
-        $condition = \FreeFW\DI\DI::get('FreeFW::Model::SimpleCondition');
-        $left = null;
+        $condition = new \FreeFW\Model\SimpleCondition;
+        $left      = null;
         if (strpos($p_left, '::Model::') !== false) {
             $left = new \FreeFW\Model\ConditionMember($p_left);
             $left->setValue($p_left);

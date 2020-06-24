@@ -167,23 +167,7 @@ class DependencyInjector extends \FreeFW\Core\DI implements \FreeFW\Interfaces\D
         $class_name = '\\' . $this->base_ns . '\Model\\' .
             \FreeFW\Tools\PBXString::toCamelCase($p_name, true);
         if (class_exists($class_name)) {
-            $cls = new $class_name();
-            if ($cls instanceof \Psr\Log\LoggerAwareInterface) {
-                $cls->setLogger($this->logger);
-            }
-            if ($cls instanceof \FreeFW\Interfaces\StorageStrategyInterface) {
-                $strategy = \FreeFW\DI\DI::getShared('Storage::' . $this->default_storage);
-                $cls->setStrategy($strategy);
-            }
-            if ($cls instanceof \FreeFW\Interfaces\ConfigAwareTraitInterface) {
-                $cls->setAppConfig($this->getAppConfig());
-            }
-            if (method_exists($cls, 'initModel')) {
-                $cls->initModel();
-            }
-            if (method_exists($cls, 'init')) {
-                $cls->init();
-            }
+            $cls = new $class_name($this->getAppConfig(), $this->logger);
             return $cls;
         }
         throw new \FreeFW\Core\FreeFWException(sprintf('Class %s not found !', $class_name));

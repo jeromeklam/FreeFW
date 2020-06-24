@@ -49,7 +49,7 @@ class Conditions extends \FreeFW\Core\Model implements
         $this->conditions = [];
         foreach ($p_conditions as $idx => $value) {
             if (strtolower($idx) == 'or' || strtolower($idx) == 'and') {
-                $aCondition = \FreeFW\Model\Conditions::getNew();
+                $aCondition = new \FreeFW\Model\Conditions();
                 $aCondition->initFromArray($value, strtolower($idx));
             } else {
                 // $idx must be a field...
@@ -58,7 +58,7 @@ class Conditions extends \FreeFW\Core\Model implements
                 /**
                  * @var \FreeFW\Model\SimpleCondition $aCondition
                  */
-                $aCondition = \FreeFW\Model\SimpleCondition::getNew();
+                $aCondition = new \FreeFW\Model\SimpleCondition();
                 $aCondition->setLeftMember($aField);
                 $aCondition->setOperator($p_cond);
                 if (is_array($value)) {

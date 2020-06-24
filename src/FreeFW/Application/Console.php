@@ -25,6 +25,8 @@ class Console extends \FreeFW\Core\Console
         \Psr\Log\LoggerInterface $p_logger
     ) {
         parent::__construct($p_config, $p_logger);
+        \FreeFW\DI\DI::setShared('config', $p_config);
+        \FreeFW\DI\DI::setShared('logger', $p_logger);
     }
 
     /**

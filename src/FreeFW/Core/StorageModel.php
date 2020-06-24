@@ -26,13 +26,26 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
     protected $main_broker = null;
 
     /**
+     * Get default storage
+     *
+     * @return string
+     */
+    protected static function getDefaultStorage()
+    {
+        return 'default';
+    }
+
+    /**
      * Constructor
      *
      * @param \FreeFW\Interfaces\StorageInterface $p_strategy
      */
-    public function __construct(\FreeFW\Interfaces\StorageInterface $p_strategy = null)
-    {
-        $this->strategy = $p_strategy;
+    public function __construct(
+        \FreeFW\Application\Config $p_config = null,
+        \Psr\Log\AbstractLogger $p_logger = null
+    ) {
+        parent::__construct($p_config, $p_logger);
+        $this->strategy = \FreeFW\DI\DI::getShared('Storage::' . self::getDefaultStorage());
     }
 
     /**
@@ -346,7 +359,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
     {
         $cls   = get_called_class();
         $cls   = rtrim(ltrim($cls, '\\'), '\\');
-        $query = \FreeFW\DI\DI::get('FreeFW::Model::Query');
+        $query = new \FreeFW\Model\Query();
         $query
             ->setType($p_type)
             ->setMainModel(str_replace('\\', '::', $cls))

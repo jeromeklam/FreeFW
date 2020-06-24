@@ -710,7 +710,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $from         = $p_model::getSource() . ' AS ' . $crtAlias;
         $properties   = $p_model::getProperties();
         $values       = [];
-        $result       = \FreeFW\DI\DI::get('FreeFW::Model::ResultSet');
+        $result       = new \FreeFW\Model\ResultSet();
         $fks          = [];
         $joins        = [];
         $whereBroker  = '';

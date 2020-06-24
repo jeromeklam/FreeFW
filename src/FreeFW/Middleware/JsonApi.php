@@ -67,7 +67,7 @@ class JsonApi implements
         if (array_key_exists('filter', $params)) {
             $filters = $params['filter'];
             // Transform filters to \FreeFW\Model\Conditions...
-            $conditions = \FreeFW\Model\Conditions::getNew();
+            $conditions = new \FreeFW\Model\Conditions();
             $conditions->initFromArray($filters);
             $apiParams->setFilters($conditions);
         }
