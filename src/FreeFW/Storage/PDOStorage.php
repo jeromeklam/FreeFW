@@ -142,7 +142,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
         if (method_exists($p_model, 'getUniqIndexes')) {
             $indexes = $p_model->getUniqIndexes();
             foreach ($indexes as $ixName => $oneIndex) {
-                $cFields = explode(',', $oneIndex['fields']);
+                if (is_array($oneIndex['fields'])) {
+                    $cFields = $oneIndex['fields'];
+                } else {
+                    $cFields = explode(',', $oneIndex['fields']);
+                }
                 $filters = [];
                 $existF  = false;
                 foreach ($cFields as $name) {
@@ -163,7 +167,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                         }
                         $p_model->addError(
                             $code,
-                            $ixName . ' allready exists !',
+                            $ixName . ' already exists !',
                             \FreeFW\Core\Error::TYPE_PRECONDITION,
                             $oneIndex['fields']
                         );
@@ -577,7 +581,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
         if (method_exists($p_model, 'getUniqIndexes')) {
             $indexes = $p_model->getUniqIndexes();
             foreach ($indexes as $ixName => $oneIndex) {
-                $cFields = explode(',', $oneIndex['fields']);
+                if (is_array($oneIndex['fields'])) {
+                    $cFields = $oneIndex['fields'];
+                } else {
+                    $cFields = explode(',', $oneIndex['fields']);
+                }
                 $filters = [];
                 $existF = false;
                 foreach ($cFields as $name) {
@@ -599,7 +607,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                         }
                         $p_model->addError(
                             $code,
-                            $ixName . ' allready exists !',
+                            $ixName . ' already exists !',
                             \FreeFW\Core\Error::TYPE_PRECONDITION
                         );
                         $next = false;
