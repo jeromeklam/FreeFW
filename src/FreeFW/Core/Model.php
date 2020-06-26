@@ -316,6 +316,38 @@ abstract class Model implements
 
     /**
      *
+     * {@inheritDoc}
+     * @see \FreeFW\Interfaces\ApiResponseInterface::getFieldName()
+     */
+    public function getFieldName(string $p_field, $p_option=FFCST::PROPERTY_PUBLIC) : string
+    {
+        $props = $this->getProperties();
+        //
+        switch ($p_option) {
+            case FFCST::PROPERTY_PUBLIC:
+                if (array_key_exists($p_field, $props)) {
+                    if (array_key_exists(FFCST::PROPERTY_PUBLIC, $props[$p_field])) {
+                        return $props[$p_field][FFCST::PROPERTY_PUBLIC];
+                    }
+                }
+                break;
+
+            case FFCST::PROPERTY_PRIVATE:
+                foreach ($this->getProperties() as $name => $property) {
+                    if (array_key_exists(FFCST::PROPERTY_PUBLIC, $property)) {
+                        if ($property[FFCST::PROPERTY_PUBLIC]==$p_field) {
+                            return $property[FFCST::PROPERTY_PRIVATE];
+                        }
+                    }
+                }
+                break;
+        }
+        //
+        return $p_field;
+    }
+
+    /**
+     *
      * @see \FreeFW\Interfaces\ApiResponseInterface
      */
     public function getApiId() : string
