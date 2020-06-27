@@ -8,6 +8,8 @@
 * Core.Model : initWithJson (correction de la gestion des champs avec propriété PUBLIC)
 * Core.Model : behaviour on models (standard, raw, api) for db actions
 * Adaptations DI
+* alerts
+* simple rates
 
 ** WARNING **
 

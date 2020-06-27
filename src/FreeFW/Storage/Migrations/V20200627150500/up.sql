@@ -1,0 +1,21 @@
+CREATE TABLE `sys_alert` (
+  `alert_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `brk_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `alert_object_name` varchar(32) NOT NULL,
+  `alert_object_id` bigint(20) unsigned DEFAULT NULL,
+  `alert_from` timestamp NULL DEFAULT NULL,
+  `alert_to` timestamp NULL DEFAULT NULL,
+  `alert_ts` timestamp NULL DEFAULT NULL,
+  `alert_done_ts` timestamp NULL DEFAULT NULL,
+  `alert_done_action` varchar(80) DEFAULT NULL,
+  `alert_done_user_id` bigint(20) unsigned DEFAULT NULL,
+  `alert_code` varchar(80) DEFAULT NULL,
+  `alert_text` text DEFAULT NULL,
+  `alert_activ` tinyint(1) NOT NULL DEFAULT 1,
+  `alert_priority` enum('IMPORTANT','CRITICAL','INFORMATION','TODO','NONE') NOT NULL DEFAULT 'NONE',
+  PRIMARY KEY (`alert_id`),
+  KEY `fk_alert_broker` (`brk_id`),
+  KEY `fk_alert_user` (`user_id`),
+  KEY `fk_alert_object` (`alert_object_name`, `alert_object_id`)
+);

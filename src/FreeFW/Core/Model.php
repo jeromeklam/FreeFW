@@ -760,7 +760,9 @@ abstract class Model implements
             }
             if (in_array(FFCST::OPTION_REQUIRED, $options) &&
                 !in_array(FFCST::OPTION_PK, $options) &&
-                !in_array(FFCST::OPTION_BROKER, $options)) {
+                !in_array(FFCST::OPTION_BROKER, $options) &&
+                !in_array(FFCST::OPTION_USER, $options) &&
+                !in_array(FFCST::OPTION_GROUP, $options)) {
                 if (array_key_exists(FFCST::PROPERTY_PUBLIC, $oneProperty)) {
                     $public = $oneProperty[FFCST::PROPERTY_PUBLIC];
                 }
