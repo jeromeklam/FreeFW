@@ -11,12 +11,24 @@ interface ApiResponseInterface
 
     /**
      * Get field name by option
-     * 
+     *
      * @param string $p_option
-     * 
+     *
      * @return string
      */
     public function getFieldNameByOption($p_option) : string;
+
+    /**
+     * Get field name
+     *
+     * @desc retourne l'équivalent public (par défaut) ou privé par rapport à un champ de référence. si celui-ci n'est pas trouvé alors c'est le champ de référence qui est retourné.
+     *
+     * @param string $p_field nom du champ de référence
+     * @param string $p_option [ (default)PROPERTY_PUBLIC|PROPERTY_PRIVATE ] nom du champ qu'on désire retourner
+     *
+     * @return string
+     */
+    public function getFieldName(string $p_field, $p_option) : string;
 
     /**
      * Return id
@@ -27,7 +39,7 @@ interface ApiResponseInterface
 
     /**
      * Set Id
-     * 
+     *
      * @param mixed $p_id
      */
     public function setApiId($p_id);
@@ -83,7 +95,7 @@ interface ApiResponseInterface
 
     /**
      * Get relations as Array
-     * 
+     *
      * @return array
      */
     public function getApiRelationShips() : array;
@@ -104,14 +116,14 @@ interface ApiResponseInterface
 
     /**
      * Is just one element
-     * 
+     *
      * @return bool
      */
     public function isSingleElement() : bool;
 
     /**
      * Is an array of elements
-     * 
+     *
      * @return bool
      */
     public function isArrayElement() : bool;
