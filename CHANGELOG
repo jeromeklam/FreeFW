@@ -1,6 +1,7 @@
 
 # 1.2.0 : --/--/2020
 
+* ApiController,HttpFactoryTrait : gestion des reponses
 * Database migrations light via sql
 * FindFirst & sort cols
 * removeOne, chez id exists and data loaded
@@ -8,6 +9,10 @@
 * Between and transaction
 * Core.Model : initWithJson (correction de la gestion des champs avec propriété PUBLIC)
 * Core.Model : behaviour on models (standard, raw, api) for db actions
+* Code.Model : nouvelle méthode getFiedName
+* Behaviour.ValidatorTrait : nouvelles méthodes isCreation, isModification
+* Storage.PDOStorage : correction de l'utilisation du getUniqIndexes avec un tableau de champs au lieu d'1 string
+* constants : nouvelles constantes
 * Adaptations DI
 
 ** WARNING **

@@ -28,7 +28,7 @@ interface ApiResponseInterface
      *
      * @return string
      */
-    public function getFieldName(string $p_field, $p_option='') : string;
+    public function getFieldName(string $p_field, $p_option) : string;
 
     /**
      * Return id

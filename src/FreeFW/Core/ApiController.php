@@ -62,7 +62,6 @@ class ApiController extends \FreeFW\Core\Controller
     public function autocomplete(\Psr\Http\Message\ServerRequestInterface $p_request, $p_search = '')
     {
         $this->logger->debug('FreeFW.ApiController.autocomplete.start');
-        $data = [];
         /**
          * @var \FreeFW\Http\ApiParams $apiParams
          */
@@ -99,8 +98,12 @@ class ApiController extends \FreeFW\Core\Controller
         if ($query->execute()) {
             $data = $query->getResult();
         }
+        if (count($data) > 0) {
+            $this->logger->debug('FreeFW.ApiController.autocomplete.end');
+            return $this->createSuccessResponse(FFCST::SUCCESS_RESPONSE_OK, $data); // 200
+        }
         $this->logger->debug('FreeFW.ApiController.autocomplete.end');
-        return $this->createResponse(200, $data);
+        return $this->createErrorResponse(FFCST::ERROR_NOT_FOUND); // 404
     }
 
     /**
@@ -130,7 +133,7 @@ class ApiController extends \FreeFW\Core\Controller
         /**
          * Id
          */
-        if ($p_id > 0) {
+        if (intval($p_id) > 0) {
             $filters  = new \FreeFW\Model\Conditions();
             $pk_field = $model->getPkField();
             $aField   = new \FreeFW\Model\ConditionMember();
@@ -151,20 +154,19 @@ class ApiController extends \FreeFW\Core\Controller
                 ->addRelations($apiParams->getInclude())
                 ->setLimit(0, 1)
             ;
-            $data = null;
+            $data = new \FreeFW\Model\ResultSet();
             if ($query->execute()) {
                 $data = $query->getResult();
             }
-            $this->logger->debug('FreeFW.ApiController.getChildren.end');
             if (count($data) > 0) {
                 $children = $model->find(
                     [
                         $model->getFieldNameByOption(FFCST::OPTION_NESTED_PARENT_ID) => $data[0]->getApiId()
                     ]
                 );
-                return $this->createResponse(200, $children);
             } else {
-                return $this->createResponse(404);
+                $this->logger->debug('FreeFW.ApiController.getChildren.end');
+                return $this->createErrorResponse(FFCST::ERROR_NOT_FOUND); // 404
             }
         } else {
             $children = $model->find(
@@ -172,8 +174,15 @@ class ApiController extends \FreeFW\Core\Controller
                     $model->getFieldNameByOption(FFCST::OPTION_NESTED_LEVEL) => 1
                 ]
             );
-            return $this->createResponse(200, $children);
         }
+
+        $this->logger->debug('FreeFW.ApiController.getChildren.end');
+
+//        if (count($chilren) > 0) {
+            return $this->createSuccessResponse(FFCST::SUCCESS_RESPONSE_OK, $children); // 200
+//        }
+//
+//        return $this->createErrorResponse(FFCST::ERROR_NO_DATA); // 409
     }
 
     /**
@@ -194,7 +203,7 @@ class ApiController extends \FreeFW\Core\Controller
             );
         }
         $default = $p_request->default_model;
-        $model   = \FreeFW\DI\DI::get($default);
+        $model = \FreeFW\DI\DI::get($default);
         /**
          * @var \FreeFW\Model\Query $query
          */
@@ -209,8 +218,12 @@ class ApiController extends \FreeFW\Core\Controller
         if ($query->execute()) {
             $data = $query->getResult();
         }
+        if (count($data) > 0) {
+            $this->logger->debug('FreeFW.ApiController.getOne.end');
+            return $this->createSuccessResponse(FFCST::SUCCESS_RESPONSE_OK, $data); // 200
+        }
         $this->logger->debug('FreeFW.ApiController.getAll.end');
-        return $this->createResponse(200, $data);
+        return $this->createErrorResponse(FFCST::ERROR_NOT_FOUND); // 404
     }
 
     /**
@@ -231,11 +244,11 @@ class ApiController extends \FreeFW\Core\Controller
             );
         }
         $default = $p_request->default_model;
-        $model   = \FreeFW\DI\DI::get($default);
+        $model = \FreeFW\DI\DI::get($default);
         /**
          * Id
          */
-        if ($p_id > 0) {
+        if (intval($p_id) > 0) {
             $filters  = new \FreeFW\Model\Conditions();
             $pk_field = $model->getPkField();
             $aField   = new \FreeFW\Model\ConditionMember();
@@ -256,28 +269,36 @@ class ApiController extends \FreeFW\Core\Controller
                 ->addRelations($apiParams->getInclude())
                 ->setLimit(0, 1)
             ;
-            $data = null;
+            $data = new \FreeFW\Model\ResultSet();
             if ($query->execute()) {
                 $data = $query->getResult();
             }
-            $this->logger->debug('FreeFW.ApiController.getOne.end');
             if (count($data) > 0) {
                 $model = $data[0];
                 $model->setModelBehaviour(\FreeFW\Core\Model::MODEL_BEHAVIOUR_API);
                 if (method_exists($model, 'afterRead')) {
                     $model->afterRead();
                 }
-                return $this->createResponse(200, $model);
+                $this->logger->debug('FreeFW.ApiController.getOne.end');
+                return $this->createSuccessOkResponse($model); // 200
             } else {
-                return $this->createResponse(404);
+                $data = null;
+                $code = FFCST::ERROR_NOT_FOUND; // 404
             }
-        } else {
+        } else if (intval($p_id) == 0) {
             $model->setModelBehaviour(\FreeFW\Core\Model::MODEL_BEHAVIOUR_API);
             if (method_exists($model, 'afterRead')) {
                 $model->afterRead();
             }
-            return $this->createResponse(200, $model);
+            $this->logger->debug('FreeFW.ApiController.getOne.end');
+            return $this->createSuccessResponse(FFCST::SUCCESS_RESPONSE_OK, $model); // 200
+        } else {
+            $data = null;
+            $code = FFCST::ERROR_ID_IS_MANDATORY; // 409
         }
+
+        $this->logger->debug('FreeFW.ApiController.getOne.end');
+        return $this->createErrorResponse($code, $data);
     }
 
     /**
@@ -288,27 +309,38 @@ class ApiController extends \FreeFW\Core\Controller
     public function createOne(\Psr\Http\Message\ServerRequestInterface $p_request)
     {
         $this->logger->debug('FreeFW.ApiController.createOne.start');
+        /**
+         * @var \FreeFW\Http\ApiParams $apiParams
+         */
         $apiParams = $p_request->getAttribute('api_params', false);
-        //
+        if (!isset($p_request->default_model)) {
+            throw new \FreeFW\Core\FreeFWStorageException(
+                sprintf('No default model for route !')
+                );
+        }
         if ($apiParams->hasData()) {
             /**
              * @var \FreeFW\Core\StorageModel $data
              */
             $data = $apiParams->getData();
             $data->setModelBehaviour(\FreeFW\Core\Model::MODEL_BEHAVIOUR_API);
-            if (!$data->isValid()) {
-                $this->logger->debug('FreeFW.ApiController.createOne.end');
-                return $this->createResponse(409, $data);
-            }
-            $data->create();
-            if (!$data->hasErrors()) {
+            if ($data->create()) {
                 $data = $this->getModelById($apiParams, $data, $data->getApiId());
+                $this->logger->debug('FreeFW.ApiController.createOne.end');
+                return $this->createSuccessResponse(FFCST::SUCCESS_RESPONSE_ADD, $data); // 201
+            } else {
+                if (!$data->hasErrors()) {
+                    $data = null;
+                }
+                $code = FFCST::ERROR_NOT_INSERT; // 412
             }
-            $this->logger->debug('FreeFW.ApiController.createOne.end');
-            return $this->createResponse(201, $data);
         } else {
-            return $this->createResponse(409);
+            $data = null;
+            $code = FFCST::ERROR_NO_DATA; // 409
         }
+
+        $this->logger->debug('FreeFW.ApiController.createOne.end');
+        return $this->createErrorResponse($code, $data);
     }
 
     /**
@@ -319,29 +351,54 @@ class ApiController extends \FreeFW\Core\Controller
     public function updateOne(\Psr\Http\Message\ServerRequestInterface $p_request, $p_id)
     {
         $this->logger->debug('FreeFW.ApiController.updateOne.start');
+        /**
+         * @var \FreeFW\Http\ApiParams $apiParams
+         */
         $apiParams = $p_request->getAttribute('api_params', false);
-        //
-        if (intval($p_id) > 0 ) {
+        if (!isset($p_request->default_model)) {
+            throw new \FreeFW\Core\FreeFWStorageException(
+                sprintf('No default model for route !')
+                );
+        }
+        $default = $p_request->default_model;
+        $model = \FreeFW\DI\DI::get($default);
+        if (intval($p_id) > 0) {
             if ($apiParams->hasData()) {
                 /**
                  * @var \FreeFW\Core\StorageModel $data
                  */
-                $data = $apiParams->getData();
-                $data->setModelBehaviour(\FreeFW\Core\Model::MODEL_BEHAVIOUR_API);
-                if ($data->isValid()) {
-                    $data->save();
-                    if (!$data->hasErrors()) {
+                $data = $model->findFirst([$model->getPkField() => $p_id]);
+                if ($data) {
+                    /**
+                     * @var \FreeFW\Core\StorageModel $data
+                     */
+                    $data = $apiParams->getData();
+                    $data->setModelBehaviour(\FreeFW\Core\Model::MODEL_BEHAVIOUR_API);
+                    if ($data->save()) {
                         $data = $this->getModelById($apiParams, $data, $data->getApiId());
+                        $this->logger->debug('FreeFW.ApiController.updateOne.end');
+                        return $this->createSuccessResponse(FFCST::SUCCESS_RESPONSE_OK, $data); // 200
+                    } else {
+                        if (!$data->hasErrors()) {
+                            $data = null;
+                        }
+                        $code = FFCST::ERROR_NOT_UPDATE; // 412
                     }
+                } else {
+                    $data = null;
+                    $code = FFCST::ERROR_ID_IS_UNAVALAIBLE; // 404
                 }
-                $this->logger->debug('FreeFW.ApiController.updateOne.end');
-                return $this->createResponse(200, $data);
             } else {
-                return $this->createResponse(409, 'no data');
+                $data = null;
+                $code = FFCST::ERROR_NO_DATA; // 409
             }
         } else {
-            return $this->createResponse(409, 'Id is mantarory');
+            $data = null;
+            $code = FFCST::ERROR_ID_IS_MANDATORY; // 409
         }
+
+        $this->logger->debug('FreeFW.ApiController.updateOne.end');
+        return $this->createErrorResponse($code, $data);
     }
 
     /**
@@ -352,6 +409,9 @@ class ApiController extends \FreeFW\Core\Controller
     public function removeOne(\Psr\Http\Message\ServerRequestInterface $p_request, $p_id = null)
     {
         $this->logger->debug('FreeFW.ApiController.removeOne.start');
+        /**
+         * @var \FreeFW\Http\ApiParams $apiParams
+         */
         $apiParams = $p_request->getAttribute('api_params', false);
         if (!isset($p_request->default_model)) {
             throw new \FreeFW\Core\FreeFWStorageException(
@@ -359,9 +419,8 @@ class ApiController extends \FreeFW\Core\Controller
             );
         }
         $default = $p_request->default_model;
-        $model   = \FreeFW\DI\DI::get($default);
-        //
-        if (intval($p_id) > 0 ) {
+        $model = \FreeFW\DI\DI::get($default);
+        if (intval($p_id) > 0) {
             /**
              * @var \FreeFW\Core\StorageModel $data
              */
@@ -370,12 +429,23 @@ class ApiController extends \FreeFW\Core\Controller
                 $data->setModelBehaviour(\FreeFW\Core\Model::MODEL_BEHAVIOUR_API);
                 if ($data->remove()) {
                     $this->logger->debug('FreeFW.ApiController.removeOne.end');
-                    return $this->createResponse(204);
+                    return $this->createSuccessResponse(FFCST::SUCCESS_RESPONSE_EMPTY); // 204
                 } else {
-                    return $this->createResponse(409, $data);
+                    if (!$data->hasErrors()) {
+                        $data = null;
+                    }
+                    $code = FFCST::ERROR_NOT_DELETE; // 412
                 }
+            } else {
+                $data = null;
+                $code = FFCST::ERROR_ID_IS_UNAVALAIBLE; // 404
             }
+        } else {
+            $data = null;
+            $code = FFCST::ERROR_ID_IS_MANDATORY; // 409
         }
-        return $this->createResponse(409);
+
+        $this->logger->debug('FreeFW.ApiController.removeOne.end');
+        return $this->createErrorResponse($code, $data);
     }
 }

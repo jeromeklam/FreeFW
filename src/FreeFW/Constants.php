@@ -164,11 +164,26 @@ class Constants
      * Errors types
      * @var string
      */
-    const ERROR_REQUIRED     = 666001;
-    const ERROR_FOREIGNKEY   = 666002;
-    const ERROR_UNIQINDEX    = 666003;
-    const ERROR_VALUES       = 666004;
-    const ERROR_MAXLENGTH    = 666005;
+    const ERROR_REQUIRED            = 666001;
+    const ERROR_FOREIGNKEY          = 666002;
+    const ERROR_UNIQINDEX           = 666003;
+    const ERROR_VALUES              = 666004;
+    const ERROR_MAXLENGTH           = 666005;
+    const ERROR_ID_IS_MANDATORY     = 666006;
+    const ERROR_NOT_FOUND           = 666007;
+    const ERROR_NO_DATA             = 666008;
+    const ERROR_NOT_UPDATE          = 666009;
+    const ERROR_NOT_DELETE          = 666010;
+    const ERROR_NOT_INSERT          = 666011;
+    const ERROR_ID_IS_UNAVALAIBLE   = 666012;
+
+    /**
+     * Success types
+     * @var integer
+     */
+    const SUCCESS_RESPONSE_EMPTY    = 6800204;
+    const SUCCESS_RESPONSE_ADD      = 6800201;
+    const SUCCESS_RESPONSE_OK       = 6800200;
 
     /**
      * Models error codes
