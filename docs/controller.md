@@ -79,7 +79,7 @@ Les méthodes suivantes permettent de gérer les erreurs sur l'instance :
 * erreur pendant l'insert : Erreur 666011 = errors ou 'not insert' si y a pas d'errors
 * il n'y a pas de données envoyées : Erreur 666008 = 'no data'
 
-### updateOne : modificaion et retourne l'élément modifié
+### updateOne : modification et retourne l'élément modifié
 
 * tout se passe bien : OK + datas modifiées
 * erreur pendant l'update : Erreur 666009 = errors ou 'not update' si y a pas d'errors
