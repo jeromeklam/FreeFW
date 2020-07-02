@@ -52,14 +52,16 @@ Retourne une réponse OK (2*). Cette méthode est prévue pour recevoir en param
 
 Retourne une réponse >= 4*. Le premier paramètre est le code principal de l'erreur, le second les données.
 
-## Méthodes standards
-
 Les méthodes suivantes permettent de gérer les erreurs sur l'instance :
 
 * getErrors : retourne les erreurs
 * addErrors : ajoute un tableau d'erreurs
 * addError : ajoute une erreurs
 * hasErrors : retourne vrai si il y a des erreurs
+
+## Méthodes standards
+
+Ces méthodes sont à utiliser pour des appels simples
 
 ### getAll : la recherche
 
