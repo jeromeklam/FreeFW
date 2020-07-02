@@ -116,7 +116,7 @@ trait HttpFactoryTrait
      * @see \Psr\Http\Message\ResponseFactoryInterface::createResponse()
      * @return \Psr\Http\Message\Response
      */
-    public function createSuccessResponse(int $p_code, $p_reasonPhrase = null): ResponseInterface
+    protected function createSuccessResponse(int $p_code, $p_reasonPhrase = null): ResponseInterface
     {
         switch ($p_code) {
             case FFCST::SUCCESS_RESPONSE_EMPTY :
@@ -177,6 +177,34 @@ trait HttpFactoryTrait
     public function createSuccessAddResponse($p_reasonPhrase): ResponseInterface
     {
         return $this->createSuccessResponse(FFCST::SUCCESS_RESPONSE_ADD,$p_reasonPhrase);
+    }
+
+    /**
+     *
+     * Return a response positive avec info de type OK
+     *
+     * @param string|object $p_reasonPhrase les données en retour
+     *
+     * @see \Psr\Http\Message\ResponseFactoryInterface::createResponse()
+     * @return \Psr\Http\Message\Response
+     */
+    public function createSuccessUpdateResponse($p_reasonPhrase): ResponseInterface
+    {
+        return $this->createSuccessResponse(FFCST::SUCCESS_RESPONSE_OK, $p_reasonPhrase);
+    }
+
+    /**
+     *
+     * Return a response positive avec info de type OK
+     *
+     * @param string|object $p_reasonPhrase les données en retour
+     *
+     * @see \Psr\Http\Message\ResponseFactoryInterface::createResponse()
+     * @return \Psr\Http\Message\Response
+     */
+    public function createSuccessRemoveResponse(): ResponseInterface
+    {
+        return $this->createSuccessResponse(FFCST::SUCCESS_RESPONSE_EMPTY);
     }
 
     /**

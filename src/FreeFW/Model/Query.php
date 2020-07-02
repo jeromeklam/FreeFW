@@ -400,6 +400,9 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
      */
     public function getResult()
     {
+        if (!$this->result_set instanceof \FreeFW\Model\ResultSet) {
+            $this->result_set = new \FreeFW\Model\ResultSet();
+        }
         return $this->result_set;
     }
 

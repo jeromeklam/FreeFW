@@ -98,12 +98,9 @@ class ApiController extends \FreeFW\Core\Controller
         if ($query->execute()) {
             $data = $query->getResult();
         }
-        if (count($data) > 0) {
-            $this->logger->debug('FreeFW.ApiController.autocomplete.end');
-            return $this->createSuccessResponse(FFCST::SUCCESS_RESPONSE_OK, $data); // 200
-        }
+        // data can be empty, but it's a 2*
         $this->logger->debug('FreeFW.ApiController.autocomplete.end');
-        return $this->createErrorResponse(FFCST::ERROR_NOT_FOUND); // 404
+        return $this->createSuccessOkResponse($data); // 200
     }
 
     /**
@@ -177,12 +174,7 @@ class ApiController extends \FreeFW\Core\Controller
         }
 
         $this->logger->debug('FreeFW.ApiController.getChildren.end');
-
-//        if (count($chilren) > 0) {
-            return $this->createSuccessResponse(FFCST::SUCCESS_RESPONSE_OK, $children); // 200
-//        }
-//
-//        return $this->createErrorResponse(FFCST::ERROR_NO_DATA); // 409
+        return $this->createSuccessOkResponse($children); // 200
     }
 
     /**
@@ -218,12 +210,9 @@ class ApiController extends \FreeFW\Core\Controller
         if ($query->execute()) {
             $data = $query->getResult();
         }
-        if (count($data) > 0) {
-            $this->logger->debug('FreeFW.ApiController.getOne.end');
-            return $this->createSuccessResponse(FFCST::SUCCESS_RESPONSE_OK, $data); // 200
-        }
-        $this->logger->debug('FreeFW.ApiController.getAll.end');
-        return $this->createSuccessEmptyResponse(); // 200, but empty
+        // data can be empty, but it's a 2*
+        $this->logger->debug('FreeFW.ApiController.getOne.end');
+        return $this->createSuccessOkResponse($data); // 200
     }
 
     /**
@@ -291,7 +280,7 @@ class ApiController extends \FreeFW\Core\Controller
                 $model->afterRead();
             }
             $this->logger->debug('FreeFW.ApiController.getOne.end');
-            return $this->createSuccessResponse(FFCST::SUCCESS_RESPONSE_OK, $model); // 200
+            return $this->createSuccessOkResponse($model); // 200
         } else {
             $data = null;
             $code = FFCST::ERROR_ID_IS_MANDATORY; // 409
@@ -327,7 +316,7 @@ class ApiController extends \FreeFW\Core\Controller
             if ($data->create()) {
                 $data = $this->getModelById($apiParams, $data, $data->getApiId());
                 $this->logger->debug('FreeFW.ApiController.createOne.end');
-                return $this->createSuccessResponse(FFCST::SUCCESS_RESPONSE_ADD, $data); // 201
+                return $this->createSuccessAddResponse($data); // 201
             } else {
                 if (!$data->hasErrors()) {
                     $data = null;
@@ -358,7 +347,7 @@ class ApiController extends \FreeFW\Core\Controller
         if (!isset($p_request->default_model)) {
             throw new \FreeFW\Core\FreeFWStorageException(
                 sprintf('No default model for route !')
-                );
+            );
         }
         $default = $p_request->default_model;
         $model = \FreeFW\DI\DI::get($default);
@@ -377,7 +366,7 @@ class ApiController extends \FreeFW\Core\Controller
                     if ($data->save()) {
                         $data = $this->getModelById($apiParams, $data, $data->getApiId());
                         $this->logger->debug('FreeFW.ApiController.updateOne.end');
-                        return $this->createSuccessResponse(FFCST::SUCCESS_RESPONSE_OK, $data); // 200
+                        return $this->createSuccessUpdateResponse($data); // 200
                     } else {
                         if (!$data->hasErrors()) {
                             $data = null;
@@ -429,7 +418,7 @@ class ApiController extends \FreeFW\Core\Controller
                 $data->setModelBehaviour(\FreeFW\Core\Model::MODEL_BEHAVIOUR_API);
                 if ($data->remove()) {
                     $this->logger->debug('FreeFW.ApiController.removeOne.end');
-                    return $this->createSuccessResponse(FFCST::SUCCESS_RESPONSE_EMPTY); // 204
+                    return $this->createSuccessRemoveResponse(); // 204
                 } else {
                     if (!$data->hasErrors()) {
                         $data = null;
