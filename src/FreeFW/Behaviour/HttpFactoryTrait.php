@@ -132,8 +132,11 @@ trait HttpFactoryTrait
                 $codeHttp = 200;
                 break;
         }
-
-        return $this->createResponse($codeHttp, $p_reasonPhrase);
+        $reasonPhrase = $p_reasonPhrase;
+        if ($reasonPhrase === null || $reasonPhrase === false) {
+            $reasonPhrase = '';
+        }
+        return $this->createResponse($codeHttp, $reasonPhrase);
     }
 
     /**

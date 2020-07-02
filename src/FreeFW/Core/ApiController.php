@@ -223,7 +223,7 @@ class ApiController extends \FreeFW\Core\Controller
             return $this->createSuccessResponse(FFCST::SUCCESS_RESPONSE_OK, $data); // 200
         }
         $this->logger->debug('FreeFW.ApiController.getAll.end');
-        return $this->createErrorResponse(FFCST::ERROR_NOT_FOUND); // 404
+        return $this->createSuccessEmptyResponse(); // 200, but empty
     }
 
     /**
