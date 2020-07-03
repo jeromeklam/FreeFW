@@ -66,6 +66,8 @@ trait HttpFactoryTrait
             FFCST::ERROR_NOT_DELETE         => 'not delete',
             FFCST::ERROR_NOT_UPDATE         => 'not update',
 
+            FFCST::ERROR_NOT_AUTHENTICATED  => 'not authenticated',     // 401
+
             FFCST::ERROR_NOT_FOUND          => 'not found',             // 404
             FFCST::ERROR_ID_IS_UNAVALAIBLE  => 'id is unavailable',
 
@@ -93,8 +95,13 @@ trait HttpFactoryTrait
                 $codeHttp = 404;
                 break;
 
+            case FFCST::ERROR_NOT_AUTHENTICATED:
+                $codeHttp = 401;
+                break;
+
 //          case FFCST::ERROR_ID_IS_MANDATORY :
 //          case FFCST::ERROR_NO_DATA :
+//          case FFCST::ERROR_IN_DATA :
 
             default :
                 $codeHttp = 409;

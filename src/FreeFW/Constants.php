@@ -176,6 +176,8 @@ class Constants
     const ERROR_NOT_DELETE          = 666010;
     const ERROR_NOT_INSERT          = 666011;
     const ERROR_ID_IS_UNAVALAIBLE   = 666012;
+    const ERROR_NOT_AUTHENTICATED   = 666013;
+    const ERROR_IN_DATA             = 666014;
 
     /**
      * Success types
