@@ -99,6 +99,7 @@ class Constants
     const PROPERTY_FK         = 'fk';
     const PROPERTY_DEPRECATED = 'deprecated';
     const PROPERTY_SCOPE      = 'scope';
+    const PROPERTY_FUNCTION   = 'function';
 
     /**
      * Index
@@ -138,6 +139,7 @@ class Constants
     const OPTION_FK               = 'FK';
     const OPTION_JSONIGNORE       = 'NOJSON';
     const OPTION_LOCAL            = 'LOCAL';
+    const OPTION_FUNCTION         = 'FUNCTION';
     const OPTION_UNIQ             = 'UNIQ';
     const OPTION_BROKER           = 'BROKER';
     const OPTION_USER             = 'USER';

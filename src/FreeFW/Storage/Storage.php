@@ -39,6 +39,7 @@ abstract class Storage implements
     const COND_BEGIN_WITH            = 'containsb';
     const COND_END_WITH              = 'containse';
     const COND_GLOBAL_MAX            = 'gmax';
+    const COND_GLOBAL_MIN            = 'gmin';
 
     /**
      * Operators
@@ -48,12 +49,23 @@ abstract class Storage implements
     const COND_OR                    = 'or';
 
     /**
-     * Tri
-     *
+     * Sort
      * @var string
      */
     const SORT_ASC  = 'ASC';
     const SORT_DESC = 'DESC';
+
+    /**
+     * Functions
+     * @var string
+     */
+    const FUNCTION_MAX      = 'MAX';
+    const FUNCTION_MIN      = 'MIN';
+    const FUNCTION_SUM      = 'SUM';
+    const FUNCTION_DISTINCT = 'DISTINCT';
+    const FUNCTION_YEAR     = 'YEAR';
+    const FUNCTION_MONTH    = 'MONTH';
+    const FUNCTION_DAY      = 'DAY';
 
     /**
      * comportements
@@ -62,6 +74,25 @@ abstract class Storage implements
     use \FreeFW\Behaviour\EventManagerAwareTrait;
     use \FreeFW\Behaviour\ConfigAwareTrait;
 
+    /**
+     * Get all functions
+     *
+     * @return string[]
+     */
+    public static function getAllFunctions()
+    {
+        return [
+            self::FUNCTION_MIN,
+            self::FUNCTION_MAX,
+            self::FUNCTION_SUM,
+            self::FUNCTION_DISTINCT,
+        ];
+    }
+
+    /**
+     * Return all operators for check
+     * @return string[]
+     */
     public static function getAllOperators()
     {
         return [
@@ -86,6 +117,7 @@ abstract class Storage implements
             self::COND_NOT_EQUAL,
             self::COND_NOT_EQUAL_OR_NULL,
             self::COND_GLOBAL_MAX,
+            self::COND_GLOBAL_MIN,
         ];
     }
 }

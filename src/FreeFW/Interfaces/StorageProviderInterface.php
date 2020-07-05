@@ -36,4 +36,14 @@ interface StorageProviderInterface
      * @return boolean
      */
     public function hasSqlCalcFoundRows();
+
+    /**
+     * Convert a function in SQL
+     *
+     * @param string $p_function
+     * @param string $p_field
+     *
+     * @return string
+     */
+    public function convertFunction($p_function, $p_field);
 }

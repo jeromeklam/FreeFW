@@ -15,17 +15,21 @@ class Encoder
      * @param \FreeFW\Interfaces\ApiResponseInterface $p_api_response
      * @param \FreeFW\JsonApi\V1\Model\IncludedObject $p_included
      * @param \FreeFW\Http\ApiParams                  $p_api_params
+     * @param string                                  $p_prefix
      *
      * @return \FreeFW\JsonApi\V1\Model\ResourceObject
      */
     protected function encodeSingleResource(
         \FreeFW\Interfaces\ApiResponseInterface $p_api_response,
         \FreeFW\JsonApi\V1\Model\IncludedObject $p_included,
-        \FreeFW\Http\ApiParams $p_api_params
+        \FreeFW\Http\ApiParams $p_api_params,
+        $p_prefix = ''
     ) : \FreeFW\JsonApi\V1\Model\ResourceObject {
+        if ($p_prefix != '') {
+            $p_prefix = $p_prefix . '.';
+        }
         $incTab   = $p_api_params->getInclude();
         $includes = '@@' . implode('@@', $incTab) . '@@';
-        $includes = str_replace('.', '@@', $includes);
         $resource = new \FreeFW\JsonApi\V1\Model\ResourceObject(
             $p_api_response->getApiType(),
             $p_api_response->getApiId(),
@@ -37,12 +41,10 @@ class Encoder
             $resource->setAttributes($attributes);
         }
         $relations = $p_api_response->getApiRelationShips();
-        $continue  = !$p_included->incomingExists($resource);
-        if ($relations && $continue) {
-            $p_included->addIncoming($resource);
+        if ($relations) {
             $relationShips = new \FreeFW\JsonApi\V1\Model\RelationshipsObject();
             foreach ($relations as $relation) {
-                if (strpos($includes, '@@' . $relation->getName() . '@@') !== false) {
+                if (strpos($includes, '@@' . $p_prefix . $relation->getName() . '@@') !== false) {
                     $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relation->getName(), true);
                     if (method_exists($p_api_response, $getter)) {
                         $model  = $p_api_response->$getter();
@@ -55,7 +57,12 @@ class Encoder
                                     $model->isSingleElement()
                                 );
                                 $relationShips->addRelation($relation->getName(), $resourceRel);
-                                $included = $this->encodeSingleResource($model, $p_included, $p_api_params);
+                                $included = $this->encodeSingleResource(
+                                    $model,
+                                    $p_included,
+                                    $p_api_params,
+                                    $p_prefix . $relation->getName()
+                                );
                                 $p_included->addIncluded($included);
                             } else {
                                 unset($incTab[$relation->getName()]);
@@ -66,7 +73,12 @@ class Encoder
                                         $oneModel->isSingleElement()
                                     );
                                     $relationShips->addRelation($relation->getName(), $resourceRel, true);
-                                    $included = $this->encodeSingleResource($oneModel, $p_included, $p_api_params);
+                                    $included = $this->encodeSingleResource(
+                                        $oneModel,
+                                        $p_included,
+                                        $p_api_params,
+                                        $p_prefix . $relation->getName()
+                                    );
                                     $p_included->addIncluded($included);
                                 }
                             }

@@ -452,21 +452,96 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
     /**
      * Return all fields for a select clause
      *
+     * @param string                                      $p_alias
+     * @param array                                       $p_fields
+     * @param \FreeFW\Interfaces\StorageProviderInterface $p_provider
+     *
      * @return string
      */
-    public function getFieldsForSelect(string $p_alias = '') : string
-    {
+    public function getFieldsForSelect(
+        string $p_alias = '',
+        array $p_fields = [],
+        \FreeFW\Interfaces\StorageProviderInterface $p_provider = null
+    ) : string {
         $select = '';
+        $check  = false;
+        if (is_array($p_fields) && count($p_fields) > 0) {
+            $check = [];
+            foreach ($p_fields as $oneField) {
+                array_push($check, $oneField->getFldName());
+            }
+        }
         foreach ($this->getProperties() as $name => $property) {
-            if ($p_alias == '') {
-                $add = $name;
-            } else {
-                $add = $p_alias . '.' . $name . ' AS ' . $p_alias . '_' . $name;
+            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property) &&
+                in_array(FFCST::OPTION_LOCAL, $property[FFCST::PROPERTY_OPTIONS])) {
+                continue;
+            }
+            if ($check && !in_array($name, $check)) {
+                continue;
+            }
+            $from = $name;
+            $to   = $name;
+            if ($p_alias != '') {
+                $from = $p_alias . '.' . $from;
+                $to   = $p_alias . '_' . $to;
+            }
+            if (in_array(FFCST::OPTION_FUNCTION, $property[FFCST::PROPERTY_OPTIONS])) {
+                foreach ($property[FFCST::PROPERTY_FUNCTION] as $fct => $fldName) {
+                   $from = $p_provider->convertFunction($fct, $fldName);
+                   $to   = $name;
+                   if ($p_alias != '') {
+                       $from = $p_provider->convertFunction($fct, $p_alias . '.' . $fldName);
+                       $to   = $p_alias . '_' . $to;
+                   }
+                }
             }
             if ($select == '') {
-                $select = $add;
+                $select = $from . ' AS ' . $to;
             } else {
-                $select = $select . ', ' . $add;
+                $select = $select . ', ' . $from . ' AS ' . $to;
+            }
+        }
+        return $select;
+    }
+
+    /**
+     * Return all fields for a select clause
+     *
+     * @param string                                      $p_alias
+     * @param array                                       $p_fields
+     * @param \FreeFW\Interfaces\StorageProviderInterface $p_provider
+     *
+     * @return string
+     */
+    public function getFieldsAliasForSelect(
+        string $p_alias = '',
+        array $p_fields = [],
+        \FreeFW\Interfaces\StorageProviderInterface $p_provider = null
+        ) : string {
+        $select = '';
+        $check  = false;
+        if (is_array($p_fields) && count($p_fields) > 0) {
+            $check = [];
+            foreach ($p_fields as $oneField) {
+                array_push($check, $oneField->getFldName());
+            }
+        }
+        foreach ($this->getProperties() as $name => $property) {
+            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property) &&
+                in_array(FFCST::OPTION_LOCAL, $property[FFCST::PROPERTY_OPTIONS])) {
+                continue;
+            }
+            if ($check && !in_array($name, $check)) {
+                continue;
+            }
+            $to = $name;
+            if ($p_alias != '') {
+                $to   = $p_alias . '_' . $to;
+            }
+            if ($select == '') {
+                $select = $to;
+            } else {
+                $select = $select . ', ' . $to;
             }
         }
         return $select;

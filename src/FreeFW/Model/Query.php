@@ -17,6 +17,7 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
      */
     const QUERY_SELECT   = 'SELECT';
     const QUERY_DISTINCT = 'DISTINCT';
+    const QUERY_GROUP    = 'GROUP';
     const QUERY_UPDATE   = 'UPDATE';
     const QUERY_DELETE   = 'DELETE';
     const QUERY_COUNT    = 'COUNT';
@@ -47,6 +48,12 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
      * @var string
      */
     protected $main_model = null;
+
+    /**
+     * Fields
+     * @var array
+     */
+    protected $fields = [];
 
     /**
      * Conditions
@@ -103,6 +110,8 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
         $this->result_set = new \FreeFW\Model\ResultSet();
         $this->conditions = new \FreeFW\Model\Conditions();
         $this->strategy = \FreeFW\DI\DI::getShared('Storage::' . self::getDefaultStorage());
+        $this->flushErrors();
+        $this->flushFields();
     }
 
     /**
@@ -133,12 +142,14 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
      * Set type
      *
      * @param string $p_type
+     * @param array  $p_fields
      *
      * @return \FreeFW\Model\Query
      */
-    public function setType(string $p_type)
+    public function setType(string $p_type, array $p_fields = [])
     {
         $this->type = $p_type;
+        $this->setFields($p_fields);
         return $this;
     }
 
@@ -173,6 +184,88 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
     public function getMainModel()
     {
         return $this->main_model;
+    }
+
+    /**
+     * Set fields
+     *
+     * @param array $p_fields
+     *
+     * @return \FreeFW\Model\Query
+     */
+    public function setFields(array $p_fields)
+    {
+        if (is_array($p_fields) && count($p_fields) > 0) {
+            foreach ($p_fields as $oneField) {
+                $this->addField($oneField);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Get fields
+     *
+     * @return array
+     */
+    public function getFields()
+    {
+        return $this->fields;
+    }
+
+    /**
+     * Has fields
+     *
+     * @return boolean
+     */
+    public function hasFields()
+    {
+        return count($this->fields) > 0;
+    }
+
+    /**
+     * Flush fields
+     *
+     * @return \FreeFW\Model\Query
+     */
+    public function flushFields()
+    {
+        $this->fields = [];
+        return $this;
+    }
+
+    /**
+     * Add one field
+     *
+     * @param string|\FreeFW\Model\Field $p_field
+     * @param string                     $p_function
+     *
+     * @return \FreeFW\Model\Query
+     */
+    public function addField($p_field, $p_function = '')
+    {
+        if (is_string($p_field)) {
+            $field    = $p_field;
+            $function = $p_function;
+            if (strpos(':', $p_field) !== false) {
+                $parts    = explode(':', $p_field);
+                $field    = $parts[0];
+                $function = $parts[1];
+            }
+            $newField = new \FreeFW\Model\Field();
+            $newField
+                ->setFldName($field)
+                ->setFldFunction($function)
+            ;
+            $this->fields[] = $newField;
+        } else {
+            if ($p_field instanceof \FreeFW\Model\Field) {
+                $this->fields[] = $p_field;
+            } else {
+                throw new \InvalidArgumentException('Incorrect select type class');
+            }
+        }
+        return $this;
     }
 
     /**
@@ -332,6 +425,21 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
                     $this->sort
                 );
                 return true;
+            case self::QUERY_GROUP:
+                $model            = \FreeFW\DI\DI::get($this->main_model);
+                $this->result_set = $this->strategy->select(
+                    $model,
+                    $this->conditions,
+                    $this->relations,
+                    $this->from,
+                    $this->length,
+                    $this->sort,
+                    '',
+                    $p_function,
+                    $this->getFields(),
+                    'GROUPBY'
+                );
+                return true;
             case self::QUERY_SELECT:
                 $model            = \FreeFW\DI\DI::get($this->main_model);
                 $this->result_set = $this->strategy->select(
@@ -342,7 +450,9 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
                     $this->length,
                     $this->sort,
                     '',
-                    $p_function
+                    $p_function,
+                    [],
+                    'SELECT'
                 );
                 return true;
             case self::QUERY_UPDATE:

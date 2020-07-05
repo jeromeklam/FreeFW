@@ -77,6 +77,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 if (in_array(FFCST::OPTION_LOCAL, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $add = false;
                 }
+                if (in_array(FFCST::OPTION_FUNCTION, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
+                    $add = false;
+                }
                 if (in_array(FFCST::OPTION_PK, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $pk = true;
                 }
@@ -506,6 +509,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 if (in_array(FFCST::OPTION_LOCAL, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $add = false;
                 }
+                if (in_array(FFCST::OPTION_FUNCTION, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
+                    $add = false;
+                }
                 if (in_array(FFCST::OPTION_PK, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $pk = true;
                 }
@@ -695,10 +701,8 @@ class PDOStorage extends \FreeFW\Storage\Storage
     /**
      * Select the model
      *
-     * @param \FreeFW\Core\StorageModel $p_model
-     * @param \FreeFW\Model\Conditions  $p_conditions
-     *
-     * @return \FreeFW\Model\ResultSet
+     * {@inheritDoc}
+     * @see \FreeFW\Interfaces\StorageInterface::select()
      */
     public function select(
         \FreeFW\Core\StorageModel &$p_model,
@@ -708,13 +712,16 @@ class PDOStorage extends \FreeFW\Storage\Storage
         int $p_length = 0,
         array $p_sort = [],
         string $p_force_select = '',
-        $p_function = null
+        $p_function = null,
+        array $p_fields = [],
+        $p_special = 'SELECT'
     ) {
         $crtAlias     = 'A';
         $aliases      = [];
         $aliases['@'] = $crtAlias;
         $ids          = [];
-        $select       = $p_model->getFieldsForSelect($crtAlias);
+        $select       = $p_model->getFieldsForSelect($crtAlias, $p_fields, $this->provider);
+        $group        = $p_model->getFieldsAliasForSelect($crtAlias, $p_fields, $this->provider);
         $from         = $p_model::getSource() . ' AS ' . $crtAlias;
         $properties   = $p_model::getProperties();
         $values       = [];
@@ -766,7 +773,8 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     self::$models[$onePart] = $newModel;
                     ++$crtAlias;
                     $aliases[$baseAlias . '.' . $onePart] = $crtAlias;
-                    $select   = $select . ', ' . $newModel->getFieldsForSelect($crtAlias);
+                    $select   = $select . ', ' . $newModel->getFieldsForSelect($crtAlias, $p_fields, $this->provider);
+                    $group    = $group . ', ' . $newModel->getFieldsAliasForSelect($crtAlias, $p_fields, $this->provider);
                     $alias1   = $aliases[$baseAlias];
                     switch ($crtFKs[$onePart]['right']['type']) {
                         case \FreeFW\Model\Query::JOIN_RIGHT:
@@ -786,8 +794,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                             break;
                     }
                 } else {
-                    $onePart = array_shift($parts);
-                    continue;
+                    $newModel = self::$models[$onePart];
                 }
                 $baseAlias = $baseAlias . '.' . $onePart;
                 if ($newModel && count($parts) > 0) {
@@ -829,6 +836,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
         if ($p_force_select !== '') {
             $select = $p_force_select;
         }
+        if ($p_special == 'GROUPBY') {
+            $group = ' GROUP BY ' . $group;
+        } else {
+            $group = '';
+        }
         // Sort
         $sort = '';
         foreach ($p_sort as $column => $order) {
@@ -856,7 +868,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
             }
         }
         // Build query
-        $sql = 'SELECT ' . $select . ' FROM ' . $from . ' WHERE ( ' . $where . ' ) ' . $whereBroker . ' ' . $sort . ' ' . $limit;
+        $sql = 'SELECT ' . $select . ' FROM ' . $from . ' WHERE ( ' . $where . ' ) ' . $whereBroker . ' ' . $group . ' ' . $sort . ' ' . $limit;
         //var_export($sql);
         $this->logger->debug('PDOStorage.select : ' . $sql);
         $this->logger->debug('PDOStorage.fields : ' . print_r($values, true));

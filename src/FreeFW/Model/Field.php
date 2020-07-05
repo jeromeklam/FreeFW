@@ -15,37 +15,43 @@ class Field extends \FreeFW\Core\Model
      * Field name
      * @var string
      */
-    protected $fld_name;
+    protected $fld_name = null;
 
     /**
      * Field type
      * @var string
      */
-    protected $fld_type;
+    protected $fld_type = null;
 
     /**
      * Field length
      * @var int
      */
-    protected $fld_length;
+    protected $fld_length = null;
 
     /**
      * Field length complement
      * @var int
      */
-    protected $fld_complement;
+    protected $fld_complement = null;
 
     /**
      * Primary key ?
      * @var bool
      */
-    protected $fld_primary;
+    protected $fld_primary = null;
 
     /**
      * Required ?
      * @var bool
      */
-    protected $fld_required;
+    protected $fld_required = null;
+
+    /**
+     * Function
+     * @var string
+     */
+    protected $fld_function = null;
 
     /**
      * Set field name
@@ -183,6 +189,29 @@ class Field extends \FreeFW\Core\Model
     public function getFldRequired()
     {
         return $this->fld_required;
+    }
+
+    /**
+     * Set field function
+     *
+     * @param string $p_function
+     *
+     * @return \FreeFW\Model\Field
+     */
+    public function setFldFunction(bool $p_function)
+    {
+        $this->fld_function = $p_function;
+        return $this;
+    }
+
+    /**
+     * Get field function
+     *
+     * @return string
+     */
+    public function getFldFunction()
+    {
+        return $this->fld_function;
     }
 
     /**

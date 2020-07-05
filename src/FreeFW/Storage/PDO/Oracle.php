@@ -109,4 +109,31 @@ class Oracle extends \PDO implements \FreeFW\Interfaces\StorageProviderInterface
     {
         return false;
     }
+
+    /**
+     * Convert a function in SQL
+     *
+     * @param string $p_function
+     * @param string $p_field
+     *
+     * @return string
+     */
+    public function convertFunction($p_function, $p_field)
+    {
+        switch ($p_function) {
+            case \FreeFW\Storage\Storage::FUNCTION_YEAR:
+                return ('EXTRACT year FROM ' . $p_field);
+            case \FreeFW\Storage\Storage::FUNCTION_MONTH:
+                return ('EXTRACT month FROM ' . $p_field);
+            case \FreeFW\Storage\Storage::FUNCTION_DAY:
+                return ('EXTRACT day FROM ' . $p_field);
+            case \FreeFW\Storage\Storage::FUNCTION_MIN:
+                return ('MIN(' . $p_field . ')');
+            case \FreeFW\Storage\Storage::FUNCTION_MAX:
+                return ('MAX(' . $p_field . ')');
+            case \FreeFW\Storage\Storage::FUNCTION_SUM:
+                return ('SUM(' . $p_field . ')');
+        }
+        return $p_field;
+    }
 }

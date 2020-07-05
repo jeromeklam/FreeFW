@@ -9,13 +9,15 @@
 * Between and transaction
 * Core.Model : initWithJson (correction de la gestion des champs avec propriété PUBLIC)
 * Core.Model : behaviour on models (standard, raw, api) for db actions
-* Code.Model : nouvelle méthode getFiedName
+* Core.Model : nouvelle méthode getFiedName
 * Behaviour.ValidatorTrait : nouvelles méthodes isCreation, isModification
 * Storage.PDOStorage : correction de l'utilisation du getUniqIndexes avec un tableau de champs au lieu d'1 string
 * constants : nouvelles constantes
 * Adaptations DI
 * alerts
 * simple rate
+* StorageModel.getFieldsForSelect : ne rajoute plus les champs LOCAL dans la clause SELECT
+* PDO.* : gestion des functions basique (MIN, MAX, ...) + limitation de la clause select
 
 ** WARNING **
 

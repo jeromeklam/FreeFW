@@ -54,6 +54,14 @@ interface StorageInterface
      *
      * @param \FreeFW\Core\StorageModel $p_model
      * @param \FreeFW\Model\Conditions  $p_conditions
+     * @param array                     $p_relations
+     * @param number                    $p_from
+     * @param number                    $p_length
+     * @param array                     $p_sort
+     * @param string                    $p_force_select
+     * @param string                    $p_function
+     * @param array                     $p_fields
+     * @param string                    $p_special
      *
      * @return \FreeFW\Model\ResultSet
      */
@@ -65,7 +73,9 @@ interface StorageInterface
         int $p_length = 0,
         array $p_sort = [],
         string $p_force_select = '',
-        $p_function = null
+        $p_function = null,
+        array $p_fields = [],
+        $p_special = 'SELECT'
     );
 
     /**
