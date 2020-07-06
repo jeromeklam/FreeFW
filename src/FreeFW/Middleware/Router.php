@@ -6,6 +6,7 @@ use \Psr\Http\Server\RequestHandlerInterface;
 use \Psr\Http\Message\ResponseFactoryInterface;
 use \Psr\Http\Message\ServerRequestInterface;
 use \Psr\Http\Message\ResponseInterface;
+use \FreeFW\Router\Route as FFCSTRT;
 
 /**
  *
@@ -79,6 +80,10 @@ class Router implements
         }
     }
 
+    public function getRouteIncludes()
+    {
+        return $this->include;
+    }
     /**
      * Process an incoming server request and return a response, optionally delegating
      * to the next middleware component to create the response.
@@ -96,15 +101,46 @@ class Router implements
         $object                   = \FreeFW\DI\DI::get($this->controller);
         $apiParams                = $p_request->getAttribute('api_params', false);
         if ($apiParams instanceof \FreeFW\Http\ApiParams) {
-            $includes = $apiParams->getInclude();
-            if (array_key_exists('limit', $this->include)) {
+//          if (array_key_exists('limit', $this->include)) {
                 // @todo, no mode than limit...
-            }
-            if (count($includes) <= 0 && array_key_exists('default', $this->include)) {
-                $apiParams->setInclude($this->include['default']);
-            }
+//          }
+            $this->setInclude($apiParams);
+            var_dump($apiParams->getInclude());
             $p_request = $p_request->withAttribute('api_params', $apiParams);
         }
         return call_user_func_array([$object, $this->function], array_merge([$p_request], $this->params));
+    }
+
+    /**
+     * Construit l'include d'apiParams
+     *
+     * @param \FreeFW\Http\ApiParams $p_apiParams
+     * @return \FreeFW\Http\ApiParams
+     */
+    protected function setInclude($p_apiParams)
+    {
+        $includes = $p_apiParams->getInclude();
+
+        if (count($includes) == 0 && array_key_exists(FFCSTRT::ROUTE_INCLUDE_DEFAULT, $this->include)) {
+            $includes = $p_apiParams->renderInclude($this->include[FFCSTRT::ROUTE_INCLUDE_DEFAULT]);
+        }
+
+        if (array_key_exists(FFCSTRT::ROUTE_INCLUDE_LIST,$this->include)) {
+            if (count($p_apiParams->renderInclude($this->include[FFCSTRT::ROUTE_INCLUDE_LIST])) > 0) {
+                $includes = array_intersect(
+                                $includes,
+                                $p_apiParams->renderInclude($this->include[FFCSTRT::ROUTE_INCLUDE_LIST])
+                            );
+            }
+        }
+
+        if (array_key_exists(FFCSTRT::ROUTE_INCLUDE_REQJIRED,$this->include)) {
+            $includes = array_merge(
+                            $includes,
+                            $p_apiParams->renderInclude($this->include[FFCSTRT::ROUTE_INCLUDE_REQJIRED])
+                        );
+        }
+
+        $p_apiParams->setInclude($includes);
     }
 }

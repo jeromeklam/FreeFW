@@ -1,6 +1,8 @@
 
 # 1.2.0 : --/--/2020
 
+* ROUTE_INCLUDE_REQJIRED remplacé par ROUTE_INCLUDE_REQUIRED
+* ROUTE_INCLUDE_LISTE et ROUTE_INCLUDE_REQUIRED sont désormais utilisables
 * ApiController,HttpFactoryTrait : gestion des reponses
 * Database migrations light via sql
 * FindFirst & sort cols
