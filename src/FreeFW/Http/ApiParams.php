@@ -22,7 +22,7 @@ class ApiParams
     protected $fields = [];
 
     /**
-     * Includes
+     * Include default or include with ApiParam
      * @var array
      */
     protected $include = [];
@@ -168,24 +168,20 @@ class ApiParams
 
     /**
      * Set include
-     * 
+     *
      * @param mixed $p_include
-     * 
+     *
      * @return \FreeFW\Http\ApiParams
      */
     public function setInclude($p_include)
     {
-       if (is_array($p_include)) {
-             $this->include = $p_include;
-        } else {
-            $this->include = explode(',', str_replace(' ', '', $p_include));
-        }
+        $this->include = $this->renderInclude($p_include);
         return $this;
     }
 
     /**
      * Get include
-     * 
+     *
      * @return array
      */
     public function getInclude()
@@ -194,10 +190,27 @@ class ApiParams
     }
 
     /**
+     * render include
+     *
+     * @param string|array $p_include 'include1,include2,...' ou ['include1','include2',...]
+     * @return array
+     */
+    public function renderInclude($p_include)
+    {
+        if (is_array($p_include)) {
+            $include = $p_include;
+        } else {
+            $include = explode(',', str_replace(' ', '', $p_include));
+        }
+
+        return $include;
+    }
+
+    /**
      * Set sort
-     * 
+     *
      * @param mixed $p_sort
-     * 
+     *
      * @return \FreeFW\Http\ApiParams
      */
     public function setSort($p_sort)
@@ -224,7 +237,7 @@ class ApiParams
 
     /**
      * Get sort
-     * 
+     *
      * @return array
      */
     public function getSort()

@@ -46,7 +46,7 @@ class Route implements \Psr\Log\LoggerAwareInterface
      * @var string
      */
     const ROUTE_INCLUDE_DEFAULT  = 'default';
-    const ROUTE_INCLUDE_REQJIRED = 'required';
+    const ROUTE_INCLUDE_REQUIRED = 'required';
     const ROUTE_INCLUDE_LIST     = 'list';
 
     /**
@@ -639,6 +639,7 @@ class Route implements \Psr\Log\LoggerAwareInterface
             throw new \FreeFW\Core\FreeFWException('Secured route with no Auth middleware !');
         }
         // Last middleware is router
+//        var_dump($routerMiddleware->getRouteIncludes());
         $pipeline->pipe($routerMiddleware);
         // Go
         return $pipeline->handle($p_request);
