@@ -105,7 +105,6 @@ class Router implements
                 // @todo, no mode than limit...
 //          }
             $this->setInclude($apiParams);
-            var_dump($apiParams->getInclude());
             $p_request = $p_request->withAttribute('api_params', $apiParams);
         }
         return call_user_func_array([$object, $this->function], array_merge([$p_request], $this->params));
@@ -134,10 +133,10 @@ class Router implements
             }
         }
 
-        if (array_key_exists(FFCSTRT::ROUTE_INCLUDE_REQJIRED,$this->include)) {
+        if (array_key_exists(FFCSTRT::ROUTE_INCLUDE_REQUIRED,$this->include)) {
             $includes = array_merge(
                             $includes,
-                            $p_apiParams->renderInclude($this->include[FFCSTRT::ROUTE_INCLUDE_REQJIRED])
+                            $p_apiParams->renderInclude($this->include[FFCSTRT::ROUTE_INCLUDE_REQUIRED])
                         );
         }
 
