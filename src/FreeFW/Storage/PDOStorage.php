@@ -1194,6 +1194,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $left     = $p_condition->getLeftMember();
         $right    = $p_condition->getRightMember();
         $oper     = $p_condition->getOperator();
+        $provider = $this->getProvider();
         $addL     = '';
         $addR     = '';
         $realOper = '=';
@@ -1269,6 +1270,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
         }
         if ($left !== null ) {
             $leftDatas  = $this->renderConditionField($left, $p_model, $p_aliases, $p_crtAlias);
+            if (array_key_exists('fct', $leftDatas) && $leftDatas['fct'] != '') {
+                $leftDatas['id'] = $provider->convertFunction($leftDatas['fct'], $leftDatas['id']);
+            }
             if ($right !== null) {
                 $rightDatas = $this->renderConditionField($right, $p_model, $p_aliases, $p_crtAlias);
                 $result     = [
@@ -1400,10 +1404,23 @@ class PDOStorage extends \FreeFW\Storage\Storage
         if ($alias === false) {
             $alias = $source;
         }
-        $type  = \FreeFW\Constants::TYPE_STRING;
+        $type     = \FreeFW\Constants::TYPE_STRING;
+        $function = null;
         if (array_key_exists($field, $properties)) {
-            $real = $alias . '.' . $properties[$field][FFCST::PROPERTY_PRIVATE];
+            $fieldProperties = $properties[$field];
             $type = $properties[$field][FFCST::PROPERTY_TYPE];
+            if (array_key_exists(FFCST::PROPERTY_FUNCTION, $fieldProperties)) {
+                foreach ($fieldProperties[FFCST::PROPERTY_FUNCTION] as $fct => $orig) {
+                    $fieldProperties2 = $properties[$orig];
+                    $real     = $alias . '.' . $fieldProperties2[FFCST::PROPERTY_PRIVATE];
+                    $type     = $fieldProperties2[FFCST::PROPERTY_TYPE];
+                    $function = $fct;
+                    break;
+                }
+            } else {
+                $real = $alias . '.' . $fieldProperties[FFCST::PROPERTY_PRIVATE];
+                $type = $fieldProperties[FFCST::PROPERTY_TYPE];
+            }
         } else {
             throw new \FreeFW\Core\FreeFWStorageException(
                 sprintf('Unknown field : %s !', $p_field)
@@ -1412,7 +1429,8 @@ class PDOStorage extends \FreeFW\Storage\Storage
         return [
             'id'    => $real,
             'value' => $p_field,
-            'type'  => $type
+            'type'  => $type,
+            'fct'   => $function
         ];
     }
 

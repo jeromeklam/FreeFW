@@ -32,9 +32,16 @@ abstract class History extends \FreeFW\Core\StorageModel
     protected static $PRP_USER_ID = [
         FFCST::PROPERTY_PRIVATE => 'user_id',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
-        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_USER],
+        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_USER, FFCST::OPTION_FK],
         FFCST::PROPERTY_COMMENT => '',
         FFCST::PROPERTY_SAMPLE  => 123,
+        FFCST::PROPERTY_FK      => ['user' =>
+            [
+                FFCST::FOREIGN_MODEL => 'FreeSSO::Model::User',
+                FFCST::FOREIGN_FIELD => 'user_id',
+                FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT
+            ]
+        ]
     ];
     protected static $PRP_HIST_TS = [
         FFCST::PROPERTY_PRIVATE => 'hist_ts',
