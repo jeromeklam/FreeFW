@@ -59,6 +59,7 @@ abstract class Storage implements
      * Functions
      * @var string
      */
+    const FUNCTION_COUNT    = 'COUNT';
     const FUNCTION_MAX      = 'MAX';
     const FUNCTION_MIN      = 'MIN';
     const FUNCTION_SUM      = 'SUM';

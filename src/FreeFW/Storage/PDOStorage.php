@@ -950,8 +950,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
             $p_sort,
             'COUNT(*) AS MONTOT'
         );
-        var_dump($result);
-        die;
+        return new \FreeFW\Model\ResultSet($result);
     }
 
     /**
@@ -1308,6 +1307,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 }
                 if (!is_array($rightDatas['id'])) {
                     if ($rightDatas['type'] === false) {
+                        if ($leftDatas['type'] === \FreeFW\Constants::TYPE_DATETIMETZ) {
+                            if (substr($rightDatas['value'], -1) === 'Z') {
+                                $rightDatas['value'] = \FreeFW\Tools\Date::stringToMysql($rightDatas['value']);
+                            }
+                        }
                         $result['values'][$rightDatas['id']] = $addL . $rightDatas['value'] . $addR;
                     } else {
                         $result['type'] = $rightDatas['type'];

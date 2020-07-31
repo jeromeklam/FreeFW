@@ -116,6 +116,8 @@ class DI
                     }
             }
         }
+        //var_dump(debug_print_backtrace());
+        //die;
         throw new \FreeFW\Core\FreeFWException(sprintf('DI : Nothing to handle %s', $p_object));
     }
 
