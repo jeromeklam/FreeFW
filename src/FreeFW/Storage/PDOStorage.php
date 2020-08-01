@@ -1200,6 +1200,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $nullable = false;
         $notnull  = false;
         $sql      = false;
+        $multi    = false;
         $arrayMod = '()';
         switch ($oper) {
             case \FreeFW\Storage\Storage::COND_LOWER:
@@ -1246,9 +1247,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 break;
             case \FreeFW\Storage\Storage::COND_IN:
                 $realOper = ' IN ';
+                $multi = true;
                 break;
             case \FreeFW\Storage\Storage::COND_NOT_IN:
                 $realOper = ' NOT IN ';
+                $multi = true;
                 break;
             case \FreeFW\Storage\Storage::COND_EMPTY:
                 $realOper = '=';
@@ -1279,7 +1282,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     'type'   => false
                 ];
                 if (!is_array($rightDatas['id'])) {
-                    $rightId = $rightDatas['id'];
+                    if ($multi) {
+                        $rightId = ' ( ' . $rightDatas['id'] . ' ) ';
+                    } else {
+                        $rightId = $rightDatas['id'];
+                    }
                 } else {
                     if ($arrayMod == '()') {
                         $rightId = ' ( ' . implode(', ', $rightDatas['id']) . ' ) ';
