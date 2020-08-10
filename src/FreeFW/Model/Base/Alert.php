@@ -40,6 +40,12 @@ abstract class Alert extends \FreeFW\Model\StorageModel\Alert
     protected $alert_object_id = null;
 
     /**
+     * alert_title
+     * @var string
+     */
+    protected $alert_title = null;
+
+    /**
      * alert_from
      * @var mixed
      */
@@ -58,6 +64,12 @@ abstract class Alert extends \FreeFW\Model\StorageModel\Alert
     protected $alert_ts = null;
 
     /**
+     * alert_deadline
+     * @var mixed
+     */
+    protected $alert_deadline = null;
+
+    /**
      * alert_done_ts
      * @var mixed
      */
@@ -74,6 +86,12 @@ abstract class Alert extends \FreeFW\Model\StorageModel\Alert
      * @var int
      */
     protected $alert_done_user_id = null;
+
+    /**
+     * alert_done_text
+     * @var mixed
+     */
+    protected $alert_done_text = null;
 
     /**
      * alert_code
@@ -98,6 +116,78 @@ abstract class Alert extends \FreeFW\Model\StorageModel\Alert
      * @var string
      */
     protected $alert_priority = null;
+
+    /**
+     * alert_recur_type
+     * @var string
+     */
+    protected $alert_recur_type = null;
+
+    /**
+     * alert_recur_number
+     * @var int
+     */
+    protected $alert_recur_number = null;
+
+    /**
+     * alert_email_1
+     * @var string
+     */
+    protected $alert_email_1 = null;
+
+    /**
+     * alert_email_2
+     * @var string
+     */
+    protected $alert_email_2 = null;
+
+    /**
+     * alert_string_1
+     * @var string
+     */
+    protected $alert_string_1 = null;
+
+    /**
+     * alert_string_2
+     * @var string
+     */
+    protected $alert_string_2 = null;
+
+    /**
+     * alert_number_1
+     * @var int
+     */
+    protected $alert_number_1 = null;
+
+    /**
+     * alert_numer_2
+     * @var int
+     */
+    protected $alert_numer_2 = null;
+
+    /**
+     * alert_bool_1
+     * @var int
+     */
+    protected $alert_bool_1 = null;
+
+    /**
+     * alert_bool_2
+     * @var int
+     */
+    protected $alert_bool_2 = null;
+
+    /**
+     * alert_text_1
+     * @var mixed
+     */
+    protected $alert_text_1 = null;
+
+    /**
+     * alert_text_2
+     * @var mixed
+     */
+    protected $alert_text_2 = null;
 
     /**
      * Set alert_id
@@ -215,6 +305,29 @@ abstract class Alert extends \FreeFW\Model\StorageModel\Alert
     }
 
     /**
+     * Set alert_title
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\Alert
+     */
+    public function setAlertTitle($p_value)
+    {
+        $this->alert_title = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get alert_title
+     *
+     * @return string
+     */
+    public function getAlertTitle()
+    {
+        return $this->alert_title;
+    }
+
+    /**
      * Set alert_from
      *
      * @param mixed $p_value
@@ -284,6 +397,29 @@ abstract class Alert extends \FreeFW\Model\StorageModel\Alert
     }
 
     /**
+     * Set alert_deadline
+     *
+     * @param mixed $p_value
+     *
+     * @return \FreeFW\Model\Alert
+     */
+    public function setAlertDeadline($p_value)
+    {
+        $this->alert_deadline = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get alert_deadline
+     *
+     * @return mixed
+     */
+    public function getAlertDeadline()
+    {
+        return $this->alert_deadline;
+    }
+
+    /**
      * Set alert_done_ts
      *
      * @param mixed $p_value
@@ -350,6 +486,29 @@ abstract class Alert extends \FreeFW\Model\StorageModel\Alert
     public function getAlertDoneUserId()
     {
         return $this->alert_done_user_id;
+    }
+
+    /**
+     * Set alert_done_text
+     *
+     * @param mixed $p_value
+     *
+     * @return \FreeFW\Model\Alert
+     */
+    public function setAlertDoneText($p_value)
+    {
+        $this->alert_done_text = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get alert_done_text
+     *
+     * @return mixed
+     */
+    public function getAlertDoneText()
+    {
+        return $this->alert_done_text;
     }
 
     /**
@@ -442,5 +601,281 @@ abstract class Alert extends \FreeFW\Model\StorageModel\Alert
     public function getAlertPriority()
     {
         return $this->alert_priority;
+    }
+
+    /**
+     * Set alert_recur_type
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\Alert
+     */
+    public function setAlertRecurType($p_value)
+    {
+        $this->alert_recur_type = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get alert_recur_type
+     *
+     * @return string
+     */
+    public function getAlertRecurType()
+    {
+        return $this->alert_recur_type;
+    }
+
+    /**
+     * Set alert_recur_number
+     *
+     * @param int $p_value
+     *
+     * @return \FreeFW\Model\Alert
+     */
+    public function setAlertRecurNumber($p_value)
+    {
+        $this->alert_recur_number = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get alert_recur_number
+     *
+     * @return int
+     */
+    public function getAlertRecurNumber()
+    {
+        return $this->alert_recur_number;
+    }
+
+    /**
+     * Set alert_email_1
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\Alert
+     */
+    public function setAlertEmail_1($p_value)
+    {
+        $this->alert_email_1 = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get alert_email_1
+     *
+     * @return string
+     */
+    public function getAlertEmail_1()
+    {
+        return $this->alert_email_1;
+    }
+
+    /**
+     * Set alert_email_2
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\Alert
+     */
+    public function setAlertEmail_2($p_value)
+    {
+        $this->alert_email_2 = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get alert_email_2
+     *
+     * @return string
+     */
+    public function getAlertEmail_2()
+    {
+        return $this->alert_email_2;
+    }
+
+    /**
+     * Set alert_string_1
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\Alert
+     */
+    public function setAlertString_1($p_value)
+    {
+        $this->alert_string_1 = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get alert_string_1
+     *
+     * @return string
+     */
+    public function getAlertString_1()
+    {
+        return $this->alert_string_1;
+    }
+
+    /**
+     * Set alert_string_2
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\Alert
+     */
+    public function setAlertString_2($p_value)
+    {
+        $this->alert_string_2 = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get alert_string_2
+     *
+     * @return string
+     */
+    public function getAlertString_2()
+    {
+        return $this->alert_string_2;
+    }
+
+    /**
+     * Set alert_number_1
+     *
+     * @param int $p_value
+     *
+     * @return \FreeFW\Model\Alert
+     */
+    public function setAlertNumber_1($p_value)
+    {
+        $this->alert_number_1 = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get alert_number_1
+     *
+     * @return int
+     */
+    public function getAlertNumber_1()
+    {
+        return $this->alert_number_1;
+    }
+
+    /**
+     * Set alert_numer_2
+     *
+     * @param int $p_value
+     *
+     * @return \FreeFW\Model\Alert
+     */
+    public function setAlertNumer_2($p_value)
+    {
+        $this->alert_numer_2 = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get alert_numer_2
+     *
+     * @return int
+     */
+    public function getAlertNumer_2()
+    {
+        return $this->alert_numer_2;
+    }
+
+    /**
+     * Set alert_bool_1
+     *
+     * @param int $p_value
+     *
+     * @return \FreeFW\Model\Alert
+     */
+    public function setAlertBool_1($p_value)
+    {
+        $this->alert_bool_1 = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get alert_bool_1
+     *
+     * @return int
+     */
+    public function getAlertBool_1()
+    {
+        return $this->alert_bool_1;
+    }
+
+    /**
+     * Set alert_bool_2
+     *
+     * @param int $p_value
+     *
+     * @return \FreeFW\Model\Alert
+     */
+    public function setAlertBool_2($p_value)
+    {
+        $this->alert_bool_2 = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get alert_bool_2
+     *
+     * @return int
+     */
+    public function getAlertBool_2()
+    {
+        return $this->alert_bool_2;
+    }
+
+    /**
+     * Set alert_text_1
+     *
+     * @param mixed $p_value
+     *
+     * @return \FreeFW\Model\Alert
+     */
+    public function setAlertText_1($p_value)
+    {
+        $this->alert_text_1 = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get alert_text_1
+     *
+     * @return mixed
+     */
+    public function getAlertText_1()
+    {
+        return $this->alert_text_1;
+    }
+
+    /**
+     * Set alert_text_2
+     *
+     * @param mixed $p_value
+     *
+     * @return \FreeFW\Model\Alert
+     */
+    public function setAlertText_2($p_value)
+    {
+        $this->alert_text_2 = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get alert_text_2
+     *
+     * @return mixed
+     */
+    public function getAlertText_2()
+    {
+        return $this->alert_text_2;
     }
 }
