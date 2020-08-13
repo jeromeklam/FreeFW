@@ -728,6 +728,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $result       = new \FreeFW\Model\ResultSet();
         $fks          = [];
         $joins        = [];
+        $sso          = \FreeFW\DI\DI::getShared('sso');
         $whereBroker  = '';
         /**
          * Check specific properties
@@ -737,8 +738,16 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 if (in_array(FFCST::OPTION_PK, $property[FFCST::PROPERTY_OPTIONS])) {
                     $ids['@'] = $name;
                 }
-                if (in_array(FFCST::OPTION_BROKER, $property[FFCST::PROPERTY_OPTIONS])) {
-                    $whereBroker = ' AND ( ' . $crtAlias . '.' . $name . ' = ' . $p_model->getMainBroker() . ')';
+                //Ne fait pas partie des contraintes de lecture... Pou info pour savoir créé avec qu'elle appli
+                //if (in_array(FFCST::OPTION_BROKER, $property[FFCST::PROPERTY_OPTIONS])) {
+                    //$whereBroker = ' AND ( ' . $crtAlias . '.' . $name . ' = ' . $p_model->getMainBroker() . ')';
+                //}
+                // Le groupe est une restriction.
+                if (in_array(FFCST::OPTION_GROUP, $property[FFCST::PROPERTY_OPTIONS])) {
+                    $group = $sso->getBrokerGroup();
+                    if ($group) {
+                        $whereBroker = ' AND ( ' . $crtAlias . '.' . $name . ' = ' . $group->getGrpId() . ')';
+                    }
                 }
             }
             if (array_key_exists(FFCST::PROPERTY_FK, $property)) {

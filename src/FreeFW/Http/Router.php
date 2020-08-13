@@ -149,6 +149,8 @@ class Router
             $requestUrl = '';
             if (array_key_exists('_request', $_GET)) {
                 $requestUrl = '/' . ltrim($_GET['_request'], '/');
+            } else {
+                $requestUrl = $p_request->getUri()->getPath();
             }
             if (($pos = strpos($requestUrl, '?')) !== false) {
                 if (array_key_exists('_url', $_GET)) {

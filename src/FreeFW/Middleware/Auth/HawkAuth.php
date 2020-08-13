@@ -51,12 +51,15 @@ class HawkAuth implements
             }
         }
         $inMac = $p_header->getParameter('mac');
-        $this->debug('mac.hmac : ' . $hmac);
-        $this->debug('mac.in : ' . $inMac);
-        $calcMac = self::generateMac($p_request, $p_header, $hmac, 'header');
-        $this->debug('mac.calc : ' . $calcMac);
+        $this->logger->debug('mac.hmac : ' . $hmac);
+        $this->logger->debug('mac.in : ' . $inMac);
+        $calcMac = $this->generateMac($p_request, $p_header, $hmac, 'header');
+        $this->logger->debug('mac.calc : ' . $calcMac);
         if ($inMac == $calcMac) {
             $token = $p_header->getParameter('user');
+            if ($token == '') {
+                $token = $p_header->getParameter('app');
+            }
             /**
              * @var \FreeSSO\Server $sso
              */
@@ -77,7 +80,7 @@ class HawkAuth implements
      *
      * @return string         The base64 encode MAC
      */
-    public static function generateMac(
+    public function generateMac(
         ServerRequestInterface $p_request,
         AuthorizationHeader $p_auth_header,
         $p_secret = '',
@@ -89,6 +92,8 @@ class HawkAuth implements
         $ts      = $p_auth_header->getParameter('ts', '');
         $ext     = $p_auth_header->getParameter('ext', '');
         $nonce   = $p_auth_header->getParameter('nonce', '');
+        $app     = $p_auth_header->getParameter('app', '');
+        $dlg     = $p_auth_header->getParameter('dlg', '');
         $path    = $uri->getPath();
         $query   = $uri->getQuery();
         if ($p_withPort) {
@@ -117,8 +122,12 @@ class HawkAuth implements
             'hash'   => '',
             'ext'    => $ext
         ];
+        if ($app != '') {
+            $default['app'] = $app;
+            $default['dlg'] = $dlg;
+        }
         $data = implode("\n", $default) . "\n";
-        self::debug($data);
+        $this->logger->debug($data);
         $hash = hash_hmac('sha256', $data, $p_secret, true);
         // Return base64 value
         return base64_encode($hash);
