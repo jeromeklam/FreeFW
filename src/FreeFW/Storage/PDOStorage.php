@@ -744,9 +744,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 //}
                 // Le groupe est une restriction.
                 if (in_array(FFCST::OPTION_GROUP, $property[FFCST::PROPERTY_OPTIONS])) {
-                    $group = $sso->getBrokerGroup();
-                    if ($group) {
-                        $whereBroker = ' AND ( ' . $crtAlias . '.' . $name . ' = ' . $group->getGrpId() . ')';
+                    $ssoGroup = $sso->getBrokerGroup();
+                    if ($ssoGroup) {
+                        $whereBroker = ' AND ( ' . $crtAlias . '.' . $name . ' = ' . $ssoGroup->getGrpId() . ')';
                     }
                 }
             }

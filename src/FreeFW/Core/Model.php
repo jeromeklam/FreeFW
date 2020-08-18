@@ -650,6 +650,8 @@ abstract class Model implements
     public function initModel()
     {
         $props = $this->getProperties();
+        $class = str_replace('\\Model\\', '_', get_class($this));
+        $cfg   = $this->getAppConfig();
         foreach ($props as $name => $oneProperty) {
             $options = [];
             $pk      = false;
@@ -704,7 +706,6 @@ abstract class Model implements
                                 }
                             } else {
                                 if ($value == FFCST::DEFAULT_LANG) {
-                                    $cfg    = $this->getAppConfig();
                                     $langId = $cfg->get('default:lang_id', 0);
                                     if ($langId > 0) {
                                         $langModel = \FreeFW\Model\Lang::findFirst(['lang_id' => $langId]);
@@ -719,7 +720,6 @@ abstract class Model implements
                                     }
                                 } else {
                                     if ($value == FFCST::DEFAULT_COUNTRY) {
-                                        $cfg    = $this->getAppConfig();
                                         $cntyId = $cfg->get('default:cnty_id', 0);
                                         if ($cntyId > 0) {
                                             $cntyModel = \FreeFW\Model\Country::findFirst(['cnty_id' => $cntyId]);
@@ -746,6 +746,11 @@ abstract class Model implements
             } else {
                 if ($pk) {
                     $this->$setter(0);
+                } else {
+                    $def = $cfg->get('default:' . $class . ':' . $name, null);
+                    if ($def !== null) {
+                        $this->$setter($def);
+                    }
                 }
             }
         }
