@@ -37,6 +37,24 @@ $routes_alert = [
             ],
         ]
     ],
+    'free_f_w.alert.getpendings' => [
+        FFCSTRT::ROUTE_METHOD     => FFCSTRT::METHOD_GET,
+        FFCSTRT::ROUTE_MODEL      => 'FreeFW::Model::Alert',
+        FFCSTRT::ROUTE_URL        => '/v1/core/alert/pendings',
+        FFCSTRT::ROUTE_CONTROLLER => 'FreeFW::Controller::Alert',
+        FFCSTRT::ROUTE_FUNCTION   => 'getPendings',
+        FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,
+        FFCSTRT::ROUTE_MIDDLEWARE => [],
+        FFCSTRT::ROUTE_INCLUDE    => [
+            'default' => ['cause', 'site']
+        ],
+        FFCSTRT::ROUTE_RESULTS    => [
+            '200' => [
+                FFCSTRT::ROUTE_RESULTS_TYPE    => FFCSTRT::RESULT_LIST,
+                FFCSTRT::ROUTE_RESULTS_MODEL   => 'FreeFW::Model::Alert',
+            ]
+        ]
+    ],
     'free_f_w.alert.getall' => [
         FFCSTRT::ROUTE_COLLECTION => 'FreeFW/Core/Alert',
         FFCSTRT::ROUTE_COMMENT    => 'Retourne une liste filtrée, triée et paginée.',
