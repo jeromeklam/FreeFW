@@ -3,18 +3,18 @@ use \FreeFW\Constants as FFCST;
 use \FreeFW\Router\Route as FFCSTRT;
 
 /**
- * Routes for Alert
+ * Routes for AlertCategory
  *
  * @author jeromeklam
  */
-$routes_alert = [
-    'free_f_w.alert.autocomplete' => [
-        FFCSTRT::ROUTE_COLLECTION => 'FreeFW/Core/Alert',
+$routes_alert_category = [
+    'free_f_w.alert_category.autocomplete' => [
+        FFCSTRT::ROUTE_COLLECTION => 'FreeFW/Core/AlertCategory',
         FFCSTRT::ROUTE_COMMENT    => 'Autocomplete.',
         FFCSTRT::ROUTE_METHOD     => FFCSTRT::METHOD_GET,
-        FFCSTRT::ROUTE_MODEL      => 'FreeFW::Model::Alert',
-        FFCSTRT::ROUTE_URL        => '/v1/core/alert/autocomplete/:search',
-        FFCSTRT::ROUTE_CONTROLLER => 'FreeFW::Controller::Alert',
+        FFCSTRT::ROUTE_MODEL      => 'FreeFW::Model::AlertCategory',
+        FFCSTRT::ROUTE_URL        => '/v1/core/alert_category/autocomplete/:search',
+        FFCSTRT::ROUTE_CONTROLLER => 'FreeFW::Controller::AlertCategory',
         FFCSTRT::ROUTE_FUNCTION   => 'autocomplete',
         FFCSTRT::ROUTE_ROLE       => \FreeFW\Router\Route::ROLE_AUTOCOMPLETE,
         FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,
@@ -32,69 +32,47 @@ $routes_alert = [
         FFCSTRT::ROUTE_RESULTS    => [
             '200' => [
                 FFCSTRT::ROUTE_RESULTS_TYPE    => FFCSTRT::RESULT_LIST,
-                FFCSTRT::ROUTE_RESULTS_MODEL   => 'FreeFW::Model::Alert',
+                FFCSTRT::ROUTE_RESULTS_MODEL   => 'FreeFW::Model::AlertCategory',
                 FFCSTRT::ROUTE_RESULTS_COMMENT => 'Réponse ok',
             ],
         ]
     ],
-    'free_f_w.alert.getpendings' => [
-        FFCSTRT::ROUTE_METHOD     => FFCSTRT::METHOD_GET,
-        FFCSTRT::ROUTE_MODEL      => 'FreeFW::Model::Alert',
-        FFCSTRT::ROUTE_URL        => '/v1/core/alert/pendings',
-        FFCSTRT::ROUTE_CONTROLLER => 'FreeFW::Controller::Alert',
-        FFCSTRT::ROUTE_FUNCTION   => 'getPendings',
-        FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,
-        FFCSTRT::ROUTE_MIDDLEWARE => [],
-        FFCSTRT::ROUTE_INCLUDE    => [
-            FFCSTRT::ROUTE_INCLUDE_DEFAULT => ['user', 'done_by', 'alert_category']
-        ],
-        FFCSTRT::ROUTE_RESULTS    => [
-            '200' => [
-                FFCSTRT::ROUTE_RESULTS_TYPE    => FFCSTRT::RESULT_LIST,
-                FFCSTRT::ROUTE_RESULTS_MODEL   => 'FreeFW::Model::Alert',
-            ]
-        ]
-    ],
-    'free_f_w.alert.getall' => [
-        FFCSTRT::ROUTE_COLLECTION => 'FreeFW/Core/Alert',
+    'free_f_w.alert_category.getall' => [
+        FFCSTRT::ROUTE_COLLECTION => 'FreeFW/Core/AlertCategory',
         FFCSTRT::ROUTE_COMMENT    => 'Retourne une liste filtrée, triée et paginée.',
         FFCSTRT::ROUTE_METHOD     => FFCSTRT::METHOD_GET,
-        FFCSTRT::ROUTE_MODEL      => 'FreeFW::Model::Alert',
-        FFCSTRT::ROUTE_URL        => '/v1/core/alert',
-        FFCSTRT::ROUTE_CONTROLLER => 'FreeFW::Controller::Alert',
+        FFCSTRT::ROUTE_MODEL      => 'FreeFW::Model::AlertCategory',
+        FFCSTRT::ROUTE_URL        => '/v1/core/alert_category',
+        FFCSTRT::ROUTE_CONTROLLER => 'FreeFW::Controller::AlertCategory',
         FFCSTRT::ROUTE_FUNCTION   => 'getAll',
         FFCSTRT::ROUTE_ROLE       => \FreeFW\Router\Route::ROLE_GET_FILTERED,
         FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,
         FFCSTRT::ROUTE_MIDDLEWARE => [],
-        FFCSTRT::ROUTE_INCLUDE    => [
-            FFCSTRT::ROUTE_INCLUDE_DEFAULT => ['user', 'done_by', 'alert_category']
-        ],
+        FFCSTRT::ROUTE_INCLUDE    => [],
         FFCSTRT::ROUTE_SCOPE      => [],
         FFCSTRT::ROUTE_RESULTS    => [
             '200' => [
                 FFCSTRT::ROUTE_RESULTS_TYPE    => FFCSTRT::RESULT_LIST,
-                FFCSTRT::ROUTE_RESULTS_MODEL   => 'FreeFW::Model::Alert',
+                FFCSTRT::ROUTE_RESULTS_MODEL   => 'FreeFW::Model::AlertCategory',
                 FFCSTRT::ROUTE_RESULTS_COMMENT => 'Réponse ok',
             ],
         ]
     ],
-    'free_f_w.alert.getone' => [
-        FFCSTRT::ROUTE_COLLECTION => 'FreeFW/Core/Alert',
+    'free_f_w.alert_category.getone' => [
+        FFCSTRT::ROUTE_COLLECTION => 'FreeFW/Core/AlertCategory',
         FFCSTRT::ROUTE_COMMENT    => 'Retourne un objet selon son identifiant',
         FFCSTRT::ROUTE_METHOD     => FFCSTRT::METHOD_GET,
-        FFCSTRT::ROUTE_MODEL      => 'FreeFW::Model::Alert',
-        FFCSTRT::ROUTE_URL        => '/v1/core/alert/:alert_id',
-        FFCSTRT::ROUTE_CONTROLLER => 'FreeFW::Controller::Alert',
+        FFCSTRT::ROUTE_MODEL      => 'FreeFW::Model::AlertCategory',
+        FFCSTRT::ROUTE_URL        => '/v1/core/alert_category/:alerc_id',
+        FFCSTRT::ROUTE_CONTROLLER => 'FreeFW::Controller::AlertCategory',
         FFCSTRT::ROUTE_FUNCTION   => 'getOne',
         FFCSTRT::ROUTE_ROLE       => \FreeFW\Router\Route::ROLE_GET_ONE,
         FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,
         FFCSTRT::ROUTE_MIDDLEWARE => [],
-        FFCSTRT::ROUTE_INCLUDE    => [
-            FFCSTRT::ROUTE_INCLUDE_DEFAULT => ['user', 'done_by', 'alert_category', 'object']
-        ],
+        FFCSTRT::ROUTE_INCLUDE    => [],
         FFCSTRT::ROUTE_SCOPE      => [],
         FFCSTRT::ROUTE_PARAMETERS => [
-            'alert_id' => [
+            'alerc_id' => [
                 FFCSTRT::ROUTE_PARAMETER_ORIGIN   => FFCSTRT::ROUTE_PARAMETER_ORIGIN_PATH,
                 FFCSTRT::ROUTE_PARAMETER_TYPE     => FFCST::TYPE_BIGINT,
                 FFCSTRT::ROUTE_PARAMETER_REQUIRED => true,
@@ -104,51 +82,47 @@ $routes_alert = [
         FFCSTRT::ROUTE_RESULTS    => [
             '200' => [
                 FFCSTRT::ROUTE_RESULTS_TYPE    => FFCSTRT::RESULT_OBJECT,
-                FFCSTRT::ROUTE_RESULTS_MODEL   => 'FreeFW::Model::Alert',
+                FFCSTRT::ROUTE_RESULTS_MODEL   => 'FreeFW::Model::AlertCategory',
                 FFCSTRT::ROUTE_RESULTS_COMMENT => 'Réponse ok',
             ],
         ]
     ],
-    'free_f_w.alert.createone' => [
-        FFCSTRT::ROUTE_COLLECTION => 'FreeFW/Core/Alert',
+    'free_f_w.alert_category.createone' => [
+        FFCSTRT::ROUTE_COLLECTION => 'FreeFW/Core/AlertCategory',
         FFCSTRT::ROUTE_COMMENT    => 'Créé un objet',
         FFCSTRT::ROUTE_METHOD     => FFCSTRT::METHOD_POST,
-        FFCSTRT::ROUTE_MODEL      => 'FreeFW::Model::Alert',
-        FFCSTRT::ROUTE_URL        => '/v1/core/alert',
-        FFCSTRT::ROUTE_CONTROLLER => 'FreeFW::Controller::Alert',
+        FFCSTRT::ROUTE_MODEL      => 'FreeFW::Model::AlertCategory',
+        FFCSTRT::ROUTE_URL        => '/v1/core/alert_category',
+        FFCSTRT::ROUTE_CONTROLLER => 'FreeFW::Controller::AlertCategory',
         FFCSTRT::ROUTE_FUNCTION   => 'createOne',
         FFCSTRT::ROUTE_ROLE       => \FreeFW\Router\Route::ROLE_CREATE_ONE,
         FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,
         FFCSTRT::ROUTE_MIDDLEWARE => [],
-        FFCSTRT::ROUTE_INCLUDE    => [
-            FFCSTRT::ROUTE_INCLUDE_DEFAULT => ['user', 'done_by', 'alert_category']
-        ],
+        FFCSTRT::ROUTE_INCLUDE    => [],
         FFCSTRT::ROUTE_SCOPE      => [],
         FFCSTRT::ROUTE_RESULTS    => [
             '201' => [
                 FFCSTRT::ROUTE_RESULTS_TYPE    => FFCSTRT::RESULT_OBJECT,
-                FFCSTRT::ROUTE_RESULTS_MODEL   => 'FreeFW::Model::Alert',
+                FFCSTRT::ROUTE_RESULTS_MODEL   => 'FreeFW::Model::AlertCategory',
                 FFCSTRT::ROUTE_RESULTS_COMMENT => 'Objet créé',
             ],
         ]
     ],
-    'free_f_w.alert.updateone' => [
-        FFCSTRT::ROUTE_COLLECTION => 'FreeFW/Core/Alert',
+    'free_f_w.alert_category.updateone' => [
+        FFCSTRT::ROUTE_COLLECTION => 'FreeFW/Core/AlertCategory',
         FFCSTRT::ROUTE_COMMENT    => 'Modifie un objet',
         FFCSTRT::ROUTE_METHOD     => FFCSTRT::METHOD_PUT,
-        FFCSTRT::ROUTE_MODEL      => 'FreeFW::Model::Alert',
-        FFCSTRT::ROUTE_URL        => '/v1/core/alert/:alert_id',
-        FFCSTRT::ROUTE_CONTROLLER => 'FreeFW::Controller::Alert',
+        FFCSTRT::ROUTE_MODEL      => 'FreeFW::Model::AlertCategory',
+        FFCSTRT::ROUTE_URL        => '/v1/core/alert_category/:alerc_id',
+        FFCSTRT::ROUTE_CONTROLLER => 'FreeFW::Controller::AlertCategory',
         FFCSTRT::ROUTE_FUNCTION   => 'updateOne',
         FFCSTRT::ROUTE_ROLE       => \FreeFW\Router\Route::ROLE_UPDATE_ONE,
         FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,
         FFCSTRT::ROUTE_MIDDLEWARE => [],
-        FFCSTRT::ROUTE_INCLUDE    => [
-            FFCSTRT::ROUTE_INCLUDE_DEFAULT => ['user', 'done_by', 'alert_category']
-        ],
+        FFCSTRT::ROUTE_INCLUDE    => [],
         FFCSTRT::ROUTE_SCOPE      => [],
         FFCSTRT::ROUTE_PARAMETERS => [
-            'alert_id' => [
+            'alerc_id' => [
                 FFCSTRT::ROUTE_PARAMETER_ORIGIN   => FFCSTRT::ROUTE_PARAMETER_ORIGIN_PATH,
                 FFCSTRT::ROUTE_PARAMETER_TYPE     => FFCST::TYPE_BIGINT,
                 FFCSTRT::ROUTE_PARAMETER_REQUIRED => true,
@@ -158,18 +132,18 @@ $routes_alert = [
         FFCSTRT::ROUTE_RESULTS    => [
             '200' => [
                 FFCSTRT::ROUTE_RESULTS_TYPE    => FFCSTRT::RESULT_OBJECT,
-                FFCSTRT::ROUTE_RESULTS_MODEL   => 'FreeFW::Model::Alert',
+                FFCSTRT::ROUTE_RESULTS_MODEL   => 'FreeFW::Model::AlertCategory',
                 FFCSTRT::ROUTE_RESULTS_COMMENT => 'Objet modifié',
             ],
         ]
     ],
-    'free_f_w.alert.removeone' => [
-        FFCSTRT::ROUTE_COLLECTION => 'FreeFW/Core/Alert',
+    'free_f_w.alert_category.removeone' => [
+        FFCSTRT::ROUTE_COLLECTION => 'FreeFW/Core/AlertCategory',
         FFCSTRT::ROUTE_COMMENT    => 'Supprime un objet',
         FFCSTRT::ROUTE_METHOD     => FFCSTRT::METHOD_DELETE,
-        FFCSTRT::ROUTE_MODEL      => 'FreeFW::Model::Alert',
-        FFCSTRT::ROUTE_URL        => '/v1/core/alert/:alert_id',
-        FFCSTRT::ROUTE_CONTROLLER => 'FreeFW::Controller::Alert',
+        FFCSTRT::ROUTE_MODEL      => 'FreeFW::Model::AlertCategory',
+        FFCSTRT::ROUTE_URL        => '/v1/core/alert_category/:alerc_id',
+        FFCSTRT::ROUTE_CONTROLLER => 'FreeFW::Controller::AlertCategory',
         FFCSTRT::ROUTE_FUNCTION   => 'removeOne',
         FFCSTRT::ROUTE_ROLE       => \FreeFW\Router\Route::ROLE_DELETE_ONE,
         FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,
@@ -177,7 +151,7 @@ $routes_alert = [
         FFCSTRT::ROUTE_INCLUDE    => [],
         FFCSTRT::ROUTE_SCOPE      => [],
         FFCSTRT::ROUTE_PARAMETERS => [
-            'alert_id' => [
+            'alerc_id' => [
                 FFCSTRT::ROUTE_PARAMETER_ORIGIN   => FFCSTRT::ROUTE_PARAMETER_ORIGIN_PATH,
                 FFCSTRT::ROUTE_PARAMETER_TYPE     => FFCST::TYPE_BIGINT,
                 FFCSTRT::ROUTE_PARAMETER_REQUIRED => true,

@@ -1,0 +1,2 @@
+ALTER TABLE `sys_alert` MODIFY `alert_object_name` varchar(32) DEFAULT NULL COMMENT 'Object lié : FreeAsso_Cause, FreeAsso_Site, FreeAsso_Contract, FreeAsso_Client';
+ALTER TABLE `sys_alert` MODIFY `alert_object_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Identifiant de l''objet lié';

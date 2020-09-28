@@ -190,6 +190,30 @@ abstract class Alert extends \FreeFW\Model\StorageModel\Alert
     protected $alert_text_2 = null;
 
     /**
+     * alert_task
+     * @var bool
+     */
+    protected $alert_task = true;
+
+    /**
+     * alert_parent_id
+     * @var int
+     */
+    protected $alert_parent_id = null;
+
+    /**
+     * alerc_id
+     * @var int
+     */
+    protected $alerc_id = null;
+
+    /**
+     * alert_checklist
+     * @var string
+     */
+    protected $alert_checklist = null;
+
+    /**
      * Set alert_id
      *
      * @param int $p_value
@@ -877,5 +901,97 @@ abstract class Alert extends \FreeFW\Model\StorageModel\Alert
     public function getAlertText_2()
     {
         return $this->alert_text_2;
+    }
+
+    /**
+     * Set task
+     *
+     * @param bool $p_value
+     *
+     * @return \FreeFW\Model\Base\Alert
+     */
+    public function setAlertTask($p_value)
+    {
+        $this->alert_task = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get alert task
+     *
+     * @return boolean
+     */
+    public function getAlertTask()
+    {
+        return $this->alert_task;
+    }
+
+    /**
+     * Set parent id
+     *
+     * @param int $p_value
+     *
+     * @return \FreeFW\Model\Base\Alert
+     */
+    public function setAlertParentId($p_value)
+    {
+        $this->alert_parent_id = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get parent id
+     *
+     * @return int
+     */
+    public function getAlertParentId()
+    {
+        return $this->alert_parent_id;
+    }
+
+    /**
+     * Set catgegory id
+     *
+     * @param int $p_value
+     *
+     * @return \FreeFW\Model\Base\Alert
+     */
+    public function setAlercId($p_value)
+    {
+        $this->alerc_id = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get category id
+     *
+     * @return int
+     */
+    public function getAlercId()
+    {
+        return $this->alerc_id;
+    }
+
+    /**
+     * Set checklist
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\Base\Alert
+     */
+    public function setAlertChecklist($p_value)
+    {
+        $this->alert_checklist = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get checklist
+     *
+     * @return string
+     */
+    public function getAlertChecklist()
+    {
+        return $this->alert_checklist;
     }
 }

@@ -276,6 +276,7 @@ class ApiController extends \FreeFW\Core\Controller
             }
         } else if (intval($p_id) == 0) {
             $model->setModelBehaviour(\FreeFW\Core\Model::MODEL_BEHAVIOUR_API);
+            $model->init();
             if (method_exists($model, 'afterRead')) {
                 $model->afterRead();
             }

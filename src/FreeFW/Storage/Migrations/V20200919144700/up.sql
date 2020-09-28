@@ -1,0 +1,2 @@
+ALTER TABLE `sys_alert` ADD `alert_task` TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Vrai si c\'est une tâche qu\'on peut voir dans le calendrier (une tâche finie est un suivi) sinon c\'est une alerte technique qu\'on ne verra pas dans le calendrier';
+ALTER TABLE `sys_alert` CHANGE `alert_recur_type` `alert_recur_type` ENUM('HOUR','MINUTE','DAY','MONTH','YEAR','MANUAL','NONE') NULL COMMENT 'Type de récurrence';

@@ -1,5 +1,6 @@
 <?php
 require_once(__DIR__ . '/alert.php');
+require_once(__DIR__ . '/alert_category.php');
 require_once(__DIR__ . '/country.php');
 require_once(__DIR__ . '/email.php');
 require_once(__DIR__ . '/jobqueue.php');
@@ -51,6 +52,7 @@ $localRoutes = [
 $localRoutes = array_merge(
     $localRoutes,
     $routes_alert,
+    $routes_alert_category,
     $routes_country,
     $routes_email,
     $routes_jobqueue,

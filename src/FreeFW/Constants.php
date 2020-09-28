@@ -157,6 +157,7 @@ class Constants
     const DEFAULT_COUNTRY       = 'COUNTRY';
     const DEFAULT_LANG          = 'LANG';
     const DEFAULT_NOW           = 'NOW';
+    const DEFAULT_CURRENT_YEAR  = 'YEAR';
     const DEFAULT_TRUE          = 'TRUE';
     const DEFAULT_FALSE         = 'FALSE';
     const DEFAULT_CURRENT_USER  = 'USER';

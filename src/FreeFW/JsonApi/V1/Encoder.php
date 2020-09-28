@@ -40,9 +40,9 @@ class Encoder
             $attributes = new \FreeFW\JsonApi\V1\Model\AttributesObject($fields);
             $resource->setAttributes($attributes);
         }
-        $relations = $p_api_response->getApiRelationShips();
+        $relations     = $p_api_response->getApiRelationShips();
+        $relationShips = new \FreeFW\JsonApi\V1\Model\RelationshipsObject();
         if ($relations) {
-            $relationShips = new \FreeFW\JsonApi\V1\Model\RelationshipsObject();
             foreach ($relations as $relation) {
                 if (strpos($includes, '@@' . $p_prefix . $relation->getName() . '@@') !== false) {
                     $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relation->getName(), true);
@@ -50,7 +50,9 @@ class Encoder
                         $model  = $p_api_response->$getter();
                         if ($model && $model instanceof \FreeFW\Interfaces\ApiResponseInterface) {
                             if ($model->isSingleElement()) {
-                                unset($incTab[$relation->getName()]);
+                                foreach (array_keys($incTab, $relation->getName(), true) as $key) {
+                                    unset($incTab[$key]);
+                                }
                                 $resourceRel = new \FreeFW\JsonApi\V1\Model\ResourceObject(
                                     $model->getApiType(),
                                     $model->getApiId(),
@@ -65,7 +67,9 @@ class Encoder
                                 );
                                 $p_included->addIncluded($included);
                             } else {
-                                unset($incTab[$relation->getName()]);
+                                foreach (array_keys($incTab, $relation->getName(), true) as $key) {
+                                    unset($incTab[$key]);
+                                }
                                 foreach ($model as $oneModel) {
                                     $resourceRel = new \FreeFW\JsonApi\V1\Model\ResourceObject(
                                         $oneModel->getApiType(),
@@ -109,19 +113,36 @@ class Encoder
                     }
                 }
             }
-            $resource->setRelationShips($relationShips);
         }
-        /*
+        // Extra included here...
         foreach ($incTab as $include) {
             $parts = explode('.', $include);
-            while (count($parts)>0) {
-                $elem   = array_shift($parts);
+            $posi  = explode('.', $p_prefix);
+            if (count($parts) == count($posi)) {
+                $elem   = $parts[count($posi)-1];
                 $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($elem, true);
                 if (method_exists($p_api_response, $getter)) {
                     $result = $p_api_response->$getter();
+                    if ($result) {
+                        $resourceRel = new \FreeFW\JsonApi\V1\Model\ResourceObject(
+                            $result->getApiType(),
+                            $result->getApiId(),
+                            $result->isSingleElement()
+                        );
+                        $relationShips->addRelation($elem, $resourceRel);
+                        $included = $this->encodeSingleResource(
+                            $result,
+                            $p_included,
+                            $p_api_params,
+                            $p_prefix . $elem
+                        );
+                        $p_included->addIncluded($included);
+                    }
                 }
             }
-        }*/
+        }
+        $resource->setRelationShips($relationShips);
+        // Done
         return $resource;
     }
 

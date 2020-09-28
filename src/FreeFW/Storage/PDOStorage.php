@@ -803,7 +803,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
                             break;
                     }
                 } else {
-                    $newModel = self::$models[$onePart];
+                    if (array_key_exists($onePart, self::$models)) {
+                        $newModel = self::$models[$onePart];
+                    } else {
+                        $newModel = null;
+                    }
                 }
                 $baseAlias = $baseAlias . '.' . $onePart;
                 if ($newModel && count($parts) > 0) {
@@ -1130,7 +1134,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                         $result['values'] = $parts['values'];
                     }
                 } else {
-                    $result['sql'] = $result['sql'] . $oper . $parts['sql'];
+                    $result['sql'] = ' ( ' . $result['sql'] . $oper . $parts['sql'] . ' ) ';
                     if (array_key_exists('values', $parts) && is_array($parts['values'])) {
                         $result['values'] = array_merge($result['values'], $parts['values']);
                     }
@@ -1143,7 +1147,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                         $result['values'] = $parts['values'];
                     }
                 } else {
-                    $result['sql']    = $result['sql'] . $oper . $parts['sql'];
+                    $result['sql']    = ' ( ' . $result['sql'] . $oper . $parts['sql'] . ' ) ';
                     if (array_key_exists('values', $parts) && is_array($parts['values'])) {
                         $result['values'] = array_merge($result['values'], $parts['values']);
                     }
@@ -1240,6 +1244,16 @@ class PDOStorage extends \FreeFW\Storage\Storage
             case \FreeFW\Storage\Storage::COND_NOT_EQUAL_OR_NULL:
                 $realOper = '!=';
                 $nullable = true;
+                break;
+            case \FreeFW\Storage\Storage::COND_BEGIN_WITH:
+                $realOper = 'like';
+                $addL     = '';
+                $addR     = '%';
+                break;
+            case \FreeFW\Storage\Storage::COND_END_WITH:
+                $realOper = 'like';
+                $addL     = '%';
+                $addR     = '';
                 break;
             case \FreeFW\Storage\Storage::COND_LIKE:
                 $realOper = 'like';
@@ -1426,6 +1440,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
         }
         $type     = \FreeFW\Constants::TYPE_STRING;
         $function = null;
+        if ($field === 'id') {
+            $field = $p_model->getFieldNameByOption(FFCST::OPTION_PK);
+        }
         if (array_key_exists($field, $properties)) {
             $fieldProperties = $properties[$field];
             $type = $properties[$field][FFCST::PROPERTY_TYPE];

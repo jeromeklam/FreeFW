@@ -56,7 +56,6 @@ abstract class Model implements
             $this->setLogger(\FreeFW\DI\DI::getShared('logger'));
         }
         $this->initModel();
-        $this->init();
     }
 
     /**
@@ -64,6 +63,7 @@ abstract class Model implements
      */
     public function init()
     {
+        return $this;
     }
 
     /**
@@ -668,7 +668,7 @@ abstract class Model implements
                 switch ($oneProperty[FFCST::PROPERTY_TYPE]) {
                     case FFCST::TYPE_BOOLEAN:
                         // boolean can't be null !
-                        if ($value == FFCST::DEFAULT_TRUE) {
+                        if ($value === FFCST::DEFAULT_TRUE) {
                             $this->$setter(true);
                         } else {
                             $this->$setter(false);
@@ -676,36 +676,41 @@ abstract class Model implements
                         break;
                     case FFCST::TYPE_DATETIMETZ:
                     case FFCST::TYPE_DATETIME:
-                        if ($value == FFCST::DEFAULT_NOW) {
+                        if ($value === FFCST::DEFAULT_NOW) {
                             $this->$setter(\FreeFW\Tools\Date::getCurrentTimestamp());
                         }
                         break;
+                    case FFCST::TYPE_INTEGER:
                     case FFCST::TYPE_BIGINT:
-                        if ($value == FFCST::DEFAULT_CURRENT_USER) {
+                        if ($value === FFCST::DEFAULT_CURRENT_USER) {
                             $sso  = \FreeFW\DI\DI::getShared('sso');
-                            $user = $sso->getUser();
-                            if ($user) {
-                                $this->$setter($user->getUserId());
-                                foreach ($oneProperty[FFCST::PROPERTY_FK] as $relName => $rel) {
-                                    $setter2 = 'set' . \FreeFW\Tools\PBXString::toCamelCase($relName, true);
-                                    $this->$setter2($user);
-                                    break;
-                                }
-                            }
-                        } else {
-                            if ($value == FFCST::DEFAULT_CURRENT_GROUP) {
-                                $sso  = \FreeFW\DI\DI::getShared('sso');
-                                $group = $sso->getBrokerGroup();
-                                if ($group) {
-                                    $this->$setter($group->getGrpId());
+                            if ($sso) {
+                                $user = $sso->getUser();
+                                if ($user) {
+                                    $this->$setter($user->getUserId());
                                     foreach ($oneProperty[FFCST::PROPERTY_FK] as $relName => $rel) {
-                                        $setter3 = 'set' . \FreeFW\Tools\PBXString::toCamelCase($relName, true);
-                                        $this->$setter3($group);
+                                        $setter2 = 'set' . \FreeFW\Tools\PBXString::toCamelCase($relName, true);
+                                        $this->$setter2($user);
                                         break;
                                     }
                                 }
+                            }
+                        } else {
+                            if ($value === FFCST::DEFAULT_CURRENT_GROUP) {
+                                $sso  = \FreeFW\DI\DI::getShared('sso');
+                                if ($sso) {
+                                    $group = $sso->getBrokerGroup();
+                                    if ($group) {
+                                        $this->$setter($group->getGrpId());
+                                        foreach ($oneProperty[FFCST::PROPERTY_FK] as $relName => $rel) {
+                                            $setter3 = 'set' . \FreeFW\Tools\PBXString::toCamelCase($relName, true);
+                                            $this->$setter3($group);
+                                            break;
+                                        }
+                                    }
+                                }
                             } else {
-                                if ($value == FFCST::DEFAULT_LANG) {
+                                if ($value === FFCST::DEFAULT_LANG) {
                                     $langId = $cfg->get('default:lang_id', 0);
                                     if ($langId > 0) {
                                         $langModel = \FreeFW\Model\Lang::findFirst(['lang_id' => $langId]);
@@ -719,7 +724,7 @@ abstract class Model implements
                                         }
                                     }
                                 } else {
-                                    if ($value == FFCST::DEFAULT_COUNTRY) {
+                                    if ($value === FFCST::DEFAULT_COUNTRY) {
                                         $cntyId = $cfg->get('default:cnty_id', 0);
                                         if ($cntyId > 0) {
                                             $cntyModel = \FreeFW\Model\Country::findFirst(['cnty_id' => $cntyId]);
@@ -733,7 +738,11 @@ abstract class Model implements
                                             }
                                         }
                                     } else {
-                                        $this->$setter($value);
+                                        if ($value === FFCST::DEFAULT_CURRENT_YEAR) {
+                                            $this->$setter(date('Y'));
+                                        } else {
+                                            $this->$setter($value);
+                                        }
                                     }
                                 }
                             }

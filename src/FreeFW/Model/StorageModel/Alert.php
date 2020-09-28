@@ -46,7 +46,7 @@ abstract class Alert extends \FreeFW\Core\StorageModel
     protected static $PRP_ALERT_OBJECT_NAME = [
         FFCST::PROPERTY_PRIVATE => 'alert_object_name',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
-        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED],
+        FFCST::PROPERTY_OPTIONS => [],
         FFCST::PROPERTY_COMMENT => 'Nom de l\'objet',
         FFCST::PROPERTY_MAX     => 32,
         FFCST::PROPERTY_SAMPLE  => 'FreeAsso_Cause',
@@ -54,7 +54,7 @@ abstract class Alert extends \FreeFW\Core\StorageModel
     protected static $PRP_ALERT_OBJECT_ID = [
         FFCST::PROPERTY_PRIVATE => 'alert_object_id',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
-        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED],
+        FFCST::PROPERTY_OPTIONS => [],
         FFCST::PROPERTY_COMMENT => 'Identifiant dfe l\'objet',
         FFCST::PROPERTY_SAMPLE  => 123,
     ];
@@ -84,6 +84,7 @@ abstract class Alert extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'alert_ts',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_DATETIMETZ,
         FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_DEFAULT => FFCST::DEFAULT_NOW,
         FFCST::PROPERTY_COMMENT => 'Date de dernière mise à jour de l\'alerte',
         FFCST::PROPERTY_SAMPLE  => '2020-08-09 12:11:00',
     ];
@@ -140,7 +141,7 @@ abstract class Alert extends \FreeFW\Core\StorageModel
     ];
     protected static $PRP_ALERT_TEXT = [
         FFCST::PROPERTY_PRIVATE => 'alert_text',
-        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BLOB,
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_HTML,
         FFCST::PROPERTY_OPTIONS => [],
         FFCST::PROPERTY_COMMENT => 'Description de l\'alerte',
         FFCST::PROPERTY_SAMPLE  => 'Besoin de remplir l\'eau',
@@ -149,6 +150,7 @@ abstract class Alert extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'alert_activ',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_BOOLEAN,
         FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED],
+        FFCST::PROPERTY_DEFAULT => false,
         FFCST::PROPERTY_COMMENT => 'Alerte active',
         FFCST::PROPERTY_SAMPLE  => true,
     ];
@@ -165,8 +167,9 @@ abstract class Alert extends \FreeFW\Core\StorageModel
     protected static $PRP_ALERT_RECUR_TYPE = [
         FFCST::PROPERTY_PRIVATE => 'alert_recur_type',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_SELECT,
-        FFCST::PROPERTY_ENUM    => ['HOUR','MINUTE','DAY','MONTH','YEAR','MANUAL'],
+        FFCST::PROPERTY_ENUM    => ['HOUR','MINUTE','DAY','MONTH','YEAR','MANUAL','NONE'],
         FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_DEFAULT => 'NONE',
         FFCST::PROPERTY_COMMENT => 'Type de récurrence de l\'alerte',
         FFCST::PROPERTY_SAMPLE  => 'MONTH',
     ];
@@ -181,6 +184,7 @@ abstract class Alert extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'alert_email_1',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_SELECT,
         FFCST::PROPERTY_ENUM    => ['NONE','15M','30M','1H','2H','1D','2D'],
+        FFCST::PROPERTY_DEFAULT => 'NONE',
         FFCST::PROPERTY_OPTIONS => [],
         FFCST::PROPERTY_COMMENT => 'Rappel par email 1',
         FFCST::PROPERTY_SAMPLE  => '1H',
@@ -190,8 +194,8 @@ abstract class Alert extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_SELECT,
         FFCST::PROPERTY_ENUM    => ['NONE','15M','30M','1H','2H','1D','2D'],
         FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_DEFAULT => 'NONE',
         FFCST::PROPERTY_COMMENT => 'Rappel par email 2',
-        FFCST::PROPERTY_MAX     => 4,
         FFCST::PROPERTY_SAMPLE  => 'NONE',
     ];
     protected static $PRP_ALERT_STRING_1 = [
@@ -240,16 +244,59 @@ abstract class Alert extends \FreeFW\Core\StorageModel
     ];
     protected static $PRP_ALERT_TEXT_1 = [
         FFCST::PROPERTY_PRIVATE => 'alert_text_1',
-        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BLOB,
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_HTML,
         FFCST::PROPERTY_OPTIONS => [],
         FFCST::PROPERTY_COMMENT => 'Variable de type texte 1',
         FFCST::PROPERTY_SAMPLE  => '',
     ];
     protected static $PRP_ALERT_TEXT_2 = [
         FFCST::PROPERTY_PRIVATE => 'alert_text_2',
-        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BLOB,
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_HTML,
         FFCST::PROPERTY_OPTIONS => [],
         FFCST::PROPERTY_COMMENT => 'Variable de type texte 1',
+        FFCST::PROPERTY_SAMPLE  => '',
+    ];
+    protected static $PRP_ALERT_TASK = [
+        FFCST::PROPERTY_PRIVATE => 'alert_task',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BOOLEAN,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_DEFAULT => 1,
+        FFCST::PROPERTY_COMMENT => 'Tâche du calendrier ?',
+        FFCST::PROPERTY_SAMPLE  => 1,
+    ];
+    protected static $PRP_ALERT_PARENT_ID = [
+        FFCST::PROPERTY_PRIVATE => 'alert_parent_id',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
+        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_FK],
+        FFCST::PROPERTY_COMMENT => 'Identifiant de l\'alerte parent',
+        FFCST::PROPERTY_SAMPLE  => 123,
+        FFCST::PROPERTY_FK      => ['parent' =>
+            [
+                FFCST::FOREIGN_MODEL => 'FreeFW::Model::Alert',
+                FFCST::FOREIGN_FIELD => 'alert_id',
+                FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT,
+            ]
+        ],
+    ];
+    protected static $PRP_ALERC_ID = [
+        FFCST::PROPERTY_PRIVATE => 'alerc_id',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
+        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_FK],
+        FFCST::PROPERTY_COMMENT => 'Identifiant de la catégorie d\'alerte',
+        FFCST::PROPERTY_SAMPLE  => 123,
+        FFCST::PROPERTY_FK      => ['alert_category' =>
+            [
+                FFCST::FOREIGN_MODEL => 'FreeFW::Model::AlertCategory',
+                FFCST::FOREIGN_FIELD => 'alerc_id',
+                FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT,
+            ]
+        ],
+    ];
+    protected static $PRP_ALERT_CHECKLIST = [
+        FFCST::PROPERTY_PRIVATE => 'alert_checklist',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_TEXT,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Checklists au format json',
         FFCST::PROPERTY_SAMPLE  => '',
     ];
 
@@ -290,7 +337,11 @@ abstract class Alert extends \FreeFW\Core\StorageModel
             'alert_bool_1'       => self::$PRP_ALERT_BOOL_1,
             'alert_bool_2'       => self::$PRP_ALERT_BOOL_2,
             'alert_text_1'       => self::$PRP_ALERT_TEXT_1,
-            'alert_text_2'       => self::$PRP_ALERT_TEXT_2
+            'alert_text_2'       => self::$PRP_ALERT_TEXT_2,
+            'alert_task'         => self::$PRP_ALERT_TASK,
+            'alert_parent_id'    => self::$PRP_ALERT_PARENT_ID,
+            'alerc_id'           => self::$PRP_ALERC_ID,
+            'alert_checklist'    => self::$PRP_ALERT_CHECKLIST,
         ];
     }
 
@@ -321,6 +372,6 @@ abstract class Alert extends \FreeFW\Core\StorageModel
      */
     public static function getAutocompleteField()
     {
-        return ['alert_title', 'alert_text'];
+        return ['alert_title', 'alert_text', 'alert_checklist'];
     }
 }
