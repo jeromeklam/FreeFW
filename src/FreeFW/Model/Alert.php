@@ -191,6 +191,29 @@ class Alert extends \FreeFW\Model\Base\Alert
     }
 
     /**
+     * Set Object
+     *
+     * @param \FreeFw\Core\Model $p_model
+     *
+     * @return \FreeFw\Core\Model
+     */
+    public function setObject($p_model)
+    {
+        /**
+         * @var \FreeFw\Core\Model $p_model
+         */
+        if ($p_model instanceof \FreeFw\Core\Model) {
+            $this->setAlertObjectId($p_model->getApiId());
+        } else {
+            $this
+                ->setAlertObjectName('')
+                ->setAlertObjectId(null)
+            ;
+        }
+        return $this;
+    }
+
+    /**
      * Get object
      *
      * @return NULL

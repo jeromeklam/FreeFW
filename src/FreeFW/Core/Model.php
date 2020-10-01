@@ -229,6 +229,7 @@ abstract class Model implements
         }
         foreach ($p_relations as $name => $relation) {
             if ($relation['type'] == \FreeFW\JsonApi\V1\Model\RelationshipObject::ONE_TO_ONE) {
+                $foundRel = false;
                 foreach ($props as $prp => $property) {
                     $test = $prp;
                     if (array_key_exists(FFCST::PROPERTY_PUBLIC, $property)) {
@@ -262,7 +263,25 @@ abstract class Model implements
                             // property
                             $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($test, true);
                             $this->$setter($id);
+                            $foundRel = true;
                             break;
+                        }
+                    }
+                }
+                if (!$foundRel) {
+                    $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                    if (method_exists($this, $setter)) {
+                        $id = 0;
+                        foreach ($relation['values'] as $val) {
+                            $id = $val;
+                            break;
+                        }
+                        $class  = '\\' . str_replace('::', '\\', $relation['model']);
+                        foreach ($p_included as $oneIncluded) {
+                            if ($oneIncluded instanceof $class && $oneIncluded->getApiId() == $id) {
+                                $this->$setter($oneIncluded);
+                                break;
+                            }
                         }
                     }
                 }
@@ -289,6 +308,16 @@ abstract class Model implements
                                 $rels[] = $rel;
                             }
                         }
+                        $this->$setter($rels);
+                    } else {
+                        $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                        if (method_exists($this, $setter)) {
+                            $this->$setter($rels);
+                        }
+                    }
+                } else {
+                    $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                    if (method_exists($this, $setter)) {
                         $this->$setter($rels);
                     }
                 }

@@ -110,8 +110,8 @@ class RelationshipsObject implements \Countable, \JsonSerializable
                 $rels[$name]['data'] = [];
                 foreach ($relation as $rel) {
                     $rels[$name]['data'][] = [
-                        'id'   => '' . $rel->getId(),
-                        'type' => $rel->getType()
+                        'id'    => '' . $rel->getId(),
+                        'type'  => $rel->getType(),
                     ];
                 }
             } else {
@@ -138,6 +138,7 @@ class RelationshipsObject implements \Countable, \JsonSerializable
             $arr[$value->getName()] = [
                 'name'   => $value->getName(),
                 'type'   => $value->getType(),
+                'model'  => $value->getModel(),
                 'values' => $value->getValues()
             ];
         }

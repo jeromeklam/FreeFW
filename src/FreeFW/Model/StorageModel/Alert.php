@@ -126,7 +126,7 @@ abstract class Alert extends \FreeFW\Core\StorageModel
     ];
     protected static $PRP_ALERT_DONE_TEXT = [
         FFCST::PROPERTY_PRIVATE => 'alert_done_text',
-        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BLOB,
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_HTML,
         FFCST::PROPERTY_OPTIONS => [],
         FFCST::PROPERTY_COMMENT => 'Texte de réalisation',
         FFCST::PROPERTY_SAMPLE  => 'bla bla',
