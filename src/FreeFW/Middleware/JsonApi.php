@@ -128,7 +128,7 @@ class JsonApi implements
     public function encodeResponse(ResponseInterface $p_response, \FreeFW\Http\ApiParams $p_api_params): ResponseInterface
     {
         $this->logger->debug(sprintf('FreeFW.Middleware.JsonApi.encode.start'));
-        if ($p_response->getStatusCode() < 300) {
+        if (intval($p_response->getStatusCode()) < 300) {
             $body = $p_response->getBody();
             if (is_object($body)) {
                 if ($body instanceof StreamInterface) {

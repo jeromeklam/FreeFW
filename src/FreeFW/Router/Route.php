@@ -416,6 +416,19 @@ class Route implements \Psr\Log\LoggerAwareInterface
     }
 
     /**
+     * Get default include
+     *
+     * @return array
+     */
+    public function getDefaultInclude() : array
+    {
+        if (is_array($this->include) && array_key_exists('default', $this->include)) {
+            return $this->include['default'];
+        }
+        return [];
+    }
+
+    /**
      * Set collection
      *
      * @param string $p_collection

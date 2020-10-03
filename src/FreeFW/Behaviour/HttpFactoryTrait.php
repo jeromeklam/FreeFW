@@ -40,10 +40,8 @@ trait HttpFactoryTrait
         if (is_string($p_reasonPhrase)) {
             $response = new \FreeFW\Model\Error();
             $response = $response->addError($p_code, $p_reasonPhrase, $p_codeHttp);
-
             return $this->createResponse($response->getErrors()[0]->getType(), $response);
         }
-
         return $this->createResponse($p_codeHttp, $p_reasonPhrase);
     }
 

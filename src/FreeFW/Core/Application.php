@@ -132,7 +132,12 @@ class Application implements
             // Only if requested
             try {
                 foreach ($this->updates as $oneUpdate) {
-                    // First to RabbitMQ
+                    // First send Event to webSocket...
+                    $context = new \ZMQContext();
+                    $socket = $context->getSocket(\ZMQ::SOCKET_PUSH, 'my event');
+                    $socket->connect("tcp://127.0.0.1:5555");
+                    $socket->send(serialize($oneUpdate));
+                    // And then to RabbitMQ
                     $properties = [
                         'content_type' => 'application/json',
                         'delivery_mode' => \PhpAmqpLib\Message\AMQPMessage::DELIVERY_MODE_PERSISTENT
@@ -146,11 +151,6 @@ class Application implements
                     );
                     $channel->basic_publish($msg, $p_queueCfg['name']);
                     $channel->close();
-                    // And then send Event to webSocket...
-                    $context = new \ZMQContext();
-                    $socket = $context->getSocket(\ZMQ::SOCKET_PUSH, 'my event');
-                    $socket->connect("tcp://localhost:5555");
-                    $socket->send(serialize($oneUpdate));
                 }
             } catch (\Exception $ex) {
                 // @todo...

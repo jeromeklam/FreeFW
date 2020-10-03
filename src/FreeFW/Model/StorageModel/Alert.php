@@ -61,7 +61,7 @@ abstract class Alert extends \FreeFW\Core\StorageModel
     protected static $PRP_ALERT_TITLE = [
         FFCST::PROPERTY_PRIVATE => 'alert_title',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
-        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED],
         FFCST::PROPERTY_COMMENT => 'Titre de l\'alerte',
         FFCST::PROPERTY_MAX     => 255,
         FFCST::PROPERTY_SAMPLE  => 'John Doe',
@@ -150,7 +150,7 @@ abstract class Alert extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'alert_activ',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_BOOLEAN,
         FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED],
-        FFCST::PROPERTY_DEFAULT => false,
+        FFCST::PROPERTY_DEFAULT => FFCST::DEFAULT_TRUE,
         FFCST::PROPERTY_COMMENT => 'Alerte active',
         FFCST::PROPERTY_SAMPLE  => true,
     ];

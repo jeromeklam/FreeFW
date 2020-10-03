@@ -120,23 +120,25 @@ class Encoder
             $posi  = explode('.', $p_prefix);
             if (count($parts) == count($posi)) {
                 $elem   = $parts[count($posi)-1];
-                $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($elem, true);
-                if (method_exists($p_api_response, $getter)) {
-                    $result = $p_api_response->$getter();
-                    if ($result) {
-                        $resourceRel = new \FreeFW\JsonApi\V1\Model\ResourceObject(
-                            $result->getApiType(),
-                            $result->getApiId(),
-                            $result->isSingleElement()
-                        );
-                        $relationShips->addRelation($elem, $resourceRel);
-                        $included = $this->encodeSingleResource(
-                            $result,
-                            $p_included,
-                            $p_api_params,
-                            $p_prefix . $elem
-                        );
-                        $p_included->addIncluded($included);
+                if ($elem && $elem != '') {
+                    $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($elem, true);
+                    if (method_exists($p_api_response, $getter)) {
+                        $result = $p_api_response->$getter();
+                        if ($result) {
+                            $resourceRel = new \FreeFW\JsonApi\V1\Model\ResourceObject(
+                                $result->getApiType(),
+                                $result->getApiId(),
+                                $result->isSingleElement()
+                            );
+                            $relationShips->addRelation($elem, $resourceRel);
+                            $included = $this->encodeSingleResource(
+                                $result,
+                                $p_included,
+                                $p_api_params,
+                                $p_prefix . $elem
+                            );
+                            $p_included->addIncluded($included);
+                        }
                     }
                 }
             }
@@ -160,6 +162,11 @@ class Encoder
     ) : \FreeFW\JsonApi\V1\Model\Document {
         $document = new \FreeFW\JsonApi\V1\Model\Document();
         $included = new \FreeFW\JsonApi\V1\Model\IncludedObject();
+        $resource = $this->encodeSingleResource($p_api_response, $included, $p_api_params);
+        $document
+            ->setData($resource)
+            ->setIncluded($included)
+        ;
         if ($p_api_response->hasErrors()) {
             /**
              * @var \FreeFW\Core\Error $oneError
@@ -173,12 +180,6 @@ class Encoder
                 );
                 $document->addError($newError);
             }
-        } else {
-            $resource = $this->encodeSingleResource($p_api_response, $included, $p_api_params);
-            $document
-                ->setData($resource)
-                ->setIncluded($included)
-            ;
         }
         return $document;
     }

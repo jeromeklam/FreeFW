@@ -238,4 +238,14 @@ class Alert extends \FreeFW\Model\Base\Alert
         }
         return $this->object;
     }
+
+    /**
+     * Add to queue, websocket, ?
+     *
+     * @return boolean
+     */
+    public function forwardStorageEvent()
+    {
+        return true;
+    }
 }

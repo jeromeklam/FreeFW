@@ -146,7 +146,7 @@ class WebSocket extends \FreeFW\Core\Application implements \FreeWS\Wamp2\DataPr
                 $query = $model->getQuery();
                 $query
                     ->addConditions($filters)
-                    ->addRelations($route->getInclude())
+                    ->addRelations($route->getDefaultInclude())
                     ->setLimit(0, 1)
                 ;
                 $data = null;
