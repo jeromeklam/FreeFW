@@ -28,6 +28,18 @@ class Alert extends \FreeFW\Model\Base\Alert
     const PRIORITY_INFORMATION = 'INFORMATION';
 
     /**
+     * Recurrence
+     * @var string
+     */
+    const RECUR_TYPE_NONE   = 'NONE';
+    const RECUR_TYPE_HOUR   = 'HOUR';
+    const RECUR_TYPE_MINUTE = 'MINUTE';
+    const RECUR_TYPE_DAY    = 'DAY';
+    const RECUR_TYPE_MONTH  = 'MONTH';
+    const RECUR_TYPE_YEAR   = 'YEAR';
+    const RECUR_TYPE_MANUAL = 'MANUAL';
+
+    /**
      * User
      * @var \FreeSSO\Model\User
      */
@@ -247,5 +259,87 @@ class Alert extends \FreeFW\Model\Base\Alert
     public function forwardStorageEvent()
     {
         return true;
+    }
+
+    /**
+     * Generate next event ??
+     *
+     * @return boolean
+     */
+    public function nextAlert()
+    {
+        if ($this->getAlertParentId() === null || $this->getAlertParentId() <= 0) {
+            $done = $this->getAlertDoneTs();
+            if ($done && $this->getAlertRecurType() !== self::RECUR_TYPE_NONE) {
+                /**
+                 * @var \FreeFW\Model\Alert $newAlert
+                 */
+                $newAlert = $this->clone();
+                $newAlert
+                    ->setAlertParentId(null)
+                    ->setAlertDoneText(null)
+                    ->setAlertDoneTs(null)
+                    ->setAlertDoneAction(null)
+                    ->setAlertActiv(true)
+                    ->setAlertDoneUserId(null)
+                ;
+                $newFrom  = \FreeFW\Tools\Date::mysqlToDatetime($this->getAlertFrom());
+                $newTo    = \FreeFW\Tools\Date::mysqlToDatetime($this->getAlertTo());
+                switch ($this->getAlertRecurType()) {
+                    case self::RECUR_TYPE_DAY:
+                        $interval = 'P' . $this->getAlertRecurNumber() . 'D';
+                        break;
+                    case self::RECUR_TYPE_MONTH:
+                        $interval = 'P' . $this->getAlertRecurNumber() . 'M';
+                        break;
+                    case self::RECUR_TYPE_YEAR:
+                        $interval = 'P' . $this->getAlertRecurNumber() . 'Y';
+                        break;
+                    case self::RECUR_TYPE_HOUR:
+                        $interval = 'PT' . $this->getAlertRecurNumber() . 'H';
+                        break;
+                    case self::RECUR_TYPE_MINUTE:
+                        $interval = 'PT' . $this->getAlertRecurNumber() . 'M';
+                        break;
+                    default:
+                        $interval = 'P1D';
+                        break;
+                }
+                $newFrom->add(new \DateInterval($interval));
+                $newTo->add(new \DateInterval($interval));
+                $newAlert
+                    ->setAlertFrom(\FreeFW\Tools\Date::datetimeToMysql($newFrom))
+                    ->setAlertTo(\FreeFW\Tools\Date::datetimeToMysql($newTo))
+                ;
+                if (!$newAlert->create()) {
+                    return false;
+                }
+                $this
+                    ->setAlertParentId($newAlert->getAlertId())
+                    ->setParent($newAlert)
+                ;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Après la création
+     *
+     * @return boolean
+     */
+    public function beforeCreate()
+    {
+        return $this->nextAlert();
+    }
+
+    /**
+     * Après la modification
+     *
+     * @return boolean
+     */
+    public function beforeSave()
+    {
+        return $this->nextAlert();
     }
 }

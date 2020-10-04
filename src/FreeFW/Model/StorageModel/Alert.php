@@ -33,6 +33,7 @@ abstract class Alert extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'user_id',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
         FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED, FFCST::OPTION_FK],
+        FFCST::PROPERTY_DEFAULT => FFCST::DEFAULT_CURRENT_USER,
         FFCST::PROPERTY_COMMENT => 'Identifiant de l\'utilisateur à l\'origine de l\'alerte',
         FFCST::PROPERTY_SAMPLE  => 123,
         FFCST::PROPERTY_FK      => ['user' =>
@@ -176,6 +177,7 @@ abstract class Alert extends \FreeFW\Core\StorageModel
     protected static $PRP_ALERT_RECUR_NUMBER = [
         FFCST::PROPERTY_PRIVATE => 'alert_recur_number',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_INTEGER,
+        FFCST::PROPERTY_DEFAULT => 1,
         FFCST::PROPERTY_OPTIONS => [],
         FFCST::PROPERTY_COMMENT => 'Durée pour la récurrence',
         FFCST::PROPERTY_SAMPLE  => 1,

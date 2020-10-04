@@ -869,6 +869,25 @@ abstract class Model implements
     }
 
     /**
+     * Clone current object
+     *
+     * @return \FreeFW\Core\Model
+     */
+    public function clone()
+    {
+        $class = get_called_class();
+        $new   = new $class();
+        foreach ($this->getProperties() as $name => $property) {
+            $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+            $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+            if (method_exists($new, $setter)) {
+                $new->$setter($this->$getter());
+            }
+        }
+        return $new;
+    }
+
+    /**
      * Add to queue ?
      *
      * @return boolean

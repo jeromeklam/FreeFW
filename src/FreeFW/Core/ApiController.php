@@ -233,7 +233,7 @@ class ApiController extends \FreeFW\Core\Controller
             );
         }
         $default = $p_request->default_model;
-        $model = \FreeFW\DI\DI::get($default);
+        $model   = \FreeFW\DI\DI::get($default);
         /**
          * Id
          */
