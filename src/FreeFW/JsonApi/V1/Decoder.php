@@ -28,6 +28,7 @@ class Decoder
              * @var \FreeFW\Core\Model $obj
              */
             $obj  = \FreeFW\DI\DI::get($class);
+            $obj->setModelBehaviour($obj::MODEL_BEHAVIOUR_API);
             $attr = $resource->getAttributes();
             $rels = $resource->getRelationships();
             if ($rels) {

@@ -55,12 +55,16 @@ class Json implements
         $body       = $p_response->getBody();
         if (is_object($body)) {
             if ($body instanceof StreamInterface) {
-                $content = $body->getContents();
-                $object  = unserialize($content);
+                $content    = $body->getContents();
+                $object     = unserialize($content);
+                $serializer = new \Zumba\JsonSerializer\JsonSerializer();
+                if (is_object($object)) {
+                    $result = $serializer->serialize($object->__toArray());
+                } else {
+                    $result = $serializer->serialize($object);
+                }
                 $p_response = $p_response->withBody(
-                    \GuzzleHttp\Psr7\stream_for(
-                        json_encode($object)
-                    )
+                    \GuzzleHttp\Psr7\stream_for($result)
                 );
             }
         }

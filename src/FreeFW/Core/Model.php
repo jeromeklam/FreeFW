@@ -23,6 +23,7 @@ abstract class Model implements
      */
     const MODEL_BEHAVIOUR_RAW      = 'RAW';
     const MODEL_BEHAVIOUR_STANDARD = 'STANDARD';
+    const MODEL_BEHAVIOUR_UPDATED  = 'UPDATED';
     const MODEL_BEHAVIOUR_API      = 'API';
 
     /**
@@ -37,6 +38,12 @@ abstract class Model implements
      * @var string
      */
     protected $model_behaviour = self::MODEL_BEHAVIOUR_STANDARD;
+
+    /**
+     * Updated fields
+     * @var array
+     */
+    protected $updated = [];
 
     /**
      * Constructor
@@ -56,6 +63,7 @@ abstract class Model implements
             $this->setLogger(\FreeFW\DI\DI::getShared('logger'));
         }
         $this->initModel();
+        $this->init();
     }
 
     /**
@@ -63,6 +71,29 @@ abstract class Model implements
      */
     public function init()
     {
+        return $this;
+    }
+
+    /**
+     * Merge with an exising object
+     *
+     * @param \FreeFW\Core\Model $p_model
+     * @param boolean          $p_only_updated
+     * @param boolean          $p_update_id
+     *
+     * @return \FreeFW\Core\Model
+     */
+    public function merge(\FreeFW\Core\Model $p_model, $p_only_updated = true, $p_update_id = false)
+    {
+        if (get_class($this) == get_class($p_model)) {
+            foreach ($this->getProperties() as $name => $property) {
+                if (!$p_only_updated || $p_model->hasBeenUpdated($name)) {
+                    $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                    $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                    $this->$setter($p_model->$getter());
+                }
+            }
+        }
         return $this;
     }
 
@@ -159,6 +190,51 @@ abstract class Model implements
     }
 
     /**
+     * Set a field as updated
+     *
+     * @param string $p_field
+     *
+     * @return boolean
+     */
+    public function addUpdatedField($p_field)
+    {
+        $this->updated[$p_field] = true;
+        return true;
+    }
+
+    /**
+     * Return all updated fields
+     *
+     * @return array
+     */
+    public function getUpdatedFields()
+    {
+        if ($this->model_behaviour == self::MODEL_BEHAVIOUR_UPDATED || $this->model_behaviour == self::MODEL_BEHAVIOUR_API) {
+            return array_keys($this->updated);
+        } else {
+            return array_keys($this->getProperties());
+        }
+    }
+
+    /**
+     * True if field has benn updated
+     *
+     * @param string $p_field
+     *
+     * @return boolean
+     */
+    public function hasBeenUpdated($p_field)
+    {
+        if ($this->model_behaviour == self::MODEL_BEHAVIOUR_UPDATED || $this->model_behaviour == self::MODEL_BEHAVIOUR_API) {
+            if (array_key_exists($p_field, $this->updated)) {
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Set a property
      *
      * @param string $p_property
@@ -169,6 +245,7 @@ abstract class Model implements
     public function set($p_property, $p_value)
     {
         $this->$p_property = $p_value;
+        $this->addUpdatedField($p_property);
         return $this;
     }
 
@@ -213,6 +290,7 @@ abstract class Model implements
                     $test = $property[FFCST::PROPERTY_PUBLIC];
                 }
                 if ($test == $name) {
+                    $this->addUpdatedField($prp);
                     $type   = $property[FFCST::PROPERTY_TYPE];
                     $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($prp, true);
                     switch ($type) {
@@ -250,6 +328,7 @@ abstract class Model implements
                             $found  = false;
                             foreach ($p_included as $oneIncluded) {
                                 if ($oneIncluded instanceof $class && $oneIncluded->getApiId() == $id) {
+                                    $this->addUpdatedField($prp);
                                     $found = true;
                                     $this->$setter($oneIncluded);
                                     break;

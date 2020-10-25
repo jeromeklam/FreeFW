@@ -188,7 +188,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         // Build query
         $sql = \FreeFW\Tools\Sql::makeInsertQuery($source, $fields);
         $this->logger->debug('PDOStorage.create : ' . $sql);
-        $this->logger->debug(print_r($fields, true));
+        //$this->logger->debug(print_r($fields, true));
         try {
             // Get PDO and execute
             $query = $this->provider->prepare($sql, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
@@ -630,6 +630,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         // Build query
         $sql = \FreeFW\Tools\Sql::makeUpdateQuery($source, $fields, $pks);
         $this->logger->debug('PDOStorage.save : ' . $sql);
+        //$this->logger->debug('PDOStorage.save : ' . print_r($fields, true));
         try {
             // Get PDO and execute
             $query = $this->provider->prepare($sql, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));

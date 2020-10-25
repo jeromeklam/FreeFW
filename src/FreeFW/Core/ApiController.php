@@ -264,7 +264,6 @@ class ApiController extends \FreeFW\Core\Controller
             }
             if (count($data) > 0) {
                 $model = $data[0];
-                $model->setModelBehaviour(\FreeFW\Core\Model::MODEL_BEHAVIOUR_API);
                 if (method_exists($model, 'afterRead')) {
                     $model->afterRead();
                 }
@@ -275,10 +274,12 @@ class ApiController extends \FreeFW\Core\Controller
                 $code = FFCST::ERROR_NOT_FOUND; // 404
             }
         } else if (intval($p_id) == 0) {
-            $model->setModelBehaviour(\FreeFW\Core\Model::MODEL_BEHAVIOUR_API);
             $model->init();
             if (method_exists($model, 'afterRead')) {
                 $model->afterRead();
+            }
+            if (method_exists($model, 'initCreate')) {
+                $model->initCreate();
             }
             $this->logger->debug('FreeFW.ApiController.getOne.end');
             return $this->createSuccessOkResponse($model); // 200
@@ -313,7 +314,6 @@ class ApiController extends \FreeFW\Core\Controller
              * @var \FreeFW\Core\StorageModel $data
              */
             $data = $apiParams->getData();
-            $data->setModelBehaviour(\FreeFW\Core\Model::MODEL_BEHAVIOUR_API);
             if ($data->create()) {
                 $data = $this->getModelById($apiParams, $data, $data->getApiId());
                 $this->logger->debug('FreeFW.ApiController.createOne.end');
@@ -362,8 +362,8 @@ class ApiController extends \FreeFW\Core\Controller
                     /**
                      * @var \FreeFW\Core\StorageModel $data
                      */
-                    $data = $apiParams->getData();
-                    $data->setModelBehaviour(\FreeFW\Core\Model::MODEL_BEHAVIOUR_API);
+                    $newData = $apiParams->getData();
+                    $data->merge($newData);
                     if ($data->save()) {
                         $data = $this->getModelById($apiParams, $data, $data->getApiId());
                         $this->logger->debug('FreeFW.ApiController.updateOne.end');
@@ -416,7 +416,6 @@ class ApiController extends \FreeFW\Core\Controller
              */
             $data = $model->findFirst([$model->getPkField() => $p_id]);
             if ($data) {
-                $data->setModelBehaviour(\FreeFW\Core\Model::MODEL_BEHAVIOUR_API);
                 if ($data->remove()) {
                     $this->logger->debug('FreeFW.ApiController.removeOne.end');
                     return $this->createSuccessRemoveResponse(); // 204
