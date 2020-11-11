@@ -97,6 +97,9 @@ class ApiController extends \FreeFW\Core\Controller
         $data = new \FreeFW\Model\ResultSet();
         if ($query->execute()) {
             $data = $query->getResult();
+            foreach ($data as $line) {
+                $line->id = $line->getApiId();
+            }
         }
         // data can be empty, but it's a 2*
         $this->logger->debug('FreeFW.ApiController.autocomplete.end');

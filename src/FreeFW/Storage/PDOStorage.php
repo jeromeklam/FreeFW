@@ -783,6 +783,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     self::$models[$onePart] = $newModel;
                     ++$crtAlias;
                     $aliases[$baseAlias . '.' . $onePart] = $crtAlias;
+                    $ids[$baseAlias . '.' . $onePart] = $newModel->getFieldNameByOption(FFCST::OPTION_PK);
                     $select   = $select . ', ' . $newModel->getFieldsForSelect($crtAlias, $p_fields, $this->provider);
                     $group    = $group . ', ' . $newModel->getFieldsAliasForSelect($crtAlias, $p_fields, $this->provider);
                     $alias1   = $aliases[$baseAlias];
@@ -863,17 +864,21 @@ class PDOStorage extends \FreeFW\Storage\Storage
             } else {
                 $sort = $sort . ', ';
             }
-            if ($column === 'id' || $column === '+id' || $column === '-id') {
-                $column = str_replace('id',  $ids['@'], $column);
-            }
-            $myColumn = $aliases['@'] . '.' . $column;
             if (strpos($column, '.') !== false) {
                 $parts = explode('.', $column);
                 $col   = array_pop($parts);
                 $find  = '@.' . implode('.', $parts);
                 if (array_key_exists($find, $aliases)) {
+                    if ($col === 'id' || $col === '+id' || $col === '-id') {
+                        $col = str_replace('id',  $ids[$find], $col);
+                    }
                     $myColumn = $aliases[$find] . '.' . $col;
                 }
+            } else {
+                if ($column === 'id' || $column === '+id' || $column === '-id') {
+                    $column = str_replace('id',  $ids['@'], $column);
+                }
+                $myColumn = $aliases['@'] . '.' . $column;
             }
             if ($order == '+') {
                 $sort = $sort . $myColumn;
@@ -883,7 +888,6 @@ class PDOStorage extends \FreeFW\Storage\Storage
         }
         // Build query
         $sql = 'SELECT ' . $select . ' FROM ' . $from . ' WHERE ( ' . $where . ' ) ' . $whereBroker . ' ' . $group . ' ' . $sort . ' ' . $limit;
-        //var_export($sql);
         $this->logger->debug('PDOStorage.select : ' . $sql);
         $this->logger->debug('PDOStorage.fields : ' . print_r($values, true));
         // I got all, run query...
@@ -1416,6 +1420,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $model      = self::$models[$class];
                 $source     = $model::getSource();
                 $properties = $model::getProperties();
+                if ($field == 'id') {
+                    $field = $model->getFieldNameByOption(FFCST::OPTION_PK);
+                }
             } else {
                 $field = $parts[0];
                 if (!array_key_exists($class, self::$models)) {
@@ -1430,6 +1437,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $model      = self::$models[$class];
                 $source     = $model::getSource();
                 $properties = $model::getProperties();
+                if ($field == 'id') {
+                    $field = $model->getFieldNameByOption(FFCST::OPTION_PK);
+                }
             }
         } else {
             $source     = $p_model::getSource();
@@ -1441,7 +1451,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         }
         $type     = \FreeFW\Constants::TYPE_STRING;
         $function = null;
-        if ($field === 'id') {
+        if ($field == 'id') {
             $field = $p_model->getFieldNameByOption(FFCST::OPTION_PK);
         }
         if (array_key_exists($field, $properties)) {

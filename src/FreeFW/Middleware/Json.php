@@ -58,7 +58,7 @@ class Json implements
                 $content    = $body->getContents();
                 $object     = unserialize($content);
                 $serializer = new \Zumba\JsonSerializer\JsonSerializer();
-                if (is_object($object)) {
+                if (is_object($object) && method_exists($object, '__toArray')) {
                     $result = $serializer->serialize($object->__toArray());
                 } else {
                     $result = $serializer->serialize($object);
