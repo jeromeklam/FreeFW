@@ -975,4 +975,35 @@ abstract class Model implements
     {
         return false;
     }
+
+    /**
+     * get datas for merging, print, ...
+     *
+     * @return \FreeFW\Model\MergeModel
+     */
+    public function getMergeData()
+    {
+        $datas = new \FreeFW\Model\MergeModel();
+        $block = $this->getApiType();
+        $parts = explode('_', $block);
+        array_shift($parts);
+        $block = \FreeFW\Tools\PBXString::fromCamelCase(implode('_', $parts));
+        $datas->addBlock($block);
+        $data = new \stdClass();
+        foreach ($this->getProperties() as $name => $oneProperty) {
+            $title = $oneProperty[FFCST::PROPERTY_PRIVATE];
+            if (array_key_exists(FFCST::PROPERTY_PUBLIC, $oneProperty)) {
+                $title = $oneProperty[FFCST::PROPERTY_PUBLIC];
+            }
+            if (array_key_exists(FFCST::PROPERTY_MERGE, $oneProperty)) {
+                $title = $oneProperty[FFCST::PROPERTY_MERGE];
+            }
+            $datas->addField($name, $title);
+
+            $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+            $data->{$name} = $this->{$getter}();
+        }
+        $datas->addData($data);
+        return $datas;
+    }
 }

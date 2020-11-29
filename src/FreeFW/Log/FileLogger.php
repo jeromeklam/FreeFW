@@ -229,13 +229,13 @@ class FileLogger extends \Psr\Log\AbstractLogger
         } else {
             $rr = true;
         }
-        if (is_file('/var/log/jvs/' . APP_NAME . '.log')) {
-            $size = filesize('/var/log/jvs/' . APP_NAME . '.log');
+        if (is_file(APP_LOG . '/' . APP_NAME . '.log')) {
+            $size = filesize(APP_LOG . '/' . APP_NAME . '.log');
             if ($size > self::MAXLOGSIZE) {
-                if (is_file('/var/log/jvs/' . APP_NAME . '.log.1')) {
-                    unlink('/var/log/jvs/' . APP_NAME . '.log.1');
+                if (is_file(APP_LOG . '/' . APP_NAME . '.log.1')) {
+                    unlink(APP_LOG . '/' . APP_NAME . '.log.1');
                 }
-                rename('/var/log/jvs/' . APP_NAME . '.log', '/var/log/jvs/' . APP_NAME . '.log.1');
+                rename(APP_LOG . '/' . APP_NAME . '.log', APP_LOG . '/' . APP_NAME . '.log.1');
             }
         } else {
             $rr = true;
@@ -247,14 +247,6 @@ class FileLogger extends \Psr\Log\AbstractLogger
         if ($h) {
             while (null !== ($line = array_shift($this->tabCache))) {
                 $content = implode('  ---  ', $line) . PHP_EOL;
-                fwrite($h, $content);
-            }
-            fclose($h);
-        }
-        if (is_dir('/var/log/jvs')) {
-            $h = fopen('/var/log/jvs/' . APP_NAME . '.log', 'a+');
-            while (null !== ($line = array_shift($this->tabBeat))) {
-                $content = json_encode($line) . PHP_EOL;
                 fwrite($h, $content);
             }
             fclose($h);

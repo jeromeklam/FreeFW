@@ -234,9 +234,12 @@ class Document implements \JsonSerializable
                 $this->data = $this->getResourceObject($data, $this->included);
             } else {
                 if (is_array($data)) {
-                    // Collection
+                    $this->data = new \FreeFW\Model\ResultSet();
+                    foreach ($data as $oneModel) {
+                        $this->data[] = $this->getResourceObject($oneModel, $this->included);
+                    }
                 } else {
-                    // @todo
+                    // @todo ??
                 }
             }
         }

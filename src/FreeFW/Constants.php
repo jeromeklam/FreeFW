@@ -91,6 +91,7 @@ class Constants
     const PROPERTY_ENUM       = 'enum';
     const PROPERTY_OPTIONS    = 'options';
     const PROPERTY_PUBLIC     = 'public';
+    const PROPERTY_MERGE      = 'merge';
     const PROPERTY_DEFAULT    = 'default';
     const PROPERTY_COMMENT    = 'comment';
     const PROPERTY_SAMPLE     = 'sample';
@@ -181,6 +182,7 @@ class Constants
     const ERROR_ID_IS_UNAVALAIBLE   = 666012;
     const ERROR_NOT_AUTHENTICATED   = 666013;
     const ERROR_IN_DATA             = 666014;
+    const ERROR_EDITION_NOT_FOUND   = 666015;
 
     /**
      * Success types

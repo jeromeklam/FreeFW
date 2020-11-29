@@ -96,6 +96,7 @@ class Route implements \Psr\Log\LoggerAwareInterface
     const ROLE_DELETE_ONE   = 'delete';
     const ROLE_GET_FILTERED = 'getfiltered';
     const ROLE_AUTOCOMPLETE = 'autocomplete';
+    const ROLE_OTHER        = 'other';
 
     /**
      * Auth constants

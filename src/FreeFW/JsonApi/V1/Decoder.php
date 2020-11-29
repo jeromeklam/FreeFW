@@ -56,6 +56,32 @@ class Decoder
             }
             $obj->setApiId($resource->getId());
             return $obj;
+        } else {
+            $objs = new \FreeFW\Model\ResultSet();
+            $cls = null;
+            foreach ($p_document->getData() as $oneResource) {
+                if ($cls === null) {
+                    $cls = $oneResource->getType();
+                } else {
+                    if ($cls !== $oneResource->getType()) {
+                        // @todo ?? error, one same model
+                       // continue;
+                    }
+                }
+                $class = str_replace('_', '::Model::', $cls);
+                /**
+                 * @var \FreeFW\Core\Model $obj
+                 */
+                $obj  = \FreeFW\DI\DI::get($class);
+                $obj->setModelBehaviour($obj::MODEL_BEHAVIOUR_API);
+                $attr = $oneResource->getAttributes();
+                $obj->initWithJson($attr->__toArray());
+                // @todo : add rels, ...
+                // $rels = $oneResource->getRelationships();
+                $obj->setApiId($oneResource->getId());
+                $objs[] = $obj;
+            }
+            return $objs;
         }
         return null;
     }
