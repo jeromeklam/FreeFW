@@ -18,7 +18,7 @@ class StorageFactory
      *
      * @return \FreeFW\Interfaces\StorageInterface
      */
-    public static function getFactory(string $p_dsn, $p_key1 = null, $p_key2 = null, $p_logger = null, $p_event_manager = null)
+    public static function getFactory(string $p_dsn, $p_key1 = null, $p_key2 = null, $p_logger = null, $p_event_manager = null, $p_config = null)
     {
         $parts   = explode(':', $p_dsn);
         $storage = null;
@@ -37,6 +37,7 @@ class StorageFactory
                     ->setEventManager($p_event_manager)
                     ->setLogger($p_logger)
                 ;
+                $storage->setAppConfig($p_config);
                 break;
             case 'oci':
                 $provider = new \FreeFW\Storage\PDO\Oracle($p_dsn, $p_key1, $p_key2);
@@ -46,6 +47,7 @@ class StorageFactory
                     ->setEventManager($p_event_manager)
                     ->setLogger($p_logger)
                 ;
+                $storage->setAppConfig($p_config);
                 break;
             default:
                 throw new \FreeFW\Core\FreeFWStorageException(sprintf('Unknown %s provider !', $p_dsn));

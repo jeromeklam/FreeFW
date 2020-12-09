@@ -385,4 +385,67 @@ class PBXString
         $p_text = str_replace("\'", "'", $p_text);
         return $p_text;
     }
+
+    /**
+     * COnvert html t simple text
+     *
+     * @param string $p_html
+     *
+     * @return string
+     */
+    public static function htmlToText($p_html, $p_preserve_cr = false)
+    {
+        $p_str = strip_tags($p_html);
+        $p_str = html_entity_decode($p_str, ENT_QUOTES);
+        return $p_str;
+    }
+
+    /**
+     * Permet de réduire un texte
+     *
+     * @param string $p_str
+     * @param int $p_max_len
+     * @param string $p_end_str (default '...')
+     * @param bool $p_trunc_at_space (default true)
+     * @param string $p_encoding (default null) (if null then mb_internal_encoding() is used)
+     * @return string
+     *
+     * @example truncString('je suis un texte trop long',20) = 'je suis un texte...'
+     */
+    public static function truncString($p_str, $p_max_len, $p_end_str = '...', $p_trunc_at_space = true, $p_encoding = null)
+    {
+        /**
+         * @var string $encoding
+         * @var int $string_length
+         * @var int $max_length
+         */
+        $encoding      = ($p_encoding ? $p_encoding : mb_internal_encoding());
+        $string_length = mb_strlen($p_str, $encoding);
+        $max_length    = $p_max_len - strlen($p_end_str);
+        if ($string_length <= $max_length) {
+            return $p_str;
+        }
+        if ($p_trunc_at_space && ($space_position = mb_strrpos($p_str, ' ', $max_length - $string_length, $encoding))) {
+            $max_length = $space_position;
+        }
+        return mb_substr($p_str, 0, $max_length, $encoding) . $p_end_str;
+    }
+
+    /**
+     * Return a sql regexp in lowercase
+     *
+     * @param string $p_str
+     *
+     * @return string
+     */
+    public static function toSqlRegexp($p_str)
+    {
+        $newStr = self::withoutAccent(strtolower($p_str));
+        $newStr = str_replace('e', '[eéèêë]', $newStr);
+        $newStr = str_replace('o', '[oöô]', $newStr);
+        $newStr = str_replace('a', '[aàäâ]', $newStr);
+        $newStr = str_replace('u', '[uüûù]', $newStr);
+        $newStr = str_replace('i', '[iïî]', $newStr);
+        return $newStr;
+    }
 }

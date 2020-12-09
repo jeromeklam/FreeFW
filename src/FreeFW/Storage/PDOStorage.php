@@ -92,6 +92,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 if (in_array(FFCST::OPTION_GROUP, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $grp = true;
                 }
+                if (in_array(FFCST::OPTION_GROUP_RESTRICTED, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
+                    $grp = true;
+                }
                 if ($oneProperty[FFCST::PROPERTY_TYPE] == FFCST::TYPE_DATETIMETZ) {
                     $dtz = true;
                 }
@@ -117,7 +120,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                             }
                         }
                         if ($grp) {
-                            $group = $sso->getBrokerGroup();
+                            $group = $sso->getUserGroup();
                             if ($group) {
                                 $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $group->getGrpId();
                             } else {
@@ -527,6 +530,10 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     $grp = true;
                     $add = false;
                 }
+                if (in_array(FFCST::OPTION_GROUP_RESTRICTED, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
+                    $grp = true;
+                    $add = false;
+                }
                 if ($oneProperty[FFCST::PROPERTY_TYPE] == FFCST::TYPE_DATETIMETZ) {
                     $dtz = true;
                 }
@@ -745,8 +752,15 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 //}
                 // Le groupe est une restriction.
                 if (in_array(FFCST::OPTION_GROUP, $property[FFCST::PROPERTY_OPTIONS])) {
-                    $ssoGroup = $sso->getBrokerGroup();
+                    $ssoGroup = $sso->getUserGroup();
                     if ($ssoGroup) {
+                        $whereBroker = ' AND ( ' . $crtAlias . '.' . $name . ' = ' . $ssoGroup->getGrpId() . ')';
+                    }
+                }
+                if (in_array(FFCST::OPTION_GROUP_RESTRICTED, $property[FFCST::PROPERTY_OPTIONS])) {
+                    $ssoGroup = $sso->getUserGroup();
+                    $restrictions = $this->getAppConfig()->get('restricted:group', []);
+                    if (in_array($p_model::getSource(), $restrictions)) {
                         $whereBroker = ' AND ( ' . $crtAlias . '.' . $name . ' = ' . $ssoGroup->getGrpId() . ')';
                     }
                 }
@@ -834,9 +848,6 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $parts  = $this->renderConditions($p_conditions, $p_model, $aliases, '@');
         $where  = $parts['sql'];
         $values = $parts['values'];
-        /**
-         * @var \FreeFW\Model\Condition $oneCondition
-         */
         // Build query
         if (trim($where) == '') {
             $where = ' 1 = 1';
@@ -989,9 +1000,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $properties = $p_model::getProperties();
         $values     = [];
         $ok         = false;
-        /**
-         * @var \FreeFW\Model\Condition $oneCondition
-         */
+        //
         $parts  = $this->renderConditions($p_conditions, $p_model);
         $where  = $parts['sql'];
         $values = $parts['values'];
@@ -1077,9 +1086,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $properties = $p_model::getProperties();
         $values     = [];
         $ok         = false;
-        /**
-         * @var \FreeFW\Model\Condition $oneCondition
-         */
+        //
         $parts  = $this->renderConditions($p_conditions, $p_model);
         $where  = $parts['sql'];
         $values = $parts['values'];
@@ -1130,7 +1137,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         if ($p_conditions->getOperator() == \FreeFW\Storage\Storage::COND_OR) {
             $oper = ' OR ';
         }
-        foreach ($p_conditions as $idx => $oneCondition) {
+        foreach ($p_conditions as $oneCondition) {
             if ($oneCondition instanceof \FreeFW\Model\SimpleCondition) {
                 $parts = $this->renderCondition($oneCondition, $p_model, $p_aliases, $p_crtAlias);
                 if ($result['sql'] == '') {
@@ -1260,10 +1267,18 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $addL     = '%';
                 $addR     = '';
                 break;
+            case \FreeFW\Storage\Storage::COND_BEGIN_WITH:
+                $addL     = '^';
+                $addR     = '';
+                break;
+            case \FreeFW\Storage\Storage::COND_END_WITH:
+                $addL     = '';
+                $addR     = '$';
+                break;
             case \FreeFW\Storage\Storage::COND_LIKE:
                 $realOper = 'like';
-                $addL     = '%';
-                $addR     = '%';
+                $addL     = '';
+                $addR     = '';
                 break;
             case \FreeFW\Storage\Storage::COND_EQUAL_OR_NULL:
                 $realOper = '=';
@@ -1332,7 +1347,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
                             $leftDatas['id'] . $realOper . $rightId . ' AND ' .
                             $leftDatas['id'] . ' IS NOT NULL)';
                     } else {
-                        $result['sql'] = $leftDatas['id'] . ' ' . $realOper . ' ' . $rightId;
+                        if ($realOper === 'like') {
+                            $result['sql'] = $leftDatas['id'] . ' REGEXP ' . $rightId;
+                        } else {
+                            $result['sql'] = $leftDatas['id'] . ' ' . $realOper . ' ' . $rightId;
+                        }
                     }
                 }
                 if ($leftDatas['type'] === false) {
@@ -1347,7 +1366,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
                                 $rightDatas['value'] = \FreeFW\Tools\Date::stringToMysql($rightDatas['value']);
                             }
                         }
-                        $result['values'][$rightDatas['id']] = $addL . $rightDatas['value'] . $addR;
+                        $nData = $rightDatas['value'];
+                        if ($realOper === 'like') {
+                            $nData = \FreeFW\Tools\PBXString::toSqlRegexp($nData);
+                        }
+                        $result['values'][$rightDatas['id']] = $addL . $nData . $addR;
                     } else {
                         $result['type'] = $rightDatas['type'];
                     }

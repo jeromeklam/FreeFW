@@ -22,6 +22,18 @@ abstract class Edition extends \FreeFW\Model\StorageModel\Edition
     protected $brk_id = null;
 
     /**
+     * grp_id
+     * @var int
+     */
+    protected $grp_id = null;
+
+    /**
+     * lang_id
+     * @var int
+     */
+    protected $lang_id = null;
+
+    /**
      * edi_object_name
      * @var string
      */
@@ -62,6 +74,18 @@ abstract class Edition extends \FreeFW\Model\StorageModel\Edition
      * @var string
      */
     protected $edi_type = null;
+
+    /**
+     * edi_mode
+     * @var string
+     */
+    protected $edi_mode = null;
+
+    /**
+     * edi_duration
+     * @var int
+     */
+    protected $edi_duration = null;
 
     /**
      * Set edi_id
@@ -107,6 +131,52 @@ abstract class Edition extends \FreeFW\Model\StorageModel\Edition
     public function getBrkId()
     {
         return $this->brk_id;
+    }
+
+    /**
+     * Set grp_id
+     *
+     * @param int $p_value
+     *
+     * @return \FreeFW\Model\Edition
+     */
+    public function setGrpId($p_value)
+    {
+        $this->grp_id = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get grp_id
+     *
+     * @return int
+     */
+    public function getGrpId()
+    {
+        return $this->grp_id;
+    }
+
+    /**
+     * Set lang_id
+     *
+     * @param int $p_value
+     *
+     * @return \FreeFW\Model\Edition
+     */
+    public function setLangId($p_value)
+    {
+        $this->lang_id = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get lang_id
+     *
+     * @return int
+     */
+    public function getLangId()
+    {
+        return $this->lang_id;
     }
 
     /**
@@ -268,5 +338,51 @@ abstract class Edition extends \FreeFW\Model\StorageModel\Edition
     public function getEdiType()
     {
         return $this->edi_type;
+    }
+
+    /**
+     * Set edi_mode
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\Edition
+     */
+    public function setEdiMode($p_value)
+    {
+        $this->edi_mode = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get edi_mode
+     *
+     * @return string
+     */
+    public function getEdiMode()
+    {
+        return $this->edi_mode;
+    }
+
+    /**
+     * Set edi_duration
+     *
+     * @param int $p_value
+     *
+     * @return \FreeFW\Model\Edition
+     */
+    public function setEdiDuration($p_value)
+    {
+        $this->edi_duration = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get edi_duration
+     *
+     * @return int
+     */
+    public function getEdiDuration()
+    {
+        return $this->edi_duration;
     }
 }

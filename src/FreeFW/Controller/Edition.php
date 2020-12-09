@@ -1,8 +1,6 @@
 <?php
 namespace FreeFW\Controller;
 
-use FreeFW\Model\MergeModel;
-
 /**
  * Controller Edition
  *
@@ -30,6 +28,9 @@ class Edition extends \FreeFW\Core\ApiController
             );
         }
         $data = null;
+        /**
+         * @var \FreeFW\Model\Edition $edition
+         */
         $edition = \FreeFW\Model\Edition::findFirst(['edi_id' => $p_id]);
         if (!$edition) {
             return $this->createErrorResponse(\FreeFW\Constants::ERROR_EDITION_NOT_FOUND, 'Edition not found !');
@@ -41,19 +42,49 @@ class Edition extends \FreeFW\Core\ApiController
         } else {
             $toPrint->add($data);
         }
-        $file = uniqid(true, 'edi');
-        file_put_contents('/tmp/edi_' . $file . '_tpl.odt', $edition->getEdiData());
-        file_put_contents('/tmp/edi_' . $file . '_dest.odt', $edition->getEdiData());
+        // Get group and user
+        $sso        = \FreeFW\DI\DI::getShared('sso');
+        $user       = $sso->getUser();
+        $group      = \FreeSSO\Model\Group::findFirst(['grp_id' => 15]);
+        //
+        $cfg    = $this->getAppConfig();
+        $tmpDir = rtrim($cfg->get('tmpDir', '/tmp'), '/'). '/';
+        $file   = uniqid(true, 'edi');
+        $ext    = '';
+        switch ($edition->getEdiType()) {
+            case \FreeFW\Model\Edition::TYPE_WRITER:
+                $ext = 'odt';
+                break;
+            case \FreeFW\Model\Edition::TYPE_CALC:
+                $ext = 'ods';
+                break;
+            case \FreeFW\Model\Edition::TYPE_IMPRESS:
+                $ext = 'odp';
+                break;
+            case \FreeFW\Model\Edition::TYPE_HTML:
+                $ext = 'html';
+                break;
+            default:
+                return $this->createErrorResponse(\FreeFW\Constants::ERROR_EDITION_NOT_FOUND, 'Unknown format !');
+        }
+        $src    = $tmpDir . 'edi_' . $file . '_tpl.' . $ext;
+        $dest   = $tmpDir . 'edi_' . $file . '_dest.' . $ext;
+        file_put_contents($src, $edition->getEdiData());
+        file_put_contents($dest, $edition->getEdiData());
         foreach ($data as $oneModel) {
             $oneModel     = $oneModel->findFirst(['id' => $oneModel->getApiId()]);
-            $mergeDatas   = $oneModel->getMergeData();
+            /**
+             * @var \FreeFW\Model\MergeModel $mergeDatas
+             */
+            $mergeDatas = $oneModel->getMergeData($tmpDir);
+            $mergeDatas->addGenericBlock('user');
+            $mergeDatas->addGenericData($user->getFieldsAsArray(), 'user');
+            $mergeDatas->addGenericBlock('group');
+            $mergeDatas->addGenericData($group->getFieldsAsArray(), 'group');
             $mergeService = \FreeFW\DI\DI::get('FreeOffice::Service::Merge');
-            $mergeService->merge('/tmp/edi_' . $file . '_tpl.odt', '/tmp/edi_' . $file . '_dest.odt', $mergeDatas);
+            $mergeService->merge($src, $dest, $mergeDatas);
         }
-
-
-        return $this->createMimeTypeResponse('res.odt', file_get_contents('/tmp/edi_' . $file . '_dest.odt'));
         $this->logger->debug('FreeFW.Controller.Edition.print.end');
-        return $this->createResponse(200, $data);
+        return $this->createMimeTypeResponse('res.odt', file_get_contents($dest));
     }
 }

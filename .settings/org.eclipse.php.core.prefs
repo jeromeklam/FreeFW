@@ -1,2 +1,2 @@
 eclipse.preferences.version=1
-include_path=2;/freesso\u00052;/log\u00052;/http-message\u00052;/http-server-handler\u00052;/http-server-middleware\u00052;/http-factory\u00052;/php-jwt\u00052;/guzzle\u00052;/psr7\u00052;/PHPMailer
+include_path=2;/freesso\u00052;/log\u00052;/http-message\u00052;/http-server-handler\u00052;/http-server-middleware\u00052;/http-factory\u00052;/php-jwt\u00052;/guzzle\u00052;/psr7\u00052;/PHPMailer\u00052;/freeoffice

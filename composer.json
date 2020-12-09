@@ -28,7 +28,9 @@
         "guzzlehttp/guzzle"                    : "*",
         "guzzlehttp/psr7"                      : "*",
         "firebase/php-jwt"                     : "*",
-        "bshaffer/oauth2-server-php"           : "*"
+        "bshaffer/oauth2-server-php"           : "*",
+        "jeromeklam/freeoffice"                : "*",
+        "gregwar/image"                        : "^2.0"
     },
     "autoload" : {
         "psr-4" : {

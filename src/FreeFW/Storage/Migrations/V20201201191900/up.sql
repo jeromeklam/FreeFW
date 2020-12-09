@@ -1,0 +1,37 @@
+CREATE TABLE `sys_file` (
+  `file_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `brk_id` bigint(20) unsigned NOT NULL,
+  `grp_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `lang_id` bigint(20) unsigned DEFAULT NULL,
+  `file_ts` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `parent_file_id` bigint(20) unsigned DEFAULT NULL,
+  `file_name` varchar(80) DEFAULT NULL,
+  `file_blob` longblob DEFAULT NULL,
+  `file_type` varchar(32) DEFAULT NULL,
+  `edi_id` bigint(20) unsigned DEFAULT NULL,
+  `file_object_name` varchar(80) DEFAULT NULL,
+  `file_object_id` bigint(20) unsigned DEFAULT NULL,
+  PRIMARY KEY (`file_id`),
+  KEY `fk_file_broker` (`brk_id`),
+  KEY `fk_file_group` (`grp_id`),
+  KEY `fk_file_user` (`user_id`),
+  KEY `fk_file_file` (`parent_file_id`),
+  KEY `fk_file_lang` (`lang_id`),
+  KEY `fk_file_edition` (`edi_id`),
+  KEY `fk_file_object` (`file_object_name`,`file_object_id`),
+  CONSTRAINT `fk_file_edition` FOREIGN KEY (`edi_id`) REFERENCES `sys_edition` (`edi_id`),
+  CONSTRAINT `fk_file_file` FOREIGN KEY (`parent_file_id`) REFERENCES `sys_file` (`file_id`)
+);
+CREATE TABLE `sys_link` (
+  `link_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `file_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `link_ts` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `link_dead_ts` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `link_token` varchar(255) DEFAULT NULL,
+  `link_name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`link_id`),
+  KEY `fk_link_file` (`file_id`),
+  CONSTRAINT `fk_link_file` FOREIGN KEY (`file_id`) REFERENCES `sys_file` (`file_id`)
+);

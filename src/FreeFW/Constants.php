@@ -11,7 +11,7 @@ class Constants
      * Regex
      * @var string
      */
-    const PARAM_REGEX = '[0-9A-Za-z_\-\.\@\%]*';
+    const PARAM_REGEX = '[0-9a-zA-ZÀ-ÖØ-öø-ÿœŒ_\-\.\@\%]*';
 
     /**
      * Langues
@@ -145,6 +145,7 @@ class Constants
     const OPTION_BROKER           = 'BROKER';
     const OPTION_USER             = 'USER';
     const OPTION_GROUP            = 'GROUP';
+    const OPTION_GROUP_RESTRICTED = 'GROUPRESTR';
     const OPTION_NESTED_PARENT_ID = 'NPARENT';
     const OPTION_NESTED_POSITION  = 'NPOSITION';
     const OPTION_NESTED_LEFT      = 'NLEFT';
@@ -183,6 +184,7 @@ class Constants
     const ERROR_NOT_AUTHENTICATED   = 666013;
     const ERROR_IN_DATA             = 666014;
     const ERROR_EDITION_NOT_FOUND   = 666015;
+    const ERROR_GROUP_SWITCH        = 666016;
 
     /**
      * Success types

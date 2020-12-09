@@ -175,7 +175,6 @@ class ApiController extends \FreeFW\Core\Controller
                 ]
             );
         }
-
         $this->logger->debug('FreeFW.ApiController.getChildren.end');
         return $this->createSuccessOkResponse($children); // 200
     }
@@ -196,6 +195,9 @@ class ApiController extends \FreeFW\Core\Controller
             throw new \FreeFW\Core\FreeFWStorageException(
                 sprintf('No default model for route !')
             );
+        }
+        if (method_exists($this, 'adaptApiParams')) {
+            $apiParams = $this->adaptApiParams($apiParams, 'getAll');
         }
         $default = $p_request->default_model;
         $model = \FreeFW\DI\DI::get($default);
@@ -234,6 +236,9 @@ class ApiController extends \FreeFW\Core\Controller
             throw new \FreeFW\Core\FreeFWStorageException(
                 sprintf('No default model for route !')
             );
+        }
+        if (method_exists($this, 'adaptApiParams')) {
+            $apiParams = $this->adaptApiParams($apiParams, 'getOne');
         }
         $default = $p_request->default_model;
         $model   = \FreeFW\DI\DI::get($default);
@@ -290,7 +295,6 @@ class ApiController extends \FreeFW\Core\Controller
             $data = null;
             $code = FFCST::ERROR_ID_IS_MANDATORY; // 409
         }
-
         $this->logger->debug('FreeFW.ApiController.getOne.end');
         return $this->createErrorResponse($code, $data);
     }
@@ -310,9 +314,12 @@ class ApiController extends \FreeFW\Core\Controller
         if (!isset($p_request->default_model)) {
             throw new \FreeFW\Core\FreeFWStorageException(
                 sprintf('No default model for route !')
-                );
+            );
         }
         if ($apiParams->hasData()) {
+            if (method_exists($this, 'adaptApiParams')) {
+                $apiParams = $this->adaptApiParams($apiParams, 'updateOne');
+            }
             /**
              * @var \FreeFW\Core\StorageModel $data
              */
@@ -331,7 +338,6 @@ class ApiController extends \FreeFW\Core\Controller
             $data = null;
             $code = FFCST::ERROR_NO_DATA; // 409
         }
-
         $this->logger->debug('FreeFW.ApiController.createOne.end');
         return $this->createErrorResponse($code, $data);
     }
@@ -357,6 +363,9 @@ class ApiController extends \FreeFW\Core\Controller
         $model = \FreeFW\DI\DI::get($default);
         if (intval($p_id) > 0) {
             if ($apiParams->hasData()) {
+                if (method_exists($this, 'adaptApiParams')) {
+                    $apiParams = $this->adaptApiParams($apiParams, 'updateOne');
+                }
                 /**
                  * @var \FreeFW\Core\StorageModel $data
                  */
@@ -389,7 +398,6 @@ class ApiController extends \FreeFW\Core\Controller
             $data = null;
             $code = FFCST::ERROR_ID_IS_MANDATORY; // 409
         }
-
         $this->logger->debug('FreeFW.ApiController.updateOne.end');
         return $this->createErrorResponse($code, $data);
     }
@@ -414,6 +422,9 @@ class ApiController extends \FreeFW\Core\Controller
         $default = $p_request->default_model;
         $model = \FreeFW\DI\DI::get($default);
         if (intval($p_id) > 0) {
+            if (method_exists($this, 'adaptApiParams')) {
+                $apiParams = $this->adaptApiParams($apiParams, 'removeOne');
+            }
             /**
              * @var \FreeFW\Core\StorageModel $data
              */
@@ -436,7 +447,6 @@ class ApiController extends \FreeFW\Core\Controller
             $data = null;
             $code = FFCST::ERROR_ID_IS_MANDATORY; // 409
         }
-
         $this->logger->debug('FreeFW.ApiController.removeOne.end');
         return $this->createErrorResponse($code, $data);
     }

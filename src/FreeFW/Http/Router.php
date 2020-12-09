@@ -160,6 +160,7 @@ class Router
                 }
             }
             $currentDir = rtrim($this->base_path, '/');
+            $requestUrl = urldecode($requestUrl);
             //$this->logger->debug('router.findRoute.request : ' . $requestUrl);
             foreach ($this->routes->getRoutes() as $idx => $oneRoute) {
                 //$this->logger->debug('router.findRoute.test : ' . $oneRoute->getUrl());
