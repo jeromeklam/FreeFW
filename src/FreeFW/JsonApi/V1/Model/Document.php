@@ -50,9 +50,25 @@ class Document implements \JsonSerializable
     /**
      * COnstructor
      */
-    public function __construct(\stdClass $p_data = null)
+    public function __construct(\stdClass $p_data = null, $p_metas = null)
     {
-        $this->meta    = new \FreeFW\JsonApi\V1\Model\MetaObject();
+        $this->meta = new \FreeFW\JsonApi\V1\Model\MetaObject();
+        // @todo : read metas from config file
+        $this->meta
+            ->addMeta('copyright', 'Copyright JVS-Mairistem 2020')
+            ->addMeta('authors',
+                [
+                    'Fanny KUSTER <fannykuster@free.fr>',
+                    'Jérôme KLAM <jeromeklam@free.fr>'
+                ]
+            )
+            ->addMeta('ts', microtime(true))
+        ;
+        if (is_array($p_metas)) {
+            foreach ($p_metas as $name => $value) {
+                $this->meta->addMeta($name, $value);
+            }
+        }
         $this->jsonapi = new \FreeFW\JsonApi\V1\Model\JsonApiObject();
         if ($p_data !== null) {
             $this->getFromObject($p_data);

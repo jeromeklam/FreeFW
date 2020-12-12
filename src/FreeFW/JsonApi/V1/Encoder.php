@@ -194,7 +194,11 @@ class Encoder
      */
     public function encodeList(\Iterator $p_api_response, \FreeFW\Http\ApiParams $p_api_params)
     {
-        $document = new \FreeFW\JsonApi\V1\Model\Document();
+        $count = null;
+        if (method_exists($p_api_response, 'getTotalCount')) {    // @todo : use interface instead
+            $count = $p_api_response->getTotalCount();
+        }
+        $document = new \FreeFW\JsonApi\V1\Model\Document(null, ['count' => $count]);
         $included = new \FreeFW\JsonApi\V1\Model\IncludedObject();
         foreach ($p_api_response as $idx => $oneElement) {
             $resource = $this->encodeSingleResource($oneElement, $included, $p_api_params);
@@ -202,6 +206,20 @@ class Encoder
                 ->addData($resource)
                 ->setIncluded($included)
             ;
+        }
+        if ($p_api_response->hasErrors()) {
+            /**
+             * @var \FreeFW\Core\Error $oneError
+             */
+            foreach ($p_api_response->getErrors() as $idx => $oneError) {
+                $newError = new \FreeFW\JsonApi\V1\Model\ErrorObject(
+                    $oneError->getType(),
+                    $oneError->getMessage(),
+                    $oneError->getCode(),
+                    $oneError->getField()
+                );
+                $document->addError($newError);
+            }
         }
         return $document;
     }

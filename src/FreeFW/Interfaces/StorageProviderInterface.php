@@ -46,4 +46,11 @@ interface StorageProviderInterface
      * @return string
      */
     public function convertFunction($p_function, $p_field);
+
+    /**
+     * Get total revord from query
+     *
+     * @return number
+     */
+    public function getTotalCount();
 }

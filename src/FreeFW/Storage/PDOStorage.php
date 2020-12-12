@@ -919,6 +919,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     }
                 } else {
                     $clName = str_replace('\\', '::', get_class($p_model));
+                    $result->setTotalCount($this->provider->getTotalCount());
                     while ($row = $query->fetch(\PDO::FETCH_OBJ)) {
                         $model = \FreeFW\DI\DI::get($clName);
                         $model

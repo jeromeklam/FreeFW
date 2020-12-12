@@ -136,4 +136,14 @@ class Oracle extends \PDO implements \FreeFW\Interfaces\StorageProviderInterface
         }
         return $p_field;
     }
+
+    /**
+     *
+     * {@inheritDoc}
+     * @see \FreeFW\Interfaces\StorageProviderInterface::getTotalCount()
+     */
+    public function getTotalCount()
+    {
+        return 0;
+    }
 }

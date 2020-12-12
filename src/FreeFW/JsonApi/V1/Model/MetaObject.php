@@ -21,6 +21,20 @@ class MetaObject
     ];
 
     /**
+     * Add ùeta
+     *
+     * @param string $p_name
+     * @param string $p_value
+     *
+     * @return \FreeFW\JsonApi\V1\Model\MetaObject
+     */
+    public function addMeta($p_name, $p_value)
+    {
+        $this->metas[$p_name] = $p_value;
+        return $this;
+    }
+
+    /**
      * Convert to array
      *
      * @return array

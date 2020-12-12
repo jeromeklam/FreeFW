@@ -46,6 +46,12 @@ abstract class Model implements
     protected $updated = [];
 
     /**
+     * TS
+     * @var number
+     */
+    protected $__ts = null;
+
+    /**
      * Constructor
      */
     public function __construct(
@@ -64,6 +70,27 @@ abstract class Model implements
         }
         $this->initModel();
         $this->init();
+    }
+
+    /**
+     * Set ts
+     *
+     * @return self
+     */
+    public function setTs()
+    {
+        $this->__ts = microtime(true);
+        return $this;
+    }
+
+    /**
+     * Get ts
+     *
+     * @return number
+     */
+    public function getTs()
+    {
+        return $this->__ts;
     }
 
     /**

@@ -58,6 +58,17 @@ class Date
     /**
      * Return a datetime as string
      *
+     * @return string
+     */
+    public static function getCurrentTS()
+    {
+        $datetime = new \Datetime();
+        return $datetime->format('Y-m-d H:i:s.u');
+    }
+
+    /**
+     * Return a datetime as string
+     *
      * @param number $p_plus (minutes)
      *
      * @return string
