@@ -37,7 +37,7 @@ class Edition extends \FreeFW\Core\ApiController
         }
         $data    = $apiParams->getData();
         $toPrint = new \FreeFW\Model\ResultSet();
-        if (is_array($data) || $toPrint instanceof \ArrayAccess) {
+        if (is_array($data) || $data instanceof \ArrayAccess) {
             $toPrint = $data;
         } else {
             $toPrint->add($data);
@@ -67,11 +67,11 @@ class Edition extends \FreeFW\Core\ApiController
             default:
                 return $this->createErrorResponse(\FreeFW\Constants::ERROR_EDITION_NOT_FOUND, 'Unknown format !');
         }
-        $src    = $tmpDir . 'edi_' . $file . '_tpl.' . $ext;
-        $dest   = $tmpDir . 'edi_' . $file . '_dest.' . $ext;
+        $src  = $tmpDir . 'edi_' . $file . '_tpl.' . $ext;
+        $dest = $tmpDir . 'edi_' . $file . '_dest.' . $ext;
         file_put_contents($src, $edition->getEdiData());
         file_put_contents($dest, $edition->getEdiData());
-        foreach ($data as $oneModel) {
+        foreach ($toPrint as $oneModel) {
             $oneModel     = $oneModel->findFirst(['id' => $oneModel->getApiId()]);
             /**
              * @var \FreeFW\Model\MergeModel $mergeDatas

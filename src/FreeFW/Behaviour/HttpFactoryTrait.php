@@ -221,7 +221,7 @@ trait HttpFactoryTrait
     {
         $type    = \GuzzleHttp\Psr7\mimetype_from_filename($p_filename);
         if (!$type) {
-            $type = 'application/octet-stream';
+            $type = \FreeFW\Tools\MimeType::get($p_filename,'application/octet-stream');
         }
         $content = $p_content;
         $headers = [
