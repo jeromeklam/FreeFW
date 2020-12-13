@@ -38,6 +38,10 @@ class Encoder
         $fields = $p_api_response->getApiAttributes();
         if ($fields) {
             $attributes = new \FreeFW\JsonApi\V1\Model\AttributesObject($fields);
+            if (method_exists($p_api_response, 'getTs')) {
+                $tsAttribute = new \FreeFW\JsonApi\V1\Model\AttributeObject('__ts', $p_api_response->getTs());
+                $attributes->addAttribute($tsAttribute);
+            }
             $resource->setAttributes($attributes);
         }
         $relations     = $p_api_response->getApiRelationShips();

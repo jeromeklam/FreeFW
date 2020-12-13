@@ -260,6 +260,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
             $p_array = (array)$p_array;
         }
         if (is_array($p_array)) {
+            $this->setTs();
             $properties = $this->getProperties();
             $fields     = [];
             $relations  = [];

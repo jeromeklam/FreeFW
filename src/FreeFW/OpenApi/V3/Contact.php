@@ -6,7 +6,7 @@ namespace FreeFW\OpenApi\V3;
  *
  * @author jeromeklam
  */
-class contact extends \FreeFW\OpenApi\V3\Base
+class Contact extends \FreeFW\OpenApi\V3\Base
 {
 
     /**

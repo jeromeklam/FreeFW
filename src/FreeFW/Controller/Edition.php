@@ -69,6 +69,7 @@ class Edition extends \FreeFW\Core\ApiController
         }
         $src  = $tmpDir . 'edi_' . $file . '_tpl.' . $ext;
         $dest = $tmpDir . 'edi_' . $file . '_dest.' . $ext;
+        $dpdf = $tmpDir . 'edi_' . $file . '_dest.pdf';
         file_put_contents($src, $edition->getEdiData());
         file_put_contents($dest, $edition->getEdiData());
         foreach ($toPrint as $oneModel) {
@@ -83,8 +84,11 @@ class Edition extends \FreeFW\Core\ApiController
             $mergeDatas->addGenericData($group->getFieldsAsArray(), 'group');
             $mergeService = \FreeFW\DI\DI::get('FreeOffice::Service::Merge');
             $mergeService->merge($src, $dest, $mergeDatas);
+            exec('/usr/bin/unoconv -f pdf -o ' . $dpdf . ' ' . $dest);
+            @unlink($dest);
         }
+        @unlink($src);
         $this->logger->debug('FreeFW.Controller.Edition.print.end');
-        return $this->createMimeTypeResponse('res.odt', file_get_contents($dest));
+        return $this->createMimeTypeResponse($dpdf, file_get_contents($dpdf));
     }
 }
