@@ -3,7 +3,7 @@
          backupGlobals="false"
          backupStaticAttributes="false"
          strict="true"
-         ="true">
+         verbose="true">
        
   <testsuites>
     <testsuite name="freefw">
