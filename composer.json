@@ -38,7 +38,15 @@
         }
     },
     "require-dev": {
-        "phpunit/phpunit"                      : "^6.4",
-        "phing/phing"                          : "*"
+        "phpunit/phpunit"           : "^6.4",
+        "phing/phing"               : "*",
+        "phpmd/phpmd"               : "*",
+        "squizlabs/php_codesniffer" : "*",
+        "sebastian/phpcpd"          : "*",
+        "phploc/phploc"             : "*",
+        "pdepend/pdepend"           : "*",
+        "theseer/phpdox"            : "*",
+        "symfony/browser-kit"       : "*",
+        "symfony/css-selector"      : "*"
     }
 }
