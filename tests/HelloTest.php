@@ -1,19 +1,19 @@
   
 <?php
 
-class HelloTest extends Silex\WebTestCase
+class HelloTest extends PHPUnit\Framework\TestCase
 {
-    public function createApplication()
-    {
-        return require __DIR__ . "/../src/app.php";
-    }
     
     public function testHelloNameExample()
     {
-        $client = $this->createClient();
-        $client->request("GET", "/hello/test");
-        
-        $this->assertTrue($client->getResponse()->isOk());
-        $this->assertContains("test", $client->getResponse()->getContent());
+        $stack = [];
+        $this->assertSame(0, count($stack));
+
+        array_push($stack, 'foo');
+        $this->assertSame('foo', $stack[count($stack)-1]);
+        $this->assertSame(1, count($stack));
+
+        $this->assertSame('foo', array_pop($stack));
+        $this->assertSame(0, count($stack));
     }
 }
