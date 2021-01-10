@@ -1229,6 +1229,8 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $multi    = false;
         $arrayMod = '()';
         switch ($oper) {
+            case \FreeFW\Storage\Storage::COND_LOWER_OR_NULL:
+                $nullable = true;
             case \FreeFW\Storage\Storage::COND_LOWER:
                 $realOper = '<';
                 break;
@@ -1237,6 +1239,8 @@ class PDOStorage extends \FreeFW\Storage\Storage
             case \FreeFW\Storage\Storage::COND_LOWER_EQUAL:
                 $realOper = '<=';
                 break;
+            case \FreeFW\Storage\Storage::COND_GREATER_OR_NULL:
+                $nullable = true;
             case \FreeFW\Storage\Storage::COND_GREATER:
                 $realOper = '>';
                 break;

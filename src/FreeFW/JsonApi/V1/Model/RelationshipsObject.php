@@ -28,7 +28,7 @@ class RelationshipsObject implements \Countable, \JsonSerializable
             if ($value instanceof \FreeFW\JsonApi\V1\Model\RelationshipObject) {
                 $this->addRelation($key, $value);
             } else {
-                if (is_object($value) && array_key_exists('data', $value)) {
+                if (is_object($value) && property_exists($value, 'data')) {
                     $data = $value->data;
                     if (is_array($data)) {
                         $relation = new \FreeFW\JsonApi\V1\Model\RelationshipObject($key);

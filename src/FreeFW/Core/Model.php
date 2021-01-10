@@ -748,6 +748,17 @@ abstract class Model implements
         return @serialize($this);
     }
 
+    public function unset()
+    {
+        $serializable = get_object_vars($this);
+        unset($serializable['strategy']);
+        unset($serializable['logger']);
+        unset($serializable['config']);
+        unset($serializable['app_config']);
+        unset($serializable['updated']);
+        return $serializable;
+    }
+
     /**
      *
      * {@inheritDoc}
@@ -755,11 +766,7 @@ abstract class Model implements
      */
     public function serialize()
     {
-        $serializable = get_object_vars($this);
-        unset($serializable['strategy']);
-        unset($serializable['logger']);
-        unset($serializable['config']);
-        unset($serializable['app_config']);
+        $serializable = $this->unset();
         return serialize($serializable);
     }
 
@@ -813,6 +820,15 @@ abstract class Model implements
     {
         $props = $this->getProperties();
         $class = str_replace('\\Model\\', '_', get_class($this));
+
+        $models   = $this->getAppConfig()->get('models');
+        $class    = str_replace('\\Model\\', '_', get_class($this));
+        $defaults = [];
+        if (is_array($models) && array_key_exists($class, $models)) {
+            if (array_key_exists('default', $models[$class])) {
+                $defaults = $models[$class]['default'];
+            }
+        }
         $cfg   = $this->getAppConfig();
         foreach ($props as $name => $oneProperty) {
             $options = [];
@@ -918,7 +934,10 @@ abstract class Model implements
                 if ($pk) {
                     $this->$setter(0);
                 } else {
-                    $def = $cfg->get('default:' . $class . ':' . $name, null);
+                    $def = null;
+                    if (array_key_exists($name, $defaults)) {
+                        $def = $defaults[$name];
+                    }
                     if ($def !== null) {
                         $this->$setter($def);
                     }
@@ -935,6 +954,14 @@ abstract class Model implements
      */
     protected function validate()
     {
+        $models   = $this->getAppConfig()->get('models');
+        $class    = str_replace('\\Model\\', '_', get_class($this));
+        $required = [];
+        if (is_array($models) && array_key_exists($class, $models)) {
+            if (array_key_exists('required', $models[$class])) {
+                $required = $models[$class]['required'];
+            }
+        }
         $props = $this->getProperties();
         foreach ($props as $name => $oneProperty) {
             $options = [];
@@ -966,7 +993,7 @@ abstract class Model implements
                     );
                 }
             }
-            if (in_array(FFCST::OPTION_REQUIRED, $options) &&
+            if ((in_array(FFCST::OPTION_REQUIRED, $options) || in_array($name, $required)) &&
                 !in_array(FFCST::OPTION_PK, $options) &&
                 !in_array(FFCST::OPTION_BROKER, $options) &&
                 !in_array(FFCST::OPTION_USER, $options) &&

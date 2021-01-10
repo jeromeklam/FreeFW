@@ -39,6 +39,70 @@ class Json implements
     {
         $this->logger->debug(sprintf('FreeFW.Middleware.Json.decode.start'));
         $apiParams = new \FreeFW\Http\ApiParams();
+        $params = $p_request->getQueryParams();
+        /**
+         * Handle specific parameters
+         */
+        // Fields
+        if (array_key_exists('fields', $params)) {
+
+        }
+        // Include
+        if (array_key_exists('include', $params)) {
+            $apiParams->setInclude($params['include']);
+        }
+        // Filters
+        if (array_key_exists('filter', $params)) {
+            $filters = $params['filter'];
+            // Transform filters to \FreeFW\Model\Conditions...
+            $conditions = new \FreeFW\Model\Conditions();
+            $conditions->initFromArray($filters);
+            $apiParams->setFilters($conditions);
+        }
+        // Sort
+        if (array_key_exists('sort', $params)) {
+            $apiParams->setSort($params['sort']);
+        }
+        // Page
+        if (array_key_exists('page', $params)) {
+            $page = $params['page'];
+            if (is_array($page)) {
+                $start = 0;
+                $len   = 25;
+                if (array_key_exists('number', $page) || array_key_exists('size', $page)) {
+                    $number = 1;
+                    $size   = 25;
+                    if (array_key_exists('number', $page)) {
+                        $number = $page['number'];
+                    }
+                    if (array_key_exists('size', $page)) {
+                        $size = $page['size'];
+                    }
+                    $start = ($number - 1) * $size;
+                    $len   = $size;
+                }
+                if (array_key_exists('offset', $page) || array_key_exists('limit', $page)) {
+                    $offset = 1;
+                    $limit  = 25;
+                    if (array_key_exists('offset', $page)) {
+                        $offset = $page['offset'];
+                    }
+                    if (array_key_exists('limit', $page)) {
+                        $limit = $page['limit'];
+                    }
+                    $start = $offset - 1;
+                    $len   = $limit - $offset;
+                }
+            } else {
+                throw new \FreeFW\JsonApi\FreeFWJsonApiException(
+                    sprintf('Incorrect values for page parameter !')
+                    );
+            }
+            $apiParams
+            ->setStart($start)
+            ->setLength($len)
+            ;
+        }
         // Next
         $this->logger->debug(sprintf('FreeFW.Middleware.Json.decode.end'));
         return $apiParams;
@@ -56,12 +120,16 @@ class Json implements
         if (is_object($body)) {
             if ($body instanceof StreamInterface) {
                 $content    = $body->getContents();
-                $object     = unserialize($content);
-                $serializer = new \Zumba\JsonSerializer\JsonSerializer();
-                if (is_object($object) && method_exists($object, '__toArray')) {
-                    $result = $serializer->serialize($object->__toArray());
+                $object     = @unserialize($content);
+                if ($object !== false) {
+                    $serializer = new \Zumba\JsonSerializer\JsonSerializer();
+                    if (is_object($object) && method_exists($object, '__toArray')) {
+                        $result = $serializer->serialize($object->__toArray());
+                    } else {
+                        $result = $serializer->serialize($object);
+                    }
                 } else {
-                    $result = $serializer->serialize($object);
+                    $result = $content;
                 }
                 $p_response = $p_response->withBody(
                     \GuzzleHttp\Psr7\stream_for($result)

@@ -388,6 +388,10 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
     {
         $serializable = get_object_vars($this);
         unset($serializable['strategy']);
+        unset($serializable['logger']);
+        unset($serializable['app_config']);
+        unset($serializable['config']);
+        unset($serializable['updated']);
         $vars = (array)$serializable;
         foreach ($vars as $idx => $value) {
             if (is_object($value)) {
