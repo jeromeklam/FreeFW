@@ -261,7 +261,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
     protected function getModelInfos()
     {
         $model = str_replace('\\', '_', get_called_class());
-        if (! array_key_exists($model, self::$informations)) {
+        if (! isset(self::$informations[$model])) {
             $infos     = [];
             $fields    = [];
             $relations = [];
@@ -269,7 +269,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
             $infos['properties'] = $this->getProperties();
             foreach ($infos['properties'] as $key => $prop) {
                 $fields[$prop[FFCST::PROPERTY_PRIVATE]] = $key;
-                if (array_key_exists(FFCST::PROPERTY_OPTIONS, $prop) && in_array(FFCST::OPTION_FK, $prop[FFCST::PROPERTY_OPTIONS])) {
+                if (isset($prop[FFCST::PROPERTY_OPTIONS]) && in_array(FFCST::OPTION_FK, $prop[FFCST::PROPERTY_OPTIONS])) {
                     $relations[$key] = $prop;
                 }
                 $setters[$prop[FFCST::PROPERTY_PRIVATE]] = 'set' . \FreeFW\Tools\PBXString::toCamelCase($key, true);;
@@ -304,7 +304,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
             //
             $alias = '';
             $subst = 0;
-            if (array_key_exists($p_crtAlias, $p_aliases)) {
+            if (isset($p_aliases[$p_crtAlias])) {
                 $alias = $p_aliases[$p_crtAlias];
                 $subst = strlen($alias) + 1;
             }
@@ -315,7 +315,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
                     }
                     $field = substr($field, $subst);
                 }
-                if (array_key_exists($field, $fields)) {
+                if (isset($fields[$field])) {
                     $property = $fields[$field];
                     $setter   = $setters[$field];
                     switch ($properties[$property][FFCST::PROPERTY_TYPE]) {
@@ -366,7 +366,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
                     foreach ($prop[FFCST::PROPERTY_FK] as $fk => $pfk) {
                         $fieldFK = $pfk['field'];
                         $modelFK = $pfk['model'];
-                        if (array_key_exists($fk, $newAliases)) {
+                        if (isset($newAliases[$fk])) {
                             $newModel = \FreeFW\DI\DI::get($modelFK);
                             $newModel->setFromArray($p_array, $newAliases, $fk);
                             $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($fk, true);
