@@ -56,18 +56,19 @@ class DI
     /**
      * Get object
      *
-     * @param string $p_object
+     * @param string  $p_object
+     * @param boolean $p_cache
      *
      * @return \FreeFW\Interfaces\DependencyInjectorInterface
      */
-    public static function get(string $p_object)
+    public static function get(string $p_object, $p_cache = false)
     {
         $parts = explode('::', $p_object);
         if (is_array($parts) && count($parts) == 3) {
-            if (array_key_exists($parts[0], self::$containers)) {
+            if (isset(self::$containers[$parts[0]])) {
                 $di  = self::$containers[$parts[0]];
                 $fct = 'get' . ucfirst($parts[1]);
-                $obj = $di->$fct($parts[2]);
+                $obj = $di->$fct($parts[2], $p_cache);
                 if (method_exists($obj, 'setMainBroker')) {
                     $broker = \FreeFw\DI\DI::getShared('broker');
                     if ($broker) {

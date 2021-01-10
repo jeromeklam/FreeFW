@@ -30,11 +30,12 @@ interface DependencyInjectorInterface
     /**
      * Get model
      *
-     * @param string $p_name
+     * @param string  $p_name
+     * @param boolean $p_cache
      *
      * @return \FreeFW\Core\Model
      */
-    public function getModel($p_name);
+    public function getModel($p_name, $p_cache = false);
 
     /**
      * Get manager

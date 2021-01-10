@@ -824,8 +824,8 @@ abstract class Model implements
         $models   = $this->getAppConfig()->get('models');
         $class    = str_replace('\\Model\\', '_', get_class($this));
         $defaults = [];
-        if (is_array($models) && array_key_exists($class, $models)) {
-            if (array_key_exists('default', $models[$class])) {
+        if (is_array($models) && isset($models[$class])) {
+            if (isset($models[$class]['default'])) {
                 $defaults = $models[$class]['default'];
             }
         }
@@ -833,7 +833,7 @@ abstract class Model implements
         foreach ($props as $name => $oneProperty) {
             $options = [];
             $pk      = false;
-            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $oneProperty)) {
+            if (isset($oneProperty[FFCST::PROPERTY_OPTIONS])) {
                 $options = $oneProperty[FFCST::PROPERTY_OPTIONS];
                 if (in_array(FFCST::OPTION_PK, $options)) {
                     $pk = true;
@@ -841,7 +841,7 @@ abstract class Model implements
             }
             $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
             $value  = null;
-            if (array_key_exists(FFCST::PROPERTY_DEFAULT, $oneProperty)) {
+            if (isset($oneProperty[FFCST::PROPERTY_DEFAULT])) {
                 $value = $oneProperty[FFCST::PROPERTY_DEFAULT];
                 switch ($oneProperty[FFCST::PROPERTY_TYPE]) {
                     case FFCST::TYPE_BOOLEAN:
@@ -935,7 +935,7 @@ abstract class Model implements
                     $this->$setter(0);
                 } else {
                     $def = null;
-                    if (array_key_exists($name, $defaults)) {
+                    if (isset($defaults[$name])) {
                         $def = $defaults[$name];
                     }
                     if ($def !== null) {

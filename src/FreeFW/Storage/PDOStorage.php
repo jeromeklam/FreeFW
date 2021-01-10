@@ -923,7 +923,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     $result->setTotalCount($this->provider->getTotalCount());
                     $this->logger->debug('PDOStorage.select.afterTotalCount');
                     while ($row = $query->fetch(\PDO::FETCH_OBJ)) {
-                        $model = \FreeFW\DI\DI::get($clName);
+                        $model = \FreeFW\DI\DI::get($clName, true);
                         $model
                             ->setFromArray($row, $aliases, '@')
                         ;

@@ -28,6 +28,12 @@ class DependencyInjector extends \FreeFW\Core\DI implements \FreeFW\Interfaces\D
     protected $default_storage = 'default';
 
     /**
+     * Empty Models
+     * @var array
+     */
+    protected static $models = [];
+
+    /**
      * Constructor
      */
     protected function __construct(
@@ -162,12 +168,19 @@ class DependencyInjector extends \FreeFW\Core\DI implements \FreeFW\Interfaces\D
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\DependencyInjectorInterface::getModel()
      */
-    public function getModel($p_name)
+    public function getModel($p_name, $p_cache = false)
     {
+        $test = $this->base_ns . '_' . $p_name;
+        if ($p_cache && isset(self::$models[$test])) {
+            return clone(self::$models[$test]);
+        }
         $class_name = '\\' . $this->base_ns . '\Model\\' .
             \FreeFW\Tools\PBXString::toCamelCase($p_name, true);
         if (class_exists($class_name)) {
             $cls = new $class_name($this->getAppConfig(), $this->logger);
+            if (!isset(self::$models[$test])) {
+                self::$models[$test] = $cls;
+            }
             return $cls;
         }
         throw new \FreeFW\Core\FreeFWException(sprintf('Class %s not found !', $class_name));

@@ -367,7 +367,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
                         $fieldFK = $pfk['field'];
                         $modelFK = $pfk['model'];
                         if (isset($newAliases[$fk])) {
-                            $newModel = \FreeFW\DI\DI::get($modelFK);
+                            $newModel = \FreeFW\DI\DI::get($modelFK, true);
                             $newModel->setFromArray($p_array, $newAliases, $fk);
                             $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($fk, true);
                             $this->$setter($newModel);
