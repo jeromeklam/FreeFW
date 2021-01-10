@@ -919,7 +919,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     }
                 } else {
                     $clName = str_replace('\\', '::', get_class($p_model));
+                    $this->logger->debug('PDOStorage.select.beforeTotalCount');
                     $result->setTotalCount($this->provider->getTotalCount());
+                    $this->logger->debug('PDOStorage.select.afterTotalCount');
                     while ($row = $query->fetch(\PDO::FETCH_OBJ)) {
                         $model = \FreeFW\DI\DI::get($clName);
                         $model
@@ -937,6 +939,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                             $result[] = $model;
                         }
                     }
+                    $this->logger->debug('PDOStorage.select.afterLoaded');
                 }
             } else {
                 $this->logger->debug('PDOStorage.select.error : ' . print_r($query->errorInfo(), true));

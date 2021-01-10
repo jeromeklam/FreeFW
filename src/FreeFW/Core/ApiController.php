@@ -216,7 +216,7 @@ class ApiController extends \FreeFW\Core\Controller
             $data = $query->getResult();
         }
         // data can be empty, but it's a 2*
-        $this->logger->debug('FreeFW.ApiController.getOne.end');
+        $this->logger->debug('FreeFW.ApiController.getAll.end');
         return $this->createSuccessOkResponse($data); // 200
     }
 
