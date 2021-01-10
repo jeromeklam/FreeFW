@@ -26,6 +26,12 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
     protected $main_broker = null;
 
     /**
+     * Global storage
+     * @var array
+     */
+    protected static $informations = [];
+
+    /**
      * Get default storage
      *
      * @return string
@@ -248,6 +254,35 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
     }
 
     /**
+     * Get model informations
+     *
+     * @return mixed
+     */
+    protected function getModelInfos()
+    {
+        $model = str_replace('\\', '_', get_called_class());
+        if (! array_key_exists($model, self::$informations)) {
+            $infos     = [];
+            $fields    = [];
+            $relations = [];
+            $setters   = [];
+            $infos['properties'] = $this->getProperties();
+            foreach ($infos['properties'] as $key => $prop) {
+                $fields[$prop[FFCST::PROPERTY_PRIVATE]] = $key;
+                if (array_key_exists(FFCST::PROPERTY_OPTIONS, $prop) && in_array(FFCST::OPTION_FK, $prop[FFCST::PROPERTY_OPTIONS])) {
+                    $relations[$key] = $prop;
+                }
+                $setters[$prop[FFCST::PROPERTY_PRIVATE]] = 'set' . \FreeFW\Tools\PBXString::toCamelCase($key, true);;
+            }
+            $infos['fields']    = $fields;
+            $infos['relations'] = $relations;
+            $infos['setters']   = $setters;
+            // save
+            self::$informations[$model] = $infos;
+        }
+        return self::$informations[$model];
+    }
+    /**
      * Set from array
      *
      * @param array $p_array
@@ -256,20 +291,17 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
      */
     public function setFromArray($p_array, array $p_aliases = [], $p_crtAlias = '@')
     {
+        $infos = $this->getModelInfos();
         if ($p_array instanceof \stdClass) {
             $p_array = (array)$p_array;
         }
         if (is_array($p_array)) {
             $this->setTs();
-            $properties = $this->getProperties();
-            $fields     = [];
-            $relations  = [];
-            foreach ($properties as $key => $prop) {
-                $fields[$prop[FFCST::PROPERTY_PRIVATE]] = $key;
-                if (array_key_exists(FFCST::PROPERTY_OPTIONS, $prop) && in_array(FFCST::OPTION_FK, $prop[FFCST::PROPERTY_OPTIONS])) {
-                    $relations[$key] = $prop;
-                }
-            }
+            $properties = $infos['properties'];
+            $fields     = $infos['fields'];
+            $relations  = $infos['relations'];
+            $setters    = $infos['setters'];
+            //
             $alias = '';
             $subst = 0;
             if (array_key_exists($p_crtAlias, $p_aliases)) {
@@ -285,7 +317,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
                 }
                 if (array_key_exists($field, $fields)) {
                     $property = $fields[$field];
-                    $setter   = 'set' . \FreeFW\Tools\PBXString::toCamelCase($property, true);
+                    $setter   = $setters[$field];
                     switch ($properties[$property][FFCST::PROPERTY_TYPE]) {
                         case FFCST::TYPE_BIGINT:
                         case FFCST::TYPE_INTEGER:
