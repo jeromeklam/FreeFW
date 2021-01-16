@@ -1178,6 +1178,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
      *
      * @param \FreeFW\Interfaces\ConditionInterface $p_field
      * @param \FreeFW\Core\StorageModel             $p_model
+     * @param array                                 $p_aliases
+     * @param string                                $p_crtAlias
+     * @param boolean                               $p_multi
      *
      * @throws \FreeFW\Core\FreeFWStorageException
      *
@@ -1187,7 +1190,8 @@ class PDOStorage extends \FreeFW\Storage\Storage
         \FreeFW\Interfaces\ConditionInterface $p_field,
         \FreeFW\Core\StorageModel $p_model,
         array $p_aliases = [],
-        $p_crtAlias = '@'
+        $p_crtAlias = '@',
+        $p_multi = false
     ) {
         if ($p_field instanceof \FreeFW\Model\ConditionMember) {
             $field = $p_field->getValue();
@@ -1195,7 +1199,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         } else {
             if ($p_field instanceof \FreeFW\Model\ConditionValue) {
                 $value = $p_field->getValue();
-                return $this->renderValueField($value, $p_model);
+                return $this->renderValueField($value, $p_model, $p_multi);
             } else {
                 throw new \FreeFW\Core\FreeFWStorageException(
                     sprintf('Unknown condition object !')
@@ -1327,7 +1331,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $leftDatas['id'] = $provider->convertFunction($leftDatas['fct'], $leftDatas['id']);
             }
             if ($right !== null) {
-                $rightDatas = $this->renderConditionField($right, $p_model, $p_aliases, $p_crtAlias);
+                $rightDatas = $this->renderConditionField($right, $p_model, $p_aliases, $p_crtAlias, $multi);
                 $result     = [
                     'values' => [],
                     'type'   => false
@@ -1518,16 +1522,21 @@ class PDOStorage extends \FreeFW\Storage\Storage
      *
      * @param mixed                     $p_value
      * @param \FreeFW\Core\StorageModel $p_model
+     * @param boolean                   $p_multi
      *
      * @return []
      */
-    protected function renderValueField($p_value, \FreeFW\Core\StorageModel $p_model)
+    protected function renderValueField($p_value, \FreeFW\Core\StorageModel $p_model, $p_multi = false)
     {
-        if (!is_array($p_value)) {
+        $value = $p_value;
+        if (!is_array($value) && $p_multi) {
+            $value = explode(',', str_replace(['[', ']'], '', $value));
+        }
+        if (!is_array($value)) {
             self::$uniqid = self::$uniqid + 1;
             return [
                 'id'    => ':i' . rand(10, 99) . '_' . self::$uniqid,
-                'value' => $p_value,
+                'value' => $value,
                 'type'  => false
             ];
         } else {
@@ -1537,7 +1546,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 'value' => [],
                 'type'  => false
             ];
-            foreach ($p_value as $oneValue) {
+            foreach ($value as $oneValue) {
                 $ii++;
                 $ret['id'][]    = ':i' . $ii . rand(10, 99) . '_' . self::$uniqid;
                 $ret['value'][] = $oneValue;
