@@ -118,7 +118,7 @@ class AuthNegociator implements
             $response   = false;
             $authHeader = new \FreeFW\Middleware\Auth\AuthorizationHeader($authString);
             $authType   = strtoupper($authHeader->getType());
-            if (array_key_exists($authType, $this->formats)) {
+            if (isset($this->formats[$authType])) {
                 $class = $this->formats[$authType]['class'];
             } else {
                 foreach ($this->formats as $format) {

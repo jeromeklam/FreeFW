@@ -147,13 +147,13 @@ class Router
             $params     = $p_request->getServerParams();
             $currentDir = '/';
             $requestUrl = '';
-            if (array_key_exists('_request', $_GET)) {
+            if (isset($_GET['_request'])) {
                 $requestUrl = '/' . ltrim($_GET['_request'], '/');
             } else {
                 $requestUrl = $p_request->getUri()->getPath();
             }
             if (($pos = strpos($requestUrl, '?')) !== false) {
-                if (array_key_exists('_url', $_GET)) {
+                if (isset($_GET['_url'])) {
                     $requestUrl = $_GET['_url'];
                 } else {
                     $requestUrl = substr($requestUrl, 0, $pos);

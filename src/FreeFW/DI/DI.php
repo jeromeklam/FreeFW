@@ -144,7 +144,7 @@ class DI
      */
     public static function getShared(string $p_name)
     {
-        if (array_key_exists($p_name, self::$shared)) {
+        if (isset(self::$shared[$p_name])) {
             return self::$shared[$p_name];
         }
         return false;

@@ -46,7 +46,7 @@ class PBXString
         if (0 < preg_match_all($p_regex, $p_string, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
                 $replace = '';
-                if (array_key_exists($match[1], $datas)) {
+                if (isset($datas[$match[1]])) {
                     $replace = $datas[$match[1]];
                 }
                 $p_string = str_replace(

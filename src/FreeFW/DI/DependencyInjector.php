@@ -58,7 +58,7 @@ class DependencyInjector extends \FreeFW\Core\DI implements \FreeFW\Interfaces\D
         \Psr\Log\LoggerInterface $p_logger,
         string $p_default_storage = 'default'
     ) {
-        if (!array_key_exists($p_base_ns, self::$instances)) {
+        if (!isset(self::$instances[$p_base_ns])) {
             self::$instances[$p_base_ns] = new static($p_base_ns, $p_config, $p_logger, $p_default_storage);
         }
         return self::$instances[$p_base_ns];

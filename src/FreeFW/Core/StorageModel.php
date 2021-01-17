@@ -459,7 +459,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
     public function getPkGetter() : string
     {
         foreach ($this->getProperties() as $name => $property) {
-            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
+            if (isset($property[FFCST::PROPERTY_OPTIONS])) {
                 if (in_array(FFCST::OPTION_PK, $property[FFCST::PROPERTY_OPTIONS])) {
                     $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
                     return $getter;
@@ -477,7 +477,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
     public function getPkField() : string
     {
         foreach ($this->getProperties() as $name => $property) {
-            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
+            if (isset($property[FFCST::PROPERTY_OPTIONS])) {
                 if (in_array(FFCST::OPTION_PK, $property[FFCST::PROPERTY_OPTIONS])) {
                     return $name;
                 }
@@ -509,7 +509,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
             }
         }
         foreach ($this->getProperties() as $name => $property) {
-            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property) &&
+            if (isset($property[FFCST::PROPERTY_OPTIONS]) &&
                 in_array(FFCST::OPTION_LOCAL, $property[FFCST::PROPERTY_OPTIONS])) {
                 continue;
             }
@@ -564,7 +564,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
             }
         }
         foreach ($this->getProperties() as $name => $property) {
-            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property) &&
+            if (isset($property[FFCST::PROPERTY_OPTIONS]) &&
                 in_array(FFCST::OPTION_LOCAL, $property[FFCST::PROPERTY_OPTIONS])) {
                 continue;
             }

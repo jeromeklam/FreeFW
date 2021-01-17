@@ -146,7 +146,7 @@ class ApiNegociator implements
             if ($contentType == '') {
                 $contentType = trim($p_request->getHeaderLine('Accept'));
             }
-            if (array_key_exists($contentType, $this->formats)) {
+            if (isset($this->formats[$contentType])) {
                 $class = $this->formats[$contentType]['class'];
             } else {
                 return $this->createResponse(415, "Unsupported media type !");

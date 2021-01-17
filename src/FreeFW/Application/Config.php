@@ -100,7 +100,7 @@ class Config
         if (self::$factory === null) {
             self::$factory = array();
         }
-        if (!array_key_exists($p_name, self::$factory)) {
+        if (!isset(self::$factory[$p_name])) {
              self::$factory[$p_name] = new self($p_file);
         }
 
@@ -148,14 +148,14 @@ class Config
     {
         $parts = explode(':', $p_key);
         if (count($parts) > 1) {
-            if (array_key_exists($parts[0], $p_arr)) {
+            if (isset($p_arr[$parts[0]])) {
                 $crt = $parts[0];
                 array_shift($parts);
                 $key = implode(':', $parts);
                 return $this->getValue($key, $p_arr[$crt], $p_default);
             }
         } else {
-            if (array_key_exists($p_key, $p_arr)) {
+            if (isset($p_arr[$p_key])) {
                 return $p_arr[$p_key];
             }
         }

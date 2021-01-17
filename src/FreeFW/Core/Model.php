@@ -115,7 +115,7 @@ abstract class Model implements
         if (get_class($this) == get_class($p_model)) {
             foreach ($this->getProperties() as $name => $property) {
                 $options = [];
-                if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
+                if (isset($property[FFCST::PROPERTY_OPTIONS])) {
                     $options = $property[FFCST::PROPERTY_OPTIONS];
                 }
                 if (!$p_only_updated || $p_model->hasBeenUpdated($name)) {
@@ -275,7 +275,7 @@ abstract class Model implements
     public function hasBeenUpdated($p_field)
     {
         if ($this->model_behaviour == self::MODEL_BEHAVIOUR_UPDATED || $this->model_behaviour == self::MODEL_BEHAVIOUR_API) {
-            if (array_key_exists($p_field, $this->updated)) {
+            if (isset($this->updated[$p_field])) {
                 return true;
             }
             return false;
@@ -335,7 +335,7 @@ abstract class Model implements
         foreach ($p_datas as $name => $value) {
             foreach ($props as $prp => $property) {
                 $test = $prp;
-                if (array_key_exists(FFCST::PROPERTY_PUBLIC, $property)) {
+                if (isset($property[FFCST::PROPERTY_PUBLIC])) {
                     $test = $property[FFCST::PROPERTY_PUBLIC];
                 }
                 if ($test == $name) {
@@ -359,12 +359,12 @@ abstract class Model implements
                 $foundRel = false;
                 foreach ($props as $prp => $property) {
                     $test = $prp;
-                    if (array_key_exists(FFCST::PROPERTY_PUBLIC, $property)) {
+                    if (isset($property[FFCST::PROPERTY_PUBLIC])) {
                         $test = $property[FFCST::PROPERTY_PUBLIC];
                     }
-                    if (array_key_exists(FFCST::PROPERTY_FK, $property)) {
+                    if (isset($property[FFCST::PROPERTY_FK])) {
                         $fks = $property[FFCST::PROPERTY_FK];
-                        if (array_key_exists($relation['name'], $fks)) {
+                        if (isset($fks[$relation['name']])) {
                             $fk = $fks[$relation['name']];
                             // Complete empty object
                             $id = 0;
@@ -419,7 +419,7 @@ abstract class Model implements
             } else {
                 if (method_exists($this, 'getRelationships')) {
                     $mRels = $this->getRelationships();
-                    if (array_key_exists($name, $mRels)) {
+                    if (isset($mRels[$name])) {
                         $rels   = [];
                         $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
                         foreach ($relation['values'] as $val) {
@@ -467,7 +467,7 @@ abstract class Model implements
     public function getFieldNameByOption($p_option) : string
     {
         foreach ($this->getProperties() as $name => $property) {
-            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
+            if (isset($property[FFCST::PROPERTY_OPTIONS])) {
                 if (in_array($p_option, $property[FFCST::PROPERTY_OPTIONS])) {
                    return $name;
                 }
@@ -487,8 +487,8 @@ abstract class Model implements
         //
         switch ($p_option) {
             case FFCST::PROPERTY_PUBLIC:
-                if (array_key_exists($p_field, $props)) {
-                    if (array_key_exists(FFCST::PROPERTY_PUBLIC, $props[$p_field])) {
+                if (isset($props[$p_field])) {
+                    if (isset($props[$p_field][FFCST::PROPERTY_PUBLIC])) {
                         return $props[$p_field][FFCST::PROPERTY_PUBLIC];
                     }
                 }
@@ -496,7 +496,7 @@ abstract class Model implements
 
             case FFCST::PROPERTY_PRIVATE:
                 foreach ($this->getProperties() as $name => $property) {
-                    if (array_key_exists(FFCST::PROPERTY_PUBLIC, $property)) {
+                    if (isset($property[FFCST::PROPERTY_PUBLIC])) {
                         if ($property[FFCST::PROPERTY_PUBLIC]==$p_field) {
                             return $property[FFCST::PROPERTY_PRIVATE];
                         }
@@ -515,7 +515,7 @@ abstract class Model implements
     public function getApiId() : string
     {
         foreach ($this->getProperties() as $name => $property) {
-            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
+            if (isset($property[FFCST::PROPERTY_OPTIONS])) {
                 if (in_array(FFCST::OPTION_PK, $property[FFCST::PROPERTY_OPTIONS])) {
                     $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
                     return (string)$this->$getter();
@@ -532,7 +532,7 @@ abstract class Model implements
     public function setApiId($p_id)
     {
         foreach ($this->getProperties() as $name => $property) {
-            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
+            if (isset($property[FFCST::PROPERTY_OPTIONS])) {
                 if (in_array(FFCST::OPTION_PK, $property[FFCST::PROPERTY_OPTIONS])) {
                     $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
                     return $this->$setter($p_id);
@@ -651,10 +651,10 @@ abstract class Model implements
             $oneAttribute = new \FreeFW\JsonApi\V1\Model\AttributeObject($name);
             $getter       = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
             $oneAttribute->setValue($this->$getter());
-            if (array_key_exists(FFCST::PROPERTY_PUBLIC, $property)) {
+            if (isset($property[FFCST::PROPERTY_PUBLIC])) {
                 $oneAttribute->setJsonName($property[FFCST::PROPERTY_PUBLIC]);
             }
-            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
+            if (isset($property[FFCST::PROPERTY_OPTIONS])) {
                 if (in_array(FFCST::OPTION_PK, $property[FFCST::PROPERTY_OPTIONS]) ||
                     in_array(FFCST::OPTION_FK, $property[FFCST::PROPERTY_OPTIONS]) ||
                     in_array(FFCST::OPTION_BROKER, $property[FFCST::PROPERTY_OPTIONS]) ||
@@ -680,7 +680,7 @@ abstract class Model implements
          * One to One, an attribute is the Foreign Key
          */
         foreach ($this->getProperties() as $name => $property) {
-            if (array_key_exists(FFCST::PROPERTY_FK, $property)) {
+            if (isset($property[FFCST::PROPERTY_FK])) {
                 foreach ($property[FFCST::PROPERTY_FK] as $nameP => $valueP) {
                     $oneRelation = new \FreeFW\JsonApi\V1\Model\RelationshipObject($nameP);
                     $oneRelation->setType(\FreeFW\JsonApi\V1\Model\RelationshipObject::ONE_TO_ONE);
@@ -957,8 +957,8 @@ abstract class Model implements
         $models   = $this->getAppConfig()->get('models');
         $class    = str_replace('\\Model\\', '_', get_class($this));
         $required = [];
-        if (is_array($models) && array_key_exists($class, $models)) {
-            if (array_key_exists('required', $models[$class])) {
+        if (is_array($models) && isset($models[$class])) {
+            if (isset($models[$class]['required'])) {
                 $required = $models[$class]['required'];
             }
         }
@@ -968,10 +968,10 @@ abstract class Model implements
             $getter  = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
             $value   = $this->$getter();
             $public  = $name;
-            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $oneProperty)) {
+            if (isset($oneProperty[FFCST::PROPERTY_OPTIONS])) {
                 $options = $oneProperty[FFCST::PROPERTY_OPTIONS];
             }
-            if (array_key_exists(FFCST::PROPERTY_ENUM, $oneProperty)) {
+            if (isset($oneProperty[FFCST::PROPERTY_ENUM])) {
                 if (is_array($oneProperty[FFCST::PROPERTY_ENUM])) {
                     if (!in_array($value, $oneProperty[FFCST::PROPERTY_ENUM])) {
                         $this->addError(
@@ -983,7 +983,7 @@ abstract class Model implements
                     }
                 }
             }
-            if (array_key_exists(FFCST::PROPERTY_MAX, $oneProperty)) {
+            if (isset($oneProperty[FFCST::PROPERTY_MAX])) {
                 if (strlen($value) > $oneProperty[FFCST::PROPERTY_MAX]) {
                     $this->addError(
                         FFCST::ERROR_MAXLENGTH,
@@ -998,7 +998,7 @@ abstract class Model implements
                 !in_array(FFCST::OPTION_BROKER, $options) &&
                 !in_array(FFCST::OPTION_USER, $options) &&
                 !in_array(FFCST::OPTION_GROUP, $options)) {
-                if (array_key_exists(FFCST::PROPERTY_PUBLIC, $oneProperty)) {
+                if (isset($oneProperty[FFCST::PROPERTY_PUBLIC])) {
                     $public = $oneProperty[FFCST::PROPERTY_PUBLIC];
                 }
                 if (in_array(FFCST::OPTION_FK, $options)) {
@@ -1068,7 +1068,7 @@ abstract class Model implements
         foreach ($this->getProperties() as $name => $oneProperty) {
             $getter  = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
             $content = $this->{$getter}();
-            if (array_key_exists(FFCST::PROPERTY_TYPE, $oneProperty)) {
+            if (isset($oneProperty[FFCST::PROPERTY_TYPE])) {
                 switch ($oneProperty[FFCST::PROPERTY_TYPE]) {
                     case FFCST::TYPE_HTML:
                         $content = \FreeFW\Tools\PBXString::htmlToText($content);
@@ -1117,14 +1117,14 @@ abstract class Model implements
         $data = $this->getFieldsAsArray($orig, $p_keep_binary);
         foreach ($this->getProperties() as $name => $oneProperty) {
             $title = $oneProperty[FFCST::PROPERTY_PRIVATE];
-            if (array_key_exists(FFCST::PROPERTY_PUBLIC, $oneProperty)) {
+            if (isset($oneProperty[FFCST::PROPERTY_PUBLIC])) {
                 $title = $oneProperty[FFCST::PROPERTY_PUBLIC];
             }
-            if (array_key_exists(FFCST::PROPERTY_MERGE, $oneProperty)) {
+            if (isset($oneProperty[FFCST::PROPERTY_MERGE])) {
                 $title = $oneProperty[FFCST::PROPERTY_MERGE];
             }
             $datas->addField($name, $title);
-            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $oneProperty)) {
+            if (isset($oneProperty[FFCST::PROPERTY_OPTIONS])) {
                 if (in_array(FFCST::OPTION_FK, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $relName = '';
                     foreach ($oneProperty[FFCST::PROPERTY_FK] as $relName => $relDatas) {

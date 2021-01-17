@@ -68,7 +68,7 @@ class IncludedObject implements \Countable
     public function incomingExists($p_resource)
     {
         $key = $p_resource->getType() . '.' . $p_resource->getId();
-        if (array_key_exists($key, $this->incoming)) {
+        if (isset($this->incoming[$key])) {
             return true;
         }
         return false;

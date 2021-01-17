@@ -69,18 +69,23 @@ class RelationshipsObject implements \Countable, \JsonSerializable
             $this->relationships = [];
         }
         if ($p_array) {
-            if (!array_key_exists($p_name, $this->relationships)) {
+            if (!isset($this->relationships[$p_name])) {
                 $this->relationships[$p_name] = [];
             }
             $this->relationships[$p_name][] = $p_relation;
         } else {
-            if (!array_key_exists($p_name, $this->relationships)) {
+            if (!isset($this->relationships[$p_name])) {
                 $this->relationships[$p_name] = $p_relation;
             }
         }
         return $this;
     }
 
+    /**
+     * Get relations
+     *
+     * @return array
+     */
     public function getRelations()
     {
         return $this->relationships;

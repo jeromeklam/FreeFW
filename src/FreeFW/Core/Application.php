@@ -55,6 +55,7 @@ class Application implements
             $this->router->setBasePath($bp);
         }
         \FreeFW\DI\DI::setShared('router', $this->router);
+        $this->initCache();
     }
 
     /**
@@ -156,5 +157,82 @@ class Application implements
                 // @todo...
             }
         }
+    }
+
+    /**
+     * Check for cache server
+     *
+     * @return boolean
+     */
+    protected function initCache()
+    {
+        // Le cache
+        $myCacheCfg = self::getAppConfig()->get('cache');
+        if (is_array($myCacheCfg)) {
+            if (isset($myCacheCfg['type'])) {
+                if ($myCacheCfg['type'] != \FreeFW\Cache\CacheFactory::FILE) {
+                    try {
+                        switch ($myCacheCfg['type']) {
+                            case \FreeFW\Cache\CacheFactory::REDIS:
+                                if (class_exists('\\Redis')) {
+                                    $retry = true;
+                                    $nb    = 10;
+                                    $redis = new \Redis();
+                                    $result = $redis->connect($myCacheCfg['arg0'], $myCacheCfg['arg1']);
+                                    while ($nb > 0 && $retry) {
+                                        $params = $redis->info('persistence');
+                                        if (isset($params['loading'])) {
+                                            if (intval($params['loading']) == 0) {
+                                                $retry = false;
+                                            }
+                                        }
+                                        if ($retry) {
+                                            sleep(1);
+                                            $nb--;
+                                        } else {
+                                            $pong = strtolower($redis->ping());
+                                            if ($pong != '1' && strpos($pong, 'pong') === false) {
+                                                $retry = true;
+                                                sleep(1);
+                                                $nb--;
+                                            }
+                                        }
+                                    }
+                                    if (!$retry) {
+                                        $db = 6;
+                                        if (isset($myCacheCfg['arg2'])) {
+                                            $db = $myCacheCfg['arg2'];
+                                        }
+                                        $redis->select($db);
+                                        $cache = \FreeFW\Cache\CacheFactory::make(
+                                            \FreeFW\Cache\CacheFactory::REDIS,
+                                            $redis
+                                        );
+                                    } else {
+                                        $cache = \FreeFW\Cache\CacheFactory::make(
+                                            \FreeFW\Cache\CacheFactory::FILE,
+                                            '/tmp'
+                                        );
+                                    }
+                                    \FreeFW\DI\DI::setShared('cache', $cache);
+                                    $this->getLogger()->info("FreeFW.Application.initCacheServer.cache.redis");
+                                    return true;
+                                }
+                                break;
+                        }
+                    } catch (\Exception $ex) {
+                        $this->getLogger()->error($ex->getMessage());
+                    }
+                }
+            }
+        }
+        $this->getLogger()->info("FreeFW.Application.initCacheServer.cache.file");
+        $dir = null;
+        if (isset($myCacheCfg['arg0'])) {
+            $dir = $myCacheCfg['arg0'];
+        }
+        $cache = \FreeFW\Cache\CacheFactory::make(\FreeFW\Cache\CacheFactory::FILE, $dir);
+        \FreeFW\DI\DI::setShared('cache', $cache);
+        return true;
     }
 }

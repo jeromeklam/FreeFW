@@ -73,7 +73,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
             $usr = false;
             $grp = false;
             $dtz = false;
-            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $oneProperty)) {
+            if (isset($oneProperty[FFCST::PROPERTY_OPTIONS])) {
                 if (in_array(FFCST::OPTION_LOCAL, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $add = false;
                 }
@@ -168,7 +168,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     $others = $p_model->find($filters);
                     if ($others->count() > 0) {
                         $code = \FreeFW\Constants::ERROR_UNIQINDEX;
-                        if (array_key_exists('exists', $oneIndex)) {
+                        if (isset($oneIndex['exists'])) {
                             $code = $oneIndex['exists'];
                         }
                         $p_model->addError(
@@ -268,7 +268,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $fields     = [];
         if (is_int($p_filters)) {
             foreach ($properties as $name => $oneProperty) {
-                if (array_key_exists(FFCST::PROPERTY_OPTIONS, $oneProperty)) {
+                if (isset($oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     if (in_array(FFCST::OPTION_PK, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                         $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $p_filters;
                         break;
@@ -278,7 +278,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         } else {
             if (is_array($p_filters)) {
                 foreach ($p_filters as $field => $value) {
-                    if (array_key_exists($field, $properties)) {
+                    if (isset($properties[$field])) {
                         if ($value === false) {
                             $value = 0;
                         }
@@ -331,7 +331,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $archive    = !property_exists($p_model, 'no_history');
         // Get PK and verify generic FK
         foreach ($properties as $name => $oneProperty) {
-            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $oneProperty)) {
+            if (isset($oneProperty[FFCST::PROPERTY_OPTIONS])) {
                 if (in_array(FFCST::OPTION_PK, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     // Compute getter
                     $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
@@ -350,7 +350,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
             if (method_exists($p_model, 'getRelationships')) {
                 $rels = $p_model->getRelationships();
                 foreach ($rels as $oneRelation) {
-                    if (array_key_exists('remove', $oneRelation)) {
+                    if (isset($oneRelation['remove'])) {
                         $cascade = false;
                         if ($oneRelation['remove'] == 'cascade') {
                             $cascade = true;
@@ -373,7 +373,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                             } else {
                                 $next = false;
                                 $code = \FreeFW\Constants::ERROR_FOREIGNKEY;
-                                if (array_key_exists('exists', $oneRelation)) {
+                                if (isset($oneRelation['exists'])) {
                                     $code = $oneRelation['exists'];
                                 }
                                 $p_model->addError(
@@ -508,7 +508,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
             $grp = false;
             $dtz = false;
             $str = false;
-            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $oneProperty)) {
+            if (isset($oneProperty[FFCST::PROPERTY_OPTIONS])) {
                 if (in_array(FFCST::OPTION_LOCAL, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $add = false;
                 }
@@ -615,7 +615,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     $others = $p_model->find($filters);
                     if ($others->count() > 0) {
                         $code = \FreeFW\Constants::ERROR_UNIQINDEX;
-                        if (array_key_exists('exists', $oneIndex)) {
+                        if (isset($oneIndex['exists'])) {
                             $code = $oneIndex['exists'];
                         }
                         $p_model->addError(
@@ -742,7 +742,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
          * Check specific properties
          */
         foreach ($properties as $name => $property) {
-            if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
+            if (isset($property[FFCST::PROPERTY_OPTIONS])) {
                 if (in_array(FFCST::OPTION_PK, $property[FFCST::PROPERTY_OPTIONS])) {
                     $ids['@'] = $name;
                 }
@@ -765,7 +765,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     }
                 }
             }
-            if (array_key_exists(FFCST::PROPERTY_FK, $property)) {
+            if (isset($property[FFCST::PROPERTY_FK])) {
                 foreach ($property[FFCST::PROPERTY_FK] as $fkname => $fkprops) {
                     $fks[$fkname] = [
                         'left'  => $name,
@@ -791,7 +791,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
             $baseAlias = '@';
             $newModel  = null;
             while ($onePart != '') {
-                if (array_key_exists($onePart, $crtFKs) && !array_key_exists($onePart, $joins)) {
+                if (isset($crtFKs[$onePart]) && !isset($joins[$onePart])) {
                     $joins[$onePart] = $crtFKs[$onePart]['right'];
                     $newModel = \FreeFW\DI\DI::get($crtFKs[$onePart]['right']['model']);
                     self::$models[$onePart] = $newModel;
@@ -819,7 +819,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                             break;
                     }
                 } else {
-                    if (array_key_exists($onePart, self::$models)) {
+                    if (isset(self::$models[$onePart])) {
                         $newModel = self::$models[$onePart];
                     } else {
                         $newModel = null;
@@ -831,7 +831,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     $properties = $newModel::getProperties();
                     $crtFKs     = [];
                     foreach ($properties as $name => $property) {
-                        if (array_key_exists(FFCST::PROPERTY_FK, $property)) {
+                        if (isset($property[FFCST::PROPERTY_FK])) {
                             foreach ($property[FFCST::PROPERTY_FK] as $fkname => $fkprops) {
                                 $crtFKs[$fkname] = [
                                     'left'  => $name,
@@ -879,7 +879,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $parts = explode('.', $column);
                 $col   = array_pop($parts);
                 $find  = '@.' . implode('.', $parts);
-                if (array_key_exists($find, $aliases)) {
+                if (isset($aliases[$find])) {
                     if ($col === 'id' || $col === '+id' || $col === '-id') {
                         $col = str_replace('id',  $ids[$find], $col);
                     }
@@ -1013,7 +1013,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $fields = [];
         foreach ($p_fields as $name => $value) {
             $dtz = false;
-            if (array_key_exists($name, $properties)) {
+            if (isset($properties[$name])) {
                 $oneProperty = $properties[$name];
                 if (!is_array($value)) {
                     if ($oneProperty[FFCST::PROPERTY_TYPE] == FFCST::TYPE_DATETIMETZ) {
@@ -1146,12 +1146,12 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $parts = $this->renderCondition($oneCondition, $p_model, $p_aliases, $p_crtAlias);
                 if ($result['sql'] == '') {
                     $result['sql'] = $parts['sql'];
-                    if (array_key_exists('values', $parts) && is_array($parts['values'])) {
+                    if (isset($parts['values']) && is_array($parts['values'])) {
                         $result['values'] = $parts['values'];
                     }
                 } else {
                     $result['sql'] = ' ( ' . $result['sql'] . $oper . $parts['sql'] . ' ) ';
-                    if (array_key_exists('values', $parts) && is_array($parts['values'])) {
+                    if (isset($parts['values']) && is_array($parts['values'])) {
                         $result['values'] = array_merge($result['values'], $parts['values']);
                     }
                 }
@@ -1159,12 +1159,12 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $parts = $this->renderConditions($oneCondition, $p_model, $p_aliases, $p_crtAlias);
                 if ($result['sql'] == '') {
                     $result['sql']    = $parts['sql'];
-                    if (array_key_exists('values', $parts) && is_array($parts['values'])) {
+                    if (isset($parts['values']) && is_array($parts['values'])) {
                         $result['values'] = $parts['values'];
                     }
                 } else {
                     $result['sql']    = ' ( ' . $result['sql'] . $oper . $parts['sql'] . ' ) ';
-                    if (array_key_exists('values', $parts) && is_array($parts['values'])) {
+                    if (isset($parts['values']) && is_array($parts['values'])) {
                         $result['values'] = array_merge($result['values'], $parts['values']);
                     }
                 }
@@ -1327,7 +1327,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         }
         if ($left !== null ) {
             $leftDatas  = $this->renderConditionField($left, $p_model, $p_aliases, $p_crtAlias);
-            if (array_key_exists('fct', $leftDatas) && $leftDatas['fct'] != '') {
+            if (isset($leftDatas['fct']) && $leftDatas['fct'] != '') {
                 $leftDatas['id'] = $provider->convertFunction($leftDatas['fct'], $leftDatas['id']);
             }
             if ($right !== null) {
@@ -1430,7 +1430,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $p_crtAlias = '@'
     ) {
         $alias = false;
-        if (array_key_exists($p_crtAlias, $p_aliases)) {
+        if (isset($p_aliases[$p_crtAlias])) {
             $alias = $p_aliases[$p_crtAlias];
         }
         $parts = explode('.', $p_field);
@@ -1439,7 +1439,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
             if (count($parts) > 1) {
                 $class = array_shift($parts);
                 $field = $parts[0];
-                if (!array_key_exists($class, self::$models)) {
+                if (!isset(self::$models[$class])) {
                     if (strpos($class, ':') === false) {
                         self::$models[$class] = \FreeFW\DI\DI::get($class);
                     } else {
@@ -1447,7 +1447,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     }
                 } else {
                     if (strpos($class, ':') === false) {
-                        if (array_key_exists($p_crtAlias . '.' . $class, $p_aliases)) {
+                        if (isset($p_aliases[$p_crtAlias . '.' . $class])) {
                             $alias = $p_aliases[$p_crtAlias . '.' . $class];
                         }
                     }
@@ -1460,11 +1460,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 }
             } else {
                 $field = $parts[0];
-                if (!array_key_exists($class, self::$models)) {
+                if (!isset(self::$models[$class])) {
                     self::$models[$class] = \FreeFW\DI\DI::get($class);
                 } else {
                     if (strpos($class, ':') === false) {
-                        if (array_key_exists($p_crtAlias . '.' . $class, $p_aliases)) {
+                        if (isset($p_aliases[$p_crtAlias . '.' . $class])) {
                             $alias = $p_aliases[$p_crtAlias . '.' . $class];
                         }
                     }
@@ -1489,10 +1489,10 @@ class PDOStorage extends \FreeFW\Storage\Storage
         if ($field == 'id') {
             $field = $p_model->getFieldNameByOption(FFCST::OPTION_PK);
         }
-        if (array_key_exists($field, $properties)) {
+        if (isset($properties[$field])) {
             $fieldProperties = $properties[$field];
             $type = $properties[$field][FFCST::PROPERTY_TYPE];
-            if (array_key_exists(FFCST::PROPERTY_FUNCTION, $fieldProperties)) {
+            if (isset($fieldProperties[FFCST::PROPERTY_FUNCTION])) {
                 foreach ($fieldProperties[FFCST::PROPERTY_FUNCTION] as $fct => $orig) {
                     $fieldProperties2 = $properties[$orig];
                     $real     = $alias . '.' . $fieldProperties2[FFCST::PROPERTY_PRIVATE];

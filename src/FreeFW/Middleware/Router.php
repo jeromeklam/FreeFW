@@ -101,9 +101,6 @@ class Router implements
         $object                   = \FreeFW\DI\DI::get($this->controller);
         $apiParams                = $p_request->getAttribute('api_params', false);
         if ($apiParams instanceof \FreeFW\Http\ApiParams) {
-//          if (array_key_exists('limit', $this->include)) {
-                // @todo, no mode than limit...
-//          }
             $this->setInclude($apiParams);
             $p_request = $p_request->withAttribute('api_params', $apiParams);
         }
