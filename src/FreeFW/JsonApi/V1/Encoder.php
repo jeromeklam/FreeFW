@@ -128,7 +128,7 @@ class Encoder
                     $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($elem, true);
                     if (method_exists($p_api_response, $getter)) {
                         $result = $p_api_response->$getter();
-                        if ($result) {
+                        if ($result instanceof \FreeFW\Core\Model) {
                             $resourceRel = new \FreeFW\JsonApi\V1\Model\ResourceObject(
                                 $result->getApiType(),
                                 $result->getApiId(),
@@ -142,6 +142,10 @@ class Encoder
                                 $p_prefix . $elem
                             );
                             $p_included->addIncluded($included);
+                        } else {
+                            if ($result !== null) {
+                                throw new \Exception ($elem . ' not a instanceof Model');
+                            }
                         }
                     }
                 }

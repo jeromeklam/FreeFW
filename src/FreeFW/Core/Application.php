@@ -66,10 +66,10 @@ class Application implements
     protected function afterRender()
     {
         if (!$this->rendered) {
-            $this->logger->debug('application.afterRender.start');
+            $this->logger->info('FreeFW.Application.afterRender.start');
             $manager = $this->getEventManager();
             $manager->notify(\FreeFW\Constants::EVENT_AFTER_RENDER);
-            $this->logger->debug('application.afterRender.end');
+            $this->logger->info('FreeFW.Application.afterRender.end');
             $this->rendered = true;
         }
         return $this;

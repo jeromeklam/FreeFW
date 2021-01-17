@@ -23,5 +23,6 @@ class Edition extends \FreeFW\Model\Base\Edition
     /**
      * Behaviours
      */
+    use \FreeFW\Model\Behaviour\Lang;
     use \FreeSSO\Model\Behaviour\Broker;
 }

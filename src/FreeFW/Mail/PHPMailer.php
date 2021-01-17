@@ -1,12 +1,12 @@
-<?php 
+<?php
 namespace FreeFW\Mail;
 
 /**
- * 
+ *
  * @author jeromeklam
  *
  */
-class PHPMailer implements 
+class PHPMailer implements
     \Psr\Log\LoggerAwareInterface,
     \FreeFW\Interfaces\ConfigAwareTraitInterface,
     \FreeFW\Interfaces\MessageSenderInterface
@@ -38,7 +38,7 @@ class PHPMailer implements
     protected $error = false;
 
     /**
-     * 
+     *
      * @param array $p_config
      */
     public function __construct($p_config)
@@ -164,7 +164,7 @@ class PHPMailer implements
             $this->mailer->Subject = $p_message->getMsgSubject();
             $htmlBody = $p_message->getMsgBody();
             $this->mailer->Body = '<html><body>' . $htmlBody . '</body></html>';
-            $this->mailer->Text = strip_tags(str_replace("<br />", "\n", $htmlBody));
+            $this->mailer->AltBody = strip_tags(str_replace("<br />", "\n", $htmlBody));
             // Petite pause avant l'envoi...
             sleep(1);
             $result = $this->mailer->send();

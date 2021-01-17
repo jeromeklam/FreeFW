@@ -899,8 +899,8 @@ class PDOStorage extends \FreeFW\Storage\Storage
         }
         // Build query
         $sql = 'SELECT ' . $select . ' FROM ' . $from . ' WHERE ( ' . $where . ' ) ' . $whereBroker . ' ' . $group . ' ' . $sort . ' ' . $limit;
-        $this->logger->debug('PDOStorage.select : ' . $sql);
-        $this->logger->debug('PDOStorage.fields : ' . print_r($values, true));
+        $this->logger->debug('FreeFW.PDOStorage.select : ' . $sql);
+        $this->logger->debug('FreeFW.PDOStorage.fields : ' . print_r($values, true));
         // I got all, run query...
         try {
             // Get PDO and execute
@@ -919,9 +919,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     }
                 } else {
                     $clName = str_replace('\\', '::', get_class($p_model));
-                    $this->logger->debug('PDOStorage.select.beforeTotalCount');
+                    $this->logger->debug('FreeFW.PDOStorage.select.beforeTotalCount');
                     $result->setTotalCount($this->provider->getTotalCount());
-                    $this->logger->debug('PDOStorage.select.afterTotalCount');
+                    $this->logger->debug('FreeFW.PDOStorage.select.afterTotalCount');
                     while ($row = $query->fetch(\PDO::FETCH_OBJ)) {
                         $model = \FreeFW\DI\DI::get($clName, true);
                         $model
@@ -939,10 +939,10 @@ class PDOStorage extends \FreeFW\Storage\Storage
                             $result[] = $model;
                         }
                     }
-                    $this->logger->debug('PDOStorage.select.afterLoaded');
+                    $this->logger->debug('FreeFW.PDOStorage.select.afterLoaded');
                 }
             } else {
-                $this->logger->debug('PDOStorage.select.error : ' . print_r($query->errorInfo(), true));
+                $this->logger->debug('FreeFW.PDOStorage.select.error : ' . print_r($query->errorInfo(), true));
                 $localErr = $query->errorInfo();
                 $code     = 0;
                 $message  = 'PDOStorage.select.error : ' . print_r($query->errorInfo(), true);
@@ -953,7 +953,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $result->addError($code, $message);
             }
         } catch (\Exception $ex) {
-            var_dump($ex);
+            $this->logger->error('FreeFW.PDOStorage.select : ' . $ex->getMessage());
         }
         return $result;
     }

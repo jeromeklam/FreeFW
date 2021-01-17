@@ -101,6 +101,8 @@ class Constants
     const PROPERTY_DEPRECATED = 'deprecated';
     const PROPERTY_SCOPE      = 'scope';
     const PROPERTY_FUNCTION   = 'function';
+    const PROPERTY_GETTER     = 'getter';
+    const PROPERTY_SETTER     = 'setter';
 
     /**
      * Index
@@ -185,6 +187,7 @@ class Constants
     const ERROR_IN_DATA             = 666014;
     const ERROR_EDITION_NOT_FOUND   = 666015;
     const ERROR_GROUP_SWITCH        = 666016;
+    const ERROR_EMAIL_CODE_EXISTS   = 666017;
 
     /**
      * Success types

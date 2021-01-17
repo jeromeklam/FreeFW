@@ -76,6 +76,7 @@ abstract class Edition extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'edi_ts',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_DATETIMETZ,
         FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED],
+        FFCST::PROPERTY_DEFAULT => FFCST::DEFAULT_NOW,
         FFCST::PROPERTY_COMMENT => 'Date de dernière mise à jour',
         FFCST::PROPERTY_SAMPLE  => '',
     ];
@@ -89,7 +90,7 @@ abstract class Edition extends \FreeFW\Core\StorageModel
     ];
     protected static $PRP_EDI_DESC = [
         FFCST::PROPERTY_PRIVATE => 'edi_desc',
-        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BLOB,
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_TEXT,
         FFCST::PROPERTY_OPTIONS => [],
         FFCST::PROPERTY_COMMENT => 'Description de l\'édition',
         FFCST::PROPERTY_SAMPLE  => '',

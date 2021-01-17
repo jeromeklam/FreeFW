@@ -279,7 +279,7 @@ class FileCache implements CacheItemPoolInterface
      */
     private function getFilenamePrefix()
     {
-        return 'pawbx-filecache-';
+        return APP_NAME . '-cache-';
     }
 
     /**

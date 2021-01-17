@@ -170,6 +170,7 @@ class DependencyInjector extends \FreeFW\Core\DI implements \FreeFW\Interfaces\D
      */
     public function getModel($p_name, $p_cache = false)
     {
+        $p_cache = false;
         $test = $this->base_ns . '_' . $p_name;
         if ($p_cache && isset(self::$models[$test])) {
             return clone(self::$models[$test]);

@@ -87,13 +87,25 @@ class ErrorObject
      */
     public function __construct(int $p_status, string $p_message = '', $p_code = null, $p_field = null)
     {
+        $fields = $p_field;
+        if (is_array($p_field)) {
+            $fields = '';
+            foreach ($p_field as $idx => $field) {
+                if ($field != 'brk_id') {
+                    if ($fields != '') {
+                        $fields .= ',';
+                    }
+                    $fields .= $field;
+                }
+            }
+        }
         $this->status  = $p_status;
         $this->title   = $p_message;
         $this->code    = $p_code;
         if ($p_field != '') {
             $this->source = [
-                'pointer' => '/data/attributes/' . $p_field,
-                'parameter' => $p_field
+                'pointer' => '/data/attributes/' . $fields,
+                'parameter' => $fields
             ];
         }
     }

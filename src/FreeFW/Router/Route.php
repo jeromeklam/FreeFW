@@ -577,6 +577,10 @@ class Route implements \Psr\Log\LoggerAwareInterface
         return $this->role;
     }
 
+    public function setMiddleware($p_middlewares)
+    {
+
+    }
     /**
      * Get route regexp
      *

@@ -205,6 +205,7 @@ abstract class Model implements
         if (preg_match('~^(set|get)([A-Z])(.*)$~', $p_methodName, $matches)) {
             $property = \FreeFW\Tools\PBXString::fromCamelCase($matches[2] . $matches[3]);
             if (!property_exists($this, $property)) {
+                //echo \FreeFW\Tools\Exception::format();
                 throw new \FreeFW\Core\FreeFWMemberAccessException(
                     'Property ' . $property . ' doesn\'t exists !'
                 );
@@ -215,11 +216,13 @@ abstract class Model implements
                 case 'get':
                     return $this->get($property);
                 default:
+                    //echo \FreeFW\Tools\Exception::format();
                     throw new \FreeFW\Core\FreeFWMemberAccessException(
                         'Method ' . $p_methodName . ' doesn\'t exists !'
                     );
             }
         } else {
+            //echo \FreeFW\Tools\Exception::format();
             throw new \FreeFW\Core\FreeFWMethodAccessException(
                 'Method ' . $p_methodName . ' doesn\'t exists !'
             );
@@ -330,7 +333,8 @@ abstract class Model implements
      */
     public function initWithJson(array $p_datas = [], array $p_relations = [], array $p_included = [])
     {
-        $props = $this->getProperties();
+        $description = $this->getModelDescription();
+        $props = $description['properties'];
         $this->initModel();
         foreach ($p_datas as $name => $value) {
             foreach ($props as $prp => $property) {
@@ -339,16 +343,18 @@ abstract class Model implements
                     $test = $property[FFCST::PROPERTY_PUBLIC];
                 }
                 if ($test == $name) {
-                    $this->addUpdatedField($prp);
-                    $type   = $property[FFCST::PROPERTY_TYPE];
-                    $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($prp, true);
-                    switch ($type) {
-                        case FFCST::TYPE_BLOB:
-                            $this->$setter($this->decode_chunk($value));
-                            break;
-                        default:
-                            $this->$setter($value);
-                            break;
+                    if (!in_array(FFCST::OPTION_LOCAL, $property[FFCST::PROPERTY_OPTIONS])) {
+                        $this->addUpdatedField($prp);
+                        $type   = $property[FFCST::PROPERTY_TYPE];
+                        $setter = $property[FFCST::PROPERTY_SETTER];
+                        switch ($type) {
+                            case FFCST::TYPE_BLOB:
+                                $this->$setter($this->decode_chunk($value));
+                                break;
+                            default:
+                                $this->$setter($value);
+                                break;
+                        }
                     }
                     break;
                 }
@@ -400,6 +406,8 @@ abstract class Model implements
                     }
                 }
                 if (!$foundRel) {
+                    var_dump($relation);
+                    var_export($name);
                     $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
                     if (method_exists($this, $setter)) {
                         $id = 0;
@@ -812,13 +820,54 @@ abstract class Model implements
     }
 
     /**
+     * Get Model description
+     *
+     * @return []
+     */
+    public static function getModelDescription()
+    {
+        $clsName = str_replace('\\', '_', get_called_class());
+        /**
+         * @var \Psr\Cache\CacheItemPoolInterface $cache
+         */
+        $cache   = \FreeFW\DI\DI::getShared('cache');
+        if ($cache && $cache->hasItem('FreeFW.' . $clsName . '.properties')) {
+            $item = $cache->getItem('FreeFW.' . $clsName . '.properties');
+            if ($item && $item->isHit()) {
+                return $item->get();
+            }
+        }
+        // Simple properties
+        $description = [];
+        $description['properties'] = static::getProperties();
+        foreach ($description['properties'] as $name => $oneProperty) {
+            $dbField = $name;
+            if (!isset($oneProperty[FFCST::PROPERTY_OPTIONS])) {
+                $oneProperty[FFCST::PROPERTY_OPTIONS] = [];
+            }
+            if (isset($oneProperty[FFCST::PROPERTY_PRIVATE])) {
+                $dbField = $oneProperty[FFCST::PROPERTY_PRIVATE];
+            }
+            $description['properties'][$name][FFCST::PROPERTY_GETTER] = 'get' . \FreeFW\Tools\PBXString::toCamelCase($dbField, true);
+            $description['properties'][$name][FFCST::PROPERTY_SETTER] = 'set' . \FreeFW\Tools\PBXString::toCamelCase($dbField, true);
+        }
+        //
+        if ($cache) {
+            $item = new \FreeFW\Cache\Item('FreeFW.' . $clsName . '.properties');
+            $item->set($description);
+            $cache->save($item);
+        }
+        return $description;
+    }
+    /**
      * Initialization
      *
      * return self
      */
     public function initModel()
     {
-        $props = $this->getProperties();
+        $description = $this->getModelDescription();
+        $props = $description['properties'];
         $class = str_replace('\\Model\\', '_', get_class($this));
 
         $models   = $this->getAppConfig()->get('models');
@@ -839,7 +888,7 @@ abstract class Model implements
                     $pk = true;
                 }
             }
-            $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+            $setter = $oneProperty[FFCST::PROPERTY_SETTER];
             $value  = null;
             if (isset($oneProperty[FFCST::PROPERTY_DEFAULT])) {
                 $value = $oneProperty[FFCST::PROPERTY_DEFAULT];

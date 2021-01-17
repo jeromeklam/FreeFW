@@ -55,7 +55,7 @@ abstract class Email extends \FreeFW\Core\StorageModel
     protected static $PRP_EMAIL_SUBJECT = [
         FFCST::PROPERTY_PRIVATE => 'email_subject',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
-        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED],
         FFCST::PROPERTY_COMMENT => 'Le sujet de l\'email, sans html',
         FFCST::PROPERTY_SAMPLE  => 'Expédition email',
         FFCST::PROPERTY_MAX     => 255,
@@ -63,7 +63,7 @@ abstract class Email extends \FreeFW\Core\StorageModel
     protected static $PRP_EMAIL_BODY = [
         FFCST::PROPERTY_PRIVATE => 'email_body',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_HTML,
-        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED],
         FFCST::PROPERTY_COMMENT => 'Le contenu de l\'email, de préférence en html',
         FFCST::PROPERTY_SAMPLE  => '<p>Corps du mail</p>',
     ];
@@ -138,5 +138,20 @@ abstract class Email extends \FreeFW\Core\StorageModel
     public static function getAutocompleteField()
     {
         return 'email_subject';
+    }
+
+    /**
+     * Composed index
+     *
+     * @return string[][]|number[][]
+     */
+    public static function getUniqIndexes()
+    {
+        return [
+            'code' => [
+                FFCST::INDEX_FIELDS => ['brk_id', 'lang_id', 'email_code'],
+                FFCST::INDEX_EXISTS => \FreeFW\Constants::ERROR_EMAIL_CODE_EXISTS
+            ],
+        ];
     }
 }

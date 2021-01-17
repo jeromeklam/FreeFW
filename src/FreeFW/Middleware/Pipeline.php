@@ -85,9 +85,9 @@ class Pipeline implements
         if (!$this->middlewares->isEmpty()) {
             $nextHandler = clone $this;
             $middleware  = $nextHandler->middlewares->dequeue();
-            $this->logger->debug(sprintf('FreeFW.Middleware.Pipeline >> %s', get_class($middleware)));
+            $this->logger->info(sprintf('FreeFW.Middleware.Pipeline >> %s', get_class($middleware)));
             $response = $middleware->process($p_request, $nextHandler);
-            $this->logger->debug(sprintf('FreeFW.Middleware.Pipeline << %s', get_class($middleware)));
+            $this->logger->info(sprintf('FreeFW.Middleware.Pipeline << %s', get_class($middleware)));
             return $response;
         } else {
             // @todo

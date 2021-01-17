@@ -73,7 +73,8 @@ class PBXString
      */
     public static function toCamelCase($p_str, $p_first = false, $p_glue = '_')
     {
-        if (trim($p_str) == '') {
+        $p_str = '' . trim($p_str);
+        if ($p_str == '') {
             return $p_str;
         }
         if ($p_first) {

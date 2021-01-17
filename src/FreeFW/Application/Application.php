@@ -127,7 +127,7 @@ class Application extends \FreeFW\Core\Application
      */
     public function handle()
     {
-        $this->logger->debug('Application.handle.start');
+        $this->logger->info('FreeFW.Application.handle.start');
         try {
             $request     = \FreeFW\Http\ApiServerRequest::fromGlobals();
             $this->route = $this->router->findRoute($request);
@@ -144,6 +144,6 @@ class Application extends \FreeFW\Core\Application
             $response = $this->createResponse(500, $ex->getMessage());
             $this->send($response);
         }
-        $this->logger->debug('Application.handle.end');
+        $this->logger->info('FreeFW.Application.handle.end');
     }
 }
