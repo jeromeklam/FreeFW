@@ -244,4 +244,36 @@ class ApiParams
     {
         return $this->sort;
     }
+
+    /**
+     * Set fields
+     *
+     * @param string|array $p_fields
+     *
+     * @return boolean
+     */
+    public function setFields($p_fields)
+    {
+        if (is_array($p_fields)) {
+            $this->fields = [];
+            foreach ($p_fields as $model => $fields) {
+                $this->fields[$model] = explode(',', $fields);
+            }
+        } else {
+            if ($p_fields != '') {
+                $this->fields = [];
+                $this->fields['BASE'] = explode(',', $p_fields);
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Get
+     * @return array|string[]|array[]
+     */
+    public function getFields()
+    {
+        return $this->fields;
+    }
 }

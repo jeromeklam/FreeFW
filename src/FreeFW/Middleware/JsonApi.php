@@ -57,7 +57,7 @@ class JsonApi implements
          */
         // Fields
         if (array_key_exists('fields', $params)) {
-
+            $apiParams->setFields($params['fields']);
         }
         // Include
         if (array_key_exists('include', $params)) {

@@ -437,6 +437,70 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
 
     /**
      *
+     * @return array
+     */
+    public function __toArrayFiltered($p_fields = null, $p_include = null, $p_prefix = '')
+    {
+        $description = $this->getModelDescription();
+        $cls = $this->getClassName();
+        $vars = null;
+        $test = null;
+        if (is_array($p_fields) && count($p_fields) > 0) {
+            foreach ($p_fields as $idx => $fields) {
+                if (strtolower($idx) == strtolower($cls) && is_array($fields) && count($fields) > 0) {
+                    $test = array_flip($fields);
+                }
+            }
+        }
+        foreach ($description['properties'] as $name => $property) {
+            $getter = $property[FFCST::PROPERTY_GETTER];
+            if (!$test || isset($test[$name])) {
+                $vars[$name] = $this->$getter();
+            }
+            if (in_array(FFCST::OPTION_FK, $property[FFCST::PROPERTY_OPTIONS])) {
+                foreach ($property[FFCST::PROPERTY_FK] as $relName => $relation) {
+                    if ($p_include && in_array($p_prefix . $relName, $p_include)) {
+                        $relGetter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relName, true);
+                        $object    = $this->$relGetter();
+                        if ($object) {
+                            $vars[$relName] = $object->__toArrayFiltered(
+                                $p_fields,
+                                $p_include,
+                                $p_prefix . $relName . '.'
+                            );
+                        } else {
+                            $vars[$relName] = null;
+                        }
+                    }
+                }
+            }
+        }
+/*
+        $serializable = get_object_vars($this);
+        unset($serializable['strategy']);
+        unset($serializable['logger']);
+        unset($serializable['app_config']);
+        unset($serializable['config']);
+        unset($serializable['updated']);
+        $vars = (array)$serializable;
+
+        foreach ($vars as $idx => $value) {
+            if (is_object($value)) {
+                if (method_exists($value, '__toArrayFiltered')) {
+                    $vars[$idx] = $value->__toArrayFiltered($p_fields);
+                }
+            } else {
+                if ($test && !isset($test[$idx])) {
+                    unset($vars[$idx]);
+                }
+            }
+        }
+        */
+        return $vars;
+    }
+
+    /**
+     *
      * {@inheritDoc}
      * @see \Serializable::unserialize()
      */

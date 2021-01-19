@@ -228,6 +228,20 @@ class ResultSet extends \FreeFW\Core\Model implements
     }
 
     /**
+     * Magic
+     *
+     * @return array
+     */
+    public function __toArrayFiltered($p_fields = null, $p_include = null)
+    {
+        $result = array();
+        foreach ($this->var as $line) {
+            $result[] = $line->__toArrayFiltered($p_fields, $p_include);
+        }
+        return $result;
+    }
+
+    /**
      * Convert to json
      *
      * @param string $p_version

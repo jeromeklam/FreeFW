@@ -57,6 +57,7 @@ class HawkAuth implements
             if ($inMac == $calcMac) {
                 $user = $sso->signinByIdAndLogin($user->getUserId(), $login, false);
             } else {
+                $this->logger->info('FreeFW.Middleware.Hawk.wrong.mac');
                 $user = false;
             }
             return $user;
@@ -91,6 +92,11 @@ class HawkAuth implements
         $dlg     = $p_auth_header->getParameter('dlg', '');
         $path    = $uri->getPath();
         $query   = $uri->getQuery();
+        parse_str($query, $params);
+        if (isset($params['_request'])) {
+            unset($params['_request']);
+        }
+        $query = http_build_query($params);
         if ($p_withPort) {
             $port = $uri->getPort();
             if ($port == '') {

@@ -130,7 +130,7 @@ class AuthNegociator implements
             $authorized = $p_request->getAttribute('broker_auth_methods', []);
             if ($class && in_array($authType, $authorized)) {
                 // Ok, encode, decode, ...
-                $this->logger->debug(sprintf('FreeFW.Middleware.AuthNegociator %s', $class));
+                $this->logger->info(sprintf('FreeFW.Middleware.AuthNegociator.%s', $authType));
                 $mid = \FreeFW\DI\DI::get($class);
                 // verify interface, ...
                 $allowed = true;

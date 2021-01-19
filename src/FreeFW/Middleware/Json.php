@@ -45,7 +45,7 @@ class Json implements
          */
         // Fields
         if (array_key_exists('fields', $params)) {
-
+            $apiParams->setFields($params['fields']);
         }
         // Include
         if (array_key_exists('include', $params)) {
@@ -123,8 +123,13 @@ class Json implements
                 $object     = @unserialize($content);
                 if ($object !== false) {
                     $serializer = new \Zumba\JsonSerializer\JsonSerializer();
-                    if (is_object($object) && method_exists($object, '__toArray')) {
-                        $result = $serializer->serialize($object->__toArray());
+                    if (is_object($object) && method_exists($object, '__toArrayFiltered')) {
+                        $result = $serializer->serialize(
+                            $object->__toArrayFiltered(
+                                $p_api_params->getFields(),
+                                $p_api_params->getInclude()
+                            )
+                        );
                     } else {
                         $result = $serializer->serialize($object);
                     }

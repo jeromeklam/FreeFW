@@ -207,7 +207,7 @@ abstract class Model implements
             if (!property_exists($this, $property)) {
                 //echo \FreeFW\Tools\Exception::format();
                 throw new \FreeFW\Core\FreeFWMemberAccessException(
-                    'Property ' . $property . ' doesn\'t exists !'
+                    'Property ' . $property . ' doesn\'t exists for ' . $p_methodName . ' !'
                 );
             }
             switch ($matches[1]) {
@@ -351,6 +351,11 @@ abstract class Model implements
                             case FFCST::TYPE_BLOB:
                                 $this->$setter($this->decode_chunk($value));
                                 break;
+                            case FFCST::TYPE_BIGINT:
+                            case FFCST::TYPE_INTEGER:
+                                if ($value != '') {
+                                    $this->$setter(intval($value));
+                                }
                             default:
                                 $this->$setter($value);
                                 break;
@@ -373,9 +378,19 @@ abstract class Model implements
                         if (isset($fks[$relation['name']])) {
                             $fk = $fks[$relation['name']];
                             // Complete empty object
-                            $id = 0;
+                            $id = null;
                             foreach ($relation['values'] as $val) {
-                                $id = $val;
+                                switch ($property[FFCST::PROPERTY_TYPE]) {
+                                    case FFCST::TYPE_BIGINT:
+                                    case FFCST::TYPE_INTEGER:
+                                        if ($val != '') {
+                                            $id = intval($val);
+                                        }
+                                        break;
+                                    default:
+                                        $id = $val;
+                                        break;
+                                }
                                 break;
                             }
                             $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($relation['name'], true);
@@ -543,7 +558,19 @@ abstract class Model implements
             if (isset($property[FFCST::PROPERTY_OPTIONS])) {
                 if (in_array(FFCST::OPTION_PK, $property[FFCST::PROPERTY_OPTIONS])) {
                     $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
-                    return $this->$setter($p_id);
+                    $id = null;
+                    switch ($property[FFCST::PROPERTY_TYPE]) {
+                        case FFCST::TYPE_BIGINT:
+                        case FFCST::TYPE_INTEGER:
+                            if ($p_id != '') {
+                                $id = intval($p_id);
+                            }
+                            break;
+                        default:
+                            $id = $p_id;
+                            break;
+                    }
+                    return $this->$setter($id);
                 }
             }
         }
@@ -655,9 +682,10 @@ abstract class Model implements
     public function getApiAttributes() : array
     {
         $attributes = [];
-        foreach ($this->getProperties() as $name => $property) {
+        $description = $this->getModelDescription();
+        foreach ($description['properties'] as $name => $property) {
             $oneAttribute = new \FreeFW\JsonApi\V1\Model\AttributeObject($name);
-            $getter       = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+            $getter       = $property[FFCST::PROPERTY_GETTER];
             $oneAttribute->setValue($this->$getter());
             if (isset($property[FFCST::PROPERTY_PUBLIC])) {
                 $oneAttribute->setJsonName($property[FFCST::PROPERTY_PUBLIC]);
@@ -817,6 +845,17 @@ abstract class Model implements
     public static function getProperties()
     {
         return [];
+    }
+
+    /**
+     * Get call name
+     *
+     * @return string
+     */
+    public static function getClassName()
+    {
+        $clsName = str_replace('\\', '_', get_called_class());
+        return str_replace('_Model_', '_', $clsName);
     }
 
     /**
