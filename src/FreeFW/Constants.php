@@ -188,6 +188,7 @@ class Constants
     const ERROR_EDITION_NOT_FOUND   = 666015;
     const ERROR_GROUP_SWITCH        = 666016;
     const ERROR_EMAIL_CODE_EXISTS   = 666017;
+    const ERROR_EDITION_NAME_EXISTS = 666018;
 
     /**
      * Success types

@@ -621,7 +621,8 @@ class PDOStorage extends \FreeFW\Storage\Storage
                         $p_model->addError(
                             $code,
                             $ixName . ' already exists !',
-                            \FreeFW\Core\Error::TYPE_PRECONDITION
+                            \FreeFW\Core\Error::TYPE_PRECONDITION,
+                            $oneIndex['fields']
                         );
                         $next = false;
                     }

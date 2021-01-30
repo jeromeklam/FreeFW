@@ -172,7 +172,7 @@ abstract class Edition extends \FreeFW\Core\StorageModel
      */
     public static function getSourceComments()
     {
-        return '';
+        return 'Editions';
     }
 
     /**
@@ -182,6 +182,21 @@ abstract class Edition extends \FreeFW\Core\StorageModel
      */
     public static function getAutocompleteField()
     {
-        return '';
+        return 'edi_name';
+    }
+
+    /**
+     * Composed index
+     *
+     * @return string[][]|number[][]
+     */
+    public static function getUniqIndexes()
+    {
+        return [
+            'name' => [
+                FFCST::INDEX_FIELDS => ['edi_name', 'lang_id'],
+                FFCST::INDEX_EXISTS => \FreeFW\Constants::ERROR_EDITION_NAME_EXISTS
+            ]
+        ];
     }
 }
