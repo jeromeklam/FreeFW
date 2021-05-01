@@ -450,4 +450,115 @@ class ApiController extends \FreeFW\Core\Controller
         $this->logger->debug('FreeFW.ApiController.removeOne.end');
         return $this->createErrorResponse($code, $data);
     }
+
+    /**
+     * Print one by id
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $p_request
+     */
+    public function printOne(\Psr\Http\Message\ServerRequestInterface $p_request, $p_id = null)
+    {
+        $this->logger->info('FreeFW.ApiController.printOne.start');
+        /**
+         * @var \FreeFW\Http\ApiParams $apiParams
+         */
+        $apiParams = $p_request->getAttribute('api_params', false);
+        if (!isset($p_request->default_model)) {
+            throw new \FreeFW\Core\FreeFWStorageException(
+                sprintf('No default model for route !')
+            );
+        }
+        $default = $p_request->default_model;
+        $model = \FreeFW\DI\DI::get($default);
+        /**
+         *
+         */
+        $print = $apiParams->getData();
+        if (!$print instanceof \FreeFW\Model\PrintOptions) {
+            $this->logger->info('FreeFW.ApiController.printOne.error.wrong_body');
+            return $this->createErrorResponse(FFCST::ERROR_IN_DATA);
+        } else {
+            $edition = \FreeFW\Model\Edition::findFirst(['edi_id' => $print->getEdiId()]);
+            if (!$edition instanceof \FreeFW\Model\Edition) {
+                $this->logger->info('FreeFW.ApiController.printOne.error.edi_not_found');
+                return $this->createErrorResponse(FFCST::ERROR_EDITION_NOT_FOUND);
+            }
+            // more checks...
+        }
+        /**
+         * Id
+         */
+        if (intval($p_id) > 0) {
+            $filters  = new \FreeFW\Model\Conditions();
+            $pk_field = $model->getPkField();
+            $aField   = new \FreeFW\Model\ConditionMember();
+            $aValue   = new \FreeFW\Model\ConditionValue();
+            $aValue->setValue($p_id);
+            $aField->setValue($pk_field);
+            $aCondition = new \FreeFW\Model\SimpleCondition();
+            $aCondition->setLeftMember($aField);
+            $aCondition->setOperator(\FreeFW\Storage\Storage::COND_EQUAL);
+            $aCondition->setRightMember($aValue);
+            $filters->add($aCondition);
+            /**
+             * @var \FreeFW\Model\Query $query
+             */
+            $query = $model->getQuery();
+            $query
+                ->addConditions($filters)
+                ->addConditions($apiParams->getFilters())
+                ->addRelations($apiParams->getInclude())
+                ->setLimit(0, 1)
+            ;
+            $data = new \FreeFW\Model\ResultSet();
+            if ($query->execute()) {
+                $data = $query->getResult();
+            }
+            if (count($data) > 0) {
+                $model = $data[0];
+                if (method_exists($model, 'afterRead')) {
+                    $model->afterRead();
+                }
+                $mergeDatas = $model->getMergeData($apiParams->getInclude());
+                // Get group and user
+                $sso        = \FreeFW\DI\DI::getShared('sso');
+                $user       = $sso->getUser();
+                // @todo : rechercher le groupe principal de l'utilisateur
+                $group      = \FreeSSO\Model\Group::findFirst(
+                    [
+                        'grp_id' => 4
+                    ]
+                );
+                //
+                $file = uniqid(true, 'edition');
+                $src  = '/tmp/print_' . $file . '_tpl.odt';
+                $dest = '/tmp/print_' . $file . '_dest.odt';
+                $dPdf = '/tmp/print_' . $file . '_dest.pdf';
+                $ediContent = $edition->getEdiContent();
+                file_put_contents($src, $ediContent);
+                file_put_contents($dest, $ediContent);
+                $mergeDatas->addGenericBlock('head_user');
+                $mergeDatas->addGenericData($user->getFieldsAsArray(), 'head_user');
+                $mergeDatas->addGenericBlock('head_group');
+                $mergeDatas->addGenericData($group->getFieldsAsArray(), 'head_group');
+                $mergeService = \FreeFW\DI\DI::get('FreeOffice::Service::Merge');
+                $mergeService->merge($src, $dest, $mergeDatas);
+                exec('/usr/bin/unoconv -f pdf -o ' . $dPdf . ' ' . $dest);
+                @unlink($dest);
+                @unlink($src);
+                if (is_file($dPdf)) {
+                    $this->logger->info('FreeFW.ApiController.printOne.end');
+                    return $this->createMimeTypeResponse($dPdf, file_get_contents($dPdf));
+                }
+            } else {
+                $data = null;
+                $code = FFCST::ERROR_NOT_FOUND; // 404
+            }
+        } else {
+            $data = null;
+            $code = FFCST::ERROR_ID_IS_MANDATORY; // 409
+        }
+        $this->logger->info('FreeFW.ApiController.printOne.end');
+        return $this->createErrorResponse(FFCST::ERROR_IN_DATA);
+    }
 }

@@ -15,6 +15,12 @@ class MergeModel {
     protected $blocks = [];
 
     /**
+     * Arrays
+     * @var array
+     */
+    protected $arrays = [];
+
+    /**
      * Titles
      * @var array
      */
@@ -39,7 +45,7 @@ class MergeModel {
     protected $generic_blocks = [];
 
     /**
-     *
+     * Generic datas
      * @var array
      */
     protected $generic_datas = [];
@@ -58,9 +64,12 @@ class MergeModel {
     /**
      * Add new block
      *
+     * @param mixed   $p_block
+     * @param boolean $p_array
+     *
      * @return \FreeFW\Model\MergeModel
      */
-    public function addBlock($p_block)
+    public function addBlock($p_block, $p_array = false)
     {
         $blocks = $p_block;
         if (!is_array($blocks)) {
@@ -69,6 +78,9 @@ class MergeModel {
         foreach ($blocks as $oneBlock) {
             if (!in_array(trim($oneBlock), $this->blocks)) {
                 $this->blocks[] = trim($oneBlock);
+                if ($p_array) {
+                    $this->arrays[] = $oneBlock;
+                }
             }
         }
         return $this;
@@ -152,16 +164,30 @@ class MergeModel {
     /**
      * Add data
      *
-     * @param object $p_data
+     * @param array   $p_data
+     * @param string  $p_block
+     * @param boolean $p_replace
      *
      * @return \FreeFW\Model\MergeModel
      */
-    public function addData($p_data, $p_block = 'default')
+    public function addData(array $p_data, $p_block = 'default', $p_replace = true)
     {
         if (!array_key_exists($p_block, $this->datas)) {
             $this->datas[$p_block] = [];
         }
-        $this->datas[$p_block] = array_merge($this->datas[$p_block], $p_data);
+        if (in_array($p_block, $this->arrays)) {
+            if ($p_replace) {
+                $this->datas[$p_block] = $p_data;
+            } else {
+                array_push($this->datas[$p_block], $p_data);
+            }
+        } else {
+            if ($p_replace) {
+                $this->datas[$p_block] = $p_data;
+            } else {
+                $this->datas[$p_block] = array_merge($this->datas[$p_block], $p_data);
+            }
+        }
         return $this;
     }
 
@@ -227,11 +253,11 @@ class MergeModel {
     /**
      * Add generic datas
      *
-     * @param \StdClass $p_datas
+     * @param array $p_datas
      *
      * @return \FreeFW\Model\MergeModel
      */
-    public function addGenericData($p_datas, $p_block = 'generic')
+    public function addGenericData(array $p_datas, $p_block = 'generic')
     {
         if (!array_key_exists($p_block, $this->generic_datas)) {
             $this->generic_datas[$p_block] = [];
@@ -252,6 +278,36 @@ class MergeModel {
         $datas = [];
         if (array_key_exists($p_block, $this->generic_datas)) {
             $datas = $this->generic_datas[$p_block];
+        }
+        return $datas;
+    }
+
+    /**
+     * Block is an array ?
+     *
+     * @param string $p_block
+     *
+     * @return boolean
+     */
+    public function isBlockAnArray($p_block)
+    {
+        return in_array($p_block, $this->arrays);
+    }
+
+    /**
+     * Convert to array
+     *
+     * @return array[]
+     */
+    public function __toArray()
+    {
+        $datas = [];
+        foreach ($this->blocks as $oneBlock) {
+            if (array_key_exists($oneBlock, $this->datas)) {
+                foreach ($this->datas[$oneBlock] as $key => $value) {
+                  $datas[$oneBlock . '.' . $key] =  $value;
+                }
+            }
         }
         return $datas;
     }

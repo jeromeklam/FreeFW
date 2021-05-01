@@ -34,7 +34,7 @@ class Jobqueue extends \FreeFW\Core\Service
                     \FreeFW\Storage\Storage::COND_LOWER_EQUAL_OR_NULL => \FreeFW\Tools\Date::getCurrentTimestamp()
                 ]
             ]
-            );
+        );
         if ($query->execute()) {
             $results = $query->getResult();
             foreach ($results as $jobqueue) {

@@ -138,4 +138,13 @@ class SsoMock implements
     {
         return $this->group;
     }
+
+    /**
+     *
+     * @return \FreeSSO\Model\Group
+     */
+    public function getUserGroup()
+    {
+        return $this->group;
+    }
 }

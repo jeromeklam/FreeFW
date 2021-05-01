@@ -396,9 +396,8 @@ class PBXString
      */
     public static function htmlToText($p_html, $p_preserve_cr = false)
     {
-        $p_str = strip_tags($p_html);
-        $p_str = html_entity_decode($p_str, ENT_QUOTES);
-        return $p_str;
+        $html = new \Html2Text\Html2Text($p_html, ['width' => 0]);
+        return $html->getText();
     }
 
     /**

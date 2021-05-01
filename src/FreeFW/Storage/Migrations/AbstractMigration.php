@@ -38,6 +38,12 @@ abstract class AbstractMigration implements
     protected $sql_files = [];
 
     /**
+     * methods
+     * @var array
+     */
+    protected $methods = [];
+
+    /**
      * Intern step
      * @var integer
      */
@@ -122,6 +128,23 @@ abstract class AbstractMigration implements
     }
 
     /**
+     * Add a method to execute
+     *
+     * @param string $p_method
+     * @param string $p_way
+     *
+     * @return \FreeFW\Storage\Migrations\AbstractMigration
+     */
+    protected function addMethod($p_method, $p_way = 'up')
+    {
+        if (!array_key_exists($p_way, $this->methods)) {
+            $this->methods[$p_way] = [];
+        }
+        $this->methods[$p_way][] = $p_method;
+        return $this;
+    }
+
+    /**
      * Get sql files
      *
      * @param string $p_way
@@ -137,6 +160,21 @@ abstract class AbstractMigration implements
             $this->sql_files[$p_way][] = strtolower($p_way) . '.sql';
         }
         return $this->sql_files[$p_way];
+    }
+
+    /**
+     * Get methods
+     *
+     * @param string $p_way
+     *
+     * @return [string]
+     */
+    protected function getMethods($p_way)
+    {
+        if (!array_key_exists($p_way, $this->methods)) {
+            $this->methods[$p_way] = [];
+        }
+        return $this->methods[$p_way];
     }
 
     /**
@@ -210,6 +248,74 @@ abstract class AbstractMigration implements
      * @return bool
      */
     protected function sqlDown() : bool
+    {
+        return true;
+    }
+
+    /**
+     * Upgrades via methods
+     *
+     * @return bool
+     */
+    protected function methodUp() : bool
+    {
+        $run     = [];
+        $ret     = true;
+        $methods = $this->getMethods('up');
+        foreach ($methods as $oneMethod) {
+            $this->step += 1;
+            /**
+             * @var \FreeFW\Model\Version $version
+             */
+            $version = \FreeFW\DI\DI::get('FreeFW::Model::Version');
+            $version
+                ->setVersInstallFile($oneMethod)
+                ->setVersInstallStatus(\FreeFW\Model\Version::STATUS_PENDING)
+                ->setVersInstallDate(\FreeFW\Tools\Date::getCurrentTimestamp())
+                ->setVersVersion($this->getVersion() . '.' . $this->step)
+            ;
+            if (method_exists($this, $oneMethod)) {
+                try {
+                    if (!$this->$oneMethod()) {
+                        $version
+                            ->setVersInstallStatus(\FreeFW\Model\Version::STATUS_ERROR)
+                            ->setVersInstallText('Method ' . $oneMethod . ' error !');
+                        ;
+                        $ret = false;
+                        break;
+                    }
+                    $version
+                        ->setVersInstallStatus(\FreeFW\Model\Version::STATUS_OK)
+                    ;
+                } catch (\Exception $ex) {
+                    // @todo
+                    $version
+                        ->setVersInstallStatus(\FreeFW\Model\Version::STATUS_ERROR)
+                        ->setVersInstallText('Method ' . $oneMethod . ' error !');
+                    ;
+                    $ret = false;
+                    break;
+                }
+            } else {
+                // @todo
+                $version
+                    ->setVersInstallStatus(\FreeFW\Model\Version::STATUS_ERROR)
+                    ->setVersInstallText('Method ' . $oneMethod . ' not found !');
+                ;
+                $ret = false;
+                break;
+            }
+            $version->create();
+        }
+        return $ret;
+    }
+
+    /**
+     * Downgrade via mathods
+     *
+     * @return bool
+     */
+    protected function methodDown() : bool
     {
         return true;
     }

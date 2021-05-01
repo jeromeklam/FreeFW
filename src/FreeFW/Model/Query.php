@@ -290,44 +290,24 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
      *
      * @return \FreeFW\Model\Query
      */
-    public function addSimpleCondition(string $p_operator, string $p_left, $p_right = null)
-    {
+    public function addSimpleCondition(
+        string $p_operator,
+        \FreeFW\Interfaces\ConditionInterface $p_left,
+        \FreeFW\Interfaces\ConditionInterface $p_right = null
+        ) {
         /**
          * condition
-         * @var \FreeFW\Model\Condition $condition
+         * @var \FreeFW\Model\SimpleCondition $condition
          */
         $condition = new \FreeFW\Model\SimpleCondition;
-        $left      = null;
-        if (strpos($p_left, '::Model::') !== false) {
-            $left = new \FreeFW\Model\ConditionMember($p_left);
-            $left->setValue($p_left);
-        } else {
-            $left = new \FreeFW\Model\ConditionValue($p_left);
-            $left->setValue($p_left);
-        }
-        $right = null;
-        if ($p_right !== null) {
-            if (is_array($p_right)) {
-                $right = new \FreeFW\Model\ConditionValue();
-                $right->setValue($p_right);
-            } else {
-                if (strpos($p_right, '::Model::') !== false) {
-                    $right = new \FreeFW\Model\ConditionMember();
-                    $right->setValue($p_right);
-                } else {
-                    $right = new \FreeFW\Model\ConditionValue();
-                    $right->setValue($p_right);
-                }
-            }
-        }
         $condition->setOperator($p_operator);
-        if ($left !== null) {
-            $condition->setLeftMember($left);
+        if ($p_left !== null) {
+            $condition->setLeftMember($p_left);
         } else {
             // @todo : strange...
         }
-        if ($right !== null) {
-            $condition->setRightMember($right);
+        if ($p_right !== null) {
+            $condition->setRightMember($p_right);
         } else {
             if ($p_operator === \FreeFW\Storage\Storage::COND_EQUAL) {
                 $condition->setOperator(\FreeFW\Storage\Storage::COND_EMPTY);
@@ -374,19 +354,26 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
     public function addFromFilters(array $p_filters = [])
     {
         foreach ($p_filters as $field => $condition) {
-            if (strpos($field, '::Model::') === false) {
-                $field = $this->main_model . '.' . $field;
-            }
+            $left = new \FreeFW\Model\ConditionMember($field);
+            $left->setValue($field);
             if (is_array($condition)) {
                 foreach ($condition as $oper => $value) {
                     if ($oper === 0) {
-                        $this->addSimpleCondition($value, $field, null);
+                        $this->addSimpleCondition($value, $left, null);
                     } else {
-                        $this->addSimpleCondition($oper, $field, $value);
+                        $right = new \FreeFW\Model\ConditionValue();
+                        $right->setValue($value);
+                        $this->addSimpleCondition($oper, $left, $right);
                     }
                 }
             } else {
-                $this->addSimpleCondition(\FreeFW\Storage\Storage::COND_EQUAL, $field, $condition);
+                if ($condition === null) {
+                    $this->addSimpleCondition(\FreeFW\Storage\Storage::COND_EMPTY, $left);
+                } else {
+                    $right = new \FreeFW\Model\ConditionValue();
+                    $right->setValue($condition);
+                    $this->addSimpleCondition(\FreeFW\Storage\Storage::COND_EQUAL, $left, $right);
+                }
             }
         }
         return $this;
@@ -553,5 +540,15 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
             }
         }
         return $this;
+    }
+
+    /**
+     * Get conditions
+     *
+     * @return \FreeFW\Model\Conditions
+     */
+    public function getConditions()
+    {
+        return $this->conditions;
     }
 }

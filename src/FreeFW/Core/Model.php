@@ -421,8 +421,6 @@ abstract class Model implements
                     }
                 }
                 if (!$foundRel) {
-                    var_dump($relation);
-                    var_export($name);
                     $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
                     if (method_exists($this, $setter)) {
                         $id = 0;
@@ -819,7 +817,7 @@ abstract class Model implements
                 unset($serializable[$key]);
             }
         }
-        return serialize($serializable);
+        return base64_encode(serialize($serializable));
     }
 
     /**
@@ -1168,10 +1166,16 @@ abstract class Model implements
                     case FFCST::TYPE_DATE:
                     case FFCST::TYPE_DATETIME:
                     case FFCST::TYPE_DATETIMETZ:
+                        $content_hm  = '';
+                        $content_hms = '';
                         if ($content != '') {
                             $dth = \FreeFW\Tools\Date::mysqlToDatetime($content, false, false);
-                            $content = $dth->format('d/m/Y');
+                            $content     = $dth->format('d/m/Y');
+                            $content_hm  = $dth->format('d/m/Y h:m');
+                            $content_hms = $dth->format('d/m/Y h:m:s');
                         }
+                        $data[$name . '_hm']  = $content_hm;
+                        $data[$name . '_hms'] = $content_hms;
                         break;
                     case FFCST::TYPE_RESULTSET:
                     case FFCST::TYPE_BLOB:
@@ -1190,19 +1194,22 @@ abstract class Model implements
      *
      * @return \FreeFW\Model\MergeModel
      */
-    public function getMergeData($p_tmp_dir = '/tmp/', $p_keep_binary = true)
+    public function getMergeData($p_includes = [], $p_prefix = '')
     {
         $datas = new \FreeFW\Model\MergeModel();
         $block = $this->getApiType();
         $parts = explode('_', $block);
         array_shift($parts);
         $block = \FreeFW\Tools\PBXString::fromCamelCase(implode('_', $parts));
+        if ($p_prefix != '') {
+            $block = $p_prefix;
+        }
         $datas->addBlock($block);
         $orig = [];
         if (method_exists($this, 'getSpecificEditionFields')) {
-            $orig = $this->getSpecificEditionFields($p_tmp_dir, $p_keep_binary);
+            $orig = $this->getSpecificEditionFields();
         }
-        $data = $this->getFieldsAsArray($orig, $p_keep_binary);
+        $data = $this->getFieldsAsArray($orig);
         foreach ($this->getProperties() as $name => $oneProperty) {
             $title = $oneProperty[FFCST::PROPERTY_PRIVATE];
             if (isset($oneProperty[FFCST::PROPERTY_PUBLIC])) {
@@ -1216,13 +1223,35 @@ abstract class Model implements
                 if (in_array(FFCST::OPTION_FK, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $relName = '';
                     foreach ($oneProperty[FFCST::PROPERTY_FK] as $relName => $relDatas) {
-                        $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relName, true);
-                        $relModel = $this->{$getter}();
-                        if ($relModel instanceOf \FreeFW\Core\Model) {
-                            $relDatas = $relModel->getMergeData();
-                            foreach ($relDatas->getBlocks() as $oneBlock) {
-                                $datas->addBlock($oneBlock);
-                                $datas->addData($relDatas->getDatas($oneBlock), $oneBlock);
+                        if (in_array($relName, $p_includes)) {
+                            $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relName, true);
+                            $relModel = $this->{$getter}();
+                            if ($relModel instanceOf \FreeFW\Core\Model) {
+                                $relDatas = $relModel->getMergeData($p_includes, $block . '_' . $relName);
+                                foreach ($relDatas->getBlocks() as $oneBlock) {
+                                    $datas->addBlock($oneBlock);
+                                    $datas->addData($relDatas->getDatas($oneBlock), $oneBlock);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (method_exists($this, 'getRelationships')) {
+            foreach ($this->getRelationships() as $relName => $relOptions) {
+                if (in_array($relName, $p_includes)) {
+                    $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relName, true);
+                    if (method_exists($this, $getter)) {
+                        $relDatas = $this->{$getter}();
+                        $newDatas = [];
+                        if ($relDatas instanceof \FreeFW\Model\ResultSet) {
+                            foreach ($relDatas as $relData) {
+                                $newDatas = $relData->getMergeData($p_includes, $block . '_' . $relName);
+                                foreach ($newDatas->getBlocks() as $oneBlock) {
+                                    $datas->addBlock($oneBlock, true);
+                                    $datas->addData($newDatas->getDatas($oneBlock), $oneBlock, false);
+                                }
                             }
                         }
                     }
@@ -1230,6 +1259,9 @@ abstract class Model implements
             }
         }
         $datas->addData($data, $block);
+        if (method_exists($this, 'beforeMerge')) {
+            $datas = $this->beforeMerge($datas, $block);
+        }
         return $datas;
     }
 }

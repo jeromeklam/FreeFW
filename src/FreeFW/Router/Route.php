@@ -97,6 +97,7 @@ class Route implements \Psr\Log\LoggerAwareInterface
     const ROLE_GET_FILTERED = 'getfiltered';
     const ROLE_AUTOCOMPLETE = 'autocomplete';
     const ROLE_OTHER        = 'other';
+    const ROLE_PRINT_ONE    = 'print';
 
     /**
      * Auth constants
@@ -114,6 +115,7 @@ class Route implements \Psr\Log\LoggerAwareInterface
     const RESULT_LIST   = 'list';
     const RESULT_OBJECT = 'object';
     const RESULT_DATA   = 'data';
+    const RESULT_BLOB   = 'blob';
 
     /**
      * Uniq id

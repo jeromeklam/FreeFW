@@ -100,6 +100,10 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 }
             }
             if ($add) {
+                // Compute getter
+                $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                // Get data
+                $val = $p_model->$getter();
                 // PK fields must be autoincrement...
                 if ($pk) {
                     $fields[$oneProperty[FFCST::PROPERTY_PRIVATE]] = null;
@@ -112,26 +116,30 @@ class PDOStorage extends \FreeFW\Storage\Storage
                             $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $sso->getBrokerId();
                         }
                         if ($usr) {
-                            $user = $sso->getUser();
-                            if ($user) {
-                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $user->getUserId();
+                            if (!$val) {
+                                $user = $sso->getUser();
+                                if ($user) {
+                                    $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $user->getUserId();
+                                } else {
+                                    $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = null;
+                                }
                             } else {
-                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = null;
+                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $val;
                             }
                         }
                         if ($grp) {
-                            $group = $sso->getUserGroup();
-                            if ($group) {
-                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $group->getGrpId();
+                            if (!$val) {
+                                $group = $sso->getUserGroup();
+                                if ($group) {
+                                    $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $group->getGrpId();
+                                } else {
+                                    $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = null;
+                                }
                             } else {
-                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = null;
+                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $val;
                             }
                         }
                     } else {
-                        // Compute getter
-                        $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
-                        // Get data
-                        $val = $p_model->$getter();
                         if ($val === false) {
                             $val = 0;
                         }
@@ -544,6 +552,8 @@ class PDOStorage extends \FreeFW\Storage\Storage
             if ($add) {
                 // PK fields must be autoincrement...
                 $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                // Get data
+                $val = $p_model->$getter();
                 if ($pk) {
                     // Get data
                     $pkField = $oneProperty[FFCST::PROPERTY_PRIVATE];
@@ -556,24 +566,30 @@ class PDOStorage extends \FreeFW\Storage\Storage
                             $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $sso->getBrokerId();
                         }
                         if ($usr) {
-                            $user = $sso->getUser();
-                            if ($user) {
-                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $user->getUserId();
+                            if (!$val) {
+                                $user = $sso->getUser();
+                                if ($user) {
+                                    $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $user->getUserId();
+                                } else {
+                                    $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = null;
+                                }
                             } else {
-                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = null;
+                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $val;
                             }
                         }
                         if ($grp) {
-                            $group = $sso->getBrokerGroup();
-                            if ($group) {
-                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $group->getGrpId();
+                            if (!$val) {
+                                $group = $sso->getBrokerGroup();
+                                if ($group) {
+                                    $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $group->getGrpId();
+                                } else {
+                                    $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = null;
+                                }
                             } else {
-                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = null;
+                                $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $val;
                             }
                         }
                     } else {
-                        // Get data
-                        $val = $p_model->$getter();
                         if ($val === false) {
                             $val = 0;
                         }
@@ -644,7 +660,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
             $query = $this->provider->prepare($sql, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
             if ($query->execute($fields)) {
                 if (method_exists($p_model, 'afterSave')) {
+                    $this->logger->debug('PDOStorage.afterSave');
                     if (!$p_model->afterSave()) {
+                        $this->logger->debug('PDOStorage.afterSave.error');
                         if ($p_with_transaction) {
                             $this->provider->rollbackTransaction();
                         }
@@ -680,7 +698,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 if ($p_with_transaction) {
                     $this->provider->rollbackTransaction();
                 }
-                $this->logger->debug('PDOStorage.save.error : ' . print_r($query->errorInfo(), true));
+                $this->logger->debug('PDOStorage.save.error : ' . $p_model->getSource() . ' ' . print_r($query->errorInfo(), true));
                 $localErr = $query->errorInfo();
                 $code     = 0;
                 $message  = 'PDOStorage.save.error : ' . print_r($query->errorInfo(), true);
@@ -694,7 +712,8 @@ class PDOStorage extends \FreeFW\Storage\Storage
             if ($p_with_transaction) {
                 $this->provider->rollbackTransaction();
             }
-            $this->logger->debug('PDOStorage.save.error : ' . print_r($query->errorInfo(), true));
+            $this->logger->debug('PDOStorage.save.error : ' . $p_model->getSource() . ' ' . print_r($query->errorInfo(), true));
+            $this->logger->debug('PDOStorage.save.error : ' . $ex->getMessage());
             $localErr = $query->errorInfo();
             $code     = 0;
             $message  = 'PDOStorage.save.error : ' . print_r($query->errorInfo(), true);
@@ -760,9 +779,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 }
                 if (in_array(FFCST::OPTION_GROUP_RESTRICTED, $property[FFCST::PROPERTY_OPTIONS])) {
                     $ssoGroup = $sso->getUserGroup();
-                    $restrictions = $this->getAppConfig()->get('restricted:group', []);
-                    if (in_array($p_model::getSource(), $restrictions)) {
-                        $whereBroker = ' AND ( ' . $crtAlias . '.' . $name . ' = ' . $ssoGroup->getGrpId() . ')';
+                    if ($ssoGroup) {
+                        $restrictions = $this->getAppConfig()->get('restricted:group', []);
+                        if (in_array($p_model::getSource(), $restrictions)) {
+                            $whereBroker = ' AND ( ' . $crtAlias . '.' . $name . ' = ' . $ssoGroup->getGrpId() . ')';
+                        }
                     }
                 }
             }
@@ -1417,6 +1438,18 @@ class PDOStorage extends \FreeFW\Storage\Storage
     }
 
     /**
+     * Return getSource du modèle précédé de son dbname
+     * @example `demo`.t_contrat
+     *
+     * @param \FreeFW\Core\StorageModel $p_model
+     * @return string
+     */
+    public function getFrom(&$p_model)
+    {
+        return $p_model::getSource();
+    }
+
+    /**
      * Render a model field
      *
      * @param string                    $p_field
@@ -1431,74 +1464,55 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $p_crtAlias = '@'
     ) {
         $alias = false;
-        if (isset($p_aliases[$p_crtAlias])) {
-            $alias = $p_aliases[$p_crtAlias];
-        }
         $parts = explode('.', $p_field);
         if (count($parts) > 1) {
-            $class = array_shift($parts);
-            if (count($parts) > 1) {
-                $class = array_shift($parts);
-                $field = $parts[0];
-                if (!isset(self::$models[$class])) {
-                    if (strpos($class, ':') === false) {
-                        self::$models[$class] = \FreeFW\DI\DI::get($class);
-                    } else {
-                        self::$models[$class] = \FreeFW\DI\DI::get($class);
-                    }
-                } else {
-                    if (strpos($class, ':') === false) {
-                        if (isset($p_aliases[$p_crtAlias . '.' . $class])) {
-                            $alias = $p_aliases[$p_crtAlias . '.' . $class];
-                        }
-                    }
-                }
-                $model      = self::$models[$class];
-                $source     = $model::getSource();
-                $properties = $model::getProperties();
-                if ($field == 'id') {
-                    $field = $model->getFieldNameByOption(FFCST::OPTION_PK);
-                }
-            } else {
-                $field = $parts[0];
-                if (!isset(self::$models[$class])) {
+            $field = array_pop($parts);
+            $class = $parts[count($parts)-1];
+            if (!isset(self::$models[$class])) {
+                try {
                     self::$models[$class] = \FreeFW\DI\DI::get($class);
-                } else {
-                    if (strpos($class, ':') === false) {
-                        if (isset($p_aliases[$p_crtAlias . '.' . $class])) {
-                            $alias = $p_aliases[$p_crtAlias . '.' . $class];
-                        }
-                    }
-                }
-                $model      = self::$models[$class];
-                $source     = $model::getSource();
-                $properties = $model::getProperties();
-                if ($field == 'id') {
-                    $field = $model->getFieldNameByOption(FFCST::OPTION_PK);
+                } catch (\Exception $e) {
+                    throw new \FreeFW\Core\FreeFWStorageException(sprintf('Unknown model : %s !', $class));
                 }
             }
+            $aliasKey = $p_crtAlias . (count($parts)>0 ? '.' . implode('.', $parts) : '');
+            if (isset($p_aliases[$aliasKey])) {
+                $alias = $p_aliases[$aliasKey];
+            }
+            $model      = self::$models[$class];
+            $source     = $model::getSource();
+            $properties = $model::getProperties();
+            // Convert id to ApiId
+            if ($field == 'id') {
+                $field = $model->getFieldNameByOption(FFCST::OPTION_PK);
+            }
         } else {
-            $source     = $p_model::getSource();
+            $source     = $this->getFrom($p_model);
             $properties = $p_model::getProperties();
             $field      = $parts[0];
+            // Convert id to ApiId
+            if ($field === 'id') {
+                $field = $p_model->getFieldNameByOption(FFCST::OPTION_PK);
+            }
         }
         if ($alias === false) {
-            $alias = $source;
+            if (isset($p_aliases[$p_crtAlias])) {
+                $alias = $p_aliases[$p_crtAlias]; // correspond à l'alias de la table dite 'principal'
+            } else {
+                $alias = $source;
+            }
         }
         $type     = \FreeFW\Constants::TYPE_STRING;
         $function = null;
-        if ($field == 'id') {
-            $field = $p_model->getFieldNameByOption(FFCST::OPTION_PK);
-        }
         if (isset($properties[$field])) {
             $fieldProperties = $properties[$field];
-            $type = $properties[$field][FFCST::PROPERTY_TYPE];
+            $type            = $properties[$field][FFCST::PROPERTY_TYPE];
             if (isset($fieldProperties[FFCST::PROPERTY_FUNCTION])) {
                 foreach ($fieldProperties[FFCST::PROPERTY_FUNCTION] as $fct => $orig) {
                     $fieldProperties2 = $properties[$orig];
-                    $real     = $alias . '.' . $fieldProperties2[FFCST::PROPERTY_PRIVATE];
-                    $type     = $fieldProperties2[FFCST::PROPERTY_TYPE];
-                    $function = $fct;
+                    $real             = $alias . '.' . $fieldProperties2[FFCST::PROPERTY_PRIVATE];
+                    $type             = $fieldProperties2[FFCST::PROPERTY_TYPE];
+                    $function         = $fct;
                     break;
                 }
             } else {
@@ -1506,9 +1520,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $type = $fieldProperties[FFCST::PROPERTY_TYPE];
             }
         } else {
-            throw new \FreeFW\Core\FreeFWStorageException(
-                sprintf('Unknown field : %s !', $p_field)
-            );
+            throw new \FreeFW\Core\FreeFWStorageException(sprintf('Unknown field : %s !', $p_field));
         }
         return [
             'id'    => $real,

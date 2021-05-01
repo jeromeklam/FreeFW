@@ -63,7 +63,7 @@ abstract class Email extends \FreeFW\Core\StorageModel
     protected static $PRP_EMAIL_BODY = [
         FFCST::PROPERTY_PRIVATE => 'email_body',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_HTML,
-        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED],
+        FFCST::PROPERTY_OPTIONS => [],
         FFCST::PROPERTY_COMMENT => 'Le contenu de l\'email, de préférence en html',
         FFCST::PROPERTY_SAMPLE  => '<p>Corps du mail</p>',
     ];
@@ -152,6 +152,24 @@ abstract class Email extends \FreeFW\Core\StorageModel
                 FFCST::INDEX_FIELDS => ['brk_id', 'lang_id', 'email_code'],
                 FFCST::INDEX_EXISTS => \FreeFW\Constants::ERROR_EMAIL_CODE_EXISTS
             ],
+        ];
+    }
+
+    /**
+     * Get One To many relationShips
+     *
+     * @return array
+     */
+    public function getRelationships()
+    {
+        return [
+            'versions' => [
+                FFCST::REL_MODEL   => 'FreeFW::Model::EmailLang',
+                FFCST::REL_FIELD   => 'email_id',
+                FFCST::REL_TYPE    => \FreeFW\Model\Query::JOIN_LEFT,
+                FFCST::REL_COMMENT => 'Les versions de l\'email',
+                FFCST::REL_REMOVE  => FFCST::REL_REMOVE_CASCADE
+            ]
         ];
     }
 }

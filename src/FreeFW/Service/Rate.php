@@ -16,10 +16,11 @@ class Rate extends \FreeFW\Core\Service
      */
     public function checkRates()
     {
+        $config = $this->getAppConfig();
+        $key    = $config->get('api:currency');
         $p_list = ['EUR', 'INR', 'IDR', 'CHF', 'GBP'];
         foreach ($p_list as $moneyFrom) {
-            $dest   = implode(',', $p_list);
-            $url    = 'https://api.exchangeratesapi.io/latest?symbols=' . $dest . '&base=' . $moneyFrom;
+            $url    = 'https://v6.exchangerate-api.com/v6/' . $key . '/latest/' . $moneyFrom;
             $curl   = curl_init();
             curl_setopt($curl, CURLOPT_URL, $url);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -27,16 +28,19 @@ class Rate extends \FreeFW\Core\Service
             $data = curl_exec($curl);
             curl_close($curl);
             $datas = json_decode($data, true);
-            if (array_key_exists('rates', $datas)) {
-                foreach ($datas['rates'] as $money => $mnt) {
-                    $rate = \FreeFW\DI\DI::get('FreeFW::Model::Rate');
-                    $rate
-                        ->setRateMoneyFrom($moneyFrom)
-                        ->setRateMoneyTo($money)
-                        ->setRateTs(\FreeFW\Tools\Date::stringToMysql($datas['date']))
-                        ->setRateChange($mnt)
-                    ;
-                    $rate->create();
+            if (array_key_exists('conversion_rates', $datas)) {
+                foreach ($datas['conversion_rates'] as $money => $mnt) {
+                    if (in_array($money, $p_list)) {
+                        $rate = \FreeFW\DI\DI::get('FreeFW::Model::Rate');
+                        $ts   = date('c', $datas['time_last_update_unix']);
+                        $rate
+                            ->setRateMoneyFrom($moneyFrom)
+                            ->setRateMoneyTo($money)
+                            ->setRateTs(\FreeFW\Tools\Date::stringToMysql($ts))
+                            ->setRateChange($mnt)
+                        ;
+                        $rate->create();
+                    }
                 }
             }
         }

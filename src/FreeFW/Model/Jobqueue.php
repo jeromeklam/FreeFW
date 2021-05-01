@@ -12,6 +12,12 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
 {
 
     /**
+     * Comportements
+     */
+    use \FreeSSO\Model\Behaviour\User;
+    use \FreeSSO\Model\Behaviour\Group;
+
+    /**
      * Types
      * @var string
      */
@@ -33,18 +39,6 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
      * @var bool
      */
     protected $no_history = true;
-
-    /**
-     * User
-     * @var \FreeSSO\Model\User
-     */
-    protected $user = null;
-
-    /**
-     * Group
-     * @var \FreeSSO\Model\Group
-     */
-    protected $group = null;
 
     /**
      * Report in cache...
@@ -72,52 +66,6 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
         if ($this->cache) {
             $this->saveLogs();
         }
-    }
-
-    /**
-     * Set user
-     *
-     * @param \FreeSSO\Model\User $p_user
-     *
-     * @return \FreeFW\Model\Jobqueue
-     */
-    public function setUser($p_user)
-    {
-        $this->user = $p_user;
-        return $this;
-    }
-
-    /**
-     * Get user
-     *
-     * @return \FreeSSO\Model\User
-     */
-    public function getuser()
-    {
-        return $this->user;
-    }
-
-    /**
-     * Set group
-     *
-     * @param \FreeSSO\Model\Group $p_group
-     *
-     * @return \FreeFW\Model\Jobqueue
-     */
-    public function setGroup($p_group)
-    {
-        $this->group = $p_group;
-        return $this;
-    }
-
-    /**
-     * Get group
-     *
-     * @return \FreeSSO\Model\Group
-     */
-    public function getGroup()
-    {
-        return $this->group;
     }
 
     /**
@@ -187,6 +135,8 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
      */
     public function run()
     {
+        $sso = \FreeFW\DI\DI::getShared('sso');
+        $grp = $sso->getUserGroup();
         try {
             $this
                 ->setJobqStatus(self::STATUS_PENDING)
@@ -206,7 +156,9 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
                         $params = [];
                     }
                     $service->setLogger($this);
+                    $sso->setGroup($this->getGroup());
                     $result = call_user_func_array([$service, $method], ['params' => $params]);
+                    $sso->setGroup($grp);
                     if ($result === false) {
                         $this
                             ->setJobqStatus(self::STATUS_ERROR)
@@ -239,6 +191,7 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
                 ;
             }
         } catch (\Exception $ex) {
+            $sso->setGroup($grp);
             if ($this->canContinue()) {
                 $this->setJobqStatus(self::STATUS_RETRY);
             } else {
@@ -397,5 +350,18 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
         ;
         $histo->create();
         return $this;
+    }
+
+    /**
+     *
+     * {@inheritDoc}
+     * @see \FreeFW\Model\Base\Jobqueue::getJobqLastReport()
+     */
+    public function getJobqLastReport()
+    {
+        if (is_array($this->jobq_last_report)) {
+            return implode("\n", $this->jobq_last_report);
+        }
+        return $this->jobq_last_report;
     }
 }
