@@ -136,6 +136,30 @@ abstract class Message extends \FreeFW\Model\StorageModel\Message
     protected $msg_reply_to = null;
 
     /**
+     * msg_pj1_name
+     * @var string
+     */
+    protected $msg_pj1_name = null;
+
+    /**
+     * msg_pj2_name
+     * @var string
+     */
+    protected $msg_pj2_name = null;
+
+    /**
+     * msg_pj3_name
+     * @var string
+     */
+    protected $msg_pj3_name = null;
+
+    /**
+     * msg_pj4_name
+     * @var string
+     */
+    protected $msg_pj4_name = null;
+
+    /**
      * Set msg_id
      *
      * @param int $p_value
@@ -616,5 +640,97 @@ abstract class Message extends \FreeFW\Model\StorageModel\Message
     public function getMsgReplyTo()
     {
         return $this->msg_reply_to;
+    }
+
+    /**
+     * Set pj1 name
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\Base\Message
+     */
+    public function setMsgPj1Name($p_value)
+    {
+        $this->msg_pj1_name = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get pj1 name
+     *
+     * @return string
+     */
+    public function getMsgPj1Name()
+    {
+        return $this->msg_pj1_name;
+    }
+
+    /**
+     * Set pj2 name
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\Base\Message
+     */
+    public function setMsgPj2Name($p_value)
+    {
+        $this->msg_pj2_name = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get pj2 name
+     *
+     * @return string
+     */
+    public function getMsgPj2Name()
+    {
+        return $this->msg_pj2_name;
+    }
+
+    /**
+     * Set pj3 name
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\Base\Message
+     */
+    public function setMsgPj3Name($p_value)
+    {
+        $this->msg_pj3_name = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get pj3 name
+     *
+     * @return string
+     */
+    public function getMsgPj3Name()
+    {
+        return $this->msg_pj3_name;
+    }
+
+    /**
+     * Set pj4 name
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\Base\Message
+     */
+    public function setMsgPj4Name($p_value)
+    {
+        $this->msg_pj4_name = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get pj4 name
+     *
+     * @return string
+     */
+    public function getMsgPj4Name()
+    {
+        return $this->msg_pj4_name;
     }
 }

@@ -9,7 +9,16 @@ namespace FreeFW\Service;
 class Edition extends \FreeFW\Core\Service
 {
 
-    public function printEdition($p_edi_id, $p_lang_id, $p_model)
+    /**
+     * Generate pdf
+     *
+     * @param int                $p_edi_id
+     * @param int                $p_lang_id
+     * @param \FreeFW\Core\Model $p_model
+     *
+     * @return string
+     */
+    public function printEdition($p_edi_id, $p_lang_id, \FreeFW\Core\Model $p_model)
     {
         $filename       = '';
         $editionVersion = null;
@@ -45,10 +54,16 @@ class Edition extends \FreeFW\Core\Service
                 ]
             );
             //
+            $cfg  = $this->getAppConfig();
+            $dir  = $cfg->get('ged:dir');
+            if (!is_dir($dir)) {
+                $dir = '/tmp/';
+            }
+            $bDir = rtrim(\FreeFW\Tools\Dir::mkStdFolder($dir), '/');
             $file = uniqid(true, 'edition');
-            $src  = '/tmp/print_' . $file . '_tpl.odt';
-            $dest = '/tmp/print_' . $file . '_dest.odt';
-            $dPdf = '/tmp/print_' . $file . '_dest.pdf';
+            $src  = $bDir . '/print_' . $file . '_tpl.odt';
+            $dest = $bDir . '/print_' . $file . '_dest.odt';
+            $dPdf = $bDir . '/print_' . $file . '_dest.pdf';
             $ediContent = $edition->getEdiContent();
             file_put_contents($src, $ediContent);
             file_put_contents($dest, $ediContent);
@@ -61,9 +76,7 @@ class Edition extends \FreeFW\Core\Service
             exec('/usr/bin/unoconv -f pdf -o ' . $dPdf . ' ' . $dest);
             @unlink($dest);
             @unlink($src);
-            if (is_file($dPdf)) {
-                $filename = $dPdf;
-            }
+            $filename = $dPdf;
         }
         return $filename;
     }

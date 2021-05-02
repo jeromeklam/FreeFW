@@ -17,6 +17,7 @@ class Console implements
     use \Psr\Log\LoggerAwareTrait;
     use \FreeFW\Behaviour\EventManagerAwareTrait;
     use \FreeFW\Behaviour\ConfigAwareTrait;
+    use \FreeFW\Behaviour\StorageListenerTrait;
 
     /**
      * Router

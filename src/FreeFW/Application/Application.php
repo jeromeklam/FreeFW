@@ -37,18 +37,6 @@ class Application extends \FreeFW\Core\Application
     }
 
     /**
-     * Array of modified objects
-     * @var array
-     */
-    protected $updates = [];
-
-    /**
-     * We are in transaction
-     * @var string
-     */
-    protected $in_transaction = 0;
-
-    /**
      * Get Application instance
      *
      * @param \FreeFW\Application\Config $p_config

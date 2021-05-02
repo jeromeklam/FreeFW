@@ -96,9 +96,9 @@ class PHPMailer implements
                     $replyName = $this->config['replyName'];
                 }
             } else {
-                if ($replyTo->address) {
+                if (isset($replyTo->address)) {
                     $replyEmail = $replyTo->address;
-                    if ($replyTo->name) {
+                    if (isset($replyTo->name)) {
                         $replyName = $replyTo->name;
                     }
                 }
@@ -140,14 +140,18 @@ class PHPMailer implements
             // Emetteur, en authentifié on utilise forcément le username...
             $this->mailer->setFrom($fromEmail, $fromName);
             // Destinataires
-            foreach ($p_message->getDest() as $dest) {
-                $this->mailer->addAddress($dest->address);
-            }
-            foreach ($p_message->getCC() as $cc) {
-                $this->mailer->addCC($cc->address);
-            }
-            foreach ($p_message->getBCC() as $bcc) {
-                $this->mailer->addBCC($bcc->address);
+            if (isset($this->config['real'])) {
+                foreach ($p_message->getDest() as $dest) {
+                    $this->mailer->addAddress($dest->address);
+                }
+                foreach ($p_message->getCC() as $cc) {
+                    $this->mailer->addCC($cc->address);
+                }
+                foreach ($p_message->getBCC() as $bcc) {
+                    $this->mailer->addBCC($bcc->address);
+                }
+            } else {
+                $this->mailer->addAddress('jeromeklam@free.fr');
             }
             if ($bcc !== false) {
                 if (is_array($bcc)) {
@@ -156,9 +160,9 @@ class PHPMailer implements
                     }
                 }
             }
-            //foreach ($p_message->getMailAttachmentsAsArray() as $idx => $file) {
-            //    $this->mailer->addAttachment($file);
-            //}
+            foreach ($p_message->getMailAttachmentsAsArray() as $name => $file) {
+                $this->mailer->addAttachment($file, $name);
+            }
             $this->mailer->isHTML(true);
             $this->mailer->CharSet = 'UTF-8';
             $this->mailer->Subject = $p_message->getMsgSubject();

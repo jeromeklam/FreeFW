@@ -33,6 +33,12 @@ class Message extends \FreeFW\Model\Base\Message
     const STATUS_ERROR   = 'ERROR';
 
     /**
+     * Prevent from saving history
+     * @var bool
+     */
+    protected $no_history = true;
+
+    /**
      * Add new dest
      *
      * @param string $p_address
@@ -202,6 +208,49 @@ class Message extends \FreeFW\Model\Base\Message
     public function getReplyTo()
     {
         return json_decode($this->msg_reply_to);
+    }
+
+    /**
+     * Get all pjs as attachment
+     *
+     * @return string[]
+     */
+    public function getMailAttachmentsAsArray()
+    {
+        $files = [];
+        $file  = $this->getMsgPj1();
+        if ($file && $file != '' && is_file($file)) {
+            $name = $this->getMsgPj1Name();
+            if ($name == '') {
+                $name = basename($file);
+            }
+            $files[$name] = $file;
+        }
+        $file  = $this->getMsgPj2();
+        if ($file && $file != '' && is_file($file)) {
+            $name = $this->getMsgPj2Name();
+            if ($name == '') {
+                $name = basename($file);
+            }
+            $files[$name] = $file;
+        }
+        $file  = $this->getMsgPj3();
+        if ($file && $file != '' && is_file($file)) {
+            $name = $this->getMsgPj3Name();
+            if ($name == '') {
+                $name = basename($file);
+            }
+            $files[$name] = $file;
+        }
+        $file  = $this->getMsgPj4();
+        if ($file && $file != '' && is_file($file)) {
+            $name = $this->getMsgPj4Name();
+            if ($name == '') {
+                $name = basename($file);
+            }
+            $files[$name] = $file;
+        }
+        return $files;
     }
 
     /**

@@ -16,6 +16,22 @@ class Dir
 {
 
     /**
+     * Get standard file path
+     *
+     * @param string $p_base_dir
+     *
+     * @return string
+     */
+    public static function mkStdFolder($p_base_dir = '/tmp')
+    {
+        $dir = rtrim($p_base_dir, '/') . '/' . date('Y') . '/' . date('m') . '/' . date('d') . '/';
+        if (self::mkpath($dir)) {
+            return $dir;
+        }
+        return '/tmp/';
+    }
+
+    /**
      * Création récursive d'un chemin
      *
      * @param string $path

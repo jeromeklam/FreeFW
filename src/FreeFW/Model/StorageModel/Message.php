@@ -180,6 +180,38 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_COMMENT => 'Informations de retour',
         FFCST::PROPERTY_SAMPLE  => '{"address":"support@test.fr","name":"Support"}',
     ];
+    protected static $PRP_MSG_PJ1_NAME = [
+        FFCST::PROPERTY_PRIVATE => 'msg_pj1_name',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Nom de la pj 1',
+        FFCST::PROPERTY_SAMPLE  => 'exemple.png',
+        FFCST::PROPERTY_MAX     => 80,
+    ];
+    protected static $PRP_MSG_PJ2_NAME = [
+        FFCST::PROPERTY_PRIVATE => 'msg_pj2_name',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Nom de la pj 2',
+        FFCST::PROPERTY_SAMPLE  => 'exemple.png',
+        FFCST::PROPERTY_MAX     => 80,
+    ];
+    protected static $PRP_MSG_PJ3_NAME = [
+        FFCST::PROPERTY_PRIVATE => 'msg_pj3_name',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Nom de la pj 3',
+        FFCST::PROPERTY_SAMPLE  => 'exemple.png',
+        FFCST::PROPERTY_MAX     => 80,
+    ];
+    protected static $PRP_MSG_PJ4_NAME = [
+        FFCST::PROPERTY_PRIVATE => 'msg_pj4_name',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Nom de la pj 4',
+        FFCST::PROPERTY_SAMPLE  => 'exemple.png',
+        FFCST::PROPERTY_MAX     => 80,
+    ];
 
     /**
      * get properties
@@ -209,7 +241,11 @@ abstract class Message extends \FreeFW\Core\StorageModel
             'msg_send_ts'     => self::$PRP_MSG_SEND_TS,
             'msg_send_error'  => self::$PRP_MSG_SEND_ERROR,
             'msg_from'        => self::$PRP_MSG_FROM,
-            'msg_reply_to'    => self::$PRP_MSG_REPLY_TO
+            'msg_reply_to'    => self::$PRP_MSG_REPLY_TO,
+            'msg_pj1_name'    => self::$PRP_MSG_PJ1_NAME,
+            'msg_pj2_name'    => self::$PRP_MSG_PJ2_NAME,
+            'msg_pj3_name'    => self::$PRP_MSG_PJ3_NAME,
+            'msg_pj4_name'    => self::$PRP_MSG_PJ4_NAME
         ];
     }
 
