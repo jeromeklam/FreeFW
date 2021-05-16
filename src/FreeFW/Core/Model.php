@@ -52,6 +52,12 @@ abstract class Model implements
     protected $__ts = null;
 
     /**
+     * Memory cache
+     * @var array
+     */
+    protected static $__cache = [];
+
+    /**
      * Constructor
      */
     public function __construct(
@@ -405,13 +411,14 @@ abstract class Model implements
                                     break;
                                 }
                             }
+                            /*
                             if (!$found) {
                                 $rel = \FreeFW\DI\DI::get($fk['model']);
                                 $rel->setApiId($id);
                                 $this->$setter($rel); $this->addUpdatedField($prp);
                                 $this->addUpdatedField($prp); // id first
                                 $this->addUpdatedField($relation['name']); // relation name too
-                            }
+                            }*/
                             // property
                             $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($test, true);
                             $this->$setter($id);
@@ -487,7 +494,8 @@ abstract class Model implements
      */
     public function getFieldNameByOption($p_option) : string
     {
-        foreach ($this->getProperties() as $name => $property) {
+        $description = $this->getModelDescription();
+        foreach ($description['properties'] as $name => $property) {
             if (isset($property[FFCST::PROPERTY_OPTIONS])) {
                 if (in_array($p_option, $property[FFCST::PROPERTY_OPTIONS])) {
                    return $name;
@@ -504,7 +512,8 @@ abstract class Model implements
      */
     public function getFieldName(string $p_field, $p_option=FFCST::PROPERTY_PUBLIC) : string
     {
-        $props = $this->getProperties();
+        $description = $this->getModelDescription();
+        $props       = $description['properties'];
         //
         switch ($p_option) {
             case FFCST::PROPERTY_PUBLIC:
@@ -514,9 +523,8 @@ abstract class Model implements
                     }
                 }
                 break;
-
             case FFCST::PROPERTY_PRIVATE:
-                foreach ($this->getProperties() as $name => $property) {
+                foreach ($props as $property) {
                     if (isset($property[FFCST::PROPERTY_PUBLIC])) {
                         if ($property[FFCST::PROPERTY_PUBLIC]==$p_field) {
                             return $property[FFCST::PROPERTY_PRIVATE];
@@ -535,7 +543,8 @@ abstract class Model implements
      */
     public function getApiId() : string
     {
-        foreach ($this->getProperties() as $name => $property) {
+        $description = $this->getModelDescription();
+        foreach ($description['properties'] as $name => $property) {
             if (isset($property[FFCST::PROPERTY_OPTIONS])) {
                 if (in_array(FFCST::OPTION_PK, $property[FFCST::PROPERTY_OPTIONS])) {
                     $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
@@ -552,7 +561,8 @@ abstract class Model implements
      */
     public function setApiId($p_id)
     {
-        foreach ($this->getProperties() as $name => $property) {
+        $description = $this->getModelDescription();
+        foreach ($description['properties'] as $name => $property) {
             if (isset($property[FFCST::PROPERTY_OPTIONS])) {
                 if (in_array(FFCST::OPTION_PK, $property[FFCST::PROPERTY_OPTIONS])) {
                     $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
@@ -710,10 +720,11 @@ abstract class Model implements
     public function getApiRelationShips() : array
     {
         $relations = [];
+        $description = $this->getModelDescription();
         /**
          * One to One, an attribute is the Foreign Key
          */
-        foreach ($this->getProperties() as $name => $property) {
+        foreach ($description['properties'] as $name => $property) {
             if (isset($property[FFCST::PROPERTY_FK])) {
                 foreach ($property[FFCST::PROPERTY_FK] as $nameP => $valueP) {
                     $oneRelation = new \FreeFW\JsonApi\V1\Model\RelationshipObject($nameP);
@@ -864,12 +875,19 @@ abstract class Model implements
     public static function getModelDescription()
     {
         $clsName = str_replace('\\', '_', get_called_class());
+        $key     = 'FreeFW.' . $clsName . '.properties';
+        /**
+         * First, maybe in memory ??
+         */
+        if (self::$__cache && isset(self::$__cache[$key])) {
+            return self::$__cache[$key];
+        }
         /**
          * @var \Psr\Cache\CacheItemPoolInterface $cache
          */
-        $cache   = \FreeFW\DI\DI::getShared('cache');
-        if ($cache && $cache->hasItem('FreeFW.' . $clsName . '.properties')) {
-            $item = $cache->getItem('FreeFW.' . $clsName . '.properties');
+        $cache = \FreeFW\DI\DI::getShared('cache');
+        if ($cache && $cache->hasItem($key)) {
+            $item = $cache->getItem($key);
             if ($item && $item->isHit()) {
                 return $item->get();
             }
@@ -890,10 +908,11 @@ abstract class Model implements
         }
         //
         if ($cache) {
-            $item = new \FreeFW\Cache\Item('FreeFW.' . $clsName . '.properties');
+            $item = new \FreeFW\Cache\Item($key);
             $item->set($description);
             $cache->save($item);
         }
+        self::$__cache[$key] = $description;
         return $description;
     }
     /**
@@ -963,7 +982,14 @@ abstract class Model implements
                             if ($value === FFCST::DEFAULT_CURRENT_GROUP) {
                                 $sso  = \FreeFW\DI\DI::getShared('sso');
                                 if ($sso) {
-                                    $group = $sso->getBrokerGroup();
+                                    $group = null;
+                                    $user = $sso->getUser();
+                                    if ($user) {
+                                        $group = $user->getDefaultGroup();
+                                    }
+                                    if ($group === null) {
+                                        $group = $sso->getBrokerGroup();
+                                    }
                                     if ($group) {
                                         $this->$setter($group->getGrpId());
                                         foreach ($oneProperty[FFCST::PROPERTY_FK] as $relName => $rel) {
@@ -1048,10 +1074,12 @@ abstract class Model implements
                 $required = $models[$class]['required'];
             }
         }
-        $props = $this->getProperties();
+        $description = $this->getModelDescription();
+        $props = $description['properties'];
         foreach ($props as $name => $oneProperty) {
             $options = [];
-            $getter  = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+            $getter  = $oneProperty[FFCST::PROPERTY_GETTER];
+            $setter  = $oneProperty[FFCST::PROPERTY_SETTER];
             $value   = $this->$getter();
             $public  = $name;
             if (isset($oneProperty[FFCST::PROPERTY_OPTIONS])) {

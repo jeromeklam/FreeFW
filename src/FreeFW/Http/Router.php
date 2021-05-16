@@ -164,6 +164,7 @@ class Router
             //$this->logger->debug('router.findRoute.request : ' . $requestUrl);
             foreach ($this->routes->getRoutes() as $idx => $oneRoute) {
                 //$this->logger->debug('router.findRoute.test : ' . $oneRoute->getUrl());
+                //var_dump($oneRoute->getUrl());
                 if (strtoupper($p_request->getMethod()) == strtoupper($oneRoute->getMethod())) {
                     if ($currentDir != '/') {
                         $requestUrl = str_replace($currentDir, '', $requestUrl);

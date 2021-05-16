@@ -58,7 +58,7 @@ $localRoutes = array_merge(
     $localRoutes,
     $routes_alert,
     $routes_alert_category,
-    $routes_automates,
+    $routes_automate,
     $routes_country,
     $routes_edition_lang,
     $routes_edition,

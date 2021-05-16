@@ -92,9 +92,6 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 if (in_array(FFCST::OPTION_GROUP, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $grp = true;
                 }
-                if (in_array(FFCST::OPTION_GROUP_RESTRICTED, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
-                    $grp = true;
-                }
                 if ($oneProperty[FFCST::PROPERTY_TYPE] == FFCST::TYPE_DATETIMETZ) {
                     $dtz = true;
                 }
@@ -538,10 +535,6 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     $grp = true;
                     $add = false;
                 }
-                if (in_array(FFCST::OPTION_GROUP_RESTRICTED, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
-                    $grp = true;
-                    $add = false;
-                }
                 if ($oneProperty[FFCST::PROPERTY_TYPE] == FFCST::TYPE_DATETIMETZ) {
                     $dtz = true;
                 }
@@ -765,26 +758,6 @@ class PDOStorage extends \FreeFW\Storage\Storage
             if (isset($property[FFCST::PROPERTY_OPTIONS])) {
                 if (in_array(FFCST::OPTION_PK, $property[FFCST::PROPERTY_OPTIONS])) {
                     $ids['@'] = $name;
-                }
-                //Ne fait pas partie des contraintes de lecture... Pou info pour savoir créé avec qu'elle appli
-                //if (in_array(FFCST::OPTION_BROKER, $property[FFCST::PROPERTY_OPTIONS])) {
-                    //$whereBroker = ' AND ( ' . $crtAlias . '.' . $name . ' = ' . $p_model->getMainBroker() . ')';
-                //}
-                // Le groupe est une restriction.
-                if (in_array(FFCST::OPTION_GROUP, $property[FFCST::PROPERTY_OPTIONS])) {
-                    $ssoGroup = $sso->getUserGroup();
-                    if ($ssoGroup) {
-                        $whereBroker = ' AND ( ' . $crtAlias . '.' . $name . ' = ' . $ssoGroup->getGrpId() . ')';
-                    }
-                }
-                if (in_array(FFCST::OPTION_GROUP_RESTRICTED, $property[FFCST::PROPERTY_OPTIONS])) {
-                    $ssoGroup = $sso->getUserGroup();
-                    if ($ssoGroup) {
-                        $restrictions = $this->getAppConfig()->get('restricted:group', []);
-                        if (in_array($p_model::getSource(), $restrictions)) {
-                            $whereBroker = ' AND ( ' . $crtAlias . '.' . $name . ' = ' . $ssoGroup->getGrpId() . ')';
-                        }
-                    }
                 }
             }
             if (isset($property[FFCST::PROPERTY_FK])) {
