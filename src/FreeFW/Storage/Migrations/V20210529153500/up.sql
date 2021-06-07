@@ -1,0 +1,1 @@
+ALTER TABLE `sys_automate` ADD COLUMN `auto_events` varchar(512) DEFAULT NULL;

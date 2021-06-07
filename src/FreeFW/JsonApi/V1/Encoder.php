@@ -35,8 +35,61 @@ class Encoder
             $p_api_response->getApiId(),
             $p_api_response->isSingleElement()
         );
-        $fields = $p_api_response->getApiAttributes();
+        $fieldsForeignkey = [];
+        $relations        = $p_api_response->getApiRelationShips();
+        $fields           = $p_api_response->getApiAttributes();
         if ($fields) {
+            $fldTab = $p_api_params->getFieldsFor(rtrim($p_prefix, '.'));
+            foreach ($fldTab as $oneFldTab) {
+                $jsonIgnore = false;
+                $allFields  = false;
+                switch($oneFldTab[0]) {
+                    case '-' :
+                        $jsonIgnore = true;
+                        $fldTab = substr($oneFldTab, 1);
+                        $allFields = (empty($fldTab));
+                        break;
+                    case '+' :
+                        $jsonIgnore = false;
+                        $fldTab = substr($oneFldTab, 1);
+                        if (empty($fldTab)) {
+                            continue 2;
+                        }
+                        break;
+                    default:
+                        $jsonIgnore = false;
+                        $fldTab = $oneFldTab;
+                        break;
+                }
+                $found = false;
+                foreach ($fields as $key => $field) {
+                    if ($allFields) {
+                        $found = true;
+                        if (self::isForeignkey($field->getName())) {
+                            $fieldsForeignkey[$field->getName()] = $jsonIgnore;
+                        } else {
+                            $field->setJsonIgnore($jsonIgnore);
+                        }
+                    } else {
+                        if ($p_prefix . $field->getName() === $p_prefix . $fldTab) {
+                            $found = true;
+                            if (self::isForeignkey($field->getName())) {
+                                $fieldsForeignkey[$field->getName()] = $jsonIgnore;
+                            } else {
+                                $field->setJsonIgnore($jsonIgnore);
+                            }
+                            break;
+                        }
+                    }
+                }
+                if (!$found) { // peut être qu'il s'agit du nom d'une relation !
+                    foreach ($relations as $relation) {
+                        if ($relation->getName() === $fldTab) {
+                            $fieldsForeignkey[$relation->getPropertyName()] = $jsonIgnore;
+                        }
+                    }
+                }
+            }
             $attributes = new \FreeFW\JsonApi\V1\Model\AttributesObject($fields);
             if (method_exists($p_api_response, 'getTs')) {
                 $tsAttribute = new \FreeFW\JsonApi\V1\Model\AttributeObject('__ts', $p_api_response->getTs());
@@ -44,7 +97,6 @@ class Encoder
             }
             $resource->setAttributes($attributes);
         }
-        $relations     = $p_api_response->getApiRelationShips();
         $relationShips = new \FreeFW\JsonApi\V1\Model\RelationshipsObject();
         if ($relations) {
             foreach ($relations as $relation) {
@@ -230,5 +282,16 @@ class Encoder
             }
         }
         return $document;
+    }
+
+    /**
+     * Foreign key ??
+     * @param string $p
+     *
+     * @return boolean
+     */
+    protected static function isForeignkey($p)
+    {
+        return (bool)(substr($p, -3) == '_id');
     }
 }

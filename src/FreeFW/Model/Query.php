@@ -395,9 +395,13 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
     /**
      * Execute
      *
+     * @param array  $p_fields
+     * @param string $p_function
+     * @param array  $p_parameters
+     *
      * @return boolean
      */
-    public function execute(array $p_fields = [], $p_function = null)
+    public function execute(array $p_fields = [], $p_function = null, $p_parameters = [])
     {
         $this->result_set = new \FreeFW\Model\ResultSet();
         switch ($this->type) {
@@ -439,7 +443,8 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
                     '',
                     $p_function,
                     [],
-                    'SELECT'
+                    'SELECT',
+                    $p_parameters
                 );
                 return true;
             case self::QUERY_UPDATE:

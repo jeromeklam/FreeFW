@@ -99,6 +99,29 @@ class AuthNegociator implements
     }
 
     /**
+     *
+     * @param ServerRequestInterface $p_request
+     */
+    public function beforeProcess(ServerRequestInterface $p_request)
+    {
+        $route = $p_request->getAttribute('route');
+        switch ($route->getAuth()) {
+            case \FreeFW\Router\Route::AUTH_BOTH:
+                $this->setSecured(true);
+                $this->setIdentityGeneration(true);
+                break;
+            case \FreeFW\Router\Route::AUTH_IN:
+                $this->setSecured(true);
+                break;
+            case \FreeFW\Router\Route::AUTH_OUT:
+                $this->setIdentityGeneration(true);
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
      * Process an incoming server request and return a response, optionally delegating
      * to the next middleware component to create the response.
      *
@@ -111,6 +134,7 @@ class AuthNegociator implements
         ServerRequestInterface $p_request,
         RequestHandlerInterface $p_handler
     ): ResponseInterface {
+        $this->beforeProcess($p_request);
         if ($this->secured || $this->requestIdentity()) {
             $authString = trim($p_request->getHeaderLine('Authorization'));
             $class      = false;

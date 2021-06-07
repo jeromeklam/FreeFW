@@ -246,6 +246,32 @@ class ApiParams
     }
 
     /**
+     *
+     * @param mixed $p_fields
+     *
+     * @return array[]|NULL[]
+     */
+    public function renderFields($p_fields)
+    {
+        $fields = [
+            'relations' => [],
+            'model' => []
+        ];
+        if (is_array($p_fields)) {
+            foreach ($p_fields as $key => $flds) {
+                if (is_int($key)) {
+                    $fields['model'] = array_merge($fields['model'], explode(',', str_replace(' ', '', $flds)));
+                } else {
+                    $fields['relations'][$key] = explode(',', str_replace(' ', '', $flds));
+                }
+            }
+        } else {
+            $fields['model'] = explode(',', str_replace(' ', '', $p_fields));
+        }
+        return $fields;
+    }
+
+    /**
      * Set fields
      *
      * @param string|array $p_fields
@@ -254,18 +280,8 @@ class ApiParams
      */
     public function setFields($p_fields)
     {
-        if (is_array($p_fields)) {
-            $this->fields = [];
-            foreach ($p_fields as $model => $fields) {
-                $this->fields[$model] = explode(',', $fields);
-            }
-        } else {
-            if ($p_fields != '') {
-                $this->fields = [];
-                $this->fields['BASE'] = explode(',', $p_fields);
-            }
-        }
-        return true;
+        $this->fields = $this->renderFields($p_fields);
+        return $this;
     }
 
     /**
@@ -275,5 +291,24 @@ class ApiParams
     public function getFields()
     {
         return $this->fields;
+    }
+
+    /**
+     * @return array of string
+     */
+    public function getFieldsFor($p_relation)
+    {
+        $fields = $this->getFields();
+        if ($p_relation === '') {
+            if (isset($fields['model'])) {
+                return $fields['model'];
+            }
+        }
+        if (isset($fields['relations'])) {
+            if (isset($fields[$p_relation])) {
+                return $fields[$p_relation];
+            }
+        }
+        return [];
     }
 }

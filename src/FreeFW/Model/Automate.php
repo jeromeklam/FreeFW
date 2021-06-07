@@ -14,6 +14,22 @@ class Automate extends \FreeFW\Model\Base\Automate
     use \FreeSSO\Model\Behaviour\Group;
 
     /**
+     * Run ?
+     *
+     * @param string $p_event
+     *
+     * @return boolean
+     */
+    public function runForEvent($p_event)
+    {
+        $events = explode(',', $this->getAutoEvents());
+        if (in_array($p_event, $events)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Run automate
      *
      * @param \FreeFW\Core\Model $p_model

@@ -57,6 +57,13 @@ abstract class EditionLang extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_COMMENT => '',
         FFCST::PROPERTY_SAMPLE  => '',
     ];
+    protected static $PRP_EDIL_FILENAME = [
+        FFCST::PROPERTY_PRIVATE => 'edil_filename',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Nom de l\'édition',
+        FFCST::PROPERTY_SAMPLE  => 'test.pdf',
+    ];
 
     /**
      * get properties
@@ -66,10 +73,11 @@ abstract class EditionLang extends \FreeFW\Core\StorageModel
     public static function getProperties()
     {
         return [
-            'edil_id'   => self::$PRP_EDIL_ID,
-            'edi_id'    => self::$PRP_EDI_ID,
-            'lang_id'   => self::$PRP_LANG_ID,
-            'edil_data' => self::$PRP_EDIL_DATA
+            'edil_id'       => self::$PRP_EDIL_ID,
+            'edi_id'        => self::$PRP_EDI_ID,
+            'lang_id'       => self::$PRP_LANG_ID,
+            'edil_data'     => self::$PRP_EDIL_DATA,
+            'edil_filename' => self::$PRP_EDIL_FILENAME,
         ];
     }
 

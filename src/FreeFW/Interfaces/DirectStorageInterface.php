@@ -27,23 +27,32 @@ interface DirectStorageInterface
     /**
      * Create an object
      *
-     * @return boolean
+     * @param bool $p_with_transaction
+     * @param bool $p_raw
+     *
+     * @return bool
      */
-    public function create();
+    public function create(bool $p_with_transaction = true, bool $p_raw = false) : bool;
 
     /**
      * Save an object
      *
-     * @return boolean
+     * @param bool $p_with_transaction
+     * @param bool $p_raw
+     *
+     * @return bool
      */
-    public function save();
+    public function save(bool $p_with_transaction = true, bool $p_raw = false) : bool;
 
     /**
      * Remove an object
      *
-     * @return boolean
+     * @param bool $p_with_transaction
+     * @param bool $p_raw
+     *
+     * @return bool
      */
-    public function remove();
+    public function remove(bool $p_with_transaction = true, bool $p_raw = false) : bool;
 
     /**
      * Find all objects

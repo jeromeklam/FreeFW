@@ -8,6 +8,7 @@ require_once(__DIR__ . '/edition.php');
 require_once(__DIR__ . '/email_lang.php');
 require_once(__DIR__ . '/email.php');
 require_once(__DIR__ . '/export.php');
+require_once(__DIR__ . '/inbox.php');
 require_once(__DIR__ . '/jobqueue.php');
 require_once(__DIR__ . '/history.php');
 require_once(__DIR__ . '/lang.php');
@@ -65,6 +66,7 @@ $localRoutes = array_merge(
     $routes_email_lang,
     $routes_email,
     $routes_export,
+    $routes_inbox,
     $routes_jobqueue,
     $routes_history,
     $routes_lang,

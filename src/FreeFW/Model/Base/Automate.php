@@ -58,6 +58,12 @@ abstract class Automate extends \FreeFW\Model\StorageModel\Automate
     protected $auto_params = null;
 
     /**
+     * Events
+     * @var string
+     */
+    protected $auto_events = null;
+
+    /**
      * Set auto_id
      *
      * @param int $p_value
@@ -239,5 +245,28 @@ abstract class Automate extends \FreeFW\Model\StorageModel\Automate
     public function getAutoParams()
     {
         return $this->auto_params;
+    }
+
+    /**
+     * Set auto_events
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\Base\Automate
+     */
+    public function setAutoEvents($p_value)
+    {
+        $this->auto_events = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get auto_events
+     *
+     * @return string
+     */
+    public function getAutoEvents()
+    {
+        return $this->auto_events;
     }
 }

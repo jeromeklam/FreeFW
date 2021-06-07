@@ -20,7 +20,11 @@ class Edition extends \FreeFW\Core\Service
      */
     public function printEdition($p_edi_id, $p_lang_id, \FreeFW\Core\Model $p_model)
     {
-        $filename       = '';
+        $filename = '';
+        $name     = '';
+        /**
+         * @var \FreeFW\Model\EditionLang $editionVersion
+         */
         $editionVersion = null;
         $edition        = \FreeFW\Model\Edition::findFirst(['edi_id' => $p_edi_id]);
         if ($edition instanceof \FreeFW\Model\Edition) {
@@ -40,6 +44,7 @@ class Edition extends \FreeFW\Core\Service
             }
         }
         if ($editionVersion) {
+            $name = $editionVersion->getEdilFilename();
             if (method_exists($p_model, 'afterRead')) {
                 $p_model->afterRead();
             }
@@ -78,6 +83,9 @@ class Edition extends \FreeFW\Core\Service
             @unlink($src);
             $filename = $dPdf;
         }
-        return $filename;
+        return [
+            'name' => $name,
+            'filename'  => $filename,
+        ];
     }
 }

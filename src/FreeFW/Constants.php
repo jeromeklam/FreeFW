@@ -81,6 +81,7 @@ class Constants
     const TYPE_RESULTSET          = 'RESULTSET';
     const TYPE_FILE               = 'FILE';
     const TYPE_HTML               = 'HTML';
+    const TYPE_IMAGE              = 'IMAGE';
 
     /**
      * Properties

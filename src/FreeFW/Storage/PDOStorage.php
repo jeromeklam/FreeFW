@@ -45,7 +45,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\StorageStrategyInterface::create()
      */
-    public function create(\FreeFW\Core\StorageModel &$p_model, bool $p_with_transaction = true) : bool
+    public function create(\FreeFW\Core\StorageModel &$p_model, bool $p_with_transaction = true, bool $p_raw = false) : bool
     {
         $fields     = [];
         $brkField   = '';
@@ -58,7 +58,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         if ($p_with_transaction) {
             $this->provider->startTransaction();
         }
-        if (method_exists($p_model, 'beforeCreate')) {
+        if (!$p_raw && method_exists($p_model, 'beforeCreate')) {
             if (!$p_model->beforeCreate()) {
                 if ($p_with_transaction) {
                     $this->provider->rollbackTransaction();
@@ -103,9 +103,13 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $val = $p_model->$getter();
                 // PK fields must be autoincrement...
                 if ($pk) {
-                    $fields[$oneProperty[FFCST::PROPERTY_PRIVATE]] = null;
                     // setter for id
                     $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                    if ($val) {
+                        $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $val;
+                    } else {
+                        $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = null;
+                    }
                 } else {
                     if ($sso && ($brk || $usr || $grp)) {
                         if ($brk) {
@@ -205,7 +209,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     $lastId = $this->provider->lastInsertId();
                     $p_model->$setter($lastId);
                 }
-                if (method_exists($p_model, 'afterCreate')) {
+                if (!$p_raw && method_exists($p_model, 'afterCreate')) {
                     if (!$p_model->afterCreate()) {
                         if ($p_with_transaction) {
                             $this->provider->rollbackTransaction();
@@ -327,7 +331,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\StorageStrategyInterface::remove()
      */
-    public function remove(\FreeFW\Core\StorageModel &$p_model, bool $p_with_transaction = true) : bool
+    public function remove(\FreeFW\Core\StorageModel &$p_model, bool $p_with_transaction = true, bool $p_raw = false) : bool
     {
         $fields     = [];
         $source     = $p_model::getSource();
@@ -349,6 +353,14 @@ class PDOStorage extends \FreeFW\Storage\Storage
         // @TODO : Error if no getter for PK
         if ($p_with_transaction) {
             $this->provider->startTransaction();
+        }
+        if (!$p_raw && method_exists($p_model, 'beforeRemove')) {
+            if (!$p_model->beforeRemove()) {
+                if ($p_with_transaction) {
+                    $this->provider->rollbackTransaction();
+                }
+                return false;
+            }
         }
         $next = true;
         try {
@@ -405,14 +417,6 @@ class PDOStorage extends \FreeFW\Storage\Storage
             }
             return false;
         }
-        if (method_exists($p_model, 'beforeRemove')) {
-            if (!$p_model->beforeRemove()) {
-                if ($p_with_transaction) {
-                    $this->provider->rollbackTransaction();
-                }
-                return false;
-            }
-        }
         // Build query
         $ok  = false;
         $sql = \FreeFW\Tools\Sql::makeDeleteQuery($source, $fields);
@@ -421,7 +425,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
             // Get PDO and execute
             $query = $this->provider->prepare($sql, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
             if ($query->execute($fields)) {
-                if (method_exists($p_model, 'afterRemove')) {
+                if (!$p_raw && method_exists($p_model, 'afterRemove')) {
                     if (!$p_model->afterRemove()) {
                         if ($p_with_transaction) {
                             $this->provider->rollbackTransaction();
@@ -484,7 +488,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\StorageInterface::save()
      */
-    public function save(\FreeFW\Core\StorageModel &$p_model, bool $p_with_transaction = true) : bool
+    public function save(\FreeFW\Core\StorageModel &$p_model, bool $p_with_transaction = true, bool $p_raw = false) : bool
     {
         $brkField   = '';
         $pkField    = '';
@@ -497,7 +501,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         if ($p_with_transaction) {
             $this->provider->startTransaction();
         }
-        if (method_exists($p_model, 'beforeSave')) {
+        if (!$p_raw && method_exists($p_model, 'beforeSave')) {
             if (!$p_model->beforeSave()) {
                 if ($p_with_transaction) {
                     $this->provider->rollbackTransaction();
@@ -652,7 +656,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
             // Get PDO and execute
             $query = $this->provider->prepare($sql, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
             if ($query->execute($fields)) {
-                if (method_exists($p_model, 'afterSave')) {
+                if (!$p_raw && method_exists($p_model, 'afterSave')) {
                     $this->logger->debug('PDOStorage.afterSave');
                     if (!$p_model->afterSave()) {
                         $this->logger->debug('PDOStorage.afterSave.error');
@@ -735,7 +739,8 @@ class PDOStorage extends \FreeFW\Storage\Storage
         string $p_force_select = '',
         $p_function = null,
         array $p_fields = [],
-        $p_special = 'SELECT'
+        $p_special = 'SELECT',
+        $p_parameters = []
     ) {
         $crtAlias     = 'A';
         $aliases      = [];
@@ -924,7 +929,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                         ;
                         if ($p_function) {
                             if (is_string($p_function) && method_exists($model, $p_function)) {
-                                $model->$p_function();
+                                call_user_func_array([$model, $p_function], $p_parameters);
                             } else {
                                 if (!$p_function($model)) {
                                     break;

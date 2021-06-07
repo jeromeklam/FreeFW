@@ -160,11 +160,16 @@ class ApiNegociator implements
                 // Ok, encode, decode, ...
                 $this->logger->debug(sprintf('FreeFW.Middleware.ApiNegociator %s', $class));
                 $mid       = \FreeFW\DI\DI::get($class);
-                $apiParams = $mid->decodeRequest($p_request);
-                $response  = $p_handler->handle($p_request->withAttribute('api_params', $apiParams));
+                $apiParams = $p_request->getAttribute('api_params', false);
+                if ($apiParams === false) {
+                    $apiParams = $mid->decodeRequest($p_request);
+                    $p_request = $p_request->withAttribute('api_params', $apiParams);
+                }
+                $response  = $p_handler->handle($p_request);
                 if ($response instanceof \FreeFW\Psr7\Response) {
                     return $response;
                 }
+                $apiParams = $p_request->getAttribute('api_params');
                 return $mid->encodeResponse(
                     $response, $apiParams
                 );

@@ -4,17 +4,15 @@ namespace FreeFW\Model;
 use \FreeFW\Constants as FFCST;
 
 /**
- * Model File
+ * Model Inbox
  *
  * @author jeromeklam
  */
-class File extends \FreeFW\Model\Base\File
+class Inbox extends \FreeFW\Model\Base\Inbox
 {
 
     /**
-     * Behaviour
+     * Comportements
      */
     use \FreeSSO\Model\Behaviour\User;
-    use \FreeSSO\Model\Behaviour\Broker;
-    use \FreeSSO\Model\Behaviour\Group;
 }

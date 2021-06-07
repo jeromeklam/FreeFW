@@ -33,6 +33,12 @@ class MergeModel {
     protected $fields = [];
 
     /**
+     * Types
+     * @var array
+     */
+    protected $types = [];
+
+    /**
      * Datas
      * @var array
      */
@@ -116,17 +122,19 @@ class MergeModel {
      *
      * @param string $p_name
      * @param string $p_title
+     * @param string $p_type
      *
      * @return \FreeFW\Model\MergeModel
      */
-    public function addField($p_name, $p_title = '')
+    public function addField($p_name, $p_title = '', $p_type = null)
     {
         $this->fields[] = $p_name;
         if ($p_title !== '') {
-            $this->titles[] = $p_title;
+            $this->titles[$p_name] = $p_title;
         } else {
-            $this->titles[] = $p_name;
+            $this->titles[$p_name] = $p_name;
         }
+        $this->types[$p_name] = $p_type;
         return $this;
     }
 
@@ -148,6 +156,46 @@ class MergeModel {
     public function getTitles()
     {
         return $this->titles;
+    }
+
+    /**
+     * Get title
+     *
+     * @param string $p_name
+     *
+     * @return boolean
+     */
+    public function getTitle($p_name)
+    {
+        if (isset($this->titles[$p_name])) {
+            return $this->titles[$p_name];
+        }
+        return false;
+    }
+
+    /**
+     * Get types
+     *
+     * @return array
+     */
+    public function getTypes()
+    {
+        return $this->types;
+    }
+
+    /**
+     * Get field type
+     *
+     * @param string $p_name
+     *
+     * @return boolean
+     */
+    public function getType($p_name)
+    {
+        if (isset($this->types[$p_name])) {
+            return $this->types[$p_name];
+        }
+        return false;
     }
 
     /**

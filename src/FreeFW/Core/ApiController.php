@@ -488,6 +488,7 @@ class ApiController extends \FreeFW\Core\Controller
         /**
          * Id
          */
+        $code = FFCST::ERROR_IN_DATA;
         if (intval($p_id) > 0) {
             $filters  = new \FreeFW\Model\Conditions();
             $pk_field = $model->getPkField();
@@ -524,9 +525,20 @@ class ApiController extends \FreeFW\Core\Controller
                 $sso        = \FreeFW\DI\DI::getShared('sso');
                 $user       = $sso->getUser();
                 // @todo : rechercher le groupe principal de l'utilisateur
-                $group      = \FreeSSO\Model\Group::findFirst(
+                $userBrk = \FreeSSO\Model\UserBroker::findFirst(
                     [
-                        'grp_id' => 4
+                        'user_id' => $user->GetUserId(),
+                        'brk_id'  => $sso->getBrokerId()
+                    ]
+                );
+                $userGrp = \FreeSSO\Model\Group::findFirst(
+                    [
+                        'grp_id' => $userBrk->getGrpId()
+                    ]
+                );
+                $group = \FreeSSO\Model\Group::findFirst(
+                    [
+                        'grp_id' => $userGrp->getGrpRealmId()
                     ]
                 );
                 //
@@ -559,6 +571,58 @@ class ApiController extends \FreeFW\Core\Controller
             $code = FFCST::ERROR_ID_IS_MANDATORY; // 409
         }
         $this->logger->info('FreeFW.ApiController.printOne.end');
-        return $this->createErrorResponse(FFCST::ERROR_IN_DATA);
+        return $this->createErrorResponse($code);
+    }
+
+    /**
+     * Export data
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $p_request
+     */
+    public function export(\Psr\Http\Message\ServerRequestInterface $p_request)
+    {
+        $this->logger->debug('FreeFW.ApiController.export.start');
+        /**
+         * @var \FreeFW\Http\ApiParams $apiParams
+         */
+        $apiParams = $p_request->getAttribute('api_params', false);
+        if (!isset($p_request->default_model)) {
+            throw new \FreeFW\Core\FreeFWStorageException(
+                sprintf('No default model for route !')
+            );
+        }
+        if (method_exists($this, 'adaptApiParams')) {
+            $apiParams = $this->adaptApiParams($apiParams, 'getAll');
+        }
+        /**
+         *
+         */
+        $print = $apiParams->getData();
+        if (!$print instanceof \FreeFW\Model\PrintOptions) {
+            $this->logger->info('FreeFW.ApiController.printOne.error.wrong_body');
+            return $this->createErrorResponse(FFCST::ERROR_IN_DATA);
+        }
+        /**
+         * Save for deferred action
+         */
+        $params = new \stdClass();
+        $params->model = $p_request->default_model;
+        $params->api = serialize($apiParams);
+        /**
+         *
+         * @var \FreeFW\Model\Jobqueue $jobqueue
+         */
+        $jobqueue = new \FreeFW\Model\Jobqueue();
+        $jobqueue
+            ->setJobqService('FreeFW::Service::Jobqueue')
+            ->setJobqMethod('deferredExport')
+            ->setJobqStatus(\FreeFW\Model\Jobqueue::STATUS_WAITING)
+            ->setJobqName('Demande d\'export')
+            ->setJobqType(\FreeFW\Model\Jobqueue::TYPE_ONCE)
+            ->setJobqParams(json_encode($params))
+        ;
+        $jobqueue->create();
+        $this->logger->debug('FreeFW.ApiController.export.end');
+        return $this->createSuccessAddResponse($jobqueue);
     }
 }

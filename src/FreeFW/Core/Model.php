@@ -119,15 +119,19 @@ abstract class Model implements
     public function merge(\FreeFW\Core\Model $p_model, $p_only_updated = true, $p_update_id = false)
     {
         if (get_class($this) == get_class($p_model)) {
+            if (method_exists($this, 'getRelationships')) {
+                foreach ($this->getRelationships() as $relName => $relation) {
+                    if (!$p_only_updated || $p_model->hasBeenUpdated($relName)) {
+                        $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($relName, true);
+                        $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relName, true);
+                        $this->{$setter}($p_model->{$getter}());
+                    }
+                }
+            }
             foreach ($this->getProperties() as $name => $property) {
                 $options = [];
                 if (isset($property[FFCST::PROPERTY_OPTIONS])) {
                     $options = $property[FFCST::PROPERTY_OPTIONS];
-                }
-                if (!$p_only_updated || $p_model->hasBeenUpdated($name)) {
-                    $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
-                    $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
-                    $this->$setter($p_model->$getter());
                 }
                 if (in_array(FFCST::OPTION_FK, $options)) {
                     foreach ($property[FFCST::PROPERTY_FK] as $fkName => $relation) {
@@ -138,14 +142,10 @@ abstract class Model implements
                         }
                     }
                 }
-            }
-            if (method_exists($this, 'getRelationships')) {
-                foreach ($this->getRelationships() as $relName => $relation) {
-                    if (!$p_only_updated || $p_model->hasBeenUpdated($relName)) {
-                        $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($relName, true);
-                        $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relName, true);
-                        $this->{$setter}($p_model->{$getter}());
-                    }
+                if (!$p_only_updated || $p_model->hasBeenUpdated($name)) {
+                    $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                    $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
+                    $this->$setter($p_model->$getter());
                 }
             }
         }
@@ -349,7 +349,7 @@ abstract class Model implements
                     $test = $property[FFCST::PROPERTY_PUBLIC];
                 }
                 if ($test == $name) {
-                    if (!in_array(FFCST::OPTION_LOCAL, $property[FFCST::PROPERTY_OPTIONS])) {
+                    //if (!in_array(FFCST::OPTION_LOCAL, $property[FFCST::PROPERTY_OPTIONS])) {
                         $this->addUpdatedField($prp);
                         $type   = $property[FFCST::PROPERTY_TYPE];
                         $setter = $property[FFCST::PROPERTY_SETTER];
@@ -366,7 +366,7 @@ abstract class Model implements
                                 $this->$setter($value);
                                 break;
                         }
-                    }
+                    //}
                     break;
                 }
             }
@@ -420,6 +420,7 @@ abstract class Model implements
                                 $this->addUpdatedField($relation['name']); // relation name too
                             }*/
                             // property
+                            $this->addUpdatedField($test);
                             $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($test, true);
                             $this->$setter($id);
                             $foundRel = true;
@@ -934,7 +935,7 @@ abstract class Model implements
                 $defaults = $models[$class]['default'];
             }
         }
-        $cfg   = $this->getAppConfig();
+        $cfg = $this->getAppConfig();
         foreach ($props as $name => $oneProperty) {
             $options = [];
             $pk      = false;
@@ -1233,11 +1234,7 @@ abstract class Model implements
             $block = $p_prefix;
         }
         $datas->addBlock($block);
-        $orig = [];
-        if (method_exists($this, 'getSpecificEditionFields')) {
-            $orig = $this->getSpecificEditionFields();
-        }
-        $data = $this->getFieldsAsArray($orig);
+        $data = $this->getFieldsAsArray();
         foreach ($this->getProperties() as $name => $oneProperty) {
             $title = $oneProperty[FFCST::PROPERTY_PRIVATE];
             if (isset($oneProperty[FFCST::PROPERTY_PUBLIC])) {
@@ -1286,10 +1283,27 @@ abstract class Model implements
                 }
             }
         }
+        $specific = [];
+        if (method_exists($this, 'getSpecificEditionFields')) {
+            $specific = $this->getSpecificEditionFields();
+            foreach ($specific as $specField) {
+                $datas->addField($specField['name'], $specField['title'], $specField['type']);
+                $data[$specField['name']] = $specField['content'];
+            }
+        }
         $datas->addData($data, $block);
         if (method_exists($this, 'beforeMerge')) {
             $datas = $this->beforeMerge($datas, $block);
         }
         return $datas;
+    }
+
+    /**
+     *
+     */
+    public function exportAsSheet($p_sheet)
+    {
+        $p_sheet->addLine($this->getMergeData());
+        return true;
     }
 }

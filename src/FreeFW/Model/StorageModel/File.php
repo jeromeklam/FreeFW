@@ -33,11 +33,12 @@ abstract class File extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'grp_id',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
         FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED, FFCST::OPTION_FK],
+        FFCST::PROPERTY_DEFAULT => FFCST::DEFAULT_CURRENT_GROUP,
         FFCST::PROPERTY_COMMENT => '',
         FFCST::PROPERTY_SAMPLE  => 123,
-        FFCST::PROPERTY_FK      => ['grp_id' => 
+        FFCST::PROPERTY_FK      => ['group' =>
             [
-                FFCST::FOREIGN_MODEL => 'NS::Model::ModelName',
+                FFCST::FOREIGN_MODEL => 'FreeFW::Model::Group',
                 FFCST::FOREIGN_FIELD => 'grp_id',
                 FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT,
             ]
@@ -47,11 +48,12 @@ abstract class File extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'user_id',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
         FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED, FFCST::OPTION_FK],
+        FFCST::PROPERTY_DEFAULT => FFCST::DEFAULT_CURRENT_USER,
         FFCST::PROPERTY_COMMENT => '',
         FFCST::PROPERTY_SAMPLE  => 123,
-        FFCST::PROPERTY_FK      => ['user_id' => 
+        FFCST::PROPERTY_FK      => ['user' =>
             [
-                FFCST::FOREIGN_MODEL => 'NS::Model::ModelName',
+                FFCST::FOREIGN_MODEL => 'FreeFW::Model::User',
                 FFCST::FOREIGN_FIELD => 'user_id',
                 FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT,
             ]
@@ -63,9 +65,9 @@ abstract class File extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_FK],
         FFCST::PROPERTY_COMMENT => '',
         FFCST::PROPERTY_SAMPLE  => 123,
-        FFCST::PROPERTY_FK      => ['lang_id' => 
+        FFCST::PROPERTY_FK      => ['lang_id' =>
             [
-                FFCST::FOREIGN_MODEL => 'NS::Model::ModelName',
+                FFCST::FOREIGN_MODEL => 'FreeFW::Model::Lang',
                 FFCST::FOREIGN_FIELD => 'lang_id',
                 FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT,
             ]
@@ -75,6 +77,7 @@ abstract class File extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'file_ts',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_DATETIMETZ,
         FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED],
+        FFCST::PROPERTY_DEFAULT => FFCST::DEFAULT_NOW,
         FFCST::PROPERTY_COMMENT => '',
         FFCST::PROPERTY_SAMPLE  => '',
     ];
@@ -84,9 +87,9 @@ abstract class File extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_FK],
         FFCST::PROPERTY_COMMENT => '',
         FFCST::PROPERTY_SAMPLE  => 123,
-        FFCST::PROPERTY_FK      => ['parent_file_id' => 
+        FFCST::PROPERTY_FK      => ['parent_file' =>
             [
-                FFCST::FOREIGN_MODEL => 'NS::Model::ModelName',
+                FFCST::FOREIGN_MODEL => 'FreeFW::Model::File',
                 FFCST::FOREIGN_FIELD => 'parent_file_id',
                 FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT,
             ]
@@ -121,9 +124,9 @@ abstract class File extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_FK],
         FFCST::PROPERTY_COMMENT => '',
         FFCST::PROPERTY_SAMPLE  => 123,
-        FFCST::PROPERTY_FK      => ['edi_id' => 
+        FFCST::PROPERTY_FK      => ['edition' =>
             [
-                FFCST::FOREIGN_MODEL => 'NS::Model::ModelName',
+                FFCST::FOREIGN_MODEL => 'FreeFW::Model::Edition',
                 FFCST::FOREIGN_FIELD => 'edi_id',
                 FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT,
             ]
@@ -140,16 +143,9 @@ abstract class File extends \FreeFW\Core\StorageModel
     protected static $PRP_FILE_OBJECT_ID = [
         FFCST::PROPERTY_PRIVATE => 'file_object_id',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
-        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_FK],
+        FFCST::PROPERTY_OPTIONS => [],
         FFCST::PROPERTY_COMMENT => '',
         FFCST::PROPERTY_SAMPLE  => 123,
-        FFCST::PROPERTY_FK      => ['file_object_id' => 
-            [
-                FFCST::FOREIGN_MODEL => 'NS::Model::ModelName',
-                FFCST::FOREIGN_FIELD => 'file_object_id',
-                FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT,
-            ]
-        ],
     ];
 
     /**

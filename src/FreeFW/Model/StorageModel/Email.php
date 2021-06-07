@@ -91,6 +91,58 @@ abstract class Email extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_SAMPLE  => 'support@test.fr',
         FFCST::PROPERTY_MAX     => 255,
     ];
+    protected static $PRP_EMAIL_EDI1_ID = [
+        FFCST::PROPERTY_PRIVATE => 'email_edi1_id',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
+        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_FK],
+        FFCST::PROPERTY_COMMENT => '',
+        FFCST::PROPERTY_SAMPLE  => 123,
+        FFCST::PROPERTY_FK      => ['edition1' =>
+            [
+                FFCST::FOREIGN_MODEL => 'FreeFW::Model::Edition',
+                FFCST::FOREIGN_FIELD => 'edi_id',
+                FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT,
+            ]
+        ],
+    ];
+    protected static $PRP_EMAIL_EDI1_OBJECT = [
+        FFCST::PROPERTY_PRIVATE => 'email_edi1_object',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Object de l\'édition',
+        FFCST::PROPERTY_SAMPLE  => 'donation',
+        FFCST::PROPERTY_MAX     => 80,
+    ];
+    protected static $PRP_EMAIL_EDI2_ID = [
+        FFCST::PROPERTY_PRIVATE => 'email_edi2_id',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
+        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_FK],
+        FFCST::PROPERTY_COMMENT => '',
+        FFCST::PROPERTY_SAMPLE  => 123,
+        FFCST::PROPERTY_FK      => ['edition2' =>
+            [
+                FFCST::FOREIGN_MODEL => 'FreeFW::Model::Edition',
+                FFCST::FOREIGN_FIELD => 'edi_id',
+                FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT,
+            ]
+        ],
+    ];
+    protected static $PRP_EMAIL_EDI2_OBJECT = [
+        FFCST::PROPERTY_PRIVATE => 'email_edi2_object',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Object de l\'édition',
+        FFCST::PROPERTY_SAMPLE  => 'donation',
+        FFCST::PROPERTY_MAX     => 80,
+    ];
+    protected static $PRP_EMAIL_OBJECT_NAME = [
+        FFCST::PROPERTY_PRIVATE => 'email_object_name',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Object de l\'email',
+        FFCST::PROPERTY_SAMPLE  => 'FreeFW_User',
+        FFCST::PROPERTY_MAX     => 80,
+    ];
 
     /**
      * get properties
@@ -100,15 +152,20 @@ abstract class Email extends \FreeFW\Core\StorageModel
     public static function getProperties()
     {
         return [
-            'email_id'        => self::$PRP_EMAIL_ID,
-            'brk_id'          => self::$PRP_BRK_ID,
-            'lang_id'         => self::$PRP_LANG_ID,
-            'email_code'      => self::$PRP_EMAIL_CODE,
-            'email_subject'   => self::$PRP_EMAIL_SUBJECT,
-            'email_body'      => self::$PRP_EMAIL_BODY,
-            'email_from'      => self::$PRP_EMAIL_FROM,
-            'email_from_name' => self::$PRP_EMAIL_FROM_NAME,
-            'email_reply_to'  => self::$PRP_EMAIL_REPLY_TO
+            'email_id'          => self::$PRP_EMAIL_ID,
+            'brk_id'            => self::$PRP_BRK_ID,
+            'lang_id'           => self::$PRP_LANG_ID,
+            'email_code'        => self::$PRP_EMAIL_CODE,
+            'email_subject'     => self::$PRP_EMAIL_SUBJECT,
+            'email_body'        => self::$PRP_EMAIL_BODY,
+            'email_from'        => self::$PRP_EMAIL_FROM,
+            'email_from_name'   => self::$PRP_EMAIL_FROM_NAME,
+            'email_reply_to'    => self::$PRP_EMAIL_REPLY_TO,
+            'email_edi1_id'     => self::$PRP_EMAIL_EDI1_ID,
+            'email_edi1_object' => self::$PRP_EMAIL_EDI1_OBJECT,
+            'email_edi2_id'     => self::$PRP_EMAIL_EDI2_ID,
+            'email_edi2_object' => self::$PRP_EMAIL_EDI2_OBJECT,
+            'email_object_name' => self::$PRP_EMAIL_OBJECT_NAME,
         ];
     }
 

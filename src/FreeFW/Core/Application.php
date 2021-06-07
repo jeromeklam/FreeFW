@@ -160,16 +160,17 @@ class Application implements
                     } catch (\Exception $ex) {
                         $this->getLogger()->error($ex->getMessage());
                     }
+                } else {
+                    $this->getLogger()->info("FreeFW.Application.initCacheServer.cache.file");
+                    $dir = null;
+                    if (isset($myCacheCfg['arg0'])) {
+                        $dir = $myCacheCfg['arg0'];
+                    }
+                    $cache = \FreeFW\Cache\CacheFactory::make(\FreeFW\Cache\CacheFactory::FILE, $dir);
+                    \FreeFW\DI\DI::setShared('cache', $cache);
                 }
             }
         }
-        $this->getLogger()->info("FreeFW.Application.initCacheServer.cache.file");
-        $dir = null;
-        if (isset($myCacheCfg['arg0'])) {
-            $dir = $myCacheCfg['arg0'];
-        }
-        $cache = \FreeFW\Cache\CacheFactory::make(\FreeFW\Cache\CacheFactory::FILE, $dir);
-        \FreeFW\DI\DI::setShared('cache', $cache);
         return true;
     }
 }

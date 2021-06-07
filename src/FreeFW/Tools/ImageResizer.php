@@ -81,7 +81,7 @@ class ImageResizer
                 // set new width and height for image, maybe it has changed
                 $this->original_w = ImageSX($this->source_image);
                 $this->original_h = ImageSY($this->source_image);
-                
+
                 break;
             case IMAGETYPE_PNG:
                 $this->source_image = imagecreatefrompng($filename);
@@ -90,7 +90,7 @@ class ImageResizer
                 throw new \Exception('Unsupported image type');
                 break;
         }
-        
+
         return $this->resize($this->getSourceWidth(), $this->getSourceHeight());
     }
 
@@ -104,7 +104,11 @@ class ImageResizer
     public function imageCreateJpegfromExif($filename)
     {
         $img  = imagecreatefromjpeg($filename);
-        $exif = exif_read_data($filename);
+        try {
+            $exif = @exif_read_data($filename);
+        } catch (\Exception $ex) {
+            $exif = false;
+        }
         if (!$exif || !isset($exif['Orientation'])) {
             return $img;
         }
@@ -119,7 +123,7 @@ class ImageResizer
         if ($orientation === 5 || $orientation === 4 || $orientation === 7) {
             imageflip($img, IMG_FLIP_HORIZONTAL);
         }
-        
+
         return $img;
     }
 
@@ -217,7 +221,7 @@ class ImageResizer
         $this->save($string_temp, $image_type, $quality);
         $string = file_get_contents($string_temp);
         unlink($string_temp);
-        
+
         return $string;
     }
 
@@ -259,7 +263,7 @@ class ImageResizer
         $ratio = $height / $this->getSourceHeight();
         $width = $this->getSourceWidth() * $ratio;
         $this->resize($width, $height, $allow_enlarge);
-        
+
         return $this;
     }
 
@@ -276,7 +280,7 @@ class ImageResizer
         $ratio  = $width / $this->getSourceWidth();
         $height = $this->getSourceHeight() * $ratio;
         $this->resize($width, $height, $allow_enlarge);
-        
+
         return $this;
     }
 
@@ -303,11 +307,11 @@ class ImageResizer
             $height = $max_height;
             $width  = $height / $ratio;
         }
-        
+
         if ($allow_centered) {
             return $this->resizeCentered($max_width, $max_height, $width, $height, $allow_enlarge);
         }
-        
+
         return $this->resize($width, $height, $allow_enlarge);
     }
 
@@ -355,7 +359,7 @@ class ImageResizer
         }
         return $this;
     }
-    
+
     /**
      * Redimension aux dimensions
      *
@@ -384,7 +388,7 @@ class ImageResizer
         $this->dest_h   = $height;
         $this->source_w = $this->getSourceWidth();
         $this->source_h = $this->getSourceHeight();
-        
+
         return $this;
     }
 
@@ -426,7 +430,7 @@ class ImageResizer
             $this->source_y = $this->getCropPosition($excess_height, $position);
             $this->dest_h   = $height;
         }
-        
+
         return $this;
     }
 
@@ -491,7 +495,7 @@ class ImageResizer
                 $size = $expectedSize / 2;
                 break;
         }
-        
+
         return $size;
     }
 }

@@ -295,4 +295,32 @@ class Message extends \FreeFW\Model\Base\Message
             ;
         }
     }
+
+    /**
+     * Add attachment
+     *
+     * @param string $p_filename
+     * @param string $p_name
+     *
+     * @return \FreeFW\Model\Message
+     */
+    public function addAttachment($p_filename, $p_name)
+    {
+        if (!$this->getMsgPj1()) {
+            $this->setMsgPj1Name($p_name)->setMsgPj1($p_filename);
+        } else {
+            if (!$this->getMsgPj2()) {
+                $this->setMsgPj2Name($p_name)->setMsgPj2($p_filename);
+            } else {
+                if (!$this->getMsgPj3()) {
+                    $this->setMsgPj3Name($p_name)->setMsgPj3($p_filename);
+                } else {
+                    if (!$this->getMsgPj4()) {
+                        $this->setMsgPj4Name($p_name)->setMsgPj4($p_filename);
+                    }
+                }
+            }
+        }
+        return $this;
+    }
 }
