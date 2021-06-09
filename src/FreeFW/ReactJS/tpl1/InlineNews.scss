@@ -1,0 +1,24 @@
+@import '../../styles/mixins';
+
+.cause-inline-news {
+  .col-toolbar {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+  .flag-btn:hover {
+    cursor: pointer;
+  }
+}
+
+.site-text-title {
+  font-weight: bold;
+}
+.site-text-sample {
+  margin-left: 10px;
+  margin-right: 10px;
+  p {
+    margin: 0 0 10px;
+    line-height: normal;
+  }
+  line-height: normal;
+}

@@ -1,0 +1,12 @@
+@import '../../styles/mixins';
+
+.cause-inline-photos {
+  svg.inline-action:hover {
+    cursor: pointer;
+    color: theme-color('secondary-light');
+    fill: theme-color('secondary-light');
+    path {
+      fill: theme-color('secondary-light') !important;
+    }
+  }
+}

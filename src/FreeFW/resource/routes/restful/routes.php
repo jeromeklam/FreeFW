@@ -54,6 +54,18 @@ $localRoutes = [
         FFCSTRT::ROUTE_INCLUDE    => [],
         FFCSTRT::ROUTE_SCOPE      => ['ROOT'],
     ],
+    'pofw.model.reactjs' => [
+        FFCSTRT::ROUTE_COLLECTION => 'FreeFW/Core/Model',
+        FFCSTRT::ROUTE_COMMENT    => 'Génération de la feature ReactJS',
+        FFCSTRT::ROUTE_METHOD     => \FreeFW\Router\Route::METHOD_POST,
+        FFCSTRT::ROUTE_URL        => '/v1/dev/model/reactjs',
+        FFCSTRT::ROUTE_CONTROLLER => 'FreeFW::Controller::Model',
+        FFCSTRT::ROUTE_FUNCTION   => 'reactjsModel',
+        FFCSTRT::ROUTE_AUTH       => \FreeFW\Router\Route::AUTH_NONE,
+        FFCSTRT::ROUTE_MIDDLEWARE => [],
+        FFCSTRT::ROUTE_INCLUDE    => [],
+        FFCSTRT::ROUTE_SCOPE      => ['ROOT'],
+    ],
 ];
 $localRoutes = array_merge(
     $localRoutes,
