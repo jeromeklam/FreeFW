@@ -26,7 +26,7 @@ class Model extends \FreeFW\Core\Service
          */
         $schema = \FreeFW\DI\DI::get('\FreeFW\OpenApi\V3\Schema');
         $schema->setType(\FreeFW\OpenApi\V3\Schema::TYPE_OBJECT);
-        foreach ($p_model->getProperties() as $propName => $propValue) {
+        foreach ($p_model->getModelDescriptionProperties() as $propName => $propValue) {
             /**
              * @var \FreeFW\OpenApi\V3\Schema $property
              */

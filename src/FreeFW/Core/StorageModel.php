@@ -266,7 +266,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
             $fields    = [];
             $relations = [];
             $setters   = [];
-            $infos['properties'] = $this->getProperties();
+            $infos['properties'] = $this->getModelDescriptionProperties();
             foreach ($infos['properties'] as $key => $prop) {
                 $fields[$prop[FFCST::PROPERTY_PRIVATE]] = $key;
                 if (isset($prop[FFCST::PROPERTY_OPTIONS]) && in_array(FFCST::OPTION_FK, $prop[FFCST::PROPERTY_OPTIONS])) {
@@ -522,7 +522,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
      */
     public function getPkGetter() : string
     {
-        foreach ($this->getProperties() as $name => $property) {
+        foreach ($this->getModelDescriptionProperties() as $name => $property) {
             if (isset($property[FFCST::PROPERTY_OPTIONS])) {
                 if (in_array(FFCST::OPTION_PK, $property[FFCST::PROPERTY_OPTIONS])) {
                     $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
@@ -540,7 +540,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
      */
     public function getPkField() : string
     {
-        foreach ($this->getProperties() as $name => $property) {
+        foreach ($this->getModelDescriptionProperties() as $name => $property) {
             if (isset($property[FFCST::PROPERTY_OPTIONS])) {
                 if (in_array(FFCST::OPTION_PK, $property[FFCST::PROPERTY_OPTIONS])) {
                     return $name;
@@ -572,7 +572,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
                 array_push($check, $oneField->getFldName());
             }
         }
-        foreach ($this->getProperties() as $name => $property) {
+        foreach ($this->getModelDescriptionProperties() as $name => $property) {
             if (isset($property[FFCST::PROPERTY_OPTIONS]) &&
                 in_array(FFCST::OPTION_LOCAL, $property[FFCST::PROPERTY_OPTIONS])) {
                 continue;
@@ -627,7 +627,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
                 array_push($check, $oneField->getFldName());
             }
         }
-        foreach ($this->getProperties() as $name => $property) {
+        foreach ($this->getModelDescriptionProperties() as $name => $property) {
             if (isset($property[FFCST::PROPERTY_OPTIONS]) &&
                 in_array(FFCST::OPTION_LOCAL, $property[FFCST::PROPERTY_OPTIONS])) {
                 continue;

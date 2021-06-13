@@ -23,32 +23,45 @@ class Application extends \FreeFW\Core\Application
     protected static $instance = null;
 
     /**
+     * Middlewares
+     * @var array
+     */
+    protected $middleware = [];
+
+    /**
      * Constructor
      *
      * @param \FreeFW\Application\Config $p_config
+     * @param \Psr\Log\LoggerInterface   $p_logger
+     * @param array                      $p_middleware
      */
     protected function __construct(
         \FreeFW\Application\Config $p_config,
-        \Psr\Log\LoggerInterface $p_logger
+        \Psr\Log\LoggerInterface $p_logger,
+        array $p_middleware = []
     ) {
         parent::__construct($p_config, $p_logger);
         \FreeFW\DI\DI::setShared('config', $p_config);
         \FreeFW\DI\DI::setShared('logger', $p_logger);
+        $this->middleware = $p_middleware;
     }
 
     /**
      * Get Application instance
      *
      * @param \FreeFW\Application\Config $p_config
+     * @param \Psr\Log\LoggerInterface   $p_logger
+     * @param array                      $p_middleware
      *
      * @return \FreeFW\Application\Application
      */
     public static function getInstance(
         \FreeFW\Application\Config $p_config,
-        \Psr\Log\LoggerInterface $p_logger
+        \Psr\Log\LoggerInterface $p_logger,
+        array $p_middleware = []
     ) {
         if (self::$instance === null) {
-            self::$instance = new static($p_config, $p_logger);
+            self::$instance = new static($p_config, $p_logger, $p_middleware);
         }
         return self::$instance;
     }
@@ -100,7 +113,7 @@ class Application extends \FreeFW\Core\Application
                 $pipeline->setAppConfig($this->getAppConfig());
                 $pipeline->setLogger($this->logger);
                 // Pipe default config middleware
-                $midCfg  = $this->getAppConfig()->get('middleware');
+                $midCfg  = $this->middleware;
                 $authMid = false;
                 if (is_array($midCfg)) {
                     foreach ($midCfg as $middleware) {
@@ -157,7 +170,7 @@ class Application extends \FreeFW\Core\Application
                     $pipeline->setAppConfig($this->getAppConfig());
                     $pipeline->setLogger($this->logger);
                     // Pipe default config middleware
-                    $midCfg  = $this->getAppConfig()->get('middleware');
+                    $midCfg  = $this->middleware;
                     $authMid = false;
                     if (is_array($midCfg)) {
                         foreach ($midCfg as $middleware) {

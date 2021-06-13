@@ -198,21 +198,6 @@ abstract class Email extends \FreeFW\Core\StorageModel
     }
 
     /**
-     * Composed index
-     *
-     * @return string[][]|number[][]
-     */
-    public static function getUniqIndexes()
-    {
-        return [
-            'code' => [
-                FFCST::INDEX_FIELDS => ['brk_id', 'lang_id', 'email_code'],
-                FFCST::INDEX_EXISTS => \FreeFW\Constants::ERROR_EMAIL_CODE_EXISTS
-            ],
-        ];
-    }
-
-    /**
      * Get One To many relationShips
      *
      * @return array

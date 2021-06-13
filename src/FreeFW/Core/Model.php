@@ -128,7 +128,7 @@ abstract class Model implements
                     }
                 }
             }
-            foreach ($this->getProperties() as $name => $property) {
+            foreach ($this->getModelDescriptionProperties() as $name => $property) {
                 $options = [];
                 if (isset($property[FFCST::PROPERTY_OPTIONS])) {
                     $options = $property[FFCST::PROPERTY_OPTIONS];
@@ -592,7 +592,7 @@ abstract class Model implements
      */
     public function getApiNestedParentId() : string
     {
-        foreach ($this->getProperties() as $name => $property) {
+        foreach ($this->getModelDescriptionProperties() as $name => $property) {
             if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
                 if (in_array(FFCST::OPTION_NESTED_PARENT_ID, $property[FFCST::PROPERTY_OPTIONS])) {
                     $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
@@ -609,7 +609,7 @@ abstract class Model implements
      */
     public function getApiNestedPosition() : string
     {
-        foreach ($this->getProperties() as $name => $property) {
+        foreach ($this->getModelDescriptionProperties() as $name => $property) {
             if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
                 if (in_array(FFCST::OPTION_NESTED_POSITION, $property[FFCST::PROPERTY_OPTIONS])) {
                     $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
@@ -626,7 +626,7 @@ abstract class Model implements
      */
     public function getApiNestedLeft() : string
     {
-        foreach ($this->getProperties() as $name => $property) {
+        foreach ($this->getModelDescriptionProperties() as $name => $property) {
             if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
                 if (in_array(FFCST::OPTION_NESTED_LEFT, $property[FFCST::PROPERTY_OPTIONS])) {
                     $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
@@ -643,7 +643,7 @@ abstract class Model implements
      */
     public function getApiNestedRight() : string
     {
-        foreach ($this->getProperties() as $name => $property) {
+        foreach ($this->getModelDescriptionProperties() as $name => $property) {
             if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
                 if (in_array(FFCST::OPTION_NESTED_RIGHT, $property[FFCST::PROPERTY_OPTIONS])) {
                     $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
@@ -660,7 +660,7 @@ abstract class Model implements
      */
     public function getApiNestedLevel() : string
     {
-        foreach ($this->getProperties() as $name => $property) {
+        foreach ($this->getModelDescriptionProperties() as $name => $property) {
             if (array_key_exists(FFCST::PROPERTY_OPTIONS, $property)) {
                 if (in_array(FFCST::OPTION_NESTED_LEVEL, $property[FFCST::PROPERTY_OPTIONS])) {
                     $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
@@ -876,6 +876,7 @@ abstract class Model implements
     public static function getModelDescription()
     {
         $clsName = str_replace('\\', '_', get_called_class());
+        $logName = str_replace('_Model_', '_', $clsName);
         $key     = 'FreeFW.' . $clsName . '.properties';
         /**
          * First, maybe in memory ??
@@ -896,6 +897,13 @@ abstract class Model implements
         // Simple properties
         $description = [];
         $description['properties'] = static::getProperties();
+        // Override
+        $cfg      = \FreeFW\DI\DI::getShared('config');
+        $cfgProps = $cfg->get('properties', []);
+        if (isset($cfgProps[$logName])) {
+            $description['properties'] = array_merge_recursive($description['properties'], $cfgProps[$logName]);
+        }
+        //
         foreach ($description['properties'] as $name => $oneProperty) {
             $dbField = $name;
             if (!isset($oneProperty[FFCST::PROPERTY_OPTIONS])) {
@@ -916,6 +924,41 @@ abstract class Model implements
         self::$__cache[$key] = $description;
         return $description;
     }
+
+    /**
+     * Get propreties from cache
+     *
+     * @return array
+     */
+    public static function getModelDescriptionProperties()
+    {
+        $description = self::getModelDescription();
+        return $description['properties'];
+    }
+
+    /**
+     * Get indexes
+     *
+     * @return array
+     */
+    public function getModelDescriptionIndexes()
+    {
+        $indexes = [];
+        $clsName = str_replace('\\', '_', get_called_class());
+        $logName = str_replace('_Model_', '_', $clsName);
+        //
+        if (method_exists($this, 'getUniqIndexes')) {
+            $indexes = $this->getUniqIndexes();
+        }
+        // Override
+        $cfg      = \FreeFW\DI\DI::getShared('config');
+        $cfgProps = $cfg->get('indexes', []);
+        if (isset($cfgProps[$logName])) {
+            $indexes = array_merge_recursive($indexes, $cfgProps[$logName]);
+        }
+        return $indexes;
+    }
+
     /**
      * Initialization
      *
@@ -923,8 +966,7 @@ abstract class Model implements
      */
     public function initModel()
     {
-        $description = $this->getModelDescription();
-        $props = $description['properties'];
+        $props = $this->getModelDescriptionProperties();
         $class = str_replace('\\Model\\', '_', get_class($this));
 
         $models   = $this->getAppConfig()->get('models');
@@ -1067,16 +1109,8 @@ abstract class Model implements
      */
     protected function validate()
     {
-        $models   = $this->getAppConfig()->get('models');
         $class    = str_replace('\\Model\\', '_', get_class($this));
-        $required = [];
-        if (is_array($models) && isset($models[$class])) {
-            if (isset($models[$class]['required'])) {
-                $required = $models[$class]['required'];
-            }
-        }
-        $description = $this->getModelDescription();
-        $props = $description['properties'];
+        $props = $this->getModelDescriptionProperties();
         foreach ($props as $name => $oneProperty) {
             $options = [];
             $getter  = $oneProperty[FFCST::PROPERTY_GETTER];
@@ -1108,7 +1142,7 @@ abstract class Model implements
                     );
                 }
             }
-            if ((in_array(FFCST::OPTION_REQUIRED, $options) || in_array($name, $required)) &&
+            if (in_array(FFCST::OPTION_REQUIRED, $options) &&
                 !in_array(FFCST::OPTION_PK, $options) &&
                 !in_array(FFCST::OPTION_BROKER, $options) &&
                 !in_array(FFCST::OPTION_USER, $options) &&
@@ -1152,7 +1186,7 @@ abstract class Model implements
     {
         $class = get_called_class();
         $new   = new $class();
-        foreach ($this->getProperties() as $name => $property) {
+        foreach ($this->getModelDescriptionProperties() as $name => $property) {
             $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
             $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
             if (method_exists($new, $setter)) {
@@ -1180,7 +1214,7 @@ abstract class Model implements
     public function getFieldsAsArray(array $p_orig = [], $p_keep_binary = true)
     {
         $data = $p_orig;
-        foreach ($this->getProperties() as $name => $oneProperty) {
+        foreach ($this->getModelDescriptionProperties() as $name => $oneProperty) {
             $getter  = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
             $content = $this->{$getter}();
             if (isset($oneProperty[FFCST::PROPERTY_TYPE])) {
@@ -1235,7 +1269,7 @@ abstract class Model implements
         }
         $datas->addBlock($block);
         $data = $this->getFieldsAsArray();
-        foreach ($this->getProperties() as $name => $oneProperty) {
+        foreach ($this->getModelDescriptionProperties() as $name => $oneProperty) {
             $title = $oneProperty[FFCST::PROPERTY_PRIVATE];
             if (isset($oneProperty[FFCST::PROPERTY_PUBLIC])) {
                 $title = $oneProperty[FFCST::PROPERTY_PUBLIC];

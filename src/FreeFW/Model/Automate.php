@@ -60,12 +60,29 @@ class Automate extends \FreeFW\Model\Base\Automate
      *
      * @return array|mixed
      */
-    public function getParamsAsArray()
+    public function getAutoParamsAsArray()
     {
         $params = json_decode($this->auto_params, true);
         if (!is_array($params)) {
             $params = [];
         }
         return $params;
+    }
+
+    /**
+     * Get param
+     *
+     * @param string  $p_name
+     * @param boolean $p_default
+     *
+     * @return string
+     */
+    public function getAutoParam($p_name, $p_default = false)
+    {
+        $params = $this->getAutoParamsAsArray();
+        if (isset($params[$p_name])) {
+            return $params[$p_name];
+        }
+        return $p_default;
     }
 }

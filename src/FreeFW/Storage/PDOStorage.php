@@ -154,40 +154,38 @@ class PDOStorage extends \FreeFW\Storage\Storage
         }
         // Uniq fields...
         $next = true;
-        if (method_exists($p_model, 'getUniqIndexes')) {
-            $indexes = $p_model->getUniqIndexes();
-            foreach ($indexes as $ixName => $oneIndex) {
-                if (is_array($oneIndex['fields'])) {
-                    $cFields = $oneIndex['fields'];
-                } else {
-                    $cFields = explode(',', $oneIndex['fields']);
+        $indexes = $p_model->getModelDescriptionIndexes();
+        foreach ($indexes as $ixName => $oneIndex) {
+            if (is_array($oneIndex['fields'])) {
+                $cFields = $oneIndex['fields'];
+            } else {
+                $cFields = explode(',', $oneIndex['fields']);
+            }
+            $filters = [];
+            $existF  = false;
+            foreach ($cFields as $name) {
+                if ($p_model->get($name) != '') {
+                    $filters[$name] = $p_model->get($name);
+                    $existF = true;
                 }
-                $filters = [];
-                $existF  = false;
-                foreach ($cFields as $name) {
-                    if ($p_model->get($name) != '') {
-                        $filters[$name] = $p_model->get($name);
-                        $existF = true;
-                    }
+            }
+            if ($existF) {
+                if ($brk) {
+                    $filters[$brkField] = $sso->getBrokerId();
                 }
-                if ($existF) {
-                    if ($brk) {
-                        $filters[$brkField] = $sso->getBrokerId();
+                $others = $p_model->find($filters);
+                if ($others->count() > 0) {
+                    $code = \FreeFW\Constants::ERROR_UNIQINDEX;
+                    if (isset($oneIndex['exists'])) {
+                        $code = $oneIndex['exists'];
                     }
-                    $others = $p_model->find($filters);
-                    if ($others->count() > 0) {
-                        $code = \FreeFW\Constants::ERROR_UNIQINDEX;
-                        if (isset($oneIndex['exists'])) {
-                            $code = $oneIndex['exists'];
-                        }
-                        $p_model->addError(
-                            $code,
-                            $ixName . ' already exists !',
-                            \FreeFW\Core\Error::TYPE_PRECONDITION,
-                            $oneIndex['fields']
-                        );
-                        $next = false;
-                    }
+                    $p_model->addError(
+                        $code,
+                        $ixName . ' already exists !',
+                        \FreeFW\Core\Error::TYPE_PRECONDITION,
+                        $oneIndex['fields']
+                    );
+                    $next = false;
                 }
             }
         }
@@ -604,41 +602,39 @@ class PDOStorage extends \FreeFW\Storage\Storage
         }
         // Uniq fields...
         $next = true;
-        if (method_exists($p_model, 'getUniqIndexes')) {
-            $indexes = $p_model->getUniqIndexes();
-            foreach ($indexes as $ixName => $oneIndex) {
-                if (is_array($oneIndex['fields'])) {
-                    $cFields = $oneIndex['fields'];
-                } else {
-                    $cFields = explode(',', $oneIndex['fields']);
+        $indexes = $p_model->getModelDescriptionIndexes();
+        foreach ($indexes as $ixName => $oneIndex) {
+            if (is_array($oneIndex['fields'])) {
+                $cFields = $oneIndex['fields'];
+            } else {
+                $cFields = explode(',', $oneIndex['fields']);
+            }
+            $filters = [];
+            $existF = false;
+            foreach ($cFields as $name) {
+                if ($p_model->get($name) != '') {
+                    $filters[$name] = $p_model->get($name);
+                    $existF = true;
                 }
-                $filters = [];
-                $existF = false;
-                foreach ($cFields as $name) {
-                    if ($p_model->get($name) != '') {
-                        $filters[$name] = $p_model->get($name);
-                        $existF = true;
-                    }
+            }
+            if ($existF) {
+                if ($brk) {
+                    $filters[$brkField] = $sso->getBrokerId();
                 }
-                if ($existF) {
-                    if ($brk) {
-                        $filters[$brkField] = $sso->getBrokerId();
+                $filters[$pkField] = [\FreeFW\Storage\Storage::COND_NOT_EQUAL => $p_model->get($pkField)];
+                $others = $p_model->find($filters);
+                if ($others->count() > 0) {
+                    $code = \FreeFW\Constants::ERROR_UNIQINDEX;
+                    if (isset($oneIndex['exists'])) {
+                        $code = $oneIndex['exists'];
                     }
-                    $filters[$pkField] = [\FreeFW\Storage\Storage::COND_NOT_EQUAL => $p_model->get($pkField)];
-                    $others = $p_model->find($filters);
-                    if ($others->count() > 0) {
-                        $code = \FreeFW\Constants::ERROR_UNIQINDEX;
-                        if (isset($oneIndex['exists'])) {
-                            $code = $oneIndex['exists'];
-                        }
-                        $p_model->addError(
-                            $code,
-                            $ixName . ' already exists !',
-                            \FreeFW\Core\Error::TYPE_PRECONDITION,
-                            $oneIndex['fields']
-                        );
-                        $next = false;
-                    }
+                    $p_model->addError(
+                        $code,
+                        $ixName . ' already exists !',
+                        \FreeFW\Core\Error::TYPE_PRECONDITION,
+                        $oneIndex['fields']
+                    );
+                    $next = false;
                 }
             }
         }
