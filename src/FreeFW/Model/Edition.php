@@ -95,15 +95,17 @@ class Edition extends \FreeFW\Model\Base\Edition
      */
     protected function saveVersions()
     {
-        foreach ($this->versions as $oneVersion) {
-            $oneVersion->setEdilId(null);
-            $oneVersion->setEdiId($this->getEdiId());
-            if (!$oneVersion->create()) {
-                $this->addErrors($oneVersion->getErrors());
-                return false;
+        if ($this->versions) {
+            foreach ($this->versions as $oneVersion) {
+                $oneVersion->setEdilId(null);
+                $oneVersion->setEdiId($this->getEdiId());
+                if (!$oneVersion->create()) {
+                    $this->addErrors($oneVersion->getErrors());
+                    return false;
+                }
             }
+            return true;
         }
-        return true;
     }
 
     /**

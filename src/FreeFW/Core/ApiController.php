@@ -556,11 +556,13 @@ class ApiController extends \FreeFW\Core\Controller
                 $mergeService = \FreeFW\DI\DI::get('FreeOffice::Service::Merge');
                 $mergeService->merge($src, $dest, $mergeDatas);
                 exec('/usr/bin/unoconv -f pdf -o ' . $dPdf . ' ' . $dest);
-                @unlink($dest);
-                @unlink($src);
+                //@unlink($dest);
+                //@unlink($src);
                 if (is_file($dPdf)) {
                     $this->logger->info('FreeFW.ApiController.printOne.end');
                     return $this->createMimeTypeResponse($dPdf, file_get_contents($dPdf));
+                } else {
+                    $this->logger->info('FreeFW.ApiController.printOne.errorPdf');
                 }
             } else {
                 $data = null;
@@ -570,8 +572,8 @@ class ApiController extends \FreeFW\Core\Controller
             $data = null;
             $code = FFCST::ERROR_ID_IS_MANDATORY; // 409
         }
-        $this->logger->info('FreeFW.ApiController.printOne.end');
-        return $this->createErrorResponse($code);
+        $this->logger->info('FreeFW.ApiController.printOne.errorData');
+        return $this->createErrorResponse(FFCST::ERROR_IN_DATA);
     }
 
     /**
