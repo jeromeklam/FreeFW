@@ -30,7 +30,8 @@
         "firebase/php-jwt"                     : "*",
         "bshaffer/oauth2-server-php"           : "*",
         "jeromeklam/freeoffice"                : "*",
-        "gregwar/image"                        : "^2.0"
+        "gregwar/image"                        : "^2.0",
+        "html2text/html2text"                  : "^4.3"
     },
     "autoload" : {
         "psr-4" : {

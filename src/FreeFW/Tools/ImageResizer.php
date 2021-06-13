@@ -8,6 +8,8 @@
  */
 namespace FreeFW\Tools;
 
+use \FreeFW\Constants as FFCST;
+
 /**
  * Utilitaires de traitement des images
  * @author jeromeklam
@@ -63,34 +65,62 @@ class ImageResizer
      */
     public function __construct($filename)
     {
-        $image_info = @getimagesize($filename);
+        $image_info = @getimagesizefromstring($filename);
         if (!$image_info) {
-            throw new \Exception('Could not read file');
+            $image_info = @getimagesize($filename);
+            if (!$image_info) {
+                throw new \Exception('Could not read file', FFCST::ERROR_FILE_NOT_FOUND);
+            }
+            $fromString = false;
+        } else {
+            $fromString = true;
         }
+        $this->source_filename = $filename;
         list (
             $this->original_w,
             $this->original_h,
             $this->source_type
         ) = $image_info;
-        switch ($this->source_type) {
-            case IMAGETYPE_GIF:
-                $this->source_image = imagecreatefromgif($filename);
-                break;
-            case IMAGETYPE_JPEG:
-                $this->source_image = $this->imageCreateJpegfromExif($filename);
-                // set new width and height for image, maybe it has changed
-                $this->original_w = ImageSX($this->source_image);
-                $this->original_h = ImageSY($this->source_image);
-                
-                break;
-            case IMAGETYPE_PNG:
-                $this->source_image = imagecreatefrompng($filename);
-                break;
-            default:
-                throw new \Exception('Unsupported image type');
-                break;
+        if ($fromString) {
+            switch ($this->source_type) {
+                case IMAGETYPE_GIF:
+                    $this->source_image = imagecreatefromstring($filename);
+                    break;
+                case IMAGETYPE_JPEG:
+                    $this->source_image = imagecreatefromstring($filename);
+                    $this->imageCreateJpegfromExif($this->source_image);
+                    // set new width and height for image, maybe it has changed
+                    $this->original_w = ImageSX($this->source_image);
+                    $this->original_h = ImageSY($this->source_image);
+                    break;
+                case IMAGETYPE_PNG:
+                    $this->filters = PNG_NO_FILTER;
+                    $this->source_image = imagecreatefromstring($filename);
+                    break;
+                default:
+                    throw new \Exception('Unsupported image type', FFCST::ERROR_IMAGETYPE_NOT_SUPPORTED);
+                    break;
+            }
+        } else {
+            switch ($this->source_type) {
+                case IMAGETYPE_GIF:
+                    $this->source_image = imagecreatefromgif($filename);
+                    break;
+                case IMAGETYPE_JPEG:
+                    $this->source_image = $this->imageCreateJpegfromExif($filename);
+                    // set new width and height for image, maybe it has changed
+                    $this->original_w = ImageSX($this->source_image);
+                    $this->original_h = ImageSY($this->source_image);
+                    break;
+                case IMAGETYPE_PNG:
+                    $this->filters = PNG_NO_FILTER;
+                    $this->source_image = imagecreatefrompng($filename);
+                    break;
+                default:
+                    throw new \Exception('Unsupported image type', FFCST::ERROR_IMAGETYPE_NOT_SUPPORTED);
+                    break;
+            }
         }
-        
         return $this->resize($this->getSourceWidth(), $this->getSourceHeight());
     }
 
@@ -104,7 +134,11 @@ class ImageResizer
     public function imageCreateJpegfromExif($filename)
     {
         $img  = imagecreatefromjpeg($filename);
-        $exif = exif_read_data($filename);
+        try {
+            $exif = @exif_read_data($filename);
+        } catch (\Exception $ex) {
+            $exif = false;
+        }
         if (!$exif || !isset($exif['Orientation'])) {
             return $img;
         }
@@ -119,7 +153,7 @@ class ImageResizer
         if ($orientation === 5 || $orientation === 4 || $orientation === 7) {
             imageflip($img, IMG_FLIP_HORIZONTAL);
         }
-        
+
         return $img;
     }
 
@@ -217,7 +251,7 @@ class ImageResizer
         $this->save($string_temp, $image_type, $quality);
         $string = file_get_contents($string_temp);
         unlink($string_temp);
-        
+
         return $string;
     }
 
@@ -259,7 +293,7 @@ class ImageResizer
         $ratio = $height / $this->getSourceHeight();
         $width = $this->getSourceWidth() * $ratio;
         $this->resize($width, $height, $allow_enlarge);
-        
+
         return $this;
     }
 
@@ -276,7 +310,7 @@ class ImageResizer
         $ratio  = $width / $this->getSourceWidth();
         $height = $this->getSourceHeight() * $ratio;
         $this->resize($width, $height, $allow_enlarge);
-        
+
         return $this;
     }
 
@@ -303,11 +337,11 @@ class ImageResizer
             $height = $max_height;
             $width  = $height / $ratio;
         }
-        
+
         if ($allow_centered) {
             return $this->resizeCentered($max_width, $max_height, $width, $height, $allow_enlarge);
         }
-        
+
         return $this->resize($width, $height, $allow_enlarge);
     }
 
@@ -355,7 +389,7 @@ class ImageResizer
         }
         return $this;
     }
-    
+
     /**
      * Redimension aux dimensions
      *
@@ -384,7 +418,7 @@ class ImageResizer
         $this->dest_h   = $height;
         $this->source_w = $this->getSourceWidth();
         $this->source_h = $this->getSourceHeight();
-        
+
         return $this;
     }
 
@@ -426,7 +460,7 @@ class ImageResizer
             $this->source_y = $this->getCropPosition($excess_height, $position);
             $this->dest_h   = $height;
         }
-        
+
         return $this;
     }
 
@@ -491,7 +525,7 @@ class ImageResizer
                 $size = $expectedSize / 2;
                 break;
         }
-        
+
         return $size;
     }
 }

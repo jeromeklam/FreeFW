@@ -1,0 +1,7 @@
+@import '../../styles/mixins';
+
+.[[:FEATURE_LOWER:]]-list {
+  .card {
+    margin: 10px;
+  }
+}

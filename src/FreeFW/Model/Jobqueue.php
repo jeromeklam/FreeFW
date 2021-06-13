@@ -157,7 +157,7 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
                     }
                     $service->setLogger($this);
                     $sso->setGroup($this->getGroup());
-                    $result = call_user_func_array([$service, $method], ['params' => $params]);
+                    $result = call_user_func_array([$service, $method], ['params' => $params, 'user' => $this->getUserId()]);
                     $sso->setGroup($grp);
                     if ($result === false) {
                         $this
@@ -222,6 +222,19 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
             // @TODO
         }
         return $this;
+    }
+
+    /**
+     *
+     * @return boolean
+     */
+    public function beforeRemove()
+    {
+        $histos = \FreeFW\Model\JobqueueHisto::find(['jobq_id' => $this->getJobqId()]);
+        foreach ($histos as $oneHisto) {
+            $oneHisto->remove();
+        }
+        return true;
     }
 
     /**

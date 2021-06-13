@@ -1,0 +1,1 @@
+ALTER TABLE `sys_automate` ADD COLUMN `email_id` bigint(20) unsigned DEFAULT NULL;

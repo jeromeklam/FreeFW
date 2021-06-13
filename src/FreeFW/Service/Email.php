@@ -12,21 +12,17 @@ class Email extends \FreeFW\Core\Service
     /**
      * Get new message from email
      *
-     * @param string                    $p_email_code
+     * @param array                     $p_filters
      * @param number                    $p_lang_id
      * @param \FreeFW\Core\StorageModel $p_model
      * @param boolean                   $p_merge
      *
      * @return NULL|\FreeFW\Model\Message
      */
-    public function getEmailAsMessage(string $p_email_code, int $p_lang_id, \FreeFW\Core\StorageModel $p_model, $p_merge = true)
+    public function getEmailAsMessage(array $p_filters, int $p_lang_id, \FreeFW\Core\StorageModel $p_model, $p_merge = true)
     {
         $message = null;
-        $emails  = \FreeFW\Model\Email::find(
-            [
-                'email_code' => $p_email_code
-            ]
-        );
+        $emails  = \FreeFW\Model\Email::find($p_filters);
         /**
          * @var \FreeFW\Model\Email $oneEmail
          */
@@ -50,13 +46,46 @@ class Email extends \FreeFW\Core\Service
                 $datas  = $p_model->getMergeData();
                 $fields = $datas->__toArray();
                 //
+                $message = new \FreeFW\Model\Message();
                 $subject = $oneVersion->getEmaillSubject();
                 $body    = $oneVersion->getEmaillBody();
                 if ($p_merge) {
                     $subject = \FreeFW\Tools\PBXString::parse($subject, $fields);
                     $body    = \FreeFW\Tools\PBXString::parse($body, $fields);
+                    if ($oneEmail->getEmailEdi1Id()) {
+                        try {
+                            $editionService = \FreeFW\DI\DI::get('FreeFW::Service::Edition');
+                            $datas = $editionService->printEdition(
+                                $oneEmail->getEmailEdi1Id(),
+                                $p_lang_id,
+                                $p_model
+                            );
+                            if (isset($datas['filename']) && is_file($datas['filename'])) {
+                                $message->addAttachment($datas['filename'], $datas['name']);
+                            }
+                        } catch (\Exception $ex) {
+                            // @todo
+                        }
+                    }
+                    if ($oneEmail->getEmailEdi2Id()) {
+                        try {
+                            $editionService = \FreeFW\DI\DI::get('FreeFW::Service::Edition');
+                            $datas = $editionService->printEdition(
+                                $oneEmail->getEmailEdi2Id(),
+                                $p_lang_id,
+                                $p_model
+                            );
+                            if (isset($datas['filename']) && is_file($datas['filename'])) {
+                                $message
+                                    ->setMsgPj2($datas['filename'])
+                                    ->setMsgPj2Name($datas['name'])
+                                ;
+                            }
+                        } catch (\Exception $ex) {
+                            // @todo
+                        }
+                    }
                 }
-                $message = new \FreeFW\Model\Message();
                 $message
                     ->setMsgObjectName($p_model->getApiType())
                     ->setMsgObjectId($p_model->getApiId())

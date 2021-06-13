@@ -53,7 +53,7 @@ abstract class Automate extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_SAMPLE  => 123,
         FFCST::PROPERTY_FK      => ['group' =>
             [
-                FFCST::FOREIGN_MODEL => 'NS::Model::ModelName',
+                FFCST::FOREIGN_MODEL => 'FreeFW::Model::Group',
                 FFCST::FOREIGN_FIELD => 'grp_id',
                 FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT,
             ]
@@ -82,6 +82,28 @@ abstract class Automate extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_COMMENT => '',
         FFCST::PROPERTY_SAMPLE  => '',
     ];
+    protected static $PRP_AUTO_EVENTS = [
+        FFCST::PROPERTY_PRIVATE => 'auto_events',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => '',
+        FFCST::PROPERTY_SAMPLE  => 'storage_update',
+        FFCST::PROPERTY_MAX     => 512,
+    ];
+    protected static $PRP_EMAIL_ID = [
+        FFCST::PROPERTY_PRIVATE => 'email_id',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
+        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_FK],
+        FFCST::PROPERTY_COMMENT => '',
+        FFCST::PROPERTY_SAMPLE  => 123,
+        FFCST::PROPERTY_FK      => ['email' =>
+            [
+                FFCST::FOREIGN_MODEL => 'FreeFW::Model::Email',
+                FFCST::FOREIGN_FIELD => 'email_id',
+                FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT,
+            ]
+        ],
+    ];
 
     /**
      * get properties
@@ -98,7 +120,9 @@ abstract class Automate extends \FreeFW\Core\StorageModel
             'grp_id'           => self::$PRP_GRP_ID,
             'auto_service'     => self::$PRP_AUTO_SERVICE,
             'auto_method'      => self::$PRP_AUTO_METHOD,
-            'auto_params'      => self::$PRP_AUTO_PARAMS
+            'auto_params'      => self::$PRP_AUTO_PARAMS,
+            'auto_events'      => self::$PRP_AUTO_EVENTS,
+            'email_id'         => self::$PRP_EMAIL_ID,
         ];
     }
 

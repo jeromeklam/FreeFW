@@ -10,9 +10,36 @@ class Model extends \FreeFW\Core\ApiController
 {
 
     /**
-     * 
+     * @desc Génère une doc simplifiée au format markdown <br />
+     *&emsp;- Modéle utilisé : POFW/Model/Model.php<br/>
+     *
      * @param \Psr\Http\Message\ServerRequestInterface $p_request
-     * 
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function reactjsModel(\Psr\Http\Message\ServerRequestInterface $p_request)
+    {
+        $this->logger->debug('FreeFW.Controller.Model.reactjsModel.start');
+        $apiParams = $p_request->getAttribute('api_params', false);
+        if ($apiParams->hasData()) {
+            /**
+             * @var \FreeFW\Model\Model $data
+             */
+            $model = $apiParams->getData();
+            // Generate class name
+            $generator = new \FreeFW\ReactJS\Generator($model);
+            $generator->generateFeature();
+            $this->logger->debug('FreeFW.Controller.Model.reactjsModel.end');
+            return $this->createResponse(201, $model);
+        }
+        $this->logger->debug('FreeFW.Controller.Model.reactjsModel.end');
+        return $this->createResponse(409, $doc);
+    }
+
+    /**
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $p_request
+     *
      * @return \Psr\Http\Message\ResponseInterface
      */
     public function documentModel(\Psr\Http\Message\ServerRequestInterface $p_request)
@@ -43,7 +70,7 @@ class Model extends \FreeFW\Core\ApiController
     }
 
     /**
-     * 
+     *
      * @param \Psr\Http\Message\ServerRequestInterface $p_request
      *
      * @return \Psr\Http\Message\ResponseInterface

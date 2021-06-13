@@ -34,6 +34,12 @@ abstract class EditionLang extends \FreeFW\Model\StorageModel\EditionLang
     protected $edil_data = null;
 
     /**
+     * edil_filename
+     * @var string
+     */
+    protected $edil_filename = null;
+
+    /**
      * Set edil_id
      *
      * @param int $p_value
@@ -123,5 +129,28 @@ abstract class EditionLang extends \FreeFW\Model\StorageModel\EditionLang
     public function getEdilData()
     {
         return $this->edil_data;
+    }
+
+    /**
+     * Set edil_filename
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\Base\EditionLang
+     */
+    public function setEdilFilename($p_value)
+    {
+        $this->edil_filename = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get edil_filename
+     *
+     * @return string
+     */
+    public function getEdilFilename()
+    {
+        return $this->edil_filename;
     }
 }

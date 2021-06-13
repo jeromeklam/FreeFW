@@ -115,12 +115,12 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
     /**
      *
      * {@inheritDoc}
-     * @see \FreeFW\Interfaces\StorageStrategyInterface::create()
+     * @see \FreeFW\Interfaces\DirectStorageInterface::create()
      */
-    public function create()
+    public function create(bool $p_with_transaction = true, bool $p_raw = false) : bool
     {
         if ($this->isValid()) {
-            return $this->strategy->create($this);
+            return $this->strategy->create($this, $p_with_transaction, $p_raw);
         }
         return false;
     }
@@ -130,10 +130,10 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\StorageStrategyInterface::save()
      */
-    public function save()
+    public function save(bool $p_with_transaction = true, bool $p_raw = false) : bool
     {
         if ($this->isValid()) {
-            return $this->strategy->save($this);
+            return $this->strategy->save($this, $p_with_transaction, $p_raw);
         }
         return false;
     }
@@ -248,9 +248,9 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\StorageStrategyInterface::remove()
      */
-    public function remove(bool $p_with_transaction = true) : bool
+    public function remove(bool $p_with_transaction = true, bool $p_raw = false) : bool
     {
-        return $this->strategy->remove($this, $p_with_transaction);
+        return $this->strategy->remove($this, $p_with_transaction, $p_raw);
     }
 
     /**

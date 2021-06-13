@@ -14,9 +14,26 @@ trait HttpFactoryTrait
 {
 
     /**
+     * Get ,ew Redirect
      *
-     * {@inheritDoc}
-     * @see \Psr\Http\Message\ResponseFactoryInterface::createResponse()
+     * @param string $p_model
+     * @param string $p_role
+     * @param array  $p_params
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function createRedirect(string $p_model, string $p_role, array $p_params = []): ResponseInterface
+    {
+        return new \FreeFW\Http\RedirectResponse($p_model, $p_role, $p_params);
+    }
+
+    /**
+     * Create response
+     *
+     * @param int    $code
+     * @param string $reasonPhrase
+     *
+     * @return \Psr\Http\Message\ResponseInterface
      */
     public function createResponse(int $code = 200, string $reasonPhrase = ''): ResponseInterface
     {
@@ -33,7 +50,7 @@ trait HttpFactoryTrait
      * @param int $p_codeHttp code Http à renvoyer (404,409,412,...)
      *
      * @see \Psr\Http\Message\ResponseFactoryInterface::createResponse()
-     * @return \Psr\Http\Message\Response
+     * @return \Psr\Http\Message\ResponseInterface
      */
     protected function _createErrorResponse($p_reasonPhrase, int $p_code, int $p_codeHttp): ResponseInterface
     {
@@ -55,7 +72,7 @@ trait HttpFactoryTrait
      * @param string|object $p_reasonPhrase les circonstances de l'erreur
      *
      * @see \Psr\Http\Message\ResponseFactoryInterface::createResponse()
-     * @return \Psr\Http\Message\Response
+     * @return \Psr\Http\Message\ResponseInterface
      */
     public function createErrorResponse(int $p_code, $p_reasonPhrase = null): ResponseInterface
     {

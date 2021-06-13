@@ -90,6 +90,7 @@ trait StorageListenerTrait
                         $channel->close();
                     }
                 }
+                $this->updates = [];
             } catch (\Exception $ex) {
                 // @todo...
             }
@@ -101,7 +102,9 @@ trait StorageListenerTrait
                  */
                 foreach (self::$automates as $oneAutomate) {
                     if (strtoupper($oneAutomate->getAutoObjectName()) == strtoupper($p_object->getApiType())) {
-                        $oneAutomate->run($p_object, $p_event_name);
+                        if ($oneAutomate->runForEvent($p_event_name)) {
+                            $oneAutomate->run($p_object, $p_event_name);
+                        }
                     }
                 }
             }

@@ -43,7 +43,7 @@ class Conditions extends \FreeFW\Core\Model implements
     public function initFromArray(
         array $p_conditions,
         string $p_oper = \FreeFW\Storage\Storage::COND_AND,
-        string $p_cond = \FreeFW\Storage\Storage::COND_LIKE
+        string $p_cond = \FreeFW\Storage\Storage::COND_EQUAL
     ) {
         $this->operator   = $p_oper;
         $this->conditions = [];
@@ -230,9 +230,9 @@ class Conditions extends \FreeFW\Core\Model implements
 
     /**
      *
-     * @param \FreeFW\Core\Model $value
+     * @param \FreeFW\Interfaces\ConditionInterface $value
      *
-     * @return \FreeFW\Model\ResultSet
+     * @return \FreeFW\Model\Conditions
      */
     public function add($p_value)
     {
