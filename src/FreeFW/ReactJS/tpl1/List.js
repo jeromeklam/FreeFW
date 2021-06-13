@@ -18,7 +18,7 @@ import { getEditions, printEdition } from '../edition';
 
 export class List extends Component {
   static propTypes = {
-    cause: PropTypes.object.isRequired,
+    .[[:FEATURE_LOWER:]]: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired,
   };
 
@@ -31,12 +31,10 @@ export class List extends Component {
 
   constructor(props) {
     super(props);
-    const causeType = getCausetype(this.props.causeType.items, this.props.match.params.cautId);
+    const .[[:FEATURE_LOWER:]]Type = getCausetype(this.props..[[:FEATURE_LOWER:]]Type.items, this.props.match.params.cautId);
     this.state = {
       timer: null,
-      cauId: -1,
-      cautId: this.props.match.params.cautId,
-      causeType: causeType,
+      id: -1,
       mode: null,
       item: null,
       models: props.edition.models,
@@ -60,17 +58,7 @@ export class List extends Component {
   }
 
   componentDidMount() {
-    this.props.actions.initFilters(this.state.cautId);
     this.props.actions.loadMore(false, true);
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.cautId !== this.state.cautId) {
-      const causeType = getCausetype(this.props.causeType.items, this.props.match.params.cautId);
-      this.setState({ causeType: causeType });
-      this.props.actions.initFilters(this.state.cautId);
-      this.props.actions.loadMore(false, true);
-    }
   }
 
   onSelect(id) {
@@ -78,15 +66,15 @@ export class List extends Component {
   }
 
   onCreate(event) {
-    this.setState({ cauId: 0 });
+    this.setState({ id: 0 });
   }
 
   onGetOne(id) {
-    this.setState({ cauId: id });
+    this.setState({ id: id });
   }
 
   onClose() {
-    this.setState({ cauId: -1 });
+    this.setState({ id: -1 });
   }
 
   onDelOne(id) {
@@ -109,7 +97,7 @@ export class List extends Component {
   }
 
   onQuickSearch(quickSearch) {
-    this.props.actions.updateQuickSearch(quickSearch, this.state.cautId);
+    this.props.actions.updateQuickSearch(quickSearch);
     let timer = this.state.timer;
     if (timer) {
       clearTimeout(timer);
@@ -147,7 +135,7 @@ export class List extends Component {
 
   onClearFilters(def = false) {
     console.log(def);
-    this.props.actions.initFilters(this.state.cautId, def);
+    this.props.actions.initFilters(def);
     this.props.actions.initSort();
     let timer = this.state.timer;
     if (timer) {
@@ -160,7 +148,6 @@ export class List extends Component {
   }
 
   onLoadMore(event) {
-    this.props.actions.initFilters(this.state.cautId);
     this.props.actions.loadMore();
   }
 
@@ -225,12 +212,7 @@ export class List extends Component {
     }
     const globalActions = getGlobalActions(this);
     const inlineActions = getInlineActions(this);
-    let cols = [];
-    if (this.state.causeType && this.state.causeType.caut_family === 'ANIMAL') {
-      cols = getCols(this);
-    } else {
-      cols = getColsSimple(this);
-    }
+    let cols = getCols(this);
     // L'affichage, items, loading, loadMoreError
     let search = '';
     const crit = this.props.[[:FEATURE_LOWER:]].filters.findFirst('cau_name');
@@ -242,7 +224,7 @@ export class List extends Component {
         name="quickSearch"
         label={intl.formatMessage({
           id: 'app.features.[[:FEATURE_LOWER:]].list.search',
-          defaultMessage: 'Search by name',
+          defaultMessage: 'Search by ...',
         })}
         quickSearch={search}
         onSubmit={this.onQuickSearch}
@@ -254,30 +236,13 @@ export class List extends Component {
     const selectActions = getSelectActions(this);
     // InLine components
     let inlineComponent = null;
-    switch (this.state.mode) {
-      case 'photo':
-        inlineComponent = <InlinePhotos cauId={this.state.item.id} />;
-        break;
-      case 'sponsor':
-        inlineComponent = <InlineSponsors cauId={this.state.item.id} />;
-        break;
-      case 'sponsorship':
-        inlineComponent = <InlineSponsorships mode="cause" id={this.state.item.id} />;
-        break;
-      case 'donation':
-        inlineComponent = <InlineDonations mode="cause" id={this.state.item.id} />;
-        break;
-      case 'news':
-        inlineComponent = <InlineNews cauId={this.state.item.id} />;
-        break;
-      default:
-        inlineComponent = null;
-        break;
-    }
     return (
       <div>
         <UiList
-          title={this.state.causeType ? this.state.causeType.caut_name : 'Missions'}
+          title={intl.formatMessage({
+            id: 'app.features.[[:FEATURE_LOWER:]].list.title',
+            defaultMessage: '...',
+          })}
           intl={intl}
           cols={cols}
           items={items}
@@ -305,10 +270,10 @@ export class List extends Component {
           selectMenu={selectActions}
           onSelect={this.onSelect}
         />
-        {this.state.cauId >= 0 && (
+        {this.state.id >= 0 && (
           <Input
             modal={true}
-            cauId={this.state.cauId}
+            id={this.state.id}
             onClose={this.onClose}
             loader={false}
             editions={this.state.editions}
@@ -322,19 +287,14 @@ export class List extends Component {
 function mapStateToProps(state) {
   return {
     loadTimeOut: state.auth.loadTimeOut,
-    cause: state.cause,
-    site: state.site,
-    causeType: state.causeType,
-    causeMainType: state.causeMainType,
-    sponsorship: state.sponsorships,
-    donation: state.donations,
+    [[:FEATURE_LOWER:]]: state.[[:FEATURE_LOWER:]],
     edition: state.edition,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...actions, loadDonations }, dispatch),
+    actions: bindActionCreators({ ...actions }, dispatch),
   };
 }
 

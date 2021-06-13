@@ -1,6 +1,6 @@
 @import '../../styles/mixins';
 
-.cause-list {
+.[[:FEATURE_LOWER:]]-list {
   .card {
     margin: 10px;
   }

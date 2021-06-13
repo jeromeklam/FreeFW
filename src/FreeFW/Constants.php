@@ -172,24 +172,25 @@ class Constants
      * Errors types
      * @var string
      */
-    const ERROR_REQUIRED            = 666001;
-    const ERROR_FOREIGNKEY          = 666002;
-    const ERROR_UNIQINDEX           = 666003;
-    const ERROR_VALUES              = 666004;
-    const ERROR_MAXLENGTH           = 666005;
-    const ERROR_ID_IS_MANDATORY     = 666006;
-    const ERROR_NOT_FOUND           = 666007;
-    const ERROR_NO_DATA             = 666008;
-    const ERROR_NOT_UPDATE          = 666009;
-    const ERROR_NOT_DELETE          = 666010;
-    const ERROR_NOT_INSERT          = 666011;
-    const ERROR_ID_IS_UNAVALAIBLE   = 666012;
-    const ERROR_NOT_AUTHENTICATED   = 666013;
-    const ERROR_IN_DATA             = 666014;
-    const ERROR_EDITION_NOT_FOUND   = 666015;
-    const ERROR_GROUP_SWITCH        = 666016;
-    const ERROR_EMAIL_CODE_EXISTS   = 666017;
-    const ERROR_EDITION_NAME_EXISTS = 666018;
+    const ERROR_REQUIRED                = 666001;
+    const ERROR_FOREIGNKEY              = 666002;
+    const ERROR_UNIQINDEX               = 666003;
+    const ERROR_VALUES                  = 666004;
+    const ERROR_MAXLENGTH               = 666005;
+    const ERROR_ID_IS_MANDATORY         = 666006;
+    const ERROR_NOT_FOUND               = 666007;
+    const ERROR_NO_DATA                 = 666008;
+    const ERROR_NOT_UPDATE              = 666009;
+    const ERROR_NOT_DELETE              = 666010;
+    const ERROR_NOT_INSERT              = 666011;
+    const ERROR_ID_IS_UNAVALAIBLE       = 666012;
+    const ERROR_NOT_AUTHENTICATED       = 666013;
+    const ERROR_IN_DATA                 = 666014;
+    const ERROR_EDITION_NOT_FOUND       = 666015;
+    const ERROR_GROUP_SWITCH            = 666016;
+    const ERROR_EMAIL_CODE_EXISTS       = 666017;
+    const ERROR_EDITION_NAME_EXISTS     = 666018;
+    const ERROR_IMAGETYPE_NOT_SUPPORTED = 666019;
 
     /**
      * Success types

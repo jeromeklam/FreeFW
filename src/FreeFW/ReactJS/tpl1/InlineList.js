@@ -39,7 +39,7 @@ export default class InlineList extends Component {
 
   render() {
     return (
-      <div className="cause-inline-list">
+      <div className=".[[:FEATURE_LOWER:]]-inline-list">
         {this.state.loading ? (
           <Loading3Dots />
         ) : (
@@ -47,7 +47,7 @@ export default class InlineList extends Component {
             {this.state.list &&
               this.state.list.map(item => {
                 return (
-                  <p key={item.id} title={item.cau_name}>{item.cause_type.caut_name}
+                  <p key={item.id} title={item.cau_name}>{item..[[:FEATURE_LOWER:]]_type.caut_name}
                     &nbsp;( {item.cau_sex} )
                     &nbsp;( <DataSimpleLabel code="COULEUR" value={item.cau_string_1} /> )
                   </p>

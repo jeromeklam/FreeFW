@@ -116,4 +116,29 @@ class Dir
             return false;
         }
     }
+
+    /**
+     * Get all files from directory
+     *
+     * @param string $p_directory
+     * @param array  $p_files
+     *
+     * @return array
+     */
+    public static function recursiveDirectoryIterator($p_directory = null, $p_files = [])
+    {
+        $iterator = new \DirectoryIterator($p_directory);
+        foreach ($iterator as $info) {
+            if ($info->isFile()) {
+                $p_files[$info->__toString()] = clone($info);
+            } else {
+                if (!$info->isDot()) {
+                    $p_files[$info->__toString()] = self::recursiveDirectoryIterator(
+                        $p_directory . DIRECTORY_SEPARATOR . $info->__toString()
+                    );
+                }
+            }
+        }
+        return $p_files;
+    }
 }

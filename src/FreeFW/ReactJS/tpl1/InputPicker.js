@@ -115,7 +115,7 @@ export default class InputPicker extends Component {
 
   render() {
     return (
-      <div className="cause-input-picker">
+      <div className=".[[:FEATURE_LOWER:]]-input-picker">
         <DefaultInputPicker
           {...this.props}
           name={this.props.name}
@@ -149,7 +149,7 @@ export default class InputPicker extends Component {
           <Input
             loader={false}
             modal={true}
-            cauId={this.state.item.id}
+            id={this.state.item.id}
             onClose={this.onCloseMore}
           />
         )}

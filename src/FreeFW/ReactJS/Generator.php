@@ -66,12 +66,13 @@ class Generator
              */
             $mdNs    = $this->model->getMdNs();
             $mdName  = $this->model->getMdClass();
-            $this->words['FEATURE_UPPER'] = strtoupper(\FreeFW\Tools\PBXString::fromCamelCase($mdName));
-            $this->words['FEATURE_LOWER'] = strtolower(\FreeFW\Tools\PBXString::fromCamelCase($mdName));
-            $this->words['FEATURE_MODEL'] = $mdNs . '_' . $mdName;
-            $this->words['FEATURE_CAMEL'] = $mdNs . '_' . $mdName;
-            $this->words['FEATURE_COLLECTION'] = $mdName;
-            $this->words['FEATURE_SERVICE'] = \FreeFW\Tools\PBXString::fromCamelCase($this->model->getMdClass());
+            //
+            $this->words['FEATURE_UPPER']      = strtoupper(\FreeFW\Tools\PBXString::fromCamelCase($mdName));
+            $this->words['FEATURE_LOWER']      = strtolower(\FreeFW\Tools\PBXString::fromCamelCase($mdName));
+            $this->words['FEATURE_MODEL']      = $mdNs . '_' . $mdName;
+            $this->words['FEATURE_CAMEL']      = $mdName;
+            $this->words['FEATURE_COLLECTION'] = $this->model->getMdCollPath();
+            $this->words['FEATURE_SERVICE']    = \FreeFW\Tools\PBXString::fromCamelCase($this->model->getMdClass());
             /**
              * Il me faut aussi certains champs
              * Le tri par défaut
@@ -87,12 +88,35 @@ class Generator
              * Les champs de recherche
              */
             $this->quickSearch = $this->defaultSort;
-
-
-            var_dump($this->words, $this->defaultSort, $this->quickSearch);die;
+            /**
+             * Je vais modifier pour chaque fichier du dossier tpl les variables
+             * Seuls certains fichiers ont besoin de traitements spéciaux.
+             */
+            $directory = dirname(__FILE__) . '/tpl1';
+            $files     = \FreeFW\Tools\Dir::recursiveDirectoryIterator($directory);
+            $this->renderFiles($files, $this->path . '/' . $this->words['FEATURE_LOWER']);
         } else {
             throw new \Exception(sprintf('Model not found %s !', $this->model));
         }
         return true;
+    }
+
+    /**
+     *
+     * @param array $p_files
+     * @param string $p_directory
+     */
+    protected function renderFiles($p_files, $p_directory)
+    {
+        foreach ($p_files as $name => $content) {
+            if (is_array($content)) {
+                $this->renderFiles($content, rtrim($p_directory, '/') . '/' . $name);
+            } else {
+                $data = file_get_contents($content->getPath() . '/' . $content->getFilename());
+                $data = \FreeFW\Tools\PBXString::parse($data, $this->words);
+                \FreeFW\Tools\Dir::mkpath($p_directory);
+                file_put_contents($p_directory . '/' . $content->getFilename(), $data);
+            }
+        }
     }
 }

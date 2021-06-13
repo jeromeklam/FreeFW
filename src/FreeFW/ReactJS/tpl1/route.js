@@ -4,8 +4,8 @@ export default {
   path: '',
   name: '',
   childRoutes: [
-    { path: 'cause/:cautId', name: 'List', component: List, auth: 'PRIVATE' },
-    { path: 'cause/create', name: 'Create', component: Input, auth: 'PRIVATE' },
-    { path: 'cause/modify/:causeId', name: 'Modify', component: Input, auth: 'PRIVATE' },
+    { path: '.[[:FEATURE_LOWER:]]', name: 'List', component: List, auth: 'PRIVATE' },
+    { path: '.[[:FEATURE_LOWER:]]/create', name: 'Create', component: Input, auth: 'PRIVATE' },
+    { path: '.[[:FEATURE_LOWER:]]/modify/:.[[:FEATURE_LOWER:]]Id', name: 'Modify', component: Input, auth: 'PRIVATE' },
   ],
 };

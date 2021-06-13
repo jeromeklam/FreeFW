@@ -13,7 +13,7 @@ import { getActionsButtons } from './';
 
 export class Input extends Component {
   static propTypes = {
-    cause: PropTypes.object.isRequired,
+    .[[:FEATURE_LOWER:]]: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired,
     loader: PropTypes.bool,
   };
@@ -24,7 +24,7 @@ export class Input extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      id: this.props.cauId || 0,
+      id: this.props.id || 0,
       item: null,
     };
     this.onSubmit = this.onSubmit.bind(this);
@@ -89,7 +89,7 @@ export class Input extends Component {
   render() {
     const { item, id } = this.state;
     return (
-      <div className="cause-modify global-card">
+      <div className=".[[:FEATURE_LOWER:]]-modify global-card">
         {!item ? (
           <PortalLoader show={this.props.loader} />
         ) : (
@@ -98,7 +98,7 @@ export class Input extends Component {
               <Form
                 item={item}
                 modify={id > 0}
-                cause_types={this.props.causeType.items}
+                .[[:FEATURE_LOWER:]]_types={this.props..[[:FEATURE_LOWER:]]Type.items}
                 tab_datas={this.props.data.items}
                 subspecies={this.props.subspecies.items}
                 tab_configs={this.props.config.items}
@@ -122,8 +122,8 @@ function mapStateToProps(state) {
   return {
     data: state.data,
     config: state.config,
-    cause: state.cause,
-    causeType: state.causeType,
+    .[[:FEATURE_LOWER:]]: state..[[:FEATURE_LOWER:]],
+    .[[:FEATURE_LOWER:]]Type: state..[[:FEATURE_LOWER:]]Type,
     subspecies: state.subspecies,
   };
 }

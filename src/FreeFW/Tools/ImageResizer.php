@@ -8,6 +8,8 @@
  */
 namespace FreeFW\Tools;
 
+use \FreeFW\Constants as FFCST;
+
 /**
  * Utilitaires de traitement des images
  * @author jeromeklam
@@ -63,34 +65,62 @@ class ImageResizer
      */
     public function __construct($filename)
     {
-        $image_info = @getimagesize($filename);
+        $image_info = @getimagesizefromstring($filename);
         if (!$image_info) {
-            throw new \Exception('Could not read file');
+            $image_info = @getimagesize($filename);
+            if (!$image_info) {
+                throw new \Exception('Could not read file', FFCST::ERROR_FILE_NOT_FOUND);
+            }
+            $fromString = false;
+        } else {
+            $fromString = true;
         }
+        $this->source_filename = $filename;
         list (
             $this->original_w,
             $this->original_h,
             $this->source_type
         ) = $image_info;
-        switch ($this->source_type) {
-            case IMAGETYPE_GIF:
-                $this->source_image = imagecreatefromgif($filename);
-                break;
-            case IMAGETYPE_JPEG:
-                $this->source_image = $this->imageCreateJpegfromExif($filename);
-                // set new width and height for image, maybe it has changed
-                $this->original_w = ImageSX($this->source_image);
-                $this->original_h = ImageSY($this->source_image);
-
-                break;
-            case IMAGETYPE_PNG:
-                $this->source_image = imagecreatefrompng($filename);
-                break;
-            default:
-                throw new \Exception('Unsupported image type');
-                break;
+        if ($fromString) {
+            switch ($this->source_type) {
+                case IMAGETYPE_GIF:
+                    $this->source_image = imagecreatefromstring($filename);
+                    break;
+                case IMAGETYPE_JPEG:
+                    $this->source_image = imagecreatefromstring($filename);
+                    $this->imageCreateJpegfromExif($this->source_image);
+                    // set new width and height for image, maybe it has changed
+                    $this->original_w = ImageSX($this->source_image);
+                    $this->original_h = ImageSY($this->source_image);
+                    break;
+                case IMAGETYPE_PNG:
+                    $this->filters = PNG_NO_FILTER;
+                    $this->source_image = imagecreatefromstring($filename);
+                    break;
+                default:
+                    throw new \Exception('Unsupported image type', FFCST::ERROR_IMAGETYPE_NOT_SUPPORTED);
+                    break;
+            }
+        } else {
+            switch ($this->source_type) {
+                case IMAGETYPE_GIF:
+                    $this->source_image = imagecreatefromgif($filename);
+                    break;
+                case IMAGETYPE_JPEG:
+                    $this->source_image = $this->imageCreateJpegfromExif($filename);
+                    // set new width and height for image, maybe it has changed
+                    $this->original_w = ImageSX($this->source_image);
+                    $this->original_h = ImageSY($this->source_image);
+                    break;
+                case IMAGETYPE_PNG:
+                    $this->filters = PNG_NO_FILTER;
+                    $this->source_image = imagecreatefrompng($filename);
+                    break;
+                default:
+                    throw new \Exception('Unsupported image type', FFCST::ERROR_IMAGETYPE_NOT_SUPPORTED);
+                    break;
+            }
         }
-
         return $this->resize($this->getSourceWidth(), $this->getSourceHeight());
     }
 

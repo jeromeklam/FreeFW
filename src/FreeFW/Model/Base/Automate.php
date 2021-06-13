@@ -64,6 +64,12 @@ abstract class Automate extends \FreeFW\Model\StorageModel\Automate
     protected $auto_events = null;
 
     /**
+     * Email_id
+     * @var number
+     */
+    protected $email_id = null;
+
+    /**
      * Set auto_id
      *
      * @param int $p_value
@@ -268,5 +274,28 @@ abstract class Automate extends \FreeFW\Model\StorageModel\Automate
     public function getAutoEvents()
     {
         return $this->auto_events;
+    }
+
+    /**
+     * Set email id
+     *
+     * @param number $p_value
+     *
+     * @return \FreeFW\Model\Base\Automate
+     */
+    public function setEmailId($p_value)
+    {
+        $this->email_id = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get eùail_id
+     *
+     * @return number
+     */
+    public function getEmailId()
+    {
+        return $this->email_id;
     }
 }
