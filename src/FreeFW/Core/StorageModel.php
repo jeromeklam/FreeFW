@@ -475,27 +475,9 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
                 }
             }
         }
-/*
-        $serializable = get_object_vars($this);
-        unset($serializable['strategy']);
-        unset($serializable['logger']);
-        unset($serializable['app_config']);
-        unset($serializable['config']);
-        unset($serializable['updated']);
-        $vars = (array)$serializable;
-
-        foreach ($vars as $idx => $value) {
-            if (is_object($value)) {
-                if (method_exists($value, '__toArrayFiltered')) {
-                    $vars[$idx] = $value->__toArrayFiltered($p_fields);
-                }
-            } else {
-                if ($test && !isset($test[$idx])) {
-                    unset($vars[$idx]);
-                }
-            }
+        if (isset($this->id)) {
+            $vars['id'] = $this->id;
         }
-        */
         return $vars;
     }
 
