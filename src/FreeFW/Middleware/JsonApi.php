@@ -41,7 +41,11 @@ class JsonApi implements
         // Datas
         $contents = $p_request->getBody()->getContents();
         $json     = json_decode($contents, false);
+        $version  = '1.0';
         if ($json && $json instanceof \stdClass) {
+            if (isset($json->jsonapi) && isset($json->jsonapi->version)) {
+                $version = $json->jsonapi->version;
+            }
             if (isset($json->data)) {
                 $decoder  = new \FreeFW\JsonApi\V1\Decoder();
                 $document = new \FreeFW\JsonApi\V1\Model\Document($json);
@@ -50,6 +54,8 @@ class JsonApi implements
             } else {
                 // @todo
             }
+        } else {
+            // @todo
         }
         $params = $p_request->getQueryParams();
         /**
@@ -68,7 +74,11 @@ class JsonApi implements
             $filters = $params['filter'];
             // Transform filters to \FreeFW\Model\Conditions...
             $conditions = new \FreeFW\Model\Conditions();
-            $conditions->initFromArray($filters);
+            //if ($version == '1.1') {
+                $conditions->initFromNPIArray($filters);
+            //} else {
+            //    $conditions->initFromArray($filters);
+            //}
             $apiParams->setFilters($conditions);
         }
         // Sort

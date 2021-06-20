@@ -35,4 +35,16 @@ class ConditionValue implements \FreeFW\Interfaces\ConditionInterface
     {
         return $this->value;
     }
+    
+    /**
+     * 
+     * @return unknown|string
+     */
+    public function __toString()
+    {
+        if (!is_array($this->value)) {
+            return $this->value;
+        }
+        return implode(',', $this->value);
+    }
 }

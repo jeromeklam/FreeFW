@@ -30,6 +30,7 @@ abstract class Storage implements
     const COND_LOWER_EQUAL           = 'ltwe';
     const COND_LOWER_EQUAL_OR_NULL   = 'ltwen';
     const COND_LIKE                  = 'contains';
+    const COND_LIKE_OR_NULL          = 'containsn';
     const COND_NOT_LIKE              = 'ncontains';
     const COND_IN                    = 'in';
     const COND_NOT_IN                = 'nin';
@@ -47,6 +48,7 @@ abstract class Storage implements
      */
     const COND_AND                   = 'and';
     const COND_OR                    = 'or';
+    const COND_NOT                   = 'not';
 
     /**
      * Sort

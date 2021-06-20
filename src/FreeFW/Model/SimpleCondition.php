@@ -110,4 +110,18 @@ class SimpleCondition extends \FreeFW\Core\Model
         $final = '';
         return $final;
     }
+    
+    /**
+     * 
+     * {@inheritDoc}
+     * @see \FreeFW\Core\Model::__toString()
+     */
+    public function __toString()
+    {
+        $str = $this->left->__toString() . ' ' . $this->operator;
+        if ($this->right) {
+            $str = $str . ' ' . $this->right->__toString();
+        }
+        return $str;
+    }
 }

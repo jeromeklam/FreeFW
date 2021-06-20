@@ -1,3 +1,7 @@
+# 1.5.2 : 20/06/2021
+
+* New filter syntax for JsonApi
+
 # 1.5.1 : 11/11/2020
 
 * sort with .id

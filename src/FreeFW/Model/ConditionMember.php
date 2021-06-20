@@ -35,4 +35,13 @@ class ConditionMember implements \FreeFW\Interfaces\ConditionInterface
     {
         return $this->field;
     }
+    
+    /**
+     * 
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->field;
+    }
 }
