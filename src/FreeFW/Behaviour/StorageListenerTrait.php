@@ -33,8 +33,9 @@ trait StorageListenerTrait
      * @param object $p_queue
      * @param object $p_queueCfg
      * @param string $p_event_name
+     * @param bool   $p_websocket
      */
-    public function listen($p_object, $p_queue, $p_queueCfg, $p_event_name = null) {
+    public function listen($p_object, $p_queue, $p_queueCfg, $p_event_name = null, bool $p_websocket= false) {
         if ($p_event_name == '') {
             $p_event_name = 'unknown';
         }
@@ -63,7 +64,7 @@ trait StorageListenerTrait
                 break;
         }
         // Only Core Models
-        if ($this->in_transaction <= 0) {
+        if ($p_websocket && $this->in_transaction <= 0) {
             $this->in_transaction = 0;
             // Only if requested
             try {

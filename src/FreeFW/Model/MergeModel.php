@@ -357,6 +357,12 @@ class MergeModel {
                 }
             }
         }
+        foreach($this->getGenericBlocks() as $blockName) {
+            $gDatas = $this->getGenericDatas($blockName);
+            foreach ($gDatas as $key => $val) {
+                $datas[$blockName . '.' . $key] = $val;
+            }
+        }
         return $datas;
     }
 }

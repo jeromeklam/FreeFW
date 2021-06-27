@@ -43,7 +43,31 @@ class Email extends \FreeFW\Core\Service
                 }
             }
             if ($emailVersion !== null) {
+                // Get group and user
+                $sso        = \FreeFW\DI\DI::getShared('sso');
+                $user       = $sso->getUser();
+                // @todo : rechercher le groupe principal de l'utilisateur
+                $grpId = null;
+                if (method_exists($p_model, 'getGrpId')) {
+                    $grpId = $p_model->getGrpId();
+                }
+                if (!$grpId) {
+                    $group = $sso->getUserGroup();
+                    if ($group) {
+                        $grpId = $group->getGrpId();
+                    }
+                }
+                $group = \FreeSSO\Model\Group::findFirst(
+                    [
+                        'grp_id' => $grpId
+                    ]
+                );
+                //
                 $datas  = $p_model->getMergeData();
+                $datas->addGenericBlock('head_user');
+                $datas->addGenericData($user->getFieldsAsArray(), 'head_user');
+                $datas->addGenericBlock('head_group');
+                $datas->addGenericData($group->getFieldsAsArray(), 'head_group');
                 $fields = $datas->__toArray();
                 //
                 $message = new \FreeFW\Model\Message();

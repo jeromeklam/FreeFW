@@ -1028,7 +1028,7 @@ abstract class Model implements
                                     $group = null;
                                     $user = $sso->getUser();
                                     if ($user) {
-                                        $group = $user->getDefaultGroup();
+                                        $group = $sso->getUserGroup();
                                     }
                                     if ($group === null) {
                                         $group = $sso->getBrokerGroup();

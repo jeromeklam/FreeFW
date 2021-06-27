@@ -53,9 +53,17 @@ class Edition extends \FreeFW\Core\Service
             $sso        = \FreeFW\DI\DI::getShared('sso');
             $user       = $sso->getUser();
             // @todo : rechercher le groupe principal de l'utilisateur
-            $group      = \FreeSSO\Model\Group::findFirst(
+            if (method_exists($p_model, 'getGrpId')) {
+                $grpId = $p_model->getGrpId();
+            } else {
+                $group = $sso->getUserGroup();
+                if ($group) {
+                    $grpId = $group->getGrpId();
+                }
+            }
+            $group = \FreeSSO\Model\Group::findFirst(
                 [
-                    'grp_id' => 4
+                    'grp_id' => $grpId
                 ]
             );
             //
