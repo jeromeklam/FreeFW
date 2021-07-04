@@ -58,6 +58,12 @@ abstract class History extends \FreeFW\Model\StorageModel\History
     protected $hist_object = null;
 
     /**
+     * grp_id
+     * @var int
+     */
+    protected $grp_id = null;
+
+    /**
      * Set hist_id
      *
      * @param int $p_value
@@ -239,5 +245,28 @@ abstract class History extends \FreeFW\Model\StorageModel\History
     public function getHistObject()
     {
         return $this->hist_object;
+    }
+
+    /**
+     * Set group id
+     *
+     * @param int $p_value
+     *
+     * @return \FreeFW\Model\Base\History
+     */
+    public function setGrpId($p_value)
+    {
+        $this->grp_id = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get grp_id
+     *
+     * @return int;
+     */
+    public function getGrpId()
+    {
+        return $this->grp_id;
     }
 }

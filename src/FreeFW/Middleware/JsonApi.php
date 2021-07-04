@@ -74,11 +74,7 @@ class JsonApi implements
             $filters = $params['filter'];
             // Transform filters to \FreeFW\Model\Conditions...
             $conditions = new \FreeFW\Model\Conditions();
-            //if ($version == '1.1') {
-                $conditions->initFromNPIArray($filters);
-            //} else {
-            //    $conditions->initFromArray($filters);
-            //}
+            $conditions->initFromArray($filters);
             $apiParams->setFilters($conditions);
         }
         // Sort

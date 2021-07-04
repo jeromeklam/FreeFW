@@ -39,15 +39,18 @@ class Conditions extends \FreeFW\Core\Model implements
 
     /**
      * Get simple condition
-     * 
+     * ex1 : (field, value)
+     * ex2 : and(equals(field, value),equals(field2, value2)) : @todo
+     *
      * @param string $p_operator
      * @param string $p_value
-     * 
+     *
      * @return mixed
      */
     protected function getNPICondition($p_operator, $p_value)
     {
         $value = trim($p_value);
+        // Start with (, than simple condition
         if (substr($value, 0, 1) == '(') {
             $content = substr($value, 1, -1);
             $parts   = explode(',', $content);
@@ -59,6 +62,7 @@ class Conditions extends \FreeFW\Core\Model implements
             $aCondition->setOperator($p_operator);
             array_shift($parts);
             if (count($parts) == 0) {
+                // Only possible for IS NULL
                 if ($p_operator == \FreeFW\Storage\Storage::COND_EMPTY) {
                     $aValue = new \FreeFW\Model\ConditionValue();
                     $aValue->setValue(null);
@@ -67,41 +71,113 @@ class Conditions extends \FreeFW\Core\Model implements
                     throw new \Exception(sprintf('%s operator must provide a value', $p_operator));
                 }
             } else {
+                // Can't be IS NULL
                 if ($p_operator == \FreeFW\Storage\Storage::COND_EMPTY) {
                     throw new \Exception(sprintf('%s operator cannot provide a value', $p_operator));
                 }
                 if (count($parts) == 1) {
-                    $aValue = new \FreeFW\Model\ConditionValue();
+                    // Simple value, a simple string
                     $val = trim(trim($parts[0], '\''));
-                    $aValue->setValue($val);
-                    $aCondition->setRightMember($aValue);
+                    if ($val !== 'null') {
+                        $aValue = new \FreeFW\Model\ConditionValue();
+                        $aValue->setValue($val);
+                        $aCondition->setRightMember($aValue);
+                    } else {
+                        if ($aCondition->getOperator() === \FreeFW\Storage\Storage::COND_EQUAL) {
+                            $aCondition->setOperator(\FreeFW\Storage\Storage::COND_EMPTY);
+                        } else {
+                            if ($aCondition->getOperator() === \FreeFW\Storage\Storage::COND_NOT_EQUAL) {
+                                $aCondition->setOperator(\FreeFW\Storage\Storage::COND_NOT_EMPTY);
+                            }
+                        }
+                    }
                 } else {
+                    // BETWEEN, IN, ...
                     $aValue = new \FreeFW\Model\ConditionValue();
-                    $aValue->setValue($parts);
+                    $addA = [];
+                    foreach ($parts as $val) {
+                        $addA[] = trim($val);
+                    }
+                    $aValue->setValue($addA);
                     $aCondition->setRightMember($aValue);
                 }
             }
             return $aCondition;
         } else {
-            $pos = strpos($value, '(');
-            $oper = substr($value, 0, $pos);
-            $right = substr($value, $pos);
-            $right = substr($right, 0, -1);
+            // first word is a operator with condition in ()
+            $pos         = strpos($value, '(');
+            $oper        = substr($value, 0, $pos);
+            $right       = substr($value, $pos);
+            $right       = substr($right, 0, -1);
             $aConditions = new \FreeFW\Model\Conditions();
-            return $aConditions->initFromNPIArray([$oper => $right]);
+            return $aConditions->initFromArray([$oper => $right]);
         }
     }
-    
+
+    /**
+     * Split NPI string
+     *
+     * @param string $p_string
+     *
+     * @return array
+     */
+    protected function splitNPICondition($p_string)
+    {
+        $splitted = [];
+        $toCheck = trim($p_string);
+        // Si le premier n'est pas un (, c'est un opérateur.
+        $matches = [];
+        $nbP   = 0;
+        $start = 0;
+        $found = false;
+        for ($i=0; $i<strlen($toCheck); $i++) {
+            if ($toCheck[$i] === '(') {
+                $nbP++;
+                $found = true;
+            } else {
+                if ($toCheck[$i] === ')') {
+                    $nbP--;
+                } else {
+                    if ($toCheck[$i] === ',') {
+                        if ($nbP == 0) {
+                            $matches[] = substr($toCheck, $start, $i - $start);
+                            $start = $i + 1;
+                        }
+                    }
+                }
+            }
+        }
+        if (!$found) {
+            return '(' . $toCheck . ')';
+        }
+        $matches[] = substr($toCheck, $start, strlen($toCheck) - $start);
+        if (count($matches) <= 1) {
+            if ($toCheck[0] != '(') {
+                $pos  = strpos($toCheck, '(');
+                $oper = substr($toCheck, 0, $pos);
+                $end  = substr($toCheck, $pos);
+                $splitted[$oper] = $this->splitNPICondition($end);
+            } else {
+                $splitted = $this->splitNPICondition(substr($toCheck, 1, -1));
+            }
+        } else {
+            foreach ($matches as $match) {
+                $splitted[] = $this->splitNPICondition($match);
+            }
+        }
+        return $splitted;
+    }
+
     /**
      * NPI filter
-     * 
+     *
      * @param array   $p_conditions
      * @param string  $p_operator
      * @param bool    $p_not
-     * 
+     *
      * @throws \Exception
      */
-    public function initFromNPIArray(array $p_conditions, string $p_operator = null, bool $p_not = false)
+    public function initFromArray(array $p_conditions, string $p_operator = null, bool $p_not = false)
     {
         $operator = $p_operator;
         if (!in_array(
@@ -110,187 +186,165 @@ class Conditions extends \FreeFW\Core\Model implements
                 \FreeFW\Storage\Storage::COND_AND,
                 \FreeFW\Storage\Storage::COND_OR,
                 \FreeFW\Storage\Storage::COND_NOT
-                
             ])) {
             $operator = \FreeFW\Storage\Storage::COND_AND;
         }
         $this->operator   = $operator;
         $this->conditions = [];
         foreach ($p_conditions as $index => $value) {
-            $simpleCond = null;
-            switch(strtoupper($index)) {
-                case 'NOT':
-                case 'AND':
-                case 'OR':
-                    $aCondition = new \FreeFW\Model\Conditions();
-                    $aCondition->initFromNPIArray($value, strtolower($index));
-                    break;
-                case 'EQUALS':
-                    $simpleCond = \FreeFW\Storage\Storage::COND_EQUAL;
-                    break;
-                case 'EQUALSORNULL':
-                    $simpleCond = \FreeFW\Storage\Storage::COND_EQUAL_OR_NULL;
-                    break;
-                case 'LESSTHAN':
-                    $simpleCond = \FreeFW\Storage\Storage::COND_LOWER;
-                    break;
-                case 'LESSTHANORNULL':
-                    $simpleCond = \FreeFW\Storage\Storage::COND_LOWER_OR_NULL;
-                    break;
-                case 'LESSOREQUAL':
-                    $simpleCond = \FreeFW\Storage\Storage::COND_LOWER_EQUAL;
-                    break;
-                case 'LESSOREQUALORNULL':
-                    $simpleCond = \FreeFW\Storage\Storage::COND_LOWER_EQUAL_OR_NULL;
-                    break;
-                case 'GREATERTHAN':
-                    $simpleCond = \FreeFW\Storage\Storage::COND_GREATER;
-                    break;
-                case 'GREATERTHANORNULL':
-                    $simpleCond = \FreeFW\Storage\Storage::COND_GREATER_OR_NULL;
-                    break;
-                case 'GREATEROREQUAL':
-                    $simpleCond = \FreeFW\Storage\Storage::COND_GREATER_EQUAL;
-                    break;
-                case 'GREATEROREQUALORNULL':
-                    $simpleCond = \FreeFW\Storage\Storage::COND_GREATER_EQUAL_OR_NULL;
-                    break;
-                case 'CONTAINS':
-                    $simpleCond = \FreeFW\Storage\Storage::COND_LIKE;
-                    break;
-                case 'CONTAINSORNULL':
-                    $simpleCond = \FreeFW\Storage\Storage::COND_LIKE_OR_NULL;
-                    break;
-                case 'STARTSWITH':
-                    $simpleCond = \FreeFW\Storage\Storage::COND_BEGIN_WITH;
-                    break;
-                case 'ENDSWITH':
-                    $simpleCond = \FreeFW\Storage\Storage::COND_END_WITH;
-                    break;
-                case 'ISNULL':
-                    $simpleCond = \FreeFW\Storage\Storage::COND_EMPTY;
-                    break;
-                case 'BETWEEN':
-                    $simpleCond = \FreeFW\Storage\Storage::COND_BETWEEN;
-                    break;
-                case 'ANY':
-                    $simpleCond = \FreeFW\Storage\Storage::COND_IN;
-                    break;
-                case 'HAS':
-                    break;
-                default:
-                    // $index must be a field...
-                    $aField = new \FreeFW\Model\ConditionMember();
-                    $aField->setValue($index);
-                    /**
-                     * @var \FreeFW\Model\SimpleCondition $aCondition
-                     */
-                    $aCondition = new \FreeFW\Model\SimpleCondition();
-                    $aCondition->setLeftMember($aField);
-                    if (is_array($value)) {
-                        foreach ($value as $idx2 => $value2) {
-                            // Verify oper...
-                            if (is_array($value2)) {
-                                $aValueArr = new \FreeFW\Model\ConditionValue();
-                                $aValueArr->setValue($value2);
-                                $aCondition->setOperator($idx2);
-                                $aCondition->setRightMember($aValueArr);
-                            } else {
-                                if ($value === null || $value === '') {
-                                    if (in_array($idx2, [\FreeFW\Storage\Storage::COND_EMPTY, \FreeFW\Storage\Storage::COND_NOT_EMPTY])) {
-                                        $aCondition->setOperator($idx2);
-                                        $aCondition->setRightMember(null);
-                                    } else {
-                                        continue;
-                                    }
-                                } else {
-                                    $aValue = new \FreeFW\Model\ConditionValue();
-                                    $aValue->setValue($value2);
-                                    $aCondition->setOperator($idx2);
-                                    $aCondition->setRightMember($aValue);
-                                }
-                            }
-                        }
-                    } else {
-                        $aValue = new \FreeFW\Model\ConditionValue();
-                        $aValue->setValue($value);
-                        $aCondition->setRightMember($aValue);
-                    }
-                    break;
-            }
-            if ($simpleCond) {
-                if (!is_array($value)) {
-                    $aCondition = $this->getNPICondition($simpleCond, $value);
-                    $this->conditions[] = $aCondition;
-                } else {
-                    foreach ($value as $oneValue) {
-                        $aCondition = $this->getNPICondition($simpleCond, $oneValue);
-                        $this->conditions[] = $aCondition;
-                    }
-                }
-            } else {
-                $this->conditions[] = $aCondition;
-            }
-        }
-    }
-    
-    /**
-     * Constructor
-     */
-    public function initFromArray(
-        array $p_conditions,
-        string $p_oper = \FreeFW\Storage\Storage::COND_AND,
-        string $p_cond = \FreeFW\Storage\Storage::COND_EQUAL
-    ) {
-        $this->operator   = $p_oper;
-        $this->conditions = [];
-        foreach ($p_conditions as $idx => $value) {
-            if (strtolower($idx) == 'or' || strtolower($idx) == 'and') {
+            if (is_numeric($index)) {
                 $aCondition = new \FreeFW\Model\Conditions();
-                $aCondition->initFromArray($value, strtolower($idx));
-            } else {
-                // $idx must be a field...
-                $aField = new \FreeFW\Model\ConditionMember();
-                $aField->setValue($idx);
-                /**
-                 * @var \FreeFW\Model\SimpleCondition $aCondition
-                 */
-                $aCondition = new \FreeFW\Model\SimpleCondition();
-                $aCondition->setLeftMember($aField);
-                $aCondition->setOperator($p_cond);
                 if (is_array($value)) {
-                    foreach ($value as $idx2 => $value2) {
-                        // Verify oper...
-                        if (is_array($value2)) {
-                            $aValueArr = new \FreeFW\Model\ConditionValue();
-                            $aValueArr->setValue($value2);
-                            $aCondition->setOperator($idx2);
-                            $aCondition->setRightMember($aValueArr);
+                    $aCondition->initFromArray($value, $p_operator);
+                } else {
+                    $splitted = $this->splitNPICondition($value);
+                    $aCondition->initFromArray($splitted, $p_operator);
+                }
+                $this->conditions[] = $aCondition;
+            } else {
+                $simpleCond = null;
+                switch (strtoupper(str_replace('_', '', $index))) {
+                    case 'NOT':
+                    case 'AND':
+                    case 'OR':
+                        $aCondition = new \FreeFW\Model\Conditions();
+                        if (is_array($value)) {
+                            $aCondition->initFromArray($value, strtolower($index));
                         } else {
-                            if ($value === null || $value === '') {
-                                if (in_array($idx2, [\FreeFW\Storage\Storage::COND_EMPTY, \FreeFW\Storage\Storage::COND_NOT_EMPTY])) {
-                                    $aCondition->setOperator($idx2);
+                            $splitted = $this->splitNPICondition($value);
+                            $aCondition->initFromArray($splitted, strtolower($index));
+                        }
+                        break;
+                    case 'EQ':
+                    case 'EQUAL':
+                    case 'EQUALS':
+                        $simpleCond = \FreeFW\Storage\Storage::COND_EQUAL;
+                        break;
+                    case 'EQN':
+                    case 'EQUALORNULL':
+                    case 'EQUALSORNULL':
+                        $simpleCond = \FreeFW\Storage\Storage::COND_EQUAL_OR_NULL;
+                        break;
+                    case 'ltw':
+                    case 'LESSTHAN':
+                        $simpleCond = \FreeFW\Storage\Storage::COND_LOWER;
+                        break;
+                    case 'ltwn':
+                    case 'LESSTHANORNULL':
+                        $simpleCond = \FreeFW\Storage\Storage::COND_LOWER_OR_NULL;
+                        break;
+                    case 'ltwe':
+                    case 'LESSOREQUAL':
+                        $simpleCond = \FreeFW\Storage\Storage::COND_LOWER_EQUAL;
+                        break;
+                    case 'ltwen':
+                    case 'LESSOREQUALORNULL':
+                        $simpleCond = \FreeFW\Storage\Storage::COND_LOWER_EQUAL_OR_NULL;
+                        break;
+                    case 'gt':
+                    case 'GREATERTHAN':
+                        $simpleCond = \FreeFW\Storage\Storage::COND_GREATER;
+                        break;
+                    case 'gtn':
+                    case 'GREATERTHANORNULL':
+                        $simpleCond = \FreeFW\Storage\Storage::COND_GREATER_OR_NULL;
+                        break;
+                    case 'gte':
+                    case 'GREATEROREQUAL':
+                        $simpleCond = \FreeFW\Storage\Storage::COND_GREATER_EQUAL;
+                        break;
+                    case 'gten':
+                    case 'GREATEROREQUALORNULL':
+                        $simpleCond = \FreeFW\Storage\Storage::COND_GREATER_EQUAL_OR_NULL;
+                        break;
+                    case 'LIKE':
+                    case 'CONTAINS':
+                        $simpleCond = \FreeFW\Storage\Storage::COND_LIKE;
+                        break;
+                    case 'LIKEN':
+                    case 'CONTAINSORNULL':
+                        $simpleCond = \FreeFW\Storage\Storage::COND_LIKE_OR_NULL;
+                        break;
+                    case 'CONTAINSB';
+                    case 'STARTSWITH':
+                        $simpleCond = \FreeFW\Storage\Storage::COND_BEGIN_WITH;
+                        break;
+                    case 'CONTAINSE':
+                    case 'ENDSWITH':
+                        $simpleCond = \FreeFW\Storage\Storage::COND_END_WITH;
+                        break;
+                    case 'EMPTY':
+                    case 'ISNULL':
+                        $simpleCond = \FreeFW\Storage\Storage::COND_EMPTY;
+                        break;
+                    case 'BETWEEN':
+                        $simpleCond = \FreeFW\Storage\Storage::COND_BETWEEN;
+                        break;
+                    case 'ANY':
+                        $simpleCond = \FreeFW\Storage\Storage::COND_IN;
+                        break;
+                    case 'HAS':
+                        break;
+                    default:
+                        // $index must be a field...
+                        $aField = new \FreeFW\Model\ConditionMember();
+                        $aField->setValue($index);
+                        /**
+                         * @var \FreeFW\Model\SimpleCondition $aCondition
+                         */
+                        $aCondition = new \FreeFW\Model\SimpleCondition();
+                        $aCondition->setLeftMember($aField);
+                        if (is_array($value)) {
+                            foreach ($value as $idx2 => $value2) {
+                                if (is_numeric($idx2) && in_array($value2, [\FreeFW\Storage\Storage::COND_EMPTY, \FreeFW\Storage\Storage::COND_NOT_EMPTY])) {
+                                    $aCondition->setOperator($value2);
                                     $aCondition->setRightMember(null);
                                 } else {
-                                    continue;
+                                    // Verify oper...
+                                    if (is_array($value2)) {
+                                        $aValueArr = new \FreeFW\Model\ConditionValue();
+                                        $aValueArr->setValue($value2);
+                                        $aCondition->setOperator($idx2);
+                                        $aCondition->setRightMember($aValueArr);
+                                    } else {
+                                        if ($value === null || $value === '') {
+                                            if (in_array($idx2, [\FreeFW\Storage\Storage::COND_EMPTY, \FreeFW\Storage\Storage::COND_NOT_EMPTY])) {
+                                                $aCondition->setOperator($idx2);
+                                                $aCondition->setRightMember(null);
+                                            } else {
+                                                continue;
+                                            }
+                                        } else {
+                                            $aValue = new \FreeFW\Model\ConditionValue();
+                                            $aValue->setValue($value2);
+                                            $aCondition->setOperator($idx2);
+                                            $aCondition->setRightMember($aValue);
+                                        }
+                                    }
                                 }
-                            } else {
-                                $aValue = new \FreeFW\Model\ConditionValue();
-                                $aValue->setValue($value2);
-                                $aCondition->setOperator($idx2);
-                                $aCondition->setRightMember($aValue);
                             }
+                        } else {
+                            $aValue = new \FreeFW\Model\ConditionValue();
+                            $aValue->setValue($value);
+                            $aCondition->setRightMember($aValue);
+                        }
+                        break;
+                }
+                if ($simpleCond) {
+                    if (!is_array($value)) {
+                        $aCondition = $this->getNPICondition($simpleCond, $value);
+                        $this->conditions[] = $aCondition;
+                    } else {
+                        foreach ($value as $oneValue) {
+                            $aCondition = $this->getNPICondition($simpleCond, $oneValue);
+                            $this->conditions[] = $aCondition;
                         }
                     }
                 } else {
-                    $aValue = new \FreeFW\Model\ConditionValue();
-                    $aValue->setValue($value);
-                    $aCondition->setRightMember($aValue);
+                    $this->conditions[] = $aCondition;
                 }
             }
-            $this->conditions[] = $aCondition;
         }
-        //var_dump($this->conditions);die;
     }
 
     /**
@@ -496,9 +550,9 @@ class Conditions extends \FreeFW\Core\Model implements
         }
         return false;
     }
-    
+
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see \FreeFW\Core\Model::__toString()
      */

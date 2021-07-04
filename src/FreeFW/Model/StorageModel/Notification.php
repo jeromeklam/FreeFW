@@ -85,6 +85,7 @@ abstract class Notification extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'notif_read',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_BOOLEAN,
         FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED],
+        FFCST::PROPERTY_DEFAULT => FFCST::DEFAULT_FALSE,
         FFCST::PROPERTY_COMMENT => 'La notification a-t-elle été lue ?',
         FFCST::PROPERTY_SAMPLE  => false,
     ];
@@ -109,6 +110,21 @@ abstract class Notification extends \FreeFW\Core\StorageModel
             ]
         ]
     ];
+    protected static $PRP_GPP_ID = [
+        FFCST::PROPERTY_PRIVATE => 'grp_id',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
+        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_GROUP],
+        FFCST::PROPERTY_COMMENT => '',
+        FFCST::PROPERTY_DEFAULT => FFCST::DEFAULT_CURRENT_GROUP,
+        FFCST::PROPERTY_SAMPLE  => 123,
+        FFCST::PROPERTY_FK      => ['group' =>
+            [
+                FFCST::FOREIGN_MODEL => 'FreeSSO::Model::Group',
+                FFCST::FOREIGN_FIELD => 'user_id',
+                FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT
+            ]
+        ]
+    ];
 
     /**
      * get properties
@@ -129,7 +145,8 @@ abstract class Notification extends \FreeFW\Core\StorageModel
             'notif_type'        => self::$PRP_NOTIF_TYPE,
             'notif_read'        => self::$PRP_NOTIF_READ,
             'notif_read_ts'     => self::$PRP_NOTIF_READ_TS,
-            'user_id'           => self::$PRP_USER_ID
+            'user_id'           => self::$PRP_USER_ID,
+            'grp_id'            => self::$PRP_GPP_ID,
         ];
     }
 

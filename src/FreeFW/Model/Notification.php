@@ -12,6 +12,12 @@ class Notification extends \FreeFW\Model\Base\Notification
 {
 
     /**
+     * Behaviour
+     */
+    use \FreeSSO\Model\Behaviour\User;
+    use \FreeSSO\Model\Behaviour\Group;
+
+    /**
      * Type
      * @var string
      */
@@ -26,47 +32,4 @@ class Notification extends \FreeFW\Model\Base\Notification
      * @var bool
      */
     protected $no_history = true;
-
-    /**
-     * Read user
-     * @var \FreeSSO\Model\User
-     */
-    protected $user = null;
-
-    /**
-     *
-     * {@inheritDoc}
-     * @see \FreeFW\Core\Model::init()
-     */
-    public function init()
-    {
-        $this->notif_id   = 0;
-        $this->notif_type = self::TYPE_OTHER;
-        $this->user_id    = null;
-        $this->notif_read = 0;
-        return $this;
-    }
-
-    /**
-     * Set user
-     *
-     * @param \FreeSSO\Model\User $p_user
-     *
-     * @return \FreeFW\Model\Notification
-     */
-    public function setUser($p_user)
-    {
-        $this->user = $p_user;
-        return $this;
-    }
-
-    /**
-     * Get user
-     *
-     * @return \FreeSSO\Model\User
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
 }

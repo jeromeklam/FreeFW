@@ -226,6 +226,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
                                 ->setHistTs(\FreeFW\Tools\Date::getCurrentTimestamp())
                                 ->setHistObject($p_model->toHistory())
                             ;
+                            if (method_exists($p_model, 'getGrpId')) {
+                                $history->setGrpId($p_model->getGrpId());
+                            }
                             $history->create();
                         }
                     } catch (\Exception $ex) {
@@ -442,6 +445,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
                                 ->setHistTs(\FreeFW\Tools\Date::getCurrentTimestamp())
                                 ->setHistObject($p_model->toHistory())
                             ;
+                            if (method_exists($p_model, 'getGrpId')) {
+                                $history->setGrpId($p_model->getGrpId());
+                            }
                             $history->create();
                         }
                     } catch (\Exception $ex) {
@@ -673,6 +679,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
                                 ->setHistTs(\FreeFW\Tools\Date::getCurrentTimestamp())
                                 ->setHistObject($p_model->toHistory())
                             ;
+                            if (method_exists($p_model, 'getGrpId')) {
+                                $history->setGrpId($p_model->getGrpId());
+                            }
                             $history->create();
                         }
                     } catch (\Exception $ex) {

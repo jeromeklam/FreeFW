@@ -80,6 +80,20 @@ abstract class History extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_COMMENT => '',
         FFCST::PROPERTY_SAMPLE  => '',
     ];
+    protected static $PRP_GPP_ID = [
+        FFCST::PROPERTY_PRIVATE => 'grp_id',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => '',
+        FFCST::PROPERTY_SAMPLE  => 123,
+        FFCST::PROPERTY_FK      => ['group' =>
+            [
+                FFCST::FOREIGN_MODEL => 'FreeSSO::Model::Group',
+                FFCST::FOREIGN_FIELD => 'user_id',
+                FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT
+            ]
+        ]
+    ];
 
     /**
      * get properties
@@ -96,7 +110,8 @@ abstract class History extends \FreeFW\Core\StorageModel
             'hist_method'      => self::$PRP_HIST_METHOD,
             'hist_object_name' => self::$PRP_HIST_OBJECT_NAME,
             'hist_object_id'   => self::$PRP_HIST_OBJECT_ID,
-            'hist_object'      => self::$PRP_HIST_OBJECT
+            'hist_object'      => self::$PRP_HIST_OBJECT,
+            'grp_id'           => self::$PRP_GPP_ID,
         ];
     }
 

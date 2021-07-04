@@ -8,6 +8,34 @@ use \FreeFW\Router\Route as FFCSTRT;
  * @author jeromeklam
  */
 $routes_notification = [
+    'free_f_w.notification.validate' => [
+        FFCSTRT::ROUTE_COLLECTION => 'FreeFW/Core/Notification',
+        FFCSTRT::ROUTE_COMMENT    => 'Valide la notification',
+        FFCSTRT::ROUTE_METHOD     => FFCSTRT::METHOD_PUT,
+        FFCSTRT::ROUTE_MODEL      => 'FreeFW::Model::Notification',
+        FFCSTRT::ROUTE_URL        => '/v1/core/notification/validate/:notif_id',
+        FFCSTRT::ROUTE_CONTROLLER => 'FreeFW::Controller::Notification',
+        FFCSTRT::ROUTE_FUNCTION   => 'validateOne',
+        FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,
+        FFCSTRT::ROUTE_MIDDLEWARE => [],
+        FFCSTRT::ROUTE_INCLUDE    => [],
+        FFCSTRT::ROUTE_SCOPE      => [],
+        FFCSTRT::ROUTE_PARAMETERS => [
+            'notif_id' => [
+                FFCSTRT::ROUTE_PARAMETER_ORIGIN   => FFCSTRT::ROUTE_PARAMETER_ORIGIN_PATH,
+                FFCSTRT::ROUTE_PARAMETER_TYPE     => FFCST::TYPE_BIGINT,
+                FFCSTRT::ROUTE_PARAMETER_REQUIRED => true,
+                FFCSTRT::ROUTE_PARAMETER_COMMENT  => 'Identifiant de l\'objet'
+            ],
+        ],
+        FFCSTRT::ROUTE_RESULTS    => [
+            '200' => [
+                FFCSTRT::ROUTE_RESULTS_TYPE    => FFCSTRT::RESULT_OBJECT,
+                FFCSTRT::ROUTE_RESULTS_MODEL   => 'FreeFW::Model::Notification',
+                FFCSTRT::ROUTE_RESULTS_COMMENT => 'Objet modifié',
+            ],
+        ]
+    ],
     'free_f_w.notification.autocomplete' => [
         FFCSTRT::ROUTE_COLLECTION => 'FreeFW/Core/Notification',
         FFCSTRT::ROUTE_COMMENT    => 'Autocomplete.',

@@ -82,6 +82,12 @@ abstract class Notification extends \FreeFW\Model\StorageModel\Notification
     protected $user_id = null;
 
     /**
+     * grp_id
+     * @var int
+     */
+    protected $grp_id = null;
+
+    /**
      * Set notif_id
      *
      * @param int $p_value
@@ -355,5 +361,28 @@ abstract class Notification extends \FreeFW\Model\StorageModel\Notification
     public function getUserId()
     {
         return $this->user_id;
+    }
+
+    /**
+     * Set grp_id
+     *
+     * @param int $p_value
+     *
+     * @return \FreeFW\Model\Base\Notification
+     */
+    public function setGrpId($p_value)
+    {
+        $this->grp_id = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get grp_id
+     *
+     * @return number
+     */
+    public function getGrpId()
+    {
+        return $this->grp_id;
     }
 }

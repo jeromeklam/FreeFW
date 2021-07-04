@@ -8,4 +8,9 @@ namespace FreeFW\Controller;
  */
 class History extends \FreeFW\Core\ApiController
 {
+
+    /**
+     * Comportement
+     */
+    //use \FreeSSO\Controller\Behaviour\Group;
 }

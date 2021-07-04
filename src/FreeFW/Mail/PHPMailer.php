@@ -151,7 +151,8 @@ class PHPMailer implements
                     $this->mailer->addBCC($bcc->address);
                 }
             } else {
-                $this->mailer->addAddress('jeromeklam@free.fr');
+                $dest = 'jeromeklam@free.fr';
+                $this->mailer->addAddress($dest);
             }
             if ($bcc !== false) {
                 if (is_array($bcc)) {

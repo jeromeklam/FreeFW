@@ -323,4 +323,52 @@ class Message extends \FreeFW\Model\Base\Message
         }
         return $this;
     }
+
+    /**
+     * Before all
+     *
+     * @return boolean
+     */
+    protected function before()
+    {
+        $cfg = $this->getAppConfig();
+        $email = $cfg->get('email');
+        if (!is_array($email) || !isset($email['real'])) {
+            $dest = 'jerome.klam@free.fr';
+            $sso = \FreeFW\DI\DI::getShared('sso');
+            if ($sso) {
+                $user = $sso->getUser();
+                if ($user) {
+                    $dest = $user->getUserEmail();
+                }
+            }
+            $this
+                ->setMsgBcc(null)
+                ->setMsgCc(null)
+                ->setMsgDest(null)
+                ->addDest($dest)
+            ;
+        }
+        return true;
+    }
+
+    /**
+     * Before save
+     *
+     * @return boolean
+     */
+    public function beforeSave()
+    {
+        return $this->before();
+    }
+
+    /**
+     * Before create
+     *
+     * @return boolean
+     */
+    public function beforeCreate()
+    {
+        return $this->before();
+    }
 }
