@@ -104,6 +104,7 @@ class Constants
     const PROPERTY_FUNCTION   = 'function';
     const PROPERTY_GETTER     = 'getter';
     const PROPERTY_SETTER     = 'setter';
+    const PROPERTY_TITLE      = 'title';
 
     /**
      * Index

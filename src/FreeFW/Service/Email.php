@@ -12,14 +12,14 @@ class Email extends \FreeFW\Core\Service
     /**
      * Get new message from email
      *
-     * @param array                     $p_filters
-     * @param number                    $p_lang_id
-     * @param \FreeFW\Core\StorageModel $p_model
-     * @param boolean                   $p_merge
+     * @param array                                                   $p_filters
+     * @param number                                                  $p_lang_id
+     * @param \FreeFW\Core\StorageModel | [\FreeFW\Core\StorageModel] $p_model
+     * @param boolean                                                 $p_merge
      *
      * @return NULL|\FreeFW\Model\Message
      */
-    public function getEmailAsMessage(array $p_filters, int $p_lang_id, \FreeFW\Core\StorageModel $p_model, $p_merge = true)
+    public function getEmailAsMessage(array $p_filters, int $p_lang_id, $p_model, $p_merge = true)
     {
         $message = null;
         $emails  = \FreeFW\Model\Email::find($p_filters);
@@ -47,28 +47,43 @@ class Email extends \FreeFW\Core\Service
                 $sso        = \FreeFW\DI\DI::getShared('sso');
                 $user       = $sso->getUser();
                 // @todo : rechercher le groupe principal de l'utilisateur
-                $grpId = null;
-                if (method_exists($p_model, 'getGrpId')) {
-                    $grpId = $p_model->getGrpId();
+                $grpId  = null;
+                $models = $p_model;
+                $fields = [];
+                $lModel = null;
+                if (!is_array($models)) {
+                    $models   = [];
+                    $models[] = $p_model;
                 }
-                if (!$grpId) {
-                    $group = $sso->getUserGroup();
-                    if ($group) {
-                        $grpId = $group->getGrpId();
+                foreach ($models as $oneModel) {
+                    if (!$lModel) {
+                        $lModel = $oneModel;
                     }
+                    $datas = $oneModel->getMergeData();
+                    if (!$grpId) {
+                        if (method_exists($oneModel, 'getGrpId')) {
+                            $grpId = $oneModel->getGrpId();
+                        }
+                        if (!$grpId) {
+                            $group = $sso->getUserGroup();
+                            if ($group) {
+                                $grpId = $group->getGrpId();
+                            }
+                        }
+                        $group = \FreeSSO\Model\Group::findFirst(
+                            [
+                                'grp_id' => $grpId
+                            ]
+                        );
+                        $datas->addGenericBlock('head_user');
+                        $datas->addGenericData($user->getFieldsAsArray(), 'head_user');
+                        $datas->addGenericBlock('head_group');
+                        $datas->addGenericData($group->getFieldsAsArray(), 'head_group');
+                    }
+                    $newFields = $datas->__toArray();
+                    $fields = array_merge_recursive($fields, $newFields);
                 }
-                $group = \FreeSSO\Model\Group::findFirst(
-                    [
-                        'grp_id' => $grpId
-                    ]
-                );
                 //
-                $datas  = $p_model->getMergeData();
-                $datas->addGenericBlock('head_user');
-                $datas->addGenericData($user->getFieldsAsArray(), 'head_user');
-                $datas->addGenericBlock('head_group');
-                $datas->addGenericData($group->getFieldsAsArray(), 'head_group');
-                $fields = $datas->__toArray();
                 //
                 $message = new \FreeFW\Model\Message();
                 $subject = $oneVersion->getEmaillSubject();
@@ -82,7 +97,7 @@ class Email extends \FreeFW\Core\Service
                             $datas = $editionService->printEdition(
                                 $oneEmail->getEmailEdi1Id(),
                                 $p_lang_id,
-                                $p_model
+                                $lModel
                             );
                             if (isset($datas['filename']) && is_file($datas['filename'])) {
                                 $message->addAttachment($datas['filename'], $datas['name']);
@@ -97,7 +112,7 @@ class Email extends \FreeFW\Core\Service
                             $datas = $editionService->printEdition(
                                 $oneEmail->getEmailEdi2Id(),
                                 $p_lang_id,
-                                $p_model
+                                $lModel
                             );
                             if (isset($datas['filename']) && is_file($datas['filename'])) {
                                 $message
@@ -111,8 +126,8 @@ class Email extends \FreeFW\Core\Service
                     }
                 }
                 $message
-                    ->setMsgObjectName($p_model->getApiType())
-                    ->setMsgObjectId($p_model->getApiId())
+                    ->setMsgObjectName($lModel->getApiType())
+                    ->setMsgObjectId($lModel->getApiId())
                     ->setMsgSubject($subject)
                     ->setMsgBody($body)
                     ->setMsgStatus(\FreeFW\Model\Message::STATUS_WAITING)
