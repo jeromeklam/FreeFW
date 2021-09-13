@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useDispatch, useSelector, shallowEqual } from 'react-redux';
 import { getNewJsonApi } from 'jsonapi-front';
 import mime from 'mime-types';
@@ -9,8 +9,11 @@ import {
   [[:FEATURE_UPPER:]]_PRINT_ONE_DISMISS_ERROR,
 } from './constants';
 import { downloadBlob } from '../../ui';
-import { freeAssoApi } from '../../../common';
+import { default as freeAssoApi } from '../../../common/api';
 
+/**
+ * Impression d'un modèle
+ */
 export function printOne(id, ediId) {
   return (dispatch) => {
     dispatch({
@@ -18,12 +21,12 @@ export function printOne(id, ediId) {
     });
     const promise = new Promise((resolve, reject) => {
       const options = getNewJsonApi('FreeFW_PrintOptions', id, {prt_name : '[[:FEATURE_CAMEL:]]', prt_type : 'EDITION', edi_id: ediId});
-      const doRequest = freeAssoApi.post('/v1/[[:FEATURE_COLLECTION:]]/[[:FEATURE_SERVICE:]]/print/' + id, options, {responseType: 'arraybuffer'});
+      const doRequest = freeAssoApi.post('/v1/[[:FEATURE_COLLECTION:]]/[[:FEATURE_SNAKE:]]/print/' + id, options, {responseType: 'arraybuffer'});
       doRequest.then(
         (res) => {
           const type = res.headers['content-type'] || 'application/octet-stream';
           const extension = mime.extension(type);
-          downloadBlob(res.data, type, '[[:FEATURE_LOWER:]]_' + id + '.' + extension);
+          downloadBlob(res.data, type, '[[:FEATURE_CAMEL:]]_' + id + '.' + extension);
           dispatch({
             type: [[:FEATURE_UPPER:]]_PRINT_ONE_SUCCESS,
             data: res,
@@ -54,8 +57,8 @@ export function usePrintOne() {
 
   const { printOnePending, printOneError } = useSelector(
     state => ({
-      printOnePending: state.[[:FEATURE_LOWER:]].printOnePending,
-      printOneError: state.[[:FEATURE_LOWER:]].printOneError,
+      printOnePending: state.[[:FEATURE_CAMEL:]].printOnePending,
+      printOneError: state.[[:FEATURE_CAMEL:]].printOneError,
     }),
     shallowEqual,
   );
@@ -76,6 +79,12 @@ export function usePrintOne() {
   };
 }
 
+/**
+ * Reducer
+ * 
+ * @param {Object} state  Etat courant de la mémoire (store)
+ * @param {Object} action Action à réaliser sur cet état avec options
+ */
 export function reducer(state, action) {
   switch (action.type) {
     case [[:FEATURE_UPPER:]]_PRINT_ONE_BEGIN:

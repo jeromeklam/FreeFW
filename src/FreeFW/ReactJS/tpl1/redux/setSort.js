@@ -1,7 +1,8 @@
-import {
-  [[:FEATURE_UPPER:]]_SET_SORT,
-} from './constants';
+import { [[:FEATURE_UPPER:]]_SET_SORT } from './constants';
 
+/**
+ * Met un tri sur la liste des modèles
+ */
 export function setSort(sort) {
   return {
     type: [[:FEATURE_UPPER:]]_SET_SORT,

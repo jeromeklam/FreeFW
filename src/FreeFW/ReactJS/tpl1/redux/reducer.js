@@ -17,6 +17,9 @@ import { reducer as onSelectReducer } from './onSelect';
 import { reducer as selectNoneReducer } from './selectNone';
 import { reducer as selectAllReducer } from './selectAll';
 import { reducer as exportAsTabReducer } from './exportAsTab';
+import { reducer as setCurrentReducer } from './setCurrent';
+import { reducer as setPreviousReducer } from './setPrevious';
+import { reducer as setNextReducer } from './setNext';
 
 const reducers = [
   loadMoreReducer,
@@ -37,6 +40,9 @@ const reducers = [
   selectNoneReducer,
   selectAllReducer,
   exportAsTabReducer,
+  setCurrentReducer,
+  setPreviousReducer,
+  setNextReducer,
 ];
 
 export default function reducer(state = initialState, action) {

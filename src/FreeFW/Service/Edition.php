@@ -55,7 +55,8 @@ class Edition extends \FreeFW\Core\Service
             // @todo : rechercher le groupe principal de l'utilisateur
             if (method_exists($p_model, 'getGrpId')) {
                 $grpId = $p_model->getGrpId();
-            } else {
+            }
+            if (!$grpId) {
                 $group = $sso->getUserGroup();
                 if ($group) {
                     $grpId = $group->getGrpId();
@@ -66,7 +67,6 @@ class Edition extends \FreeFW\Core\Service
                     'grp_id' => $grpId
                 ]
             );
-            //
             $cfg  = $this->getAppConfig();
             $dir  = $cfg->get('ged:dir');
             if (!is_dir($dir)) {
@@ -80,10 +80,14 @@ class Edition extends \FreeFW\Core\Service
             $ediContent = $edition->getEdiContent();
             file_put_contents($src, $ediContent);
             file_put_contents($dest, $ediContent);
-            $mergeDatas->addGenericBlock('head_user');
-            $mergeDatas->addGenericData($user->getFieldsAsArray(), 'head_user');
-            $mergeDatas->addGenericBlock('head_group');
-            $mergeDatas->addGenericData($group->getFieldsAsArray(), 'head_group');
+            if ($user) {
+                $mergeDatas->addGenericBlock('head_user');
+                $mergeDatas->addGenericData($user->getFieldsAsArray(), 'head_user');
+            }
+            if ($group) {
+                $mergeDatas->addGenericBlock('head_group');
+                $mergeDatas->addGenericData($group->getFieldsAsArray(), 'head_group');
+            }
             $mergeService = \FreeFW\DI\DI::get('FreeOffice::Service::Merge');
             $mergeService->merge($src, $dest, $mergeDatas);
             exec('/usr/bin/unoconv -f pdf -o ' . $dPdf . ' ' . $dest);

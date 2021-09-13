@@ -1,6 +1,6 @@
 @import '../../styles/mixins';
 
-.[[:FEATURE_LOWER:]]-list {
+.[[:FEATURE_CAMEL:]]-list {
   .card {
     margin: 10px;
   }

@@ -1,17 +1,24 @@
-import { Filter, FILTER_MODE_AND, FILTER_OPER_GREATER_OR_EQUAL_OR_NULL, FILTER_OPER_EQUAL } from 'react-bootstrap-front';
 import { getNewNormalizedObject } from 'jsonapi-front';
+import { getInitFilters } from './initFilters';
 
-let initialFilters = new Filter();
-initialFilters.setMode(FILTER_MODE_AND);
-
+/**
+ * Initialisation du store pour l'objet 
+ */
 const initialState = {
+  objectName: '[[:FEATURE_MODEL:]]',
   items: getNewNormalizedObject('[[:FEATURE_MODEL:]]'),
+  currentId: 0,
+  currentMode: 'none',
+  currentIsFirst: true,
+  currentIsLast: true,
   selected: [],
   page_number: 1,
   page_size: process.env.REACT_APP_PAGE_SIZE,
-  tab: "1",
-  filters: initialFilters,
-  sort: [{col:"id",way:"up"}],
+  tab: 'ident',
+  filters: getInitFilters(),
+  sort: [[:FEATURE_SORT:]],
+  include: '[[:FEATURE_INCLUDE:]]',
+  includeMore: '[[:FEATURE_INCLUDE:]]',
   loadMorePending: false,
   loadMoreFinish: false,
   loadMoreError: null,
@@ -28,6 +35,8 @@ const initialState = {
   printOneError: null,
   exportPending: false,
   exportError: null,
+  setNextPending: false,
+  setNextError: null,
 };
 
 export default initialState;

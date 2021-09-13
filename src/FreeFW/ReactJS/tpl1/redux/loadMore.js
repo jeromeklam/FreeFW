@@ -8,9 +8,12 @@ import {
   [[:FEATURE_UPPER:]]_LOAD_MORE_DISMISS_ERROR,
 } from './constants';
 
-export function loadMore(args = false, reload = false) {
+/**
+ * Récupère la liste des agents
+ */
+export function loadMore(reload = false) {
   return (dispatch, getState) => {
-    const loaded =  getState().[[:FEATURE_LOWER:]].loadMoreFinish;
+    const loaded =  getState().[[:FEATURE_CAMEL:]].loadMoreFinish;
     if (!loaded || reload) {
       if (reload) {
         dispatch({
@@ -22,13 +25,14 @@ export function loadMore(args = false, reload = false) {
         });
       }
       const promise = new Promise((resolve, reject) => {
-        let filters = getState().[[:FEATURE_LOWER:]].filters.asJsonApiObject()
+        let filters = getState().[[:FEATURE_CAMEL:]].filters.asJsonApiObject()
         let params = {
-          page: { number: getState().[[:FEATURE_LOWER:]].page_number, size: getState().[[:FEATURE_LOWER:]].page_size },
+          page: { number: getState().[[:FEATURE_CAMEL:]].page_number, size: getState().[[:FEATURE_CAMEL:]].page_size },
+          include: getState().[[:FEATURE_CAMEL:]].includeMore,
           ...filters
         };
         let sort = '';
-        getState().[[:FEATURE_LOWER:]].sort.forEach(elt => {
+        getState().[[:FEATURE_CAMEL:]].sort.forEach(elt => {
           let add = elt.col;
           if (elt.way === 'down') {
             add = '-' + add;
@@ -43,7 +47,7 @@ export function loadMore(args = false, reload = false) {
           params.sort = sort;
         }
         const addUrl = objectToQueryString(params);
-        const doRequest = freeAssoApi.get('/v1/[[:FEATURE_COLLECTION:]]/[[:FEATURE_SERVICE:]]' + addUrl, {});
+        const doRequest = freeAssoApi.get('/v1/[[:FEATURE_COLLECTION:]]/[[:FEATURE_SNAKE:]]' + addUrl, {});
         doRequest.then(
           (res) => {
             dispatch({
@@ -54,6 +58,7 @@ export function loadMore(args = false, reload = false) {
           },
           // Use rejectHandler as the second argument so that render errors won't be caught.
           (err) => {
+            console.log("err more : ", err);
             dispatch({
               type: [[:FEATURE_UPPER:]]_LOAD_MORE_FAILURE,
               data: { error: err },
@@ -73,6 +78,12 @@ export function dismissLoadMoreError() {
   };
 }
 
+/**
+ * Reducer
+ * 
+ * @param {Object} state  Etat courant de la mémoire (store)
+ * @param {Object} action Action à réaliser sur cet état avec options
+ */
 export function reducer(state, action) {
   switch (action.type) {
     case [[:FEATURE_UPPER:]]_LOAD_MORE_INIT:
@@ -116,13 +127,24 @@ export function reducer(state, action) {
       } else {
         list = state.items;
       }
+      let currentId = state.currentId;
+      let currentIsFirst = state.currentIsFirst;
+      let currentIsLast = state.currentIsLast;
+      if (!currentId) {
+        currentId = state.items.SORTEDELEMS[0];
+        currentIsFirst = true;
+        currentIsLast = state.items.SORTEDELEMS.length === 1;
+      }
       return {
         ...state,
         loadMorePending: false,
         loadMoreError: null,
         loadMoreFinish: (nbre < state.page_size),
         items: list,
-        page_number: state.page_number+1
+        page_number: state.page_number+1,
+        currentId: currentId,
+        currentIsFirst: currentIsFirst,
+        currentIsLast: currentIsLast,
       };
 
     case [[:FEATURE_UPPER:]]_LOAD_MORE_FAILURE:

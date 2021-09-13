@@ -1,7 +1,8 @@
-import {
-  [[:FEATURE_UPPER:]]_SET_FILTERS,
-} from './constants';
+import { [[:FEATURE_UPPER:]]_SET_FILTERS } from './constants';
 
+/**
+ * Met un filtre sur liste des modèles
+ */
 export function setFilters(filters) {
   return {
     type: [[:FEATURE_UPPER:]]_SET_FILTERS,
@@ -9,6 +10,12 @@ export function setFilters(filters) {
   };
 }
 
+/**
+ * Reducer
+ * 
+ * @param {Object} state  Etat courant de la mémoire (store)
+ * @param {Object} action Action à réaliser sur cet état avec options
+ */
 export function reducer(state, action) {
   switch (action.type) {
     case [[:FEATURE_UPPER:]]_SET_FILTERS:

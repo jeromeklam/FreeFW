@@ -1,27 +1,49 @@
 import React from 'react';
 import { injectIntl } from 'react-intl';
+import { getShortcuts } from './';
+import useForm from '../ui/useForm';
 import {
-  InputCheckbox,
+  ResponsiveModalOrForm,
   InputHidden,
-  InputSelect,
   InputText,
-  InputMonetary,
+  InputCheckbox,
+  InputDate,
+  InputDatetime,
+  InputPhone,
   Row,
   Col,
-} from 'react-bootstrap-front';
-import { InputDate, InputData, ResponsiveModalOrForm, InputTextarea, InputSpin } from '../ui';
-import useForm from '../ui/useForm';
+} from '../ui';
+import { Home as [[:FEATURE_CAMEL_FULL:]]Icon } from '../icons';
 
-const afterChange = (name, item) => {
-  switch (name) {
+/**
+ * Initialisation
+ * 
+ * @param {Object}   item
+ * @param {Function} setItem
+ */
+const initItem = (item, setItem) => {
+};
+
+/**
+ * Un champ a été modifié
+ * 
+ * @param {String}   field
+ * @param {Object}   item
+ * @param {Function} setitem
+ */
+const afterChange = (field, item, setItem) => {
+  switch (field) {
     default:
       break;
   }
-  return item;
 };
 
+/**
+ * Saisie des informations d'un modèle
+ */
 function Form(props) {
   let item = props.item;
+  // On récupère tout ce qu'il faut pour travailler
   const {
     values,
     handleChange,
@@ -30,6 +52,7 @@ function Form(props) {
     handleCancel,
     handleNavTab,
     getErrorMessage,
+    getCurrentTab,
   } = useForm(
     item,
     props.tab,
@@ -39,27 +62,41 @@ function Form(props) {
     props.errors,
     props.intl,
     afterChange,
+    initItem,
   );
-  const tabs = [];
-  const modifTabs = [];
+  // Le formulaire
   return (
     <ResponsiveModalOrForm
-      title={values.cau_name ? values.cau_name : ''}
-      className="m-5"
-      tab={values.__currentTab}
-      tabs={!props.modify ? tabs : tabs.concat(modifTabs)}
-      size="xl"
+      title={
+        !props.modify && !values.[[:FEATURE_MAINCOL:]]
+          ? props.intl.formatMessage({
+              id: 'app.features.[[:FEATURE_CAMEL:]].form.title',
+              defaultMessage: 'New model',
+            })
+          : values.[[:FEATURE_MAINCOL:]]
+      }
+      className=""
+      tab={getCurrentTab()}
+      tabs={!props.modify ? getShortcuts(props.intl, 'new') : getShortcuts(props.intl, 'all')}
+      size="md"
       onSubmit={handleSubmit}
       onCancel={handleCancel}
       onNavTab={handleNavTab}
       onSave={handleSave}
-      onClose={props.onClose}
+      onClose={handleCancel}
+      onPrevious={props.onPrevious}
+      onNext={props.onNext}
       modal={true}
       actionsButtons={props.actionsButtons}
+      loader={props.loader ? props.loader : false}
     >
       <InputHidden name="id" id="id" value={values.id} />
+      [[:FEATURE_FIELDS:]]
     </ResponsiveModalOrForm>
   );
 }
 
+/**
+ * Injection de l'intl
+ */
 export default injectIntl(Form);

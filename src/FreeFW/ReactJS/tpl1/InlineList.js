@@ -1,61 +1,242 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { jsonApiNormalizer, objectToQueryString, normalizedObjectModeler } from 'jsonapi-front';
-import { Loading3Dots } from 'react-bootstrap-front';
-import { SimpleLabel as DataSimpleLabel } from '../data';
+import { injectIntl } from 'react-intl';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { Filter, FILTER_OPER_EQUAL, FILTER_MODE_AND } from 'react-bootstrap-front';
+import {
+  objectToQueryString,
+  jsonApiNormalizer,
+  normalizedObjectModeler,
+  getNewNormalizedObject,
+} from 'jsonapi-front';
+import * as actions from './redux/actions';
 import { freeAssoApi } from '../../common';
+import { KalaLoader, sortAsJsonApiObject, ResponsiveInlineList } from '../ui';
+import { getCols, Input } from './';
 
-export default class InlineList extends Component {
+/**
+ * Liste interne responsive, pour la recherche ou l'affichage
+ *
+ * C'est à l'appelant de gérer la recherche et les actions.
+ */
+export class InlineList extends Component {
   static propTypes = {
-    site_id: PropTypes.string.isRequired,
+    items: PropTypes.array,
+    loading: PropTypes.bool,
+    onSelect: PropTypes.func.isRequired,
+  };
+  static defaultProps = {
+    items: [],
+    loading: false,
   };
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      site_id: this.props.site_id,
-      list: [],
-      loading: false,
-    };
+  /**
+   * Update state, ...
+   *
+   * @param {Object} props
+   * @param {Object} state
+   */
+  static getDerivedStateFromProps(props, state) {
+    if (props.parentId !== state.parentId || props.mode !== state.mode) {
+      let filters = state.filters;
+      if (props.mode === '<name>') {
+        filters.addFilter('<field>', '<value>', FILTER_OPER_EQUAL, true);
+      }
+      return {
+        parentId: props.parentId,
+        mode: props.mode,
+        normalized: getNewNormalizedObject('[[:FEATURE_MODEL:]]'),
+        items: [],
+        filters: filters,
+        currentPage: 1,
+        currentCount: 0,
+      };
+    }
+    return null;
   }
 
+  /**
+   * Constructor
+   *
+   * @param {Object} props
+   */
+  constructor(props) {
+    super(props);
+    const parentId = props.parentId || null;
+    const filters = props.filters || new Filter();
+    filters.init(FILTER_MODE_AND, FILTER_OPER_EQUAL);
+    const sort = props.sort || [{ col: '[[:FEATURE_MAINCOL:]]', way: 'up' }];
+    if (props.mode === '<name>') {
+      filters.addFilter('<field>', '<value>', FILTER_OPER_EQUAL, true);
+    }
+    // State
+    this.state = {
+      id: -1,
+      parentId: props.parentId,
+      filters: filters,
+      mode: props.mode,
+      sort: sort,
+      normalized: getNewNormalizedObject('[[:FEATURE_MODEL:]]'),
+      items: [],
+      currentPage: 1,
+      currentCount: 0,
+      loadingItems: true,
+      confirm: false,
+    };
+    // Binds
+    this.localLoad = this.localLoad.bind(this);
+    this.onAddOne = this.onAddOne.bind(this);
+    this.onGetOne = this.onGetOne.bind(this);
+    this.onDelOne = this.onDelOne.bind(this);
+    this.onClose = this.onClose.bind(this);
+    this.onConfirmOpen = this.onConfirmOpen.bind(this);
+    this.onConfirmClose = this.onConfirmClose.bind(this);
+  }
+
+  /**
+   * On mount
+   */
   componentDidMount() {
-    if (!this.state.loading) {
-      this.setState({ loading: true });
-      const params = { filter: { site_id: this.props.site_id } };
-      const addUrl = objectToQueryString(params);
-      const doRequest = freeAssoApi.get('/v1/[[:FEATURE_COLLECTION:]]/[[:FEATURE_SERVICE:]]' + addUrl, {});
-      doRequest
-        .then(result => {
-          const lines = jsonApiNormalizer(result.data);
-          const items = normalizedObjectModeler(lines, '[[:FEATURE_MODEL:]]');
-          this.setState({ loading: false, list: items });
-        })
-        .catch(err => {
-          this.setState({ loading: false, list: [] });
-        });
+    this.localLoad(true);
+  }
+
+  /**
+   * Update
+   *
+   * @param {Object} prevProps
+   * @param {Object} prevState
+   */
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.parentId !== prevState.parentId || this.state.mode !== prevState.mode) {
+      this.localLoad(true);
     }
   }
 
+  /**
+   * Load items
+   *
+   * @param {Bool} reset
+   */
+  localLoad(reset = true) {
+    let update = { loadingItems: true };
+    let currentPage = this.state.currentPage;
+    if (reset) {
+      update = {
+        ...update,
+        normalized: getNewNormalizedObject('[[:FEATURE_MODEL:]]'),
+        items: [],
+        currentPage: 1,
+        currentCount: 0,
+      };
+    } else {
+      currentPage++;
+      update = {
+        ...update,
+        currentPage: currentPage,
+      };
+    }
+    this.setState({ ...update });
+    let filters = this.state.filters;
+    let sort = sortAsJsonApiObject(this.state.sort);
+    let params = {
+      ...filters.asJsonApiObject(),
+      ...sort,
+      page: { number: currentPage, size: 25 },
+    };
+    const addUrl = objectToQueryString(params);
+    const doRequest = freeAssoApi.get('/v1/[[:FEATURE_COLLECTION:]]/[[:FEATURE_SNAKE:]]' + addUrl, {});
+    doRequest.then(result => {
+      if (result && result.data) {
+        let normalized = [];
+        if (!reset) {
+          normalized = jsonApiNormalizer(result.data, this.state.normalized);
+        } else {
+          normalized = jsonApiNormalizer(result.data);
+        }
+        this.setState({
+          normalized: normalized,
+          loadingItems: false,
+          currentCount: normalized.TOTAL || 0,
+          items: normalizedObjectModeler(normalized, '[[:FEATURE_MODEL:]]'),
+        });
+      } else {
+        this.setState({ normalized: getNewNormalizedObject('[[:FEATURE_MODEL:]]'), loadingItems: false });
+      }
+    });
+  }
+
+  onAddOne() {
+    this.setState({ id: 0 });
+  }
+
+  onGetOne(id) {
+    this.setState({ id: id });
+  }
+
+  onDelOne() {
+    const { id } = this.state;
+    this.props.actions.delOne(id).then(result => {
+      this.localLoad();
+    });
+  }
+
+  onClose() {
+    this.setState({ id: -1 });
+    this.localLoad(true);
+  }
+
+  onConfirmOpen(id) {
+    this.setState({ confirm: true, id: id });
+  }
+
+  onConfirmClose() {
+    this.setState({ confirm: false, id: -1 });
+  }
+
   render() {
+    const cols = getCols(this);
     return (
-      <div className=".[[:FEATURE_LOWER:]]-inline-list">
-        {this.state.loading ? (
-          <Loading3Dots />
-        ) : (
-          <div>
-            {this.state.list &&
-              this.state.list.map(item => {
-                return (
-                  <p key={item.id} title={item.cau_name}>{item..[[:FEATURE_LOWER:]]_type.caut_name}
-                    &nbsp;( {item.cau_sex} )
-                    &nbsp;( <DataSimpleLabel code="COULEUR" value={item.cau_string_1} /> )
-                  </p>
-                );
-              })}
-          </div>
-        )}
+      <div className="[[:FEATURE_LOWER:]]-inline-list">
+        <ResponsiveInlineList
+          cols={cols}
+          {...this.props}
+          items={this.state.items}
+          onAddOne={this.onAddOne}
+          onGetOne={this.onGetOne}
+          onDelOne={this.onDelOne}
+          onMore={() => this.localLoad(false)}
+          total={this.state.currentCount}
+          loading={this.state.loadingItems}
+          onConfirm={id => this.onConfirmOpen(id)}
+        />
+        {this.state.loadingItems && <KalaLoader />}
+        <div>
+          {!this.state.confirm && this.state.id === 0 && (
+            <Input
+              onClose={this.onClose}
+              mode={this.props.mode}
+              parentId={this.state.parentId}
+              objParent={this.props.objParent}
+            />
+          )}
+          {!this.state.confirm && this.state.id > 0 && (
+            <Input onClose={this.onClose} id={this.state.id} />
+          )}
+        </div>
       </div>
     );
   }
 }
+
+function mapStateToProps(state) {
+  return {};
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    actions: bindActionCreators({ ...actions }, dispatch),
+  };
+}
+
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(InlineList));

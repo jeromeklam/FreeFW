@@ -123,7 +123,7 @@ class JwtAuth implements
         $jUser  = $this->decodeJwtToken($token);
         if ($jUser !== null && $jUser !== false) {
             $sso  = \FreeFW\DI\DI::getShared('sso');
-            $user = $sso->signinByIdAndLogin($jUser['aud']['id'], $jUser['aud']['login']);
+            $user = $sso->signinByIdAndLogin($jUser['aud']['id'], $jUser['aud']['login'], false);
         }
         return $user;
     }

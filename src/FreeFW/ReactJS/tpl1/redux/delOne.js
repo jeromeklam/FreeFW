@@ -1,29 +1,39 @@
-import { jsonApiNormalizer } from 'jsonapi-front';
-import { freeAssoApi } from '../../../common';
+import { jsonApiNormalizer, getNewJsonApi } from 'jsonapi-front';
 import {
   [[:FEATURE_UPPER:]]_DEL_ONE_BEGIN,
   [[:FEATURE_UPPER:]]_DEL_ONE_SUCCESS,
   [[:FEATURE_UPPER:]]_DEL_ONE_FAILURE,
   [[:FEATURE_UPPER:]]_DEL_ONE_DISMISS_ERROR,
 } from './constants';
+import { freeAssoApi, propagateModel } from '../../../common';
 
-export function delOne(id) {
-  return (dispatch) => { 
+/**
+ * Suppression d'un modèle
+ *
+ * @param {String} id         Identifiant de l'objet à supprimer
+ * @param {Boolean} propagate Propagation de la suppression dans le store
+ */
+export function delOne(id, propagate = true) {
+  return dispatch => {
     dispatch({
       type: [[:FEATURE_UPPER:]]_DEL_ONE_BEGIN,
     });
 
     const promise = new Promise((resolve, reject) => {
-      const doRequest = freeAssoApi.delete('/v1/[[:FEATURE_COLLECTION:]]/[[:FEATURE_SERVICE:]]/' + id);
+      const doRequest = freeAssoApi.delete('/v1/[[:FEATURE_COLLECTION:]]/[[:FEATURE_SNAKE:]]/' + id);
       doRequest.then(
-        (res) => {
+        res => {
+          if (propagate) {
+            const result = getNewJsonApi('[[:FEATURE_MODEL:]]', id);
+            dispatch(propagateModel('[[:FEATURE_MODEL:]]', { data: result }, true));
+          }
           dispatch({
             type: [[:FEATURE_UPPER:]]_DEL_ONE_SUCCESS,
             data: res,
           });
           resolve(res);
         },
-        (err) => {
+        err => {
           dispatch({
             type: [[:FEATURE_UPPER:]]_DEL_ONE_FAILURE,
             data: { error: err },
@@ -43,6 +53,12 @@ export function dismissDelOneError() {
   };
 }
 
+/**
+ * Reducer
+ * 
+ * @param {Object} state  Etat courant de la mémoire (store)
+ * @param {Object} action Action à réaliser sur cet état avec options
+ */
 export function reducer(state, action) {
   switch (action.type) {
     case [[:FEATURE_UPPER:]]_DEL_ONE_BEGIN:

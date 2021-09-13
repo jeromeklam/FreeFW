@@ -5,9 +5,57 @@ import {
   DelOne as DelOneIcon,
   Print as PrintIcon,
 } from '../icons';
+import { displayColBool } from '../ui';
+ 
+ /**
+ * Shortcuts
+ *
+ * @param {Object} intl
+ * @param {String} mode
+ */
+export const getShortcuts = (intl, mode = 'all') => {
+  let shortcuts = [];
+  shortcuts.push({
+    name: 'ident',
+    icon: '',
+    size: 'maximized',
+    display: 'block',
+    position: 1,
+    label: intl.formatMessage({
+      id: 'app.features.[[:FEATURE_CAMEL:]].form.tabs.ident',
+      defaultMessage: 'Identification',
+    }),
+  });
+  if (mode === 'all') {
+  }
+  return shortcuts;
+}
+ 
+/**
+ * Gestion de l'affichage du champ en fonction du modèle 
+ */
+export function getPickerDisplay(item) {
+  let display = '';
+  if (item && item.id > 0) {
+    display = item.[[:FEATURE_MAINCOL:]];
+  }
+  return display;
+}
 
 /**
- *
+ * Affichage des agents dans la liste des propositions de la recherhe 
+ * ou dans la liste proposées sous le champ en autocomplète
+ */
+export const displayItemPicker = item => {
+  return (
+    <p className="input-picker-line">
+      <span className="input-picker-left">{item.[[:FEATURE_MAINCOL:]]}</span>
+    </p>
+  );
+};
+
+/**
+ * Actions disponibles depuis l'en-tête de la liste des agents
  */
 export const getGlobalActions = ({ props, onClearFilters, onCreate }) => {
   return [
@@ -19,31 +67,48 @@ export const getGlobalActions = ({ props, onClearFilters, onCreate }) => {
       }),
       onClick: onCreate,
       theme: 'primary',
-      icon: <AddOneIcon color="white" />,
+      icon: <AddOneIcon />,
       role: 'CREATE',
     },
   ];
 };
 
 /**
- *
+ * Actions disponibles sur la fiche (en plus de l'enregistrement et de l'annulation)
  */
 export const getActionsButtons = ({ onPrint, state }) => {
-  if (state.id > 0) {
-    return [
-      {
-        theme: 'secondary',
-        hidden: false,
-        function: () => onPrint(),
-        icon: <PrintIcon title="Imprimer" />,
-      },
-    ];
+  const { editions } = state;
+  let myOptions = [];
+  let printabled = false;
+  if (editions && Array.isArray(editions) && editions.length > 0) {
+    printabled = true;
+    editions.forEach(edition => {
+      myOptions.push({
+        id: edition.id,
+        label: edition.edi_name,
+        onClick: () => onPrint(edition.id),
+      });
+    });
   }
-  return [];
+  return [
+    {
+      theme: 'secondary',
+      hidden: !printabled,
+      options: myOptions,
+      optionsAlign: 'top-left',
+      function: () => onPrint(),
+      icon: <PrintIcon title="Imprimer" />,
+    },
+  ];
 };
 
 /**
- *
+ * Actions disponibles depuis l'en-tête de la liste des agents pour agir sur les lignes de la liste
+ *    Sélection lignes 
+ *    Dé-sélection 
+ *    ... 
+ *    Actions sur lignes sélectionnées
+ *    ou sur toutes les lignes 
  */
 export const getSelectActions = ({ props, onSelectMenu }) => {
   let arrOne = [
@@ -81,7 +146,7 @@ export const getSelectActions = ({ props, onSelectMenu }) => {
       },
     },
   ];
-  if (props.[[:FEATURE_LOWER:]].selected.length > 0) {
+  if (props.[[:FEATURE_CAMEL:]].selected.length > 0) {
     arrOne = arrOne.concat(arrAppend);
   }
   const arrStandard = [
@@ -102,7 +167,7 @@ export const getSelectActions = ({ props, onSelectMenu }) => {
 };
 
 /**
- *
+ * Actions disponibles sur une ligne de la liste des agents au survol de cette ligne
  */
 export const getInlineActions = ({ props, onSelectList, onGetOne, onDelOne, onPrint, state }) => {
   const { editions } = state;
@@ -110,7 +175,6 @@ export const getInlineActions = ({ props, onSelectList, onGetOne, onDelOne, onPr
   editions.forEach(edition => {
     myEditions.push({ label: edition.edi_name, onClick: item => onPrint(edition.id, item) });
   });
-
   return [
     {
       name: 'print',
@@ -120,7 +184,7 @@ export const getInlineActions = ({ props, onSelectList, onGetOne, onDelOne, onPr
       }),
       onClick: onPrint,
       theme: 'secondary',
-      icon: <PrintIcon color="white" />,
+      icon: <PrintIcon />,
       role: 'PRINT',
       param: 'object',
       active: myEditions.length > 0,
@@ -134,7 +198,7 @@ export const getInlineActions = ({ props, onSelectList, onGetOne, onDelOne, onPr
       }),
       onClick: onGetOne,
       theme: 'secondary',
-      icon: <GetOneIcon color="white" />,
+      icon: <GetOneIcon />,
       role: 'MODIFY',
     },
     {
@@ -145,13 +209,20 @@ export const getInlineActions = ({ props, onSelectList, onGetOne, onDelOne, onPr
       }),
       onClick: onDelOne,
       theme: 'warning',
-      icon: <DelOneIcon color="white" />,
+      icon: <DelOneIcon />,
       role: 'DELETE',
     },
   ];
 };
 
+/**
+ * Descriptions de toutes les colonnes de la liste
+ * Même les colonnes cachées
+ * Ces colonnes peuvent ou non données des champs dans les filtres
+ * (une info peut de pas être affichée dans la liste mais on peut peut-être mettre un filtre dessus)
+ */
 export const getCols = ({ props }) => {
   return [
+    [[:FEATURE_COLS:]]
   ];
 };

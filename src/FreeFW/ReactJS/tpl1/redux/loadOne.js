@@ -1,4 +1,3 @@
-import { freeAssoApi } from '../../../common';
 import { jsonApiNormalizer, normalizedObjectModeler } from 'jsonapi-front';
 import {
   [[:FEATURE_UPPER:]]_LOAD_ONE_BEGIN,
@@ -6,15 +5,21 @@ import {
   [[:FEATURE_UPPER:]]_LOAD_ONE_FAILURE,
   [[:FEATURE_UPPER:]]_LOAD_ONE_DISMISS_ERROR,
 } from './constants';
-import { getOne[[:FEATURE_CAMEL:]] } from '../';
+import { getOneModel } from '../';
 
+/**
+ * Récupère un modèle en fonction de son identifiant
+ */
 export function loadOne(id = 0) {
-  return dispatch => {
+  return (dispatch, getState) => {
     dispatch({
       type: [[:FEATURE_UPPER:]]_LOAD_ONE_BEGIN,
     });
     const promise = new Promise((resolve, reject) => {
-      const doRequest = getOne[[:FEATURE_CAMEL:]](id);
+      const params = {
+        include: getState().[[:FEATURE_CAMEL:]].include
+      }
+      const doRequest = getOneModel(id, params);
       doRequest.then(
         result => {
           const object = jsonApiNormalizer(result.data);
@@ -47,6 +52,12 @@ export function dismissLoadOneError() {
   };
 }
 
+/**
+ * Reducer
+ * 
+ * @param {Object} state  Etat courant de la mémoire (store)
+ * @param {Object} action Action à réaliser sur cet état avec options
+ */
 export function reducer(state, action) {
   switch (action.type) {
     case [[:FEATURE_UPPER:]]_LOAD_ONE_BEGIN:

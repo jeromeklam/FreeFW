@@ -1,4 +1,4 @@
-import { jsonApiNormalizer, getJsonApi, normalizedObjectFirstModel } from 'jsonapi-front';
+import { jsonApiNormalizer, getJsonApi, normalizedObjectFirstModel, objectToQueryString } from 'jsonapi-front';
 import {
   [[:FEATURE_UPPER:]]_CREATE_ONE_BEGIN,
   [[:FEATURE_UPPER:]]_CREATE_ONE_SUCCESS,
@@ -7,14 +7,21 @@ import {
 } from './constants';
 import { freeAssoApi, propagateModel } from '../../../common';
 
+/**
+ * Création d'un modèle
+ */
 export function createOne(obj = {}, propagate = true) {
-  return (dispatch) => {
+  return (dispatch, getState) => {
     dispatch({
       type: [[:FEATURE_UPPER:]]_CREATE_ONE_BEGIN,
     });
     const promise = new Promise((resolve, reject) => {
+      const params = {
+        include: getState().[[:FEATURE_CAMEL:]].include
+      }
+      const addUrl = objectToQueryString(params);
       const japiObj = getJsonApi(obj, '[[:FEATURE_MODEL:]]');
-      const doRequest = freeAssoApi.post('/v1/[[:FEATURE_COLLECTION:]]/[[:FEATURE_SERVICE:]]', japiObj);
+      const doRequest = freeAssoApi.post('/v1/[[:FEATURE_COLLECTION:]]/[[:FEATURE_SNAKE:]]' + addUrl, japiObj);
       doRequest.then(
         (result) => {
           const object = jsonApiNormalizer(result.data);
@@ -49,6 +56,12 @@ export function dismissCreateOneError() {
   };
 }
 
+/**
+ * Reducer
+ * 
+ * @param {Object} state  Etat courant de la mémoire (store)
+ * @param {Object} action Action à réaliser sur cet état avec options
+ */
 export function reducer(state, action) {
   switch (action.type) {
     case [[:FEATURE_UPPER:]]_CREATE_ONE_BEGIN:

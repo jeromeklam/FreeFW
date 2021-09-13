@@ -1,10 +1,12 @@
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { normalizedObjectModeler } from 'jsonapi-front';
-import {
-  [[:FEATURE_UPPER:]]_SELECT_ALL,
-} from './constants';
+import { [[:FEATURE_UPPER:]]_SELECT_ALL } from './constants';
 
+
+/**
+ * Selection de tous les modèles de la liste
+ */
 export function selectAll() {
   return {
     type: [[:FEATURE_UPPER:]]_SELECT_ALL,
@@ -17,6 +19,12 @@ export function useSelectAll() {
   return { selectAll: boundAction };
 }
 
+/**
+ * Reducer
+ * 
+ * @param {Object} state  Etat courant de la mémoire (store)
+ * @param {Object} action Action à réaliser sur cet état avec options
+ */
 export function reducer(state, action) {
   switch (action.type) {
     case [[:FEATURE_UPPER:]]_SELECT_ALL:

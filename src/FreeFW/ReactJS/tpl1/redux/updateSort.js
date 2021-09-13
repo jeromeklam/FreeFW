@@ -1,5 +1,8 @@
 import { [[:FEATURE_UPPER:]]_UPDATE_SORT } from './constants';
 
+/**
+ * Mise à jour du tri de la liste
+ */
 export function updateSort(col, way, pos = 99) {
   return {
     type: [[:FEATURE_UPPER:]]_UPDATE_SORT,
@@ -9,6 +12,12 @@ export function updateSort(col, way, pos = 99) {
   };
 }
 
+/**
+ * Reducer
+ * 
+ * @param {Object} state  Etat courant de la mémoire (store)
+ * @param {Object} action Action à réaliser sur cet état avec options
+ */
 export function reducer(state, action) {
   switch (action.type) {
     case [[:FEATURE_UPPER:]]_UPDATE_SORT:
