@@ -70,7 +70,7 @@ function Form(props) {
       title={
         !props.modify && !values.[[:FEATURE_MAINCOL:]]
           ? props.intl.formatMessage({
-              id: 'app.features.[[:FEATURE_CAMEL:]].form.title',
+              id: 'app.features.[[:FEATURE_LOWER:]].form.title',
               defaultMessage: 'New model',
             })
           : values.[[:FEATURE_MAINCOL:]]

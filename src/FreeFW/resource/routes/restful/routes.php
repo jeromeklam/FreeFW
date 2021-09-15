@@ -12,6 +12,7 @@ require_once(__DIR__ . '/inbox.php');
 require_once(__DIR__ . '/jobqueue.php');
 require_once(__DIR__ . '/history.php');
 require_once(__DIR__ . '/lang.php');
+require_once(__DIR__ . '/message.php');
 require_once(__DIR__ . '/notification.php');
 require_once(__DIR__ . '/rate.php');
 
@@ -82,6 +83,7 @@ $localRoutes = array_merge(
     $routes_jobqueue,
     $routes_history,
     $routes_lang,
+    $routes_message,
     $routes_notification,
     $routes_rate
 );

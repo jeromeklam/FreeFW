@@ -22,7 +22,7 @@ export const getShortcuts = (intl, mode = 'all') => {
     display: 'block',
     position: 1,
     label: intl.formatMessage({
-      id: 'app.features.[[:FEATURE_CAMEL:]].form.tabs.ident',
+      id: 'app.features.[[:FEATURE_LOWER:]].form.tabs.ident',
       defaultMessage: 'Identification',
     }),
   });

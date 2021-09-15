@@ -404,7 +404,7 @@ export class List extends Component {
       <ResponsiveQuickSearch
         name="quickSearch"
         label={intl.formatMessage({
-          id: 'app.features.[[:FEATURE_CAMEL:]].list.search',
+          id: 'app.features.[[:FEATURE_LOWER:]].list.search',
           defaultMessage: 'Search by ...',
         })}
         quickSearch={search}
@@ -429,7 +429,7 @@ export class List extends Component {
       <div>
         <UiList
           title={intl.formatMessage({
-            id: 'app.features.[[:FEATURE_CAMEL:]].list.title',
+            id: 'app.features.[[:FEATURE_LOWER:]].list.title',
             defaultMessage: '...',
           })}
           icon={<MainIcon />}

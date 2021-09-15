@@ -83,4 +83,11 @@ interface SSOInterface
      *     *sso:afterUserLogout
      */
     public function logout();
+
+    /**
+     * Get user permissions
+     *
+     * @return string
+     */
+    public function getPermissions() : string;
 }

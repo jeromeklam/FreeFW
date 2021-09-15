@@ -147,4 +147,13 @@ class SsoMock implements
     {
         return $this->group;
     }
+
+    /**
+     *
+     * @return string
+     */
+    public function getPermissions() : string
+    {
+        return 'ZEUS';
+    }
 }

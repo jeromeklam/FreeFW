@@ -19,6 +19,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'msg_id',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
         FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED, FFCST::OPTION_PK],
+        FFCST::PROPERTY_TITLE   => 'Id.',
         FFCST::PROPERTY_COMMENT => 'Identifiant du message',
         FFCST::PROPERTY_SAMPLE  => 123,
     ];
@@ -26,6 +27,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'brk_id',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
         FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_BROKER],
+        FFCST::PROPERTY_TITLE   => 'Broker',
         FFCST::PROPERTY_COMMENT => 'Identifiant du broker, pour restriction',
         FFCST::PROPERTY_SAMPLE  => 123,
     ];
@@ -33,6 +35,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'msg_object_name',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
         FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_TITLE   => 'Objet',
         FFCST::PROPERTY_COMMENT => 'Nom de l\'objet émétteur',
         FFCST::PROPERTY_SAMPLE  => 'FreeSSO_User',
         FFCST::PROPERTY_MAX     => 80,
@@ -41,6 +44,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'msg_object_id',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
         FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_TITLE   => 'Id objet',
         FFCST::PROPERTY_COMMENT => 'Identifiant de l\'objet émétteur',
         FFCST::PROPERTY_SAMPLE  => '123',
         FFCST::PROPERTY_MAX     => 20,
@@ -49,6 +53,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'lang_id',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
         FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_FK],
+        FFCST::PROPERTY_TITLE   => 'Langue',
         FFCST::PROPERTY_COMMENT => 'Identifiant de la langue du message',
         FFCST::PROPERTY_SAMPLE  => 123,
         FFCST::PROPERTY_FK      => ['lang' =>
@@ -64,6 +69,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_DATETIMETZ,
         FFCST::PROPERTY_DEFAULT => FFCST::DEFAULT_NOW,
         FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_TITLE   => 'Créé le',
         FFCST::PROPERTY_COMMENT => 'Date heure d\'expédition du message',
         FFCST::PROPERTY_SAMPLE  => '2020-04-01 18:34:00',
     ];
@@ -73,6 +79,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_ENUM    => ['WAITING','PENDING','OK','ERROR'],
         FFCST::PROPERTY_DEFAULT => ['WAITING'],
         FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED],
+        FFCST::PROPERTY_TITLE   => 'Status',
         FFCST::PROPERTY_COMMENT => 'Status du message',
         FFCST::PROPERTY_SAMPLE  => 'PENDING',
     ];
@@ -82,6 +89,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_ENUM    => ['EMAIL','SMS'],
         FFCST::PROPERTY_DEFAULT => ['EMAIL'],
         FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED],
+        FFCST::PROPERTY_TITLE   => 'Type',
         FFCST::PROPERTY_COMMENT => 'Type du message',
         FFCST::PROPERTY_SAMPLE  => 'EMAIL',
     ];
@@ -89,6 +97,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'msg_dest',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_JSON,
         FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_TITLE   => 'Destinataire(s)',
         FFCST::PROPERTY_COMMENT => 'Destinataires du message au format json',
         FFCST::PROPERTY_SAMPLE  => '[{"address":"test@free.fr"}]',
     ];
@@ -96,6 +105,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'msg_cc',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_JSON,
         FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_TITLE   => 'CC(s)',
         FFCST::PROPERTY_COMMENT => 'CC du message au format json',
         FFCST::PROPERTY_SAMPLE  => '[{"address":"test@free.fr"}]',
     ];
@@ -103,6 +113,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'msg_bcc',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_JSON,
         FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_TITLE   => 'BCC(s)',
         FFCST::PROPERTY_COMMENT => 'CC cachés du message au format json',
         FFCST::PROPERTY_SAMPLE  => '[{"address":"test@free.fr"}]',
     ];
@@ -110,6 +121,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'msg_subject',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_TEXT,
         FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_TITLE   => 'Sujet',
         FFCST::PROPERTY_COMMENT => 'Sujet du message, sans html',
         FFCST::PROPERTY_SAMPLE  => 'Mon sujet',
     ];
@@ -117,6 +129,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'msg_body',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_HTML,
         FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_TITLE   => 'Contenu',
         FFCST::PROPERTY_COMMENT => 'Le corps du message, html recommandé',
         FFCST::PROPERTY_SAMPLE  => '<p>Mon message</p>',
     ];
@@ -124,6 +137,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'msg_pj1',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
         FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_TITLE   => 'PJ 1',
         FFCST::PROPERTY_COMMENT => 'Fichier en pj 1',
         FFCST::PROPERTY_SAMPLE  => '/tmp/fic001.png',
         FFCST::PROPERTY_MAX     => 255,
@@ -132,6 +146,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'msg_pj2',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
         FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_TITLE   => 'PJ 2',
         FFCST::PROPERTY_COMMENT => 'Fichier en pj 2',
         FFCST::PROPERTY_SAMPLE  => '/tmp/fic001.png',
         FFCST::PROPERTY_MAX     => 255,
@@ -140,6 +155,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'msg_pj3',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
         FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_TITLE   => 'PJ 3',
         FFCST::PROPERTY_COMMENT => 'Fichier en pj 3',
         FFCST::PROPERTY_SAMPLE  => '/tmp/fic001.png',
         FFCST::PROPERTY_MAX     => 255,
@@ -148,6 +164,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'msg_pj4',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
         FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_TITLE   => 'PJ 4',
         FFCST::PROPERTY_COMMENT => 'Fichier en pj 4',
         FFCST::PROPERTY_SAMPLE  => '/tmp/fic001.png',
         FFCST::PROPERTY_MAX     => 255,
@@ -156,6 +173,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'msg_send_ts',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_DATETIMETZ,
         FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_TITLE   => 'Expédié le',
         FFCST::PROPERTY_COMMENT => 'Date heure d\'expédition',
         FFCST::PROPERTY_SAMPLE  => '2020:04:01 13:00:00',
     ];
@@ -163,6 +181,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'msg_send_error',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_TEXT,
         FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_TITLE   => 'Erreur',
         FFCST::PROPERTY_COMMENT => 'Message d\'erreur retourné par le serveur',
         FFCST::PROPERTY_SAMPLE  => 'Error ...',
     ];
@@ -170,6 +189,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'msg_from',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_JSON,
         FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_TITLE   => 'From',
         FFCST::PROPERTY_COMMENT => 'From du message',
         FFCST::PROPERTY_SAMPLE  => '{"address":"support@test.fr","name":"Support"}',
     ];
@@ -177,6 +197,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'msg_reply_to',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_TEXT,
         FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_TITLE   => 'From name',
         FFCST::PROPERTY_COMMENT => 'Informations de retour',
         FFCST::PROPERTY_SAMPLE  => '{"address":"support@test.fr","name":"Support"}',
     ];
@@ -184,6 +205,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'msg_pj1_name',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
         FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_TITLE   => 'Nom PJ 1',
         FFCST::PROPERTY_COMMENT => 'Nom de la pj 1',
         FFCST::PROPERTY_SAMPLE  => 'exemple.png',
         FFCST::PROPERTY_MAX     => 80,
@@ -192,6 +214,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'msg_pj2_name',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
         FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_TITLE   => 'Nom PJ 2',
         FFCST::PROPERTY_COMMENT => 'Nom de la pj 2',
         FFCST::PROPERTY_SAMPLE  => 'exemple.png',
         FFCST::PROPERTY_MAX     => 80,
@@ -200,6 +223,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'msg_pj3_name',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
         FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_TITLE   => 'Nom PJ 3',
         FFCST::PROPERTY_COMMENT => 'Nom de la pj 3',
         FFCST::PROPERTY_SAMPLE  => 'exemple.png',
         FFCST::PROPERTY_MAX     => 80,
@@ -208,6 +232,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_PRIVATE => 'msg_pj4_name',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
         FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_TITLE   => 'Nom PJ 4',
         FFCST::PROPERTY_COMMENT => 'Nom de la pj 4',
         FFCST::PROPERTY_SAMPLE  => 'exemple.png',
         FFCST::PROPERTY_MAX     => 80,
@@ -257,6 +282,14 @@ abstract class Message extends \FreeFW\Core\StorageModel
     public static function getSource()
     {
         return 'sys_message';
+    }
+
+    /**
+     * Retourne une explication de la table
+     */
+    public static function getSourceTitle()
+    {
+        return 'Messages';
     }
 
     /**

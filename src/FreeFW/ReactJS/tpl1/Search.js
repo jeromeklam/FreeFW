@@ -161,7 +161,7 @@ export class Search extends Component {
     return (
       <SearchModal
         title={this.props.intl.formatMessage({
-          id: 'app.features.[[:FEATURE_CAMEL:]].search.title',
+          id: 'app.features.[[:FEATURE_LOWER:]].search.title',
           defaultMessage: 'Rechercher',
         })}
         show={this.props.show}

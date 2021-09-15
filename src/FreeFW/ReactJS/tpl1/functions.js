@@ -44,7 +44,7 @@ export const search[[:FEATURE_CAMEL_FULL:]] = search => {
  */
 export const getOneModel = (id, params = {}) => {
   const addUrl = objectToQueryString(params);
-  return freeAssoApi.get('/v1/[[:FEATURE_COLLECTION:]]/[[:FEATURE_LOWER:]]/' + id + addUrl);
+  return freeAssoApi.get('/v1/[[:FEATURE_COLLECTION:]]/[[:FEATURE_SNAKE:]]/' + id + addUrl);
 };
 
 /**
@@ -94,7 +94,7 @@ export const getAll[[:FEATURE_CAMEL_FULL:]]AsModel = (filters = {}, sort= [], pa
       params.sort = sort;
     }
     const addUrl = objectToQueryString(params);
-    const doRequest = freeAssoApi.get('/v1/[[:FEATURE_COLLECTION:]]/[[:FEATURE_LOWER:]]' + addUrl, {});
+    const doRequest = freeAssoApi.get('/v1/[[:FEATURE_COLLECTION:]]/[[:FEATURE_SNAKE:]]' + addUrl, {});
     doRequest.then(
       (res) => {
         let result = false;
