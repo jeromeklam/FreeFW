@@ -75,7 +75,7 @@ trait Lang
     /**
      * Get lang id
      *
-     * @return number
+     * @return int
      */
     public function getLangId()
     {

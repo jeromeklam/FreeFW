@@ -167,6 +167,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 if ($p_model->get($name) != '') {
                     $filters[$name] = $p_model->get($name);
                     $existF = true;
+                } else {
+                    $filters[$name] = [\FreeFW\Storage\Storage::COND_EQUAL_OR_NULL => ''];
+                    $existF = true;
                 }
             }
             if ($existF) {
@@ -1329,6 +1332,10 @@ class PDOStorage extends \FreeFW\Storage\Storage
         }
         if ($realOper == '=' && $nullable && $right === null) {
             $realOper = ' IS NULL';
+        } else {
+            if ($realOper == '!=' && $notnull && $right === null) {
+                $realOper = ' IS NOT NULL';
+            }
         }
         if ($left !== null ) {
             $leftDatas  = $this->renderConditionField($left, $p_model, $p_aliases, $p_crtAlias);

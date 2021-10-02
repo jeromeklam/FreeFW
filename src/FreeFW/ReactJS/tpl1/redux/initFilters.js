@@ -1,4 +1,4 @@
-import { Filter, FILTER_MODE_AND, FILTER_OPER_EQUAL } from 'react-bootstrap-front';
+import { Filter, FILTER_MODE_AND } from 'react-bootstrap-front';
 import { [[:FEATURE_UPPER:]]_INIT_FILTERS } from './constants';
 
 /**

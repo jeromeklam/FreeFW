@@ -370,9 +370,17 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
                 if ($condition === null) {
                     $this->addSimpleCondition(\FreeFW\Storage\Storage::COND_EMPTY, $left);
                 } else {
-                    $right = new \FreeFW\Model\ConditionValue();
-                    $right->setValue($condition);
-                    $this->addSimpleCondition(\FreeFW\Storage\Storage::COND_EQUAL, $left, $right);
+                    if ($condition === \FreeFW\Storage\Storage::COND_EMPTY) {
+                        $this->addSimpleCondition(\FreeFW\Storage\Storage::COND_EMPTY, $left);
+                    } else {
+                        if ($condition === \FreeFW\Storage\Storage::COND_NOT_EMPTY) {
+                            $this->addSimpleCondition(\FreeFW\Storage\Storage::COND_NOT_EMPTY, $left);
+                        } else {
+                            $right = new \FreeFW\Model\ConditionValue();
+                            $right->setValue($condition);
+                            $this->addSimpleCondition(\FreeFW\Storage\Storage::COND_EQUAL, $left, $right);
+                        }
+                    }
                 }
             }
         }

@@ -76,9 +76,13 @@ class Email extends \FreeFW\Core\Service
                             ]
                         );
                         $datas->addGenericBlock('head_user');
-                        $datas->addGenericData($user->getFieldsAsArray(), 'head_user');
+                        if ($user) {
+                            $datas->addGenericData($user->getFieldsAsArray(), 'head_user');
+                        }
                         $datas->addGenericBlock('head_group');
-                        $datas->addGenericData($group->getFieldsAsArray(), 'head_group');
+                        if ($group) {
+                            $datas->addGenericData($group->getFieldsAsArray(), 'head_group');
+                        }
                     }
                     $newFields = $datas->__toArray();
                     $fields = array_merge_recursive($fields, $newFields);

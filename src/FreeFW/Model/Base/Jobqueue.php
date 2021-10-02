@@ -118,6 +118,12 @@ abstract class Jobqueue extends \FreeFW\Model\StorageModel\Jobqueue
     protected $jobq_next_retry = null;
 
     /**
+     * jobq_cron
+     * @var string
+     */
+    protected $jobq_cron = null;
+
+    /**
      * Set jobq_id
      *
      * @param int $p_value
@@ -529,5 +535,28 @@ abstract class Jobqueue extends \FreeFW\Model\StorageModel\Jobqueue
     public function getJobqNextRetry()
     {
         return $this->jobq_next_retry;
+    }
+
+    /**
+     * Cron
+     *
+     * @param string $p_cron
+     *
+     * @return \FreeFW\Model\Base\Jobqueue
+     */
+    public function setJobqCron($p_cron)
+    {
+        $this->jobq_cron = $p_cron;
+        return $this;
+    }
+
+    /**
+     * Get cron
+     *
+     * @return string
+     */
+    public function getJobqCron()
+    {
+        return $this->jobq_cron;
     }
 }

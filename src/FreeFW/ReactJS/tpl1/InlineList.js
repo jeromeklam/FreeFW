@@ -73,7 +73,7 @@ export class InlineList extends Component {
     // State
     this.state = {
       id: -1,
-      parentId: props.parentId,
+      parentId: parentId,
       filters: filters,
       mode: props.mode,
       sort: sort,

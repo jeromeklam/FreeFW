@@ -70,9 +70,9 @@ export const getOneModelAsModel = (id, params = {}) => {
  * Récupération de modèle(s) en fonction de critères
  * Renvoie un résultat qu'au retour de la promesse
  */
-export const getAll[[:FEATURE_CAMEL_FULL:]]AsModel = (filters = {}, sort= [], page = 1, size = 99999) => {
+export const getAll[[:FEATURE_CAMEL_FULL:]]AsModel = (p_filters = {}, sort= [], page = 1, size = 99999) => {
   return new Promise((resolve, reject) => {
-    let filters = filters.asJsonApiObject()
+    let filters = p_filters.asJsonApiObject()
     let params = {
       page: page,
       size: size,

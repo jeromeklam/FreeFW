@@ -188,6 +188,14 @@ abstract class Jobqueue extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_COMMENT => 'Date heure du prochain lancement',
         FFCST::PROPERTY_SAMPLE  => '2020-05-01 23:00:00',
     ];
+    protected static $PRP_JOBQ_CRON = [
+        FFCST::PROPERTY_PRIVATE => 'jobq_cron',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_TITLE   => 'Cron',
+        FFCST::PROPERTY_COMMENT => 'Prohcian sous forme de crontab',
+        FFCST::PROPERTY_SAMPLE  => '* * * * *',
+    ];
 
     /**
      * get properties
@@ -214,7 +222,8 @@ abstract class Jobqueue extends \FreeFW\Core\StorageModel
             'jobq_max_retry'    => self::$PRP_JOBQ_MAX_RETRY,
             'jobq_nb_retry'     => self::$PRP_JOBQ_NB_RETRY,
             'jobq_next_minutes' => self::$PRP_JOBQ_NEXT_MINUTES,
-            'jobq_next_retry'   => self::$PRP_JOBQ_NEXT_RETRY
+            'jobq_next_retry'   => self::$PRP_JOBQ_NEXT_RETRY,
+            'jobq_cron'         => self::$PRP_JOBQ_CRON,
         ];
     }
 

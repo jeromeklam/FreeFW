@@ -120,10 +120,21 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
         if ($this->getJobqType() === self::TYPE_ONCE) {
             $this->setJobqStatus(self::STATUS_FINISHED);
         } else {
-            $this
-                ->setJobqStatus(self::STATUS_WAITING)
-                ->setJobqNextRetry(\FreeFW\Tools\Date::getCurrentTimestamp($this->getJobqNextMinutes()))
-            ;
+            $this->setJobqStatus(self::STATUS_WAITING);
+            $cronTab = $this->getJobqCron();
+            if ($cronTab == '') {
+                $this->setJobqNextRetry(
+                    \FreeFW\Tools\Date::getCurrentTimestamp($this->getJobqNextMinutes())
+                );
+            } else {
+                try {
+                    $cron    = new \Cron\CronExpression($cronTab);
+                    $mysqlDt = $cron->getNextRunDate()->format('Y-m-d H:i:s');
+                    $this->setJobqNextRetry($mysqlDt);
+                } catch (\Exception $ex) {
+
+                }
+            }
         }
         return $this;
     }

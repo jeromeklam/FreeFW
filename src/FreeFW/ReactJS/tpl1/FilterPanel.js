@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { injectIntl } from 'react-intl';
-import { FilterPanel as UIFilterPanel, Filter } from 'react-bootstrap-front';
+import { FilterPanel as UIFilterPanel } from 'react-bootstrap-front';
 import * as actions from './redux/actions';
 import {
   Calendar as CalendarIcon,
