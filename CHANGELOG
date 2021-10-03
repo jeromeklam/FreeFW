@@ -1,3 +1,8 @@
+# 1.6.1 : 03/10/2021
+
+* HAWK Auth
+    * user / app for user token to login.   
+
 # 1.6.0 : 03/10/2021
 
 * New template for ReactJS

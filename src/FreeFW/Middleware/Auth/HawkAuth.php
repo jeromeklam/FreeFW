@@ -39,30 +39,42 @@ class HawkAuth implements
      */
     public function verifyAuthorizationHeader(ServerRequestInterface $p_request, AuthorizationHeader $p_header)
     {
-        $sso    = \FreeFW\DI\DI::getShared('sso');
         $user   = false;
         $config = $p_request->getAttribute('broker_config', []);
         if (!is_array($config)) {
             $config = [];
         }
-        $login = $p_header->getParameter('id');
-        $user = \FreeSSO\Model\User::findFirst(['user_login' => $login]);
-        if ($user && $user->isActive()) {
-            $hmac  = $user->getUserPassword();
-            $inMac = $p_header->getParameter('mac');
-            $this->logger->debug('mac.hmac : ' . $hmac);
-            $this->logger->debug('mac.in : ' . $inMac);
-            $calcMac = $this->generateMac($p_request, $p_header, $hmac, 'header');
-            $this->logger->debug('mac.calc : ' . $calcMac);
-            if ($inMac == $calcMac) {
-                $user = $sso->signinByIdAndLogin($user->getUserId(), $login, false);
-            } else {
-                $this->logger->info('FreeFW.Middleware.Hawk.wrong.mac');
+        $hmac = '56a54c01b34e4752a6a217f7fb1070a4';
+        if (array_key_exists('hawk', $config)) {
+            if (array_key_exists('hmac', $config['hawk'])) {
+                $hmac = $config['hawk']['hmac'];
+            }
+        }
+        $inMac = $p_header->getParameter('mac');
+        $this->logger->debug('mac.hmac : ' . $hmac);
+        $this->logger->debug('mac.in : ' . $inMac);
+        $calcMac = $this->generateMac($p_request, $p_header, $hmac, 'header');
+        $this->logger->debug('mac.calc : ' . $calcMac);
+        if ($inMac == $calcMac) {
+            $token = $p_header->getParameter('user');
+            if ($token == '') {
+                $token = $p_header->getParameter('app');
+            }
+            try {
+                /**
+                 * @var \FreeSSO\Server $sso
+                 */
+                $sso  = \FreeFW\DI\DI::getShared('sso');
+                $user = $sso->signinByUserToken($token);
+            } catch (\Exception $ex) {
+                $this->logger->info($ex->getMessage());
                 $user = false;
             }
-            return $user;
+        } else {
+            $this->logger->info('FreeFW.Middleware.Hawk.wrong.mac');
+            $user = false;
         }
-        return false;
+        return $user;
     }
 
     /**
