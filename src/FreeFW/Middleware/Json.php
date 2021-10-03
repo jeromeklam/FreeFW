@@ -51,6 +51,14 @@ class Json implements
         if (array_key_exists('include', $params)) {
             $apiParams->setInclude($params['include']);
         }
+        // Option
+        if (array_key_exists('option', $params)) {
+            $options = $params['option'];
+            $apiParams->setOption($options);
+            if (isset($options['lang'])) {
+                \FreeFW\DI\DI::setShared('lang', $options['lang']);
+            }
+        }
         // Filters
         if (array_key_exists('filter', $params)) {
             $filters = $params['filter'];

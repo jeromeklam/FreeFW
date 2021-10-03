@@ -452,6 +452,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
                 }
             }
         }
+        $done = [];
         foreach ($description['properties'] as $name => $property) {
             $getter = $property[FFCST::PROPERTY_GETTER];
             if (!$test || isset($test[$name])) {
@@ -471,6 +472,24 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
                         } else {
                             $vars[$relName] = null;
                         }
+                    }
+                }
+            }
+        }
+        foreach ($p_include as $oneInclude) {
+            if ($p_prefix == '' || strpos($oneInclude, $p_prefix) == 0) {
+                $fct = str_replace($p_prefix, '', $oneInclude);
+                $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($fct, true);
+                if (method_exists($this, $getter) && !in_array($fct, $done)) {
+                    $object = $this->$getter();
+                    if ($object instanceof \FreeFW\Core\StorageModel) {
+                        $vars[$fct] = $object->__toArrayFiltered(
+                            $p_fields,
+                            $p_include,
+                            $p_prefix . $fct . '.'
+                        );
+                    } else {
+                        $vars[$fct] = $object;
                     }
                 }
             }

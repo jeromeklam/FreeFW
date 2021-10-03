@@ -28,6 +28,13 @@ class ApiParams
     protected $include = [];
 
     /**
+     * Options
+     *
+     * @var array
+     */
+    protected $option = [];
+
+    /**
      * Sort
      * @var array
      */
@@ -187,6 +194,29 @@ class ApiParams
     public function getInclude()
     {
         return $this->include;
+    }
+
+    /**
+     * Set option
+     *
+     * @param mixed $p_option
+     * 
+     * @return \FreeFW\Http\ApiParams
+     */
+    public function setOption($p_option)
+    {
+        $this->option = $p_option;
+        return $this;
+    }
+
+    /**
+     * Get Option
+     *
+     * @return Array
+     */
+    public function getOption()
+    {
+        return $this->option;
     }
 
     /**

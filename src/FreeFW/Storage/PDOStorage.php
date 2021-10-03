@@ -1307,6 +1307,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
             case \FreeFW\Storage\Storage::COND_BETWEEN:
                 $realOper = ' BETWEEN ';
                 $arrayMod = 'AND';
+                $multi = true;
                 break;
             case \FreeFW\Storage\Storage::COND_IN:
                 $realOper = ' IN ';

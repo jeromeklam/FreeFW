@@ -1,8 +1,11 @@
-# 1.6.1 : 03/10/2021
+# 1.6.2 : 03/10/2021
 
 * HAWK Auth
     * user / app for user token to login.   
-
+* ApiParams
+    * Gestion du paramètre option
+    * Ajout en cahred fe la langue en court (fr, en, ...)
+  
 # 1.6.0 : 03/10/2021
 
 * New template for ReactJS
