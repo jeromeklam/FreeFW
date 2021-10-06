@@ -187,12 +187,14 @@ class Email extends \FreeFW\Model\Base\Email implements
      */
     protected function saveVersions()
     {
-        foreach ($this->versions as $oneVersion) {
-            $oneVersion->setEmaillId(null);
-            $oneVersion->setEmailId($this->getEmailId());
-            if (!$oneVersion->create()) {
-                $this->addErrors($oneVersion->getErrors());
-                return false;
+        if (is_array($this->versions)) {
+            foreach ($this->versions as $oneVersion) {
+                $oneVersion->setEmaillId(null);
+                $oneVersion->setEmailId($this->getEmailId());
+                if (!$oneVersion->create()) {
+                    $this->addErrors($oneVersion->getErrors());
+                    return false;
+                }
             }
         }
         return true;

@@ -1257,10 +1257,22 @@ abstract class Model implements
      *
      * @return \FreeFW\Model\MergeModel
      */
-    public function getMergeData($p_includes = [], $p_prefix = '')
+    public function getMergeData($p_includes = false, $p_prefix = '')
     {
         $datas = new \FreeFW\Model\MergeModel();
         $block = $this->getApiType();
+        if (!is_array($p_includes)) {
+            if (method_exists($this, 'getDefaultMergeIncludes')) {
+                $includes = $this->getDefaultMergeIncludes();
+                if (is_array($includes)) {
+                    $p_includes = $includes;
+                } else {
+                    $p_includes = explode(',', $includes);
+                }
+            } else {
+                $p_includes = [];
+            }
+        }
         $parts = explode('_', $block);
         array_shift($parts);
         $block = \FreeFW\Tools\PBXString::fromCamelCase(implode('_', $parts));

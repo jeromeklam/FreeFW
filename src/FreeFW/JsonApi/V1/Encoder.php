@@ -196,7 +196,9 @@ class Encoder
                             $p_included->addIncluded($included);
                         } else {
                             if ($result !== null) {
-                                throw new \Exception ($elem . ' not a instanceof Model');
+                                $specAttribute = new \FreeFW\JsonApi\V1\Model\AttributeObject($elem, $result);
+                                $attributes->addAttribute($specAttribute);
+                                //throw new \Exception ($elem . ' not a instanceof Model');
                             }
                         }
                     }

@@ -516,6 +516,9 @@ class ApiController extends \FreeFW\Core\Controller
                 $data = $query->getResult();
             }
             if (count($data) > 0) {
+                /**
+                 * @var \FreeFW\Core\StorageModel $model
+                 */
                 $model = $data[0];
                 if (method_exists($model, 'afterRead')) {
                     $model->afterRead();

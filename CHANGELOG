@@ -1,3 +1,10 @@
+# 1.6.3 : 06/10/2021
+
+* Model
+    * MergeData: Possibilité de charger des données par défaut via la méthode getDefaultMergeIncludes
+* Encoder
+    * Gestion des inclusions de type simple
+
 # 1.6.2 : 03/10/2021
 
 * HAWK Auth
