@@ -1,3 +1,10 @@
+# 1.6.4 : 08/10/2021
+
+* Model
+    * Gestion des include vides 
+* Hawk
+    * Utilisation de la clef hmac de la config, (hawk-id)
+
 # 1.6.3 : 06/10/2021
 
 * Model

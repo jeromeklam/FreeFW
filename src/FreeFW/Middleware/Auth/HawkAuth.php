@@ -40,14 +40,15 @@ class HawkAuth implements
     public function verifyAuthorizationHeader(ServerRequestInterface $p_request, AuthorizationHeader $p_header)
     {
         $user   = false;
+        $hawkId = $p_header->getParameter('id');
         $config = $p_request->getAttribute('broker_config', []);
         if (!is_array($config)) {
             $config = [];
         }
         $hmac = '56a54c01b34e4752a6a217f7fb1070a4';
         if (array_key_exists('hawk', $config)) {
-            if (array_key_exists('hmac', $config['hawk'])) {
-                $hmac = $config['hawk']['hmac'];
+            if (array_key_exists($hawkId, $config['hawk'])) {
+                $hmac = $config['hawk'][$hawkId];
             }
         }
         $inMac = $p_header->getParameter('mac');
