@@ -104,11 +104,11 @@ class Json implements
             } else {
                 throw new \FreeFW\JsonApi\FreeFWJsonApiException(
                     sprintf('Incorrect values for page parameter !')
-                    );
+                );
             }
             $apiParams
-            ->setStart($start)
-            ->setLength($len)
+                ->setStart($start)
+                ->setLength($len)
             ;
         }
         // Next
@@ -127,17 +127,20 @@ class Json implements
         $body       = $p_response->getBody();
         if (is_object($body)) {
             if ($body instanceof StreamInterface) {
-                $content    = $body->getContents();
-                $object     = @unserialize($content);
+                $content = $body->getContents();
+                $object  = @unserialize($content);
                 if ($object !== false) {
                     $serializer = new \Zumba\JsonSerializer\JsonSerializer();
                     if (is_object($object) && method_exists($object, '__toArrayFiltered')) {
-                        $result = $serializer->serialize(
-                            $object->__toArrayFiltered(
-                                $p_api_params->getFields(),
-                                $p_api_params->getInclude()
-                            )
+                        $result = new \stdClass();
+                        $result->data = $object->__toArrayFiltered(
+                            $p_api_params->getFields(),
+                            $p_api_params->getInclude()
                         );
+                        if (method_exists($object, 'getTotalCount')) {
+                            $result->total_count = $object->getTotalCount();
+                        }
+                        $result = $serializer->serialize($result);
                     } else {
                         $result = $serializer->serialize($object);
                     }
