@@ -233,9 +233,9 @@ class FileLogger extends \Psr\Log\AbstractLogger
             $size = filesize(APP_LOG . '/' . APP_NAME . '.log');
             if ($size > self::MAXLOGSIZE) {
                 if (is_file(APP_LOG . '/' . APP_NAME . '.log.1')) {
-                    unlink(APP_LOG . '/' . APP_NAME . '.log.1');
+                    @unlink(APP_LOG . '/' . APP_NAME . '.log.1');
                 }
-                rename(APP_LOG . '/' . APP_NAME . '.log', APP_LOG . '/' . APP_NAME . '.log.1');
+                @rename(APP_LOG . '/' . APP_NAME . '.log', APP_LOG . '/' . APP_NAME . '.log.1');
             }
         } else {
             $rr = true;
