@@ -1,3 +1,15 @@
+# 1.6.5 : 10/10/2021
+
+* Model
+    * Encodage Json avec data et total_count
+
+# 1.6.4 : 08/10/2021
+
+* Model
+    * Gestion des include vides 
+* Hawk
+    * Utilisation de la clef hmac de la config, (hawk-id)
+
 # 1.6.3 : 06/10/2021
 
 * Model

@@ -477,7 +477,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
             }
         }
         foreach ($p_include as $oneInclude) {
-            if ($p_prefix == '' || strpos($oneInclude, $p_prefix) == 0) {
+            if (trim($oneInclude) != '' && ($p_prefix == '' || strpos($oneInclude, $p_prefix) == 0)) {
                 $fct = str_replace($p_prefix, '', $oneInclude);
                 $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($fct, true);
                 if (method_exists($this, $getter) && !in_array($fct, $done)) {
