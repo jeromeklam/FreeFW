@@ -96,6 +96,7 @@ class Generator
             $this->words['FEATURE_COLLECTION'] = $this->model->getMdCollPath();
             $this->words['FEATURE_SERVICE']    = \FreeFW\Tools\PBXString::fromCamelCase($this->model->getMdClass());
             $this->words['FEATURE_INCLUDE']    = $this->getDefaultInclude($model);
+            $this->words['FEATURE_ID_FIELD']   = $model->getFieldNameByOption(FFCST::OPTION_PK);
             /**
              *
              * @var Ambiguous $colsR

@@ -20,6 +20,7 @@ export default class InputPicker extends Component {
     name: PropTypes.string.isRequired,
     item: PropTypes.object,
     label: PropTypes.string.isRequired,
+    labelTop: PropTypes.bool,
     required: PropTypes.bool,
     disabled: PropTypes.bool,
     list: PropTypes.element.isRequired,
@@ -34,6 +35,7 @@ export default class InputPicker extends Component {
     item: null,
     required: false,
     disabled: false,
+    labelTop: true,
     onAdd: null,
     addIcon: null,
     error: false,
@@ -126,13 +128,17 @@ export default class InputPicker extends Component {
           headers: headers,
         })
         .then(result => {
-          const list = result.data;
-          if (Array.isArray(list) && list.length === 1) {
-            this.props.onChange({
-              target: { name: this.props.name, value: list[0].cau_id, type: '[[:FEATURE_MODEL:]]' },
-            });
+          if (result && result.data && result.data.data) {
+            const list = result.data.data;
+            if (Array.isArray(list) && list.length === 1) {
+              this.props.onChange({
+                target: { name: this.props.name, value: list[0].id, type: '[[:FEATURE_MODEL:]]' },
+              });
+            } else {
+              this.setState({ list: list, loading: false });
+            }
           } else {
-            this.setState({ list: list, loading: false });
+            this.setState({ list: [], loading: false });
           }
         })
         .catch(err => {
@@ -169,6 +175,7 @@ export default class InputPicker extends Component {
    * Gestion de la sélection d'un modèle depuis la recherche
    */
   onSelect(item) {
+    console.log(item);
     this.setState({ search: false, autocomplete: false, list: [] });
     if (item) {
       this.props.onChange({
@@ -202,7 +209,7 @@ export default class InputPicker extends Component {
               error={this.props.error}
               onSelect={this.onSelect}
               required={this.props.required || false}
-              pickerId="agent_id"
+              pickerId="[[:FEATURE_ID_FIELD:]]"
               pickerDisplay={displayItemPicker}
               conditions={this.state.conditions || {}}
               moreIcon={<More className="text-secondary" size={0.8} />}
@@ -224,6 +231,7 @@ export default class InputPicker extends Component {
           <div className=".[[:FEATURE_CAMEL:]]-button-picker">
             <DefaultButtonPicker
               label={this.props.label}
+              labelTop={this.props.labelTop || false}
               value={this.state.value}
               display={this.state.display}
               disabled={this.props.disabled || false}

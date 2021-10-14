@@ -17,10 +17,14 @@ import { displayItemPicker, getCols } from './';
  */
 export class Search extends Component {
   static propTypes = {
+    conditions: PropTypes.array,
     title: PropTypes.string.isRequired,
     show: PropTypes.bool.isRequired,
     onSelect: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
+  }; 
+  static defaultProps = {
+    conditions: [],
   };
 
   /**
@@ -175,7 +179,7 @@ export class Search extends Component {
             cols={cols}
             {...this.props}
             items={this.state.list}
-            onMore={() => this.onMore}
+            onMore={this.onMore}
             total={this.state.total}
             loading={this.state.loading}
           />
