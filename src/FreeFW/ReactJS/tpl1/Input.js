@@ -60,6 +60,7 @@ export class Input extends Component {
       id: props.id || 0,
       item: null,
       editions: props.editions,
+      loading: true,
     };
     this.onSubmit = this.onSubmit.bind(this);
     this.onCancel = this.onCancel.bind(this);
@@ -76,8 +77,13 @@ export class Input extends Component {
    * On modification on recevra l'objet à modifier
    */
   componentDidMount() {
+    this.setState({ loading: true });
     this.props.actions.loadOne(this.state.id).then(item => {
-      this.setState({ item: item });
+      this.setState({ item: item, loading: false });
+    }).catch((errors) => {
+      showErrors(this.props.intl, errors);
+      this.setState({ loading: false });
+      this.props.onClose();
     });
   }
 
@@ -88,8 +94,13 @@ export class Input extends Component {
    */
   componentDidUpdate(prevProps) {
     if (prevProps.id !== this.props.id) {
+      this.setState({ loading: true });
       this.props.actions.loadOne(this.state.id).then(item => {
-        this.setState({ item: item });
+        this.setState({ item: item, loading: false });
+      }).catch((errors) => {
+        showErrors(this.props.intl, errors);
+        this.setState({ loading: false });
+        this.props.onClose();
       });
     }
   }
@@ -182,11 +193,13 @@ export class Input extends Component {
    * render
    */
   render() {
-    const { item, id } = this.state;
+    const { item, id, loading } = this.state;
     return (
       <div className=".[[:FEATURE_CAMEL:]]-modify global-card">
-        {!item ? (
+        {!item ? loading ? (
           <KalaLoader portal={true} />
+        ) : (
+          <></>
         ) : (
           <div>
             {this.props.[[:FEATURE_CAMEL:]].loadOnePending && <KalaLoader portal={true} />}

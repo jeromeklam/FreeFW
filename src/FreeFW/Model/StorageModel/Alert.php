@@ -362,6 +362,16 @@ abstract class Alert extends \FreeFW\Core\StorageModel
      *
      * @return string
      */
+    public static function getSourceTitle()
+    {
+        return 'Alertes';
+    }
+
+    /**
+     * Get object short description
+     *
+     * @return string
+     */
     public static function getSourceComments()
     {
         return 'Table système des alertes';

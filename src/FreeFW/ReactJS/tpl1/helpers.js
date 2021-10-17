@@ -170,11 +170,13 @@ export const getSelectActions = ({ props, onSelectMenu }) => {
  * Actions disponibles sur une ligne de la liste des agents au survol de cette ligne
  */
 export const getInlineActions = ({ props, onSelectList, onGetOne, onDelOne, onPrint, state }) => {
-  const { editions } = state;
   let myEditions = [];
-  editions.forEach(edition => {
-    myEditions.push({ label: edition.edi_name, onClick: item => onPrint(edition.id, item) });
-  });
+  if (state && state.editions) {
+    const { editions } = state;
+    editions.forEach(edition => {
+      myEditions.push({ label: edition.edi_name, onClick: item => onPrint(edition.id, item) });
+    });
+  }
   return [
     {
       name: 'print',

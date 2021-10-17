@@ -12,7 +12,7 @@ import {
 } from 'jsonapi-front';
 import * as actions from './redux/actions';
 import { freeAssoApi } from '../../common';
-import { KalaLoader, sortAsJsonApiObject, ResponsiveInlineList } from '../ui';
+import { KalaLoader, sortAsJsonApiObject, ResponsiveInlineList, showErrors } from '../ui';
 import { getCols, Input } from './';
 
 /**
@@ -174,10 +174,11 @@ export class InlineList extends Component {
     this.setState({ id: id });
   }
 
-  onDelOne() {
-    const { id } = this.state;
+  onDelOne(id) {
     this.props.actions.delOne(id).then(result => {
       this.localLoad();
+    }).catch(errors => {
+      showErrors(this.props.intl, errors);
     });
   }
 
