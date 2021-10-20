@@ -160,6 +160,18 @@ abstract class Message extends \FreeFW\Model\StorageModel\Message
     protected $msg_pj4_name = null;
 
     /**
+     * dest_id
+     * @var int
+     */
+    protected $dest_id = null;
+
+    /**
+     * user_id
+     * @var int
+     */
+    protected $user_id = null;
+
+    /**
      * Set msg_id
      *
      * @param int $p_value
@@ -732,5 +744,51 @@ abstract class Message extends \FreeFW\Model\StorageModel\Message
     public function getMsgPj4Name()
     {
         return $this->msg_pj4_name;
+    }
+
+    /**
+     * Set dest_id
+     *
+     * @param int $p_value
+     *
+     * @return \FreeFW\Model\File
+     */
+    public function setDestId($p_value)
+    {
+        $this->dest_id = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get dest_id
+     *
+     * @return int
+     */
+    public function getDestId()
+    {
+        return $this->dest_id;
+    }
+
+    /**
+     * Set grp_id
+     *
+     * @param int $p_value
+     *
+     * @return \FreeFW\Model\File
+     */
+    public function setGrpId($p_value)
+    {
+        $this->grp_id = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get grp_id
+     *
+     * @return int
+     */
+    public function getGrpId()
+    {
+        return $this->grp_id;
     }
 }

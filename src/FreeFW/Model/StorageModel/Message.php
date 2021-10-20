@@ -237,6 +237,28 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_SAMPLE  => 'exemple.png',
         FFCST::PROPERTY_MAX     => 80,
     ];
+    protected static $PRP_DEST_ID = [
+        FFCST::PROPERTY_PRIVATE => 'dest_id',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => '',
+        FFCST::PROPERTY_SAMPLE  => 123,
+    ];
+    protected static $PRP_GRP_ID = [
+        FFCST::PROPERTY_PRIVATE => 'grp_id',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
+        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED, FFCST::OPTION_FK],
+        FFCST::PROPERTY_DEFAULT => FFCST::DEFAULT_CURRENT_GROUP,
+        FFCST::PROPERTY_COMMENT => '',
+        FFCST::PROPERTY_SAMPLE  => 123,
+        FFCST::PROPERTY_FK      => ['group' =>
+            [
+                FFCST::FOREIGN_MODEL => 'FreeFW::Model::Group',
+                FFCST::FOREIGN_FIELD => 'grp_id',
+                FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT,
+            ]
+        ],
+    ];
 
     /**
      * get properties
@@ -270,7 +292,9 @@ abstract class Message extends \FreeFW\Core\StorageModel
             'msg_pj1_name'    => self::$PRP_MSG_PJ1_NAME,
             'msg_pj2_name'    => self::$PRP_MSG_PJ2_NAME,
             'msg_pj3_name'    => self::$PRP_MSG_PJ3_NAME,
-            'msg_pj4_name'    => self::$PRP_MSG_PJ4_NAME
+            'msg_pj4_name'    => self::$PRP_MSG_PJ4_NAME,
+            'grp_id'          => self::$PRP_GRP_ID,
+            'dest_id'         => self::$PRP_DEST_ID,
         ];
     }
 

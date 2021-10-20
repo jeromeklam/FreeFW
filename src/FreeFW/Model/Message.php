@@ -15,6 +15,7 @@ class Message extends \FreeFW\Model\Base\Message
      * Behaviours
      */
     use \FreeFW\Model\Behaviour\Lang;
+    use \FreeSSO\Model\Behaviour\Group;
 
     /**
      * Types
