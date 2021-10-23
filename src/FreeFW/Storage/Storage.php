@@ -30,6 +30,7 @@ abstract class Storage implements
     const COND_LOWER_EQUAL           = 'ltwe';
     const COND_LOWER_EQUAL_OR_NULL   = 'ltwen';
     const COND_LIKE                  = 'contains';
+    const COND_SOUND_LIKE            = 'soundex';
     const COND_LIKE_OR_NULL          = 'containsn';
     const COND_NOT_LIKE              = 'ncontains';
     const COND_IN                    = 'in';
@@ -121,6 +122,7 @@ abstract class Storage implements
             self::COND_NOT_EQUAL_OR_NULL,
             self::COND_GLOBAL_MAX,
             self::COND_GLOBAL_MIN,
+            self::COND_SOUND_LIKE,
         ];
     }
 }

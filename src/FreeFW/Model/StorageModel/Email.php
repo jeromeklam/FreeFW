@@ -143,6 +143,14 @@ abstract class Email extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_SAMPLE  => 'FreeFW_User',
         FFCST::PROPERTY_MAX     => 80,
     ];
+    protected static $PRP_EMAIL_BCC = [
+        FFCST::PROPERTY_PRIVATE => 'email_bcc',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Destinataires cachés',
+        FFCST::PROPERTY_SAMPLE  => 'toto@toto.fre',
+        FFCST::PROPERTY_MAX     => 255,
+    ];
 
     /**
      * get properties
@@ -166,6 +174,7 @@ abstract class Email extends \FreeFW\Core\StorageModel
             'email_edi2_id'     => self::$PRP_EMAIL_EDI2_ID,
             'email_edi2_object' => self::$PRP_EMAIL_EDI2_OBJECT,
             'email_object_name' => self::$PRP_EMAIL_OBJECT_NAME,
+            'email_bcc'         => self::$PRP_EMAIL_BCC,
         ];
     }
 

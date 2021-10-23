@@ -221,6 +221,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 if ($archive) {
                     try {
                         if (APP_HISTORY) {
+                            /**
+                             * @var FreeFW\Model\History $history
+                             */
                             $history = \FreeFW\DI\DI::get('FreeFW::Model::History');
                             $history
                                 ->setHistMethod('C')
@@ -909,6 +912,8 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $sql = 'SELECT ' . $select . ' FROM ' . $from . ' WHERE ( ' . $where . ' ) ' . $whereBroker . ' ' . $group . ' ' . $sort . ' ' . $limit;
         $this->logger->debug('FreeFW.PDOStorage.select : ' . $sql);
         $this->logger->debug('FreeFW.PDOStorage.fields : ' . print_r($values, true));
+        //var_export($sql);
+        //echo PHP_EOL;
         // I got all, run query...
         try {
             // Get PDO and execute
@@ -1243,6 +1248,8 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $sql      = false;
         $multi    = false;
         $arrayMod = '()';
+        $fctL     = '';
+        $fctR     = '';
         switch ($oper) {
             case \FreeFW\Storage\Storage::COND_LOWER_OR_NULL:
                 $nullable = true;
@@ -1281,6 +1288,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $realOper = 'like';
                 $addL     = '';
                 $addR     = '%';
+                break;
+            case \FreeFW\Storage\Storage::COND_SOUND_LIKE:
+                $realOper = '=';
+                $fctL     = 'SOUNDEX';
+                $fctR     = 'SOUNDEX';
                 break;
             case \FreeFW\Storage\Storage::COND_END_WITH:
                 $realOper = 'like';
@@ -1343,6 +1355,10 @@ class PDOStorage extends \FreeFW\Storage\Storage
             if (isset($leftDatas['fct']) && $leftDatas['fct'] != '') {
                 $leftDatas['id'] = $provider->convertFunction($leftDatas['fct'], $leftDatas['id']);
             }
+            $leftId = $leftDatas['id'];
+            if ($fctL != '') {
+                $leftId = $fctL . '(' . $leftId . ')';
+            }
             if ($right !== null) {
                 $rightDatas = $this->renderConditionField($right, $p_model, $p_aliases, $p_crtAlias, $multi);
                 $result     = [
@@ -1355,6 +1371,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     } else {
                         $rightId = $rightDatas['id'];
                     }
+                    if ($fctR != '') {
+                        $rightId = $fctR . '(' . $rightId . ')';
+                    }
                 } else {
                     if ($arrayMod == '()') {
                         $rightId = ' ( ' . implode(', ', $rightDatas['id']) . ' ) ';
@@ -1364,18 +1383,20 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 }
                 if ($nullable) {
                     $result['sql'] = '(' .
-                        $leftDatas['id'] . $realOper . $rightId . ' OR ' .
-                        $leftDatas['id'] . ' IS NULL)';
+                        $leftId . $realOper . $rightId . ' OR ' .
+                        $leftId . ' IS NULL)'
+                    ;
                 } else {
                     if ($notnull) {
                         $result['sql'] = '(' .
-                            $leftDatas['id'] . $realOper . $rightId . ' AND ' .
-                            $leftDatas['id'] . ' IS NOT NULL)';
+                            $leftId . $realOper . $rightId . ' AND ' .
+                            $leftId . ' IS NOT NULL)'
+                        ;
                     } else {
                         if ($realOper === 'like') {
-                            $result['sql'] = $leftDatas['id'] . ' REGEXP ' . $rightId;
+                            $result['sql'] = $leftId . ' REGEXP ' . $rightId;
                         } else {
-                            $result['sql'] = $leftDatas['id'] . ' ' . $realOper . ' ' . $rightId;
+                            $result['sql'] = $leftId . ' ' . $realOper . ' ' . $rightId;
                         }
                     }
                 }

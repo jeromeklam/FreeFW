@@ -94,6 +94,12 @@ abstract class Email extends \FreeFW\Model\StorageModel\Email
     protected $email_object_name = null;
 
     /**
+     * email_bcc
+     * @var string
+     */
+    protected $email_bcc = null;
+
+    /**
      * Set email_id
      *
      * @param int $p_value
@@ -413,5 +419,28 @@ abstract class Email extends \FreeFW\Model\StorageModel\Email
     public function getEmailObjectName()
     {
         return $this->email_object_name;
+    }
+
+    /**
+     * Set email_bcc
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\Base\Email
+     */
+    public function setEmailBcc($p_value)
+    {
+        $this->email_bcc = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get email_bcc
+     *
+     * @return string
+     */
+    public function getEmailBcc()
+    {
+        return $this->email_bcc;
     }
 }

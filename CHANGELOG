@@ -1,3 +1,8 @@
+# 1.8.0 : 23/10/2021
+
+* SOUNDEX disponible en Sql
+* Email: ajout du champ BCC
+
 # 1.7.0 : 20/10/2021
 
 * Compléments d'IDs sur les messages
