@@ -41,6 +41,31 @@ class PDOStorage extends \FreeFW\Storage\Storage
     }
 
     /**
+     * Get standard members
+     *
+     * @param mixed $p_conditions
+     *
+     * @return array
+     */
+    protected function getConditionsRelations($p_conditions)
+    {
+        $relations = [];
+        if ($p_conditions instanceof \FreeFW\Model\SimpleCondition) {
+            $left = $p_conditions->getLeftMember();
+            if ($left instanceof \FreeFW\Model\ConditionMember) {
+                array_push($relations, $left->getValue());
+            }
+        } else {
+            foreach ($p_conditions as $oneCondition) {
+                $news = $this->getConditionsRelations($oneCondition);
+                $relations = array_merge($relations, $news);
+            }
+        }
+        return $relations;
+    }
+
+
+    /**
      *
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\StorageStrategyInterface::create()
@@ -795,7 +820,18 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 }
             }
         }
-        foreach ($p_relations as $idx => $shortcut) {
+        $allRels = $p_relations;
+        foreach ($this->getConditionsRelations($p_conditions) as $oneCondition) {
+            if (strpos($oneCondition, '.') > 0 && strpos($oneCondition, ':') === false) {
+                $parts = explode('.', $oneCondition);
+                array_pop($parts);
+                $newRel = implode('.', $parts);
+                if (!in_array($newRel, $allRels)) {
+                    $allRels[] = $newRel;
+                }
+            }
+        }
+        foreach ($allRels as $idx => $shortcut) {
             $parts     = explode('.', $shortcut);
             $onePart   = array_shift($parts);
             $crtFKs    = $fks;
@@ -1484,6 +1520,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 try {
                     self::$models[$class] = \FreeFW\DI\DI::get($class);
                 } catch (\Exception $e) {
+                    var_dump($p_field, $class, $p_aliases);die;
                     throw new \FreeFW\Core\FreeFWStorageException(sprintf('Unknown model : %s !', $class));
                 }
             }

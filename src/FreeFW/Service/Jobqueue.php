@@ -40,13 +40,24 @@ class Jobqueue extends \FreeFW\Core\Service
         ;
         $tmpFile = '/tmp/export_' . uniqid() . '.xlsx';
         $sheet = new \FreeOffice\Model\SpreadSheet($tmpFile);
-        $query->execute([], 'exportAsSheet', [$sheet]);
+        try {
+            $query->execute([], 'exportAsSheet', [$sheet]);
+        } catch (\Exception $ex) {
+            $myEx = \FreeFW\Tools\Exception::format($ex); 
+            $this->logger->error($myEx);
+            $sheet->close();
+            @unlink($tmpFile);
+            return false;
+        }
         $sheet->close();
         // Add notification and inbox
         $object = str_replace('::Model::', '_', $p_params['model']);
+        $parts  = explode('_', $object);
+        $date   = \str_replace('-', '', \FreeFW\Tools\Date::getCurrentDate());
+        $name   = array_pop($parts) . '_' . $date;
         $inbox = new \FreeFW\Model\Inbox();
         $inbox
-            ->setInboxFilename('export.xlsx')
+            ->setInboxFilename($name . '.xlsx')
             ->setInboxObjectName($object)
             ->setInboxParams(json_encode($p_params))
             ->setInboxContent(file_get_contents($tmpFile))
@@ -59,7 +70,7 @@ class Jobqueue extends \FreeFW\Core\Service
         $notification
             ->setNotifCode('EXPORT')
             ->setNotifType(\FreeFW\Model\Notification::TYPE_INFORMATION)
-            ->setNotifSubject('Export')
+            ->setNotifSubject('Export terminé')
             ->setNotifObjectName($object)
             ->setUserId($p_user_id)
         ;
@@ -99,6 +110,9 @@ class Jobqueue extends \FreeFW\Core\Service
         );
         if ($query->execute()) {
             $results = $query->getResult();
+            /**
+             * @var \FreeFW\Model\Jobqueue $jobqueue
+             */
             foreach ($results as $jobqueue) {
                 $jobqueue->addToHistory();
                 $jobqueue->run();

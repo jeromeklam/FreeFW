@@ -671,6 +671,7 @@ class Model extends \FreeFW\Core\Service
             $lines[] = '        FFCST::PROPERTY_PRIVATE => \'' . $oneField->getFldName() . '\',';
             $lines[] = '        FFCST::PROPERTY_TYPE    => FFCST::' . $oneField->getFldTypeForClass() . ',';
             $lines[] = '        FFCST::PROPERTY_OPTIONS => [' . $oneField->getFldOptionsForClass() . '],';
+            $lines[] = '        FFCST::PROPERTY_TITLE   => \'\',';
             $lines[] = '        FFCST::PROPERTY_COMMENT => \'\',';
             switch ($oneField->getFldType()) {
                 case FFCST::TYPE_INTEGER:
@@ -739,6 +740,16 @@ class Model extends \FreeFW\Core\Service
         $lines[] = '';
         $lines[] = '    /**';
         $lines[] = '     * Get object short description';
+        $lines[] = '     *';
+        $lines[] = '     * @return string';
+        $lines[] = '     */';
+        $lines[] = '    public static function getSourceTitle()';
+        $lines[] = '    {';
+        $lines[] = '        return \'\';';
+        $lines[] = '    }';
+        $lines[] = '';
+        $lines[] = '    /**';
+        $lines[] = '     * Get object description';
         $lines[] = '     *';
         $lines[] = '     * @return string';
         $lines[] = '     */';

@@ -140,6 +140,12 @@ class Email extends \FreeFW\Core\Service
                     ->setReplyTo($oneEmail->getEmailReplyTo())
                     ->setFrom($oneEmail->getEmailFrom(), $oneEmail->getEmailFromName())
                 ;
+                $bcc = explode(',', $oneEmail->getEmailBcc());
+                foreach ($bcc as $oneCourriel) {
+                    if (trim($oneCourriel) != '') {
+                        $message->addBCC($oneCourriel);
+                    }
+                }
             }
         }
         return $message;

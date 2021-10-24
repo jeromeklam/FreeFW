@@ -55,19 +55,11 @@ export class Search extends Component {
       size: 10,
       total: 0,
       conditions: props.conditions,
-      filters: new Filter(),
+      filters: null,
     };
     this.onChange = this.onChange.bind(this);
     this.onSearch = this.onSearch.bind(this);
-    this.onClear = this.onClear.bind(this);
     this.onMore = this.onMore.bind(this);
-  }
-
-  /**
-   * Suppression des critères de sélection
-   */
-  onClear() {
-    this.setState({ loading: false, finish: true, list: [] });
   }
 
   /**
@@ -90,7 +82,10 @@ export class Search extends Component {
       page = 1;
     }
     if (!this.state.loading) {
-      this.state.conditions.forEach(cond => filters.addFilter(cond.field, cond.value, cond.oper));
+      if (!filters) {
+        filters = new Filter();
+        filters.addConditions(this.state.conditions);
+      }
       const crits = filters.asJsonApiObject();
       const dSort = [[:FEATURE_SORT:]];
       let sort = '';
@@ -159,8 +154,6 @@ export class Search extends Component {
    * Render
    */
   render() {
-    let filters = this.state.filters;
-    this.state.conditions.forEach(cond => filters.addFilter(cond.field, cond.value, cond.oper));
     const cols = getCols(this);
     return (
       <SearchModal
@@ -171,7 +164,6 @@ export class Search extends Component {
         show={this.props.show}
         loading={this.state.loading}
         onClose={this.props.onClose}
-        onClear={this.onClear}
         onSearch={this.onSearch}
         onSelect={this.props.onSelect}
         list={
@@ -185,7 +177,6 @@ export class Search extends Component {
           />
         }
         pickerDisplay={displayItemPicker}
-        filters={filters}
         cols={cols}
         t={this.props.intl.formatMessage}
       />
