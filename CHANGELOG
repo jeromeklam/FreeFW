@@ -1,3 +1,9 @@
+# 1.9.1 : 28/10/2021
+
+* Emails : ajouts de PJ fixes (2)
+* Jobqueue : deferredEmail
+* PDO : Correction "start with" et "end with"
+
 # 1.8.0 : 24/10/2021
 
 * SOUNDEX disponible en Sql

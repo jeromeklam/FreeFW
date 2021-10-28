@@ -28,6 +28,12 @@ abstract class PrintOptions extends \FreeFW\Model\Model\PrintOptions
     protected $edi_id = null;
 
     /**
+     * email_id
+     * @var number
+     */
+    protected $email_id = null;
+
+    /**
      * Set prt_name
      *
      * @param string $p_value
@@ -94,5 +100,28 @@ abstract class PrintOptions extends \FreeFW\Model\Model\PrintOptions
     public function getEdiId()
     {
         return $this->edi_id;
+    }
+
+    /**
+     * Set email_id
+     *
+     * @param number $p_value
+     *
+     * @return \FreeFW\Model\Base\PrintOptions
+     */
+    public function setEmailId($p_value)
+    {
+        $this->email_id = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get email_id
+     *
+     * @return number
+     */
+    public function getEmailId()
+    {
+        return $this->email_id;
     }
 }

@@ -28,6 +28,9 @@ class Email extends \FreeFW\Core\Service
          */
         foreach ($emails as $oneEmail) {
             $emailVersion = null;
+            /**
+             * @var \FreeFW\Model\EmailLang $oneVersion
+             */
             foreach ($oneEmail->getVersions() as $oneVersion) {
                 if ($oneVersion->getLangId() == $p_lang_id) {
                     $emailVersion = $oneVersion;
@@ -145,6 +148,22 @@ class Email extends \FreeFW\Core\Service
                     if (trim($oneCourriel) != '') {
                         $message->addBCC($oneCourriel);
                     }
+                }
+                if ($oneVersion->getEmaillPj1()) {
+                    $cfg  = $this->getAppConfig();
+                    $dir  = $cfg->get('ged:dir');
+                    $bDir = rtrim(\FreeFW\Tools\Dir::mkStdFolder($dir), '/');
+                    $filename = $bDir . '/' . uniqid(true);
+                    file_put_contents($filename, $oneVersion->getEmaillPj1());
+                    $message->addAttachment($filename, $oneVersion->getEmaillPj1Name());
+                }
+                if ($oneVersion->getEmaillPj2()) {
+                    $cfg  = $this->getAppConfig();
+                    $dir  = $cfg->get('ged:dir');
+                    $bDir = rtrim(\FreeFW\Tools\Dir::mkStdFolder($dir), '/');
+                    $filename = $bDir . '/' . uniqid(true);
+                    file_put_contents($filename, $oneVersion->getEmaillPj1());
+                    $message->addAttachment($filename, $oneVersion->getEmaillPj2Name());
                 }
             }
         }

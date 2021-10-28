@@ -39,6 +39,13 @@ class PrintOptions extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_COMMENT => 'Identifiant de l\'édition',
         FFCST::PROPERTY_SAMPLE  => 1,
     ];
+    protected static $EMAIL_ID = [
+        FFCST::PROPERTY_PRIVATE => 'email_id',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Identifiant de l\'email',
+        FFCST::PROPERTY_SAMPLE  => 1,
+    ];
 
     /**
      * get properties
@@ -51,6 +58,7 @@ class PrintOptions extends \FreeFW\Core\StorageModel
             'prt_name' => self::$PRT_NAME,
             'prt_type' => self::$PRT_TYPE,
             'edi_id'   => self::$EDI_ID,
+            'email_id' => self::$EMAIL_ID,
         ];
     }
 

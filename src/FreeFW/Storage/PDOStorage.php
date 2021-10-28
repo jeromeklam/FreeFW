@@ -1320,26 +1320,18 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $realOper = '!=';
                 $nullable = true;
                 break;
-            case \FreeFW\Storage\Storage::COND_BEGIN_WITH:
-                $realOper = 'like';
-                $addL     = '';
-                $addR     = '%';
-                break;
             case \FreeFW\Storage\Storage::COND_SOUND_LIKE:
                 $realOper = '=';
                 $fctL     = 'SOUNDEX';
                 $fctR     = 'SOUNDEX';
                 break;
-            case \FreeFW\Storage\Storage::COND_END_WITH:
-                $realOper = 'like';
-                $addL     = '%';
-                $addR     = '';
-                break;
             case \FreeFW\Storage\Storage::COND_BEGIN_WITH:
+                $realOper = 'like';
                 $addL     = '^';
                 $addR     = '';
                 break;
             case \FreeFW\Storage\Storage::COND_END_WITH:
+                $realOper = 'like';
                 $addL     = '';
                 $addR     = '$';
                 break;

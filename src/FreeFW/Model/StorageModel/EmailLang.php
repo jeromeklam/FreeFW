@@ -65,6 +65,34 @@ abstract class EmailLang extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_COMMENT => '',
         FFCST::PROPERTY_SAMPLE  => '',
     ];
+    protected static $PRP_EMAILL_PJ1 = [
+        FFCST::PROPERTY_PRIVATE => 'emaill_pj1',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BLOB,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => '',
+        FFCST::PROPERTY_SAMPLE  => '',
+    ];
+    protected static $PRP_EMAILL_PJ1_NAME = [
+        FFCST::PROPERTY_PRIVATE => 'emaill_pj1_name',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => '',
+        FFCST::PROPERTY_SAMPLE  => '',
+    ];
+    protected static $PRP_EMAILL_PJ2 = [
+        FFCST::PROPERTY_PRIVATE => 'emaill_pj2',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BLOB,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => '',
+        FFCST::PROPERTY_SAMPLE  => '',
+    ];
+    protected static $PRP_EMAILL_PJ2_NAME = [
+        FFCST::PROPERTY_PRIVATE => 'emaill_pj2_name',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => '',
+        FFCST::PROPERTY_SAMPLE  => '',
+    ];
 
     /**
      * get properties
@@ -74,11 +102,15 @@ abstract class EmailLang extends \FreeFW\Core\StorageModel
     public static function getProperties()
     {
         return [
-            'emaill_id'      => self::$PRP_EMAILL_ID,
-            'email_id'       => self::$PRP_EMAIL_ID,
-            'lang_id'        => self::$PRP_LANG_ID,
-            'emaill_subject' => self::$PRP_EMAILL_SUBJECT,
-            'emaill_body'    => self::$PRP_EMAILL_BODY
+            'emaill_id'       => self::$PRP_EMAILL_ID,
+            'email_id'        => self::$PRP_EMAIL_ID,
+            'lang_id'         => self::$PRP_LANG_ID,
+            'emaill_subject'  => self::$PRP_EMAILL_SUBJECT,
+            'emaill_body'     => self::$PRP_EMAILL_BODY,
+            'emaill_pj1'      => self::$PRP_EMAILL_PJ1,
+            'emaill_pj2'      => self::$PRP_EMAILL_PJ2,
+            'emaill_pj1_name' => self::$PRP_EMAILL_PJ1_NAME,
+            'emaill_pj2_name' => self::$PRP_EMAILL_PJ2_NAME,
         ];
     }
 

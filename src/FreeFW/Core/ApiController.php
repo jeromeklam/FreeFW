@@ -618,14 +618,32 @@ class ApiController extends \FreeFW\Core\Controller
          * @var \FreeFW\Model\Jobqueue $jobqueue
          */
         $jobqueue = new \FreeFW\Model\Jobqueue();
-        $jobqueue
-            ->setJobqService('FreeFW::Service::Jobqueue')
-            ->setJobqMethod('deferredExport')
-            ->setJobqStatus(\FreeFW\Model\Jobqueue::STATUS_WAITING)
-            ->setJobqName('Demande d\'export')
-            ->setJobqType(\FreeFW\Model\Jobqueue::TYPE_ONCE)
-            ->setJobqParams(json_encode($params))
-        ;
+        if ($print->getEmailId()) {
+            $params->email_id = $print->getEmailId();
+            /**
+             * All as email
+             */
+            $jobqueue
+                ->setJobqService('FreeFW::Service::Jobqueue')
+                ->setJobqMethod('deferredEmail')
+                ->setJobqStatus(\FreeFW\Model\Jobqueue::STATUS_WAITING)
+                ->setJobqName('Demande d\'envoi d\'email')
+                ->setJobqType(\FreeFW\Model\Jobqueue::TYPE_ONCE)
+                ->setJobqParams(json_encode($params))
+            ;
+        } else {
+            /**
+             * All in one sheet
+             */
+            $jobqueue
+                ->setJobqService('FreeFW::Service::Jobqueue')
+                ->setJobqMethod('deferredExport')
+                ->setJobqStatus(\FreeFW\Model\Jobqueue::STATUS_WAITING)
+                ->setJobqName('Demande d\'export')
+                ->setJobqType(\FreeFW\Model\Jobqueue::TYPE_ONCE)
+                ->setJobqParams(json_encode($params))
+            ;
+        }
         $jobqueue->create();
         $this->logger->debug('FreeFW.ApiController.export.end');
         return $this->createSuccessAddResponse($jobqueue);

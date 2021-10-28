@@ -1,4 +1,5 @@
 <?php
+
 namespace FreeFW\Model\Base;
 
 /**
@@ -38,6 +39,30 @@ abstract class EmailLang extends \FreeFW\Model\StorageModel\EmailLang
      * @var mixed
      */
     protected $emaill_body = null;
+
+    /**
+     * emaill_pj1
+     * @var mixed
+     */
+    protected $emaill_pj1 = null;
+
+    /**
+     * emaill_pj1_name
+     * @var mixed
+     */
+    protected $emaill_pj1_name = null;
+
+    /**
+     * emaill_pj2
+     * @var mixed
+     */
+    protected $emaill_pj2 = null;
+
+    /**
+     * emaill_pj2_name
+     * @var mixed
+     */
+    protected $emaill_pj2_name = null;
 
     /**
      * Set emaill_id
@@ -152,5 +177,97 @@ abstract class EmailLang extends \FreeFW\Model\StorageModel\EmailLang
     public function getEmaillBody()
     {
         return $this->emaill_body;
+    }
+
+    /**
+     * Set emaill_pj1
+     *
+     * @param mixed $p_value
+     *
+     * @return \FreeFW\Model\EmailLang
+     */
+    public function setEmaillPj1($p_value)
+    {
+        $this->emaill_pj1 = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get emaill_pj1
+     *
+     * @return mixed
+     */
+    public function getEmaillPj1()
+    {
+        return $this->emaill_pj1;
+    }
+
+    /**
+     * Set emaill_pj1_name
+     *
+     * @param mixed $p_value
+     *
+     * @return \FreeFW\Model\EmailLang
+     */
+    public function setEmaillPj1Name($p_value)
+    {
+        $this->emaill_pj1_name = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get emaill_pj1_name
+     *
+     * @return mixed
+     */
+    public function getEmaillPj1Name()
+    {
+        return $this->emaill_pj1_name;
+    }
+
+    /**
+     * Set emaill_pj2
+     *
+     * @param mixed $p_value
+     *
+     * @return \FreeFW\Model\EmailLang
+     */
+    public function setEmaillPj2($p_value)
+    {
+        $this->emaill_pj2 = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get emaill_pj2
+     *
+     * @return mixed
+     */
+    public function getEmaillPj2()
+    {
+        return $this->emaill_pj2;
+    }
+
+    /**
+     * Set emaill_pj2_name
+     *
+     * @param mixed $p_value
+     *
+     * @return \FreeFW\Model\EmailLang
+     */
+    public function setEmaillPj2Name($p_value)
+    {
+        $this->emaill_pj2_name = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get emaill_pj2_name
+     *
+     * @return mixed
+     */
+    public function getEmaillPj2Name()
+    {
+        return $this->emaill_pj2_name;
     }
 }

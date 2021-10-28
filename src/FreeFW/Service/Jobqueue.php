@@ -10,6 +10,68 @@ class Jobqueue extends \FreeFW\Core\Service
 {
 
     /**
+     * Deferred email
+     *
+     * @param mixed $p_params
+     * @param mixed $p_user_id
+     *
+     * @return boolean
+     */
+    public function deferredEmail($p_params, $p_user_id = null)
+    {
+        $this->logger->debug('FreeFW.Service.Jobqueue.deferredEmail.start');
+        $result = true;
+        /**
+         * @var \FreeFW\Model\Query $query
+         */
+        $model   = \FreeFW\DI\DI::get($p_params['model']);
+        $query   = $model->getQuery();
+        $params  = unserialize($p_params['api']);
+        $emailId = $p_params['email_id'];
+        /**
+         *
+         * @var \FreeFW\Model\Conditions $conditions
+         */
+        $conditions = $params->getFilters();
+        $query
+            ->addConditions($params->getFilters())
+            ->addRelations($params->getInclude())
+            ->setLimit($params->getStart(), $params->getlength())
+            ->setSort($params->getSort())
+        ;
+        $email = \FreeFW\Model\Email::findFirst(['email_id' => $emailId]);
+        if ($email) {
+            if (method_exists($model, 'sendEmail')) {
+                $query->execute([], 'sendEmail', [$email]);
+            } else {
+                $this->logger->debug('FreeFW.Service.Jobqueue.deferredEmail.sendEmail.notfound');
+                return false;
+            }
+        } else {
+            return false;
+        }
+        // Add notification and inbox
+        $object = str_replace('::Model::', '_', $p_params['model']);
+        $parts  = explode('_', $object);
+        $date   = \str_replace('-', '', \FreeFW\Tools\Date::getCurrentDate());
+        $name   = array_pop($parts) . '_' . $date;
+        $notification = new \FreeFW\Model\Notification();
+        $notification
+            ->setNotifCode('EMAIL')
+            ->setNotifType(\FreeFW\Model\Notification::TYPE_INFORMATION)
+            ->setNotifSubject('Envoi d\'email terminé')
+            ->setNotifObjectName($object)
+            ->setUserId($p_user_id)
+        ;
+        if (!$notification->create()) {
+            $result = false;
+        }
+        // data can be empty, but it's a 2*
+        $this->logger->debug('FreeFW.Service.Jobqueue.deferredEmail.end');
+        return $result;
+    }
+
+    /**
      * Deferred export
      *
      * @param mixed $p_params
