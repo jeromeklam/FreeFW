@@ -167,6 +167,6 @@ abstract class Translation extends \FreeFW\Core\StorageModel
      */
     public static function getAutocompleteField()
     {
-        return '';
+        return 'tr_key';
     }
 }

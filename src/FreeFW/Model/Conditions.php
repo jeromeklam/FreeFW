@@ -315,10 +315,25 @@ class Conditions extends \FreeFW\Core\Model implements
                                                 continue;
                                             }
                                         } else {
-                                            $aValue = new \FreeFW\Model\ConditionValue();
-                                            $aValue->setValue($value2);
-                                            $aCondition->setOperator($idx2);
-                                            $aCondition->setRightMember($aValue);
+                                            if (strpos($value2, ',') > 0) {
+                                                $orCondition = new \FreeFW\Model\Conditions();
+                                                $orCondition->setOperator(\FreeFW\Storage\Storage::COND_OR);
+                                                foreach (explode(',', $value2) as $oneValue) {
+                                                    $a2Condition = new \FreeFW\Model\SimpleCondition();
+                                                    $a2Condition->setLeftMember($aField);
+                                                    $aValue = new \FreeFW\Model\ConditionValue();
+                                                    $aValue->setValue($oneValue);
+                                                    $a2Condition->setOperator($idx2);
+                                                    $a2Condition->setRightMember($aValue);
+                                                    $orCondition[] = $a2Condition;
+                                                }
+                                                $aCondition = $orCondition;
+                                            } else {
+                                                $aValue = new \FreeFW\Model\ConditionValue();
+                                                $aValue->setValue($value2);
+                                                $aCondition->setOperator($idx2);
+                                                $aCondition->setRightMember($aValue);
+                                            }
                                         }
                                     }
                                 }

@@ -361,6 +361,7 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
                     if ($oper === 0) {
                         $this->addSimpleCondition($value, $left, null);
                     } else {
+                        // Simple condition
                         $right = new \FreeFW\Model\ConditionValue();
                         $right->setValue($value);
                         $this->addSimpleCondition($oper, $left, $right);

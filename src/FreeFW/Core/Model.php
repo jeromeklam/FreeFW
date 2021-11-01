@@ -31,6 +31,7 @@ abstract class Model implements
      */
     use \FreeFW\Behaviour\ValidatorTrait;
     use \FreeFW\Behaviour\ConfigAwareTrait;
+    use \FreeFW\Behaviour\AutomateAwareTrait;
     use \Psr\Log\LoggerAwareTrait;
 
     /**

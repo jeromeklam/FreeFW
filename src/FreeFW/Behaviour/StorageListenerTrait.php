@@ -97,7 +97,7 @@ trait StorageListenerTrait
             }
         }
         try {
-            if ($p_object instanceof \FreeFW\Core\Model) {
+            if ($p_object instanceof \FreeFW\Core\Model && $p_object->mustRunAutomate()) {
                 /**
                  * @var \FreeFW\Model\Automate $oneAutomate
                  */
