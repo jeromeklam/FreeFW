@@ -171,7 +171,7 @@ class PHPMailer implements
             $this->mailer->Body = '<html><body>' . $htmlBody . '</body></html>';
             $this->mailer->AltBody = strip_tags(str_replace("<br />", "\n", $htmlBody));
             // Petite pause avant l'envoi...
-            sleep(1);
+            sleep(2);
             $result = $this->mailer->send();
             if ($result === false || $this->mailer->isError()) {
                 //$this->logger->debug(print_r($this->mailer->ErrorInfo, true));
