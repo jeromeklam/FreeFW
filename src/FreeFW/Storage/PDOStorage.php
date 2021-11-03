@@ -1321,9 +1321,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $nullable = true;
                 break;
             case \FreeFW\Storage\Storage::COND_SOUND_LIKE:
-                $realOper = '=';
-                $fctL     = 'SOUNDEX';
-                $fctR     = 'SOUNDEX';
+                $realOper = 'SOUNDEX';
+                $fctL     = '';
+                $fctR     = '';
                 break;
             case \FreeFW\Storage\Storage::COND_BEGIN_WITH:
                 $realOper = 'like';
@@ -1424,7 +1424,15 @@ class PDOStorage extends \FreeFW\Storage\Storage
                         if ($realOper === 'like') {
                             $result['sql'] = $leftId . ' REGEXP ' . $rightId;
                         } else {
-                            $result['sql'] = $leftId . ' ' . $realOper . ' ' . $rightId;
+                            if ($realOper == 'SOUNDEX') {
+                                $result['sql'] = '(SOUNDEX(' . $leftId . ') = SOUNDEX(' . $rightId . ') OR ' .
+                                                 $leftId . ' REGEXP ' . $rightDatas['id'] . '_2' . ')';
+                                $nData = $rightDatas['value'];
+                                $nData = \FreeFW\Tools\PBXString::toSqlRegexp($nData);
+                                $result['values'][$rightDatas['id'] . '_2'] = $addL . $nData . $addR;
+                            } else {
+                                $result['sql'] = $leftId . ' ' . $realOper . ' ' . $rightId;
+                            }
                         }
                     }
                 }
