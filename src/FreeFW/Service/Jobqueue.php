@@ -103,7 +103,7 @@ class Jobqueue extends \FreeFW\Core\Service
         $tmpFile = '/tmp/export_' . uniqid() . '.xlsx';
         $sheet = new \FreeOffice\Model\SpreadSheet($tmpFile);
         try {
-            $query->execute([], 'exportAsSheet', [$sheet]);
+            $query->execute([], 'exportAsSheet', [$sheet, $params->getInclude()]);
         } catch (\Exception $ex) {
             $myEx = \FreeFW\Tools\Exception::format($ex); 
             $this->logger->error($myEx);

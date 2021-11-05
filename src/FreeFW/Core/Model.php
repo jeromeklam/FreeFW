@@ -1258,22 +1258,12 @@ abstract class Model implements
      *
      * @return \FreeFW\Model\MergeModel
      */
-    public function getMergeData($p_includes = false, $p_prefix = '')
+    public function getMergeData($p_includes = [], $p_prefix = '', $p_parent = '')
     {
+        $config = $this->getAppConfig();
+        $merge  = $config->get('models:' . $this->getApiType() . ':merge', true);
         $datas = new \FreeFW\Model\MergeModel();
         $block = $this->getApiType();
-        if (!is_array($p_includes)) {
-            if (method_exists($this, 'getDefaultMergeIncludes')) {
-                $includes = $this->getDefaultMergeIncludes();
-                if (is_array($includes)) {
-                    $p_includes = $includes;
-                } else {
-                    $p_includes = explode(',', $includes);
-                }
-            } else {
-                $p_includes = [];
-            }
-        }
         $parts = explode('_', $block);
         array_shift($parts);
         $block = \FreeFW\Tools\PBXString::fromCamelCase(implode('_', $parts));
@@ -1281,8 +1271,12 @@ abstract class Model implements
             $block = $p_prefix;
         }
         $datas->addBlock($block);
-        $data = $this->getFieldsAsArray();
-        foreach ($this->getModelDescriptionProperties() as $name => $oneProperty) {
+        $orig = [];
+        if (method_exists($this, 'getSpecificEditionFields')) {
+            $orig = $this->getSpecificEditionFields();
+        }
+        $data = $this->getFieldsAsArray($orig);
+        foreach ($this->getProperties() as $name => $oneProperty) {
             $title = $oneProperty[FFCST::PROPERTY_PRIVATE];
             if (isset($oneProperty[FFCST::PROPERTY_PUBLIC])) {
                 $title = $oneProperty[FFCST::PROPERTY_PUBLIC];
@@ -1290,12 +1284,14 @@ abstract class Model implements
             if (isset($oneProperty[FFCST::PROPERTY_MERGE])) {
                 $title = $oneProperty[FFCST::PROPERTY_MERGE];
             }
-            $datas->addField($name, $title);
+            if ($merge === true || in_array($name, $merge)) {
+                $datas->addField($name, $title, $oneProperty[FFCST::PROPERTY_TYPE]);
+            }
             if (isset($oneProperty[FFCST::PROPERTY_OPTIONS])) {
                 if (in_array(FFCST::OPTION_FK, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $relName = '';
                     foreach ($oneProperty[FFCST::PROPERTY_FK] as $relName => $relDatas) {
-                        if (in_array($relName, $p_includes)) {
+                        if ($p_includes === true || in_array($relName, $p_includes)) {
                             $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relName, true);
                             $relModel = $this->{$getter}();
                             if ($relModel instanceOf \FreeFW\Core\Model) {
@@ -1303,6 +1299,7 @@ abstract class Model implements
                                 foreach ($relDatas->getBlocks() as $oneBlock) {
                                     $datas->addBlock($oneBlock);
                                     $datas->addData($relDatas->getDatas($oneBlock), $oneBlock);
+                                    $datas->addFields($relDatas->getFields(), $relDatas->getTitles(), $relDatas->getTypes(), $oneBlock);
                                 }
                             }
                         }
@@ -1312,7 +1309,7 @@ abstract class Model implements
         }
         if (method_exists($this, 'getRelationships')) {
             foreach ($this->getRelationships() as $relName => $relOptions) {
-                if (in_array($relName, $p_includes)) {
+                if ($p_includes === true || in_array($relName, $p_includes)) {
                     $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relName, true);
                     if (method_exists($this, $getter)) {
                         $relDatas = $this->{$getter}();
@@ -1334,8 +1331,10 @@ abstract class Model implements
         if (method_exists($this, 'getSpecificEditionFields')) {
             $specific = $this->getSpecificEditionFields();
             foreach ($specific as $specField) {
-                $datas->addField($specField['name'], $specField['title'], $specField['type']);
-                $data[$specField['name']] = $specField['content'];
+                if ($merge === true || in_array($specField['name'], $merge)) {
+                    $datas->addField($specField['name'], $specField['title'], $specField['type']);
+                    $data[$specField['name']] = $specField['content'];
+                } 
             }
         }
         $datas->addData($data, $block);
@@ -1346,11 +1345,17 @@ abstract class Model implements
     }
 
     /**
-     *
+     * Export one as in sheet
+     * 
+     * @param \FreeOffice\Model\Spreesheet $p_sheet
+     * @param array                        $p_includes
+     * 
+     * @return boolean
      */
-    public function exportAsSheet($p_sheet)
+    public function exportAsSheet($p_sheet, $p_includes = [])
     {
-        $p_sheet->addLine($this->getMergeData());
+        $p_sheet->addLine($this->getMergeData($p_includes));
         return true;
     }
+
 }

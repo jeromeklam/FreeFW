@@ -126,15 +126,30 @@ class MergeModel {
      *
      * @return \FreeFW\Model\MergeModel
      */
-    public function addField($p_name, $p_title = '', $p_type = null)
+    public function addField($p_name, $p_title = '', $p_type = null, $p_block = '')
     {
-        $this->fields[] = $p_name;
-        if ($p_title !== '') {
-            $this->titles[$p_name] = $p_title;
-        } else {
-            $this->titles[$p_name] = $p_name;
+        $name = $p_name;
+        if ($p_block != '') {
+            $name = $p_block . '_' . $name;
         }
-        $this->types[$p_name] = $p_type;
+        $this->fields[] = $name;
+        if ($p_title !== '') {
+            $this->titles[$name] = $p_title;
+        } else {
+            $this->titles[$name] = $name;
+        }
+        $this->types[$name] = $p_type;
+        return $this;
+    }
+
+    /**
+     * Aff fields, ...
+     */
+    public function addFields($p_fields, $p_titles, $p_types, $p_block)
+    {
+        foreach ($p_fields as $oneField) {
+            $this->addField($oneField, $p_titles[$oneField], $p_types[$oneField], $p_block);
+        }
         return $this;
     }
 
@@ -162,13 +177,21 @@ class MergeModel {
      * Get title
      *
      * @param string $p_name
+     * @param string $oneBlock
      *
      * @return boolean
      */
-    public function getTitle($p_name)
+    public function getTitle($p_name, $p_block = '')
     {
+        $name = $p_name;
+        if ($p_block != '')  {
+            $name = $p_block . '_' . $name;
+        }
         if (isset($this->titles[$p_name])) {
             return $this->titles[$p_name];
+        }
+        if (isset($this->titles[$name])) {
+            return $this->titles[$name];
         }
         return false;
     }
@@ -187,13 +210,21 @@ class MergeModel {
      * Get field type
      *
      * @param string $p_name
+     * @param string $p_block
      *
      * @return boolean
      */
-    public function getType($p_name)
+    public function getType($p_name, $p_block = '')
     {
+        $name = $p_name;
+        if ($p_block != '')  {
+            $name = $p_block . '_' . $name;
+        }
         if (isset($this->types[$p_name])) {
             return $this->types[$p_name];
+        }
+        if (isset($this->types[$name])) {
+            return $this->types[$name];
         }
         return false;
     }
@@ -353,7 +384,7 @@ class MergeModel {
         foreach ($this->blocks as $oneBlock) {
             if (array_key_exists($oneBlock, $this->datas)) {
                 foreach ($this->datas[$oneBlock] as $key => $value) {
-                  $datas[$oneBlock . '.' . $key] =  $value;
+                    $datas[$oneBlock . '.' . $key] =  $value;
                 }
             }
         }
