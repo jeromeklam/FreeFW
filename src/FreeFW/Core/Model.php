@@ -1261,7 +1261,11 @@ abstract class Model implements
     public function getMergeData($p_includes = [], $p_prefix = '', $p_parent = '')
     {
         $config = $this->getAppConfig();
-        $merge  = $config->get('models:' . $this->getApiType() . ':merge', true);
+        if ($p_prefix !== '') {
+            $merge  = $config->get('models:' . $this->getApiType() . ':merge:include', true);
+        } else {
+            $merge  = $config->get('models:' . $this->getApiType() . ':merge:main', true);
+        }
         $datas = new \FreeFW\Model\MergeModel();
         $block = $this->getApiType();
         $parts = explode('_', $block);

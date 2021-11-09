@@ -1,3 +1,7 @@
+# 1.10.2 : 09/11/2021
+
+* Export : séparation modèle principal, includes
+
 # 1.10.1 : 03/11/2021
 
 * SOUNDEX : SoundEX + Regexp pour retourner le maximum de résultats ressemblants
