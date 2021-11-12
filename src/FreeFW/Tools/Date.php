@@ -285,4 +285,17 @@ class Date
         }
         return $month;
     }
+
+    /**
+     * NbDays at now
+     *
+     * @param \DateTime $p_date
+     * 
+     * @return int
+     */
+    public static function nbDaysAtNow(\DateTime $p_date)
+    {
+        $now = new \DateTime();
+        return $now->diff($p_date)->format("%r%a");
+    }
 }

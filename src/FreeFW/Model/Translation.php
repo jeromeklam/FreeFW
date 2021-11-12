@@ -10,4 +10,10 @@ use \FreeFW\Constants as FFCST;
  */
 class Translation extends \FreeFW\Model\Base\Translation
 {
+
+    /**
+     * Constants
+     */
+    const TYPE_SHEET = 'SHEET';
+    const TYPE_NODE  = 'NODE';
 }
