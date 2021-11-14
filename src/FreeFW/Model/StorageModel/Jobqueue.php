@@ -193,8 +193,17 @@ abstract class Jobqueue extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
         FFCST::PROPERTY_OPTIONS => [],
         FFCST::PROPERTY_TITLE   => 'Cron',
-        FFCST::PROPERTY_COMMENT => 'Prohcian sous forme de crontab',
+        FFCST::PROPERTY_COMMENT => 'Prochain sous forme de crontab',
         FFCST::PROPERTY_SAMPLE  => '* * * * *',
+    ];
+    protected static $PRP_JOBQ_MAX_HOUR = [
+        FFCST::PROPERTY_PRIVATE => 'jobq_max_hour',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_INTEGER,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_TITLE   => 'Heures',
+        FFCST::PROPERTY_COMMENT => 'Nombre d\'heure avant timeout',
+        FFCST::PROPERTY_DEFAULT => 48,
+        FFCST::PROPERTY_SAMPLE  => 48,
     ];
 
     /**
@@ -224,6 +233,7 @@ abstract class Jobqueue extends \FreeFW\Core\StorageModel
             'jobq_next_minutes' => self::$PRP_JOBQ_NEXT_MINUTES,
             'jobq_next_retry'   => self::$PRP_JOBQ_NEXT_RETRY,
             'jobq_cron'         => self::$PRP_JOBQ_CRON,
+            'jobq_max_hour'     => self::$PRP_JOBQ_MAX_HOUR,
         ];
     }
 

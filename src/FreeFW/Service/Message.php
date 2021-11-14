@@ -54,4 +54,23 @@ class Message extends \FreeFW\Core\Service
         $this->logger->debug('Message.sendMessage.END');
         return $p_params;
     }
+
+    /**
+     * Send administrator email
+     *
+     * @param string $p_subject
+     * @param string $p_body
+     * 
+     * @return bool
+     */
+    public function sendAdminMessage($p_subject, $p_body)
+    {
+        $message = new \FreeFW\Model\Message();
+        $message
+            ->setMsgSubject($p_subject)
+            ->setMsgBody($p_body)
+            ->addDest('jeromeklam@free.fr')
+        ;
+        return $message->send();
+    }
 }

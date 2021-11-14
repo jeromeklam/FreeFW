@@ -124,6 +124,12 @@ abstract class Jobqueue extends \FreeFW\Model\StorageModel\Jobqueue
     protected $jobq_cron = null;
 
     /**
+     * jobq_max_hour
+     * @var int
+     */
+    protected $jobq_max_hour = null;
+
+    /**
      * Set jobq_id
      *
      * @param int $p_value
@@ -558,5 +564,28 @@ abstract class Jobqueue extends \FreeFW\Model\StorageModel\Jobqueue
     public function getJobqCron()
     {
         return $this->jobq_cron;
+    }
+
+    /**
+     * Set jobq_max_hour
+     *
+     * @param int $p_hour
+     * 
+     * @return \FreeFW\Model\Base\Jobqueue
+     */
+    public function setJobqMaxHour($p_hour)
+    {
+        $this->jobq_max_hour = $p_hour;
+        return $this;
+    }
+
+    /**
+     * Get jobq_max_hour
+     *
+     * @return int
+     */
+    public function getJobqMaxHour()
+    {
+        return $this->jobq_max_hour;
     }
 }

@@ -19,6 +19,16 @@ $localCommands = [
         'command'    => 'jobqueue::check',
         'controller' => 'FreeFW::Command::Cron',
         'function'   => 'checkJobqueue'
+    ],
+    /**
+     * ########################################################################
+     * Import des traductions
+     * ########################################################################
+     */
+    'freefw.dev.importtranslations' => [
+        'command'    => 'translation::import',
+        'controller' => 'FreeFW::Command::Dev',
+        'function'   => 'importTranslations'
     ]
 ];
 

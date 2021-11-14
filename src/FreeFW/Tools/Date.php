@@ -298,4 +298,18 @@ class Date
         $now = new \DateTime();
         return $now->diff($p_date)->format("%r%a");
     }
+
+    /**
+     * NbHours at now
+     *
+     * @param \DateTime $p_date
+     * 
+     * @return int
+     */
+    public static function nbHoursAtNow(\DateTime $p_date)
+    {
+        $now  = new \DateTime();
+        $diff = $now->diff($p_date);
+        return $diff-> h + ($diff->days * 24);
+    }
 }

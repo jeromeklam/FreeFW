@@ -151,6 +151,7 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
             $this
                 ->setJobqStatus(self::STATUS_PENDING)
                 ->setJobqLastReport(null)
+                ->setJobqLastTs(\FreeFW\Tools\Date::getCurrentTimestamp())
                 ->save();
             /**
              *
@@ -226,7 +227,8 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
         try {
             $this
                 ->setJobqStatus(self::STATUS_WAITING)
-                ->save();
+                ->save()
+            ;
         } catch (\Exception $ex) {
             // @TODO
         }

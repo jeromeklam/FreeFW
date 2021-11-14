@@ -197,16 +197,25 @@ class Jobqueue extends \FreeFW\Core\Service
         $query = $jobqueue->getQuery();
         $query->addFromFilters(
             [
-                'jobq_status' => \FreeFW\Model\Jobqueue::STATUS_PENDING,
-                'jobq_last_ts' => [
-                    \FreeFW\Storage\Storage::COND_LOWER_EQUAL_OR_NULL => \FreeFW\Tools\Date::getCurrentTimestamp(-1440)
-                ]
+                'jobq_status' => \FreeFW\Model\Jobqueue::STATUS_PENDING
             ]
-            );
+        );
         if ($query->execute()) {
+            /**
+             * @var \FreeFW\Service\Message msgService
+             */
+            $msgService = \FreeFW\DI\DI::get('FreeFW::Service::Message');
             $results = $query->getResult();
+            /**
+             * @var \FreeFW\Model\Jobqueue $jobqueue
+             */
             foreach ($results as $jobqueue) {
-                $jobqueue->reset();
+                $fromDate  = \FreeFW\Tools\Date::mysqlToDatetime($jobqueue->getJobqLastTs());
+                $fromHours = abs(\FreeFW\Tools\Date::nbHoursAtNow($fromDate));
+                if ($fromHours > $jobqueue->getJobqMaxHour()) {
+                    $msgService->sendAdminMessage('JobQueue pending reset', print_r($jobqueue, true));
+                    $jobqueue->reset();
+                }
             }
         }
     }

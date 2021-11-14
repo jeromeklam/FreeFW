@@ -34,7 +34,7 @@ abstract class Translation extends \FreeFW\Core\StorageModel
     ];
     protected static $PRP_TR_DESC = [
         FFCST::PROPERTY_PRIVATE => 'tr_desc',
-        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BLOB,
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_HTML,
         FFCST::PROPERTY_OPTIONS => [],
         FFCST::PROPERTY_TITLE   => 'Description',
         FFCST::PROPERTY_COMMENT => 'Description',
