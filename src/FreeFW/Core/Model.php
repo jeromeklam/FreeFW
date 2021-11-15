@@ -1258,13 +1258,16 @@ abstract class Model implements
      *
      * @return \FreeFW\Model\MergeModel
      */
-    public function getMergeData($p_includes = [], $p_prefix = '', $p_parent = '')
+    public function getMergeData($p_includes = [], $p_prefix = '', $p_parent = '', $p_check_merge = false)
     {
         $config = $this->getAppConfig();
-        if ($p_prefix !== '') {
-            $merge  = $config->get('models:' . $this->getApiType() . ':merge:include', true);
-        } else {
-            $merge  = $config->get('models:' . $this->getApiType() . ':merge:main', true);
+        $merge  = true;
+        if ($p_check_merge) {
+            if ($p_prefix !== '') {
+                $merge  = $config->get('models:' . $this->getApiType() . ':merge:include', true);
+            } else {
+                $merge  = $config->get('models:' . $this->getApiType() . ':merge:main', true);
+            }
         }
         $datas = new \FreeFW\Model\MergeModel();
         $block = $this->getApiType();
@@ -1275,11 +1278,7 @@ abstract class Model implements
             $block = $p_prefix;
         }
         $datas->addBlock($block);
-        $orig = [];
-        if (method_exists($this, 'getSpecificEditionFields')) {
-            $orig = $this->getSpecificEditionFields();
-        }
-        $data = $this->getFieldsAsArray($orig);
+        $data = $this->getFieldsAsArray([]);
         foreach ($this->getProperties() as $name => $oneProperty) {
             $title = $oneProperty[FFCST::PROPERTY_PRIVATE];
             if (isset($oneProperty[FFCST::PROPERTY_PUBLIC])) {
@@ -1299,7 +1298,13 @@ abstract class Model implements
                             $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relName, true);
                             $relModel = $this->{$getter}();
                             if ($relModel instanceOf \FreeFW\Core\Model) {
-                                $relDatas = $relModel->getMergeData($p_includes, $block . '_' . $relName);
+                                $newIncludes = [];
+                                foreach ($p_includes as $newOne) {
+                                    if (strpos($newOne, $relName . '.') === 0) {
+                                        $newIncludes[] = str_replace($relName . '.', '', $newOne);
+                                    }
+                                }
+                                $relDatas = $relModel->getMergeData($newIncludes, $block . '_' . $relName, $p_parent, $p_check_merge);
                                 foreach ($relDatas->getBlocks() as $oneBlock) {
                                     $datas->addBlock($oneBlock);
                                     $datas->addData($relDatas->getDatas($oneBlock), $oneBlock);
@@ -1320,7 +1325,7 @@ abstract class Model implements
                         $newDatas = [];
                         if ($relDatas instanceof \FreeFW\Model\ResultSet) {
                             foreach ($relDatas as $relData) {
-                                $newDatas = $relData->getMergeData($p_includes, $block . '_' . $relName);
+                                $newDatas = $relData->getMergeData($p_includes, $block . '_' . $relName, $p_parent, $p_check_merge);
                                 foreach ($newDatas->getBlocks() as $oneBlock) {
                                     $datas->addBlock($oneBlock, true);
                                     $datas->addData($newDatas->getDatas($oneBlock), $oneBlock, false);
@@ -1358,8 +1363,7 @@ abstract class Model implements
      */
     public function exportAsSheet($p_sheet, $p_includes = [])
     {
-        $p_sheet->addLine($this->getMergeData($p_includes));
+        $p_sheet->addLine($this->getMergeData($p_includes, '' , '', true));
         return true;
     }
-
 }

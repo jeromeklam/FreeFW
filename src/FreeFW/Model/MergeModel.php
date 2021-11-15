@@ -148,7 +148,7 @@ class MergeModel {
     public function addFields($p_fields, $p_titles, $p_types, $p_block)
     {
         foreach ($p_fields as $oneField) {
-            $this->addField($oneField, $p_titles[$oneField], $p_types[$oneField], $p_block);
+            $this->addField($oneField, $p_titles[$oneField], $p_types[$oneField]);
         }
         return $this;
     }
