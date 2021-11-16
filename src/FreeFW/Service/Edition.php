@@ -48,7 +48,7 @@ class Edition extends \FreeFW\Core\Service
             if (method_exists($p_model, 'afterRead')) {
                 $p_model->afterRead();
             }
-            $mergeDatas = $p_model->getMergeData();
+            $mergeDatas = $p_model->getMergeData(true);
             // Get group and user
             $sso        = \FreeFW\DI\DI::getShared('sso');
             $user       = $sso->getUser();

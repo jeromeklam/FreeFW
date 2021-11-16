@@ -1261,6 +1261,17 @@ abstract class Model implements
     public function getMergeData($p_includes = [], $p_prefix = '', $p_parent = '', $p_check_merge = false)
     {
         $config = $this->getAppConfig();
+        if ($p_includes === false) {
+            $p_includes = [];
+        } else {
+            if ($p_includes === true || $p_includes === []) {
+                if (method_exists($this, 'getDefaultMergeIncludes')) {
+                    $p_includes = $this->getDefaultMergeIncludes();
+                } else {
+                    $p_includes = [];
+                }
+            }
+        }
         $merge  = true;
         if ($p_check_merge) {
             if ($p_prefix !== '') {
@@ -1298,11 +1309,18 @@ abstract class Model implements
                             $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relName, true);
                             $relModel = $this->{$getter}();
                             if ($relModel instanceOf \FreeFW\Core\Model) {
-                                $newIncludes = [];
-                                foreach ($p_includes as $newOne) {
-                                    if (strpos($newOne, $relName . '.') === 0) {
-                                        $newIncludes[] = str_replace($relName . '.', '', $newOne);
+                                if (is_array($p_includes)) {
+                                    $newIncludes = false;
+                                    foreach ($p_includes as $newOne) {
+                                        if (strpos($newOne, $relName . '.') === 0) {
+                                            if (!is_array($newIncludes)) {
+                                                $newIncludes = [];
+                                            }
+                                            $newIncludes[] = str_replace($relName . '.', '', $newOne);
+                                        }
                                     }
+                                } else {
+                                    $newIncludes = $p_includes;
                                 }
                                 $relDatas = $relModel->getMergeData($newIncludes, $block . '_' . $relName, $p_parent, $p_check_merge);
                                 foreach ($relDatas->getBlocks() as $oneBlock) {

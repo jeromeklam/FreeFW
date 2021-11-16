@@ -1,3 +1,7 @@
+# 1.11.2 : 16/11/2021
+
+* Gestion des includes par défaut pour les impressions, exports, ...
+
 # 1.11.1 : 15/11/2021
 
 * Correction d'un souci dans la génération des champs d'export.

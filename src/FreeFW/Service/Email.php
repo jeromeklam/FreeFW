@@ -62,7 +62,7 @@ class Email extends \FreeFW\Core\Service
                     if (!$lModel) {
                         $lModel = $oneModel;
                     }
-                    $datas = $oneModel->getMergeData();
+                    $datas = $oneModel->getMergeData(true);
                     if (!$grpId) {
                         if (method_exists($oneModel, 'getGrpId')) {
                             $grpId = $oneModel->getGrpId();
