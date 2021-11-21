@@ -147,12 +147,17 @@ class Encoder
                                 $relModel = \FreeFW\DI\DI::get($relation->getModel());
                                 $getter   = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relation->getPropertyName(), true);
                                 if (method_exists($p_api_response, $getter)) {
-                                    $resourceRel = new \FreeFW\JsonApi\V1\Model\ResourceObject(
-                                        $relModel->getApiType(),
-                                        $p_api_response->$getter(),
-                                        $relModel->isSingleElement()
-                                    );
-                                    $relationShips->addRelation($relation->getName(), $resourceRel);
+                                    if ($relation->getType() == \FreeFW\JsonApi\V1\Model\RelationshipObject::ONE_TO_ONE) {
+                                        $result = $p_api_response->$getter();
+                                        $resourceRel = new \FreeFW\JsonApi\V1\Model\ResourceObject(
+                                            $relModel->getApiType(),
+                                            $p_api_response->$getter(),
+                                            $relModel->isSingleElement()
+                                        );
+                                        $relationShips->addRelation($relation->getName(), $resourceRel);
+                                    } else {
+                                        // @todo
+                                    }
                                 }
                             }
                         }
@@ -160,12 +165,15 @@ class Encoder
                 } else {
                     if ($relation->getType() == \FreeFW\JsonApi\V1\Model\RelationshipObject::ONE_TO_ONE) {
                         $getter      = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relation->getPropertyName(), true);
+                        $result = $p_api_response->$getter();
                         $resourceRel = new \FreeFW\JsonApi\V1\Model\ResourceObject(
                             str_replace('::Model::', '_', $relation->getModel()),
                             $p_api_response->$getter(),
                             true
                         );
                         $relationShips->addRelation($relation->getName(), $resourceRel);
+                    } else {
+                        // @todo
                     }
                 }
             }

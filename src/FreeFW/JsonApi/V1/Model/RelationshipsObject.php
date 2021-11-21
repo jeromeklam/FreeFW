@@ -120,6 +120,9 @@ class RelationshipsObject implements \Countable, \JsonSerializable
                     ];
                 }
             } else {
+                if (is_array($relation->getId())) {
+                    var_dump($relation);
+                }
                 $rels[$name] = [
                     'data' => [
                         'id'   => '' . $relation->getId(),

@@ -1295,6 +1295,9 @@ abstract class Model implements
             if (isset($oneProperty[FFCST::PROPERTY_PUBLIC])) {
                 $title = $oneProperty[FFCST::PROPERTY_PUBLIC];
             }
+            if (isset($oneProperty[FFCST::PROPERTY_TITLE])) {
+                $title = $oneProperty[FFCST::PROPERTY_TITLE];
+            }
             if (isset($oneProperty[FFCST::PROPERTY_MERGE])) {
                 $title = $oneProperty[FFCST::PROPERTY_MERGE];
             }
