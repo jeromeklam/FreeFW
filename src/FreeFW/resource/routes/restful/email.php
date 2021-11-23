@@ -8,6 +8,36 @@ use \FreeFW\Router\Route as FFCSTRT;
  * @author jeromeklam
  */
 $routes_email = [
+    'free_f_w.email.sendone' => [
+        FFCSTRT::ROUTE_COLLECTION => 'FreeFW/Core/Email',
+        FFCSTRT::ROUTE_COMMENT    => 'Expédition un objet',
+        FFCSTRT::ROUTE_METHOD     => FFCSTRT::METHOD_POST,
+        FFCSTRT::ROUTE_MODEL      => 'FreeFW::Model::Email',
+        FFCSTRT::ROUTE_URL        => '/v1/core/email/test/:email_id',
+        FFCSTRT::ROUTE_CONTROLLER => 'FreeFW::Controller::Email',
+        FFCSTRT::ROUTE_FUNCTION   => 'sendOne',
+        FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,
+        FFCSTRT::ROUTE_MIDDLEWARE => [],
+        FFCSTRT::ROUTE_INCLUDE    => [
+            FFCSTRT::ROUTE_INCLUDE_DEFAULT => ['lang']
+        ],
+        FFCSTRT::ROUTE_SCOPE      => [],
+        FFCSTRT::ROUTE_PARAMETERS => [
+            'email_id' => [
+                FFCSTRT::ROUTE_PARAMETER_ORIGIN   => FFCSTRT::ROUTE_PARAMETER_ORIGIN_PATH,
+                FFCSTRT::ROUTE_PARAMETER_TYPE     => FFCST::TYPE_BIGINT,
+                FFCSTRT::ROUTE_PARAMETER_REQUIRED => true,
+                FFCSTRT::ROUTE_PARAMETER_COMMENT  => 'Identifiant de l\'objet'
+            ],
+        ],
+        FFCSTRT::ROUTE_RESULTS    => [
+            '201' => [
+                FFCSTRT::ROUTE_RESULTS_TYPE    => FFCSTRT::RESULT_OBJECT,
+                FFCSTRT::ROUTE_RESULTS_MODEL   => 'FreeFW::Model::Email',
+                FFCSTRT::ROUTE_RESULTS_COMMENT => 'Objet créé',
+            ],
+        ]
+    ],
     'free_f_w.email.autocomplete' => [
         FFCSTRT::ROUTE_COLLECTION => 'FreeFW/Core/Email',
         FFCSTRT::ROUTE_COMMENT    => 'Autocomplete.',
