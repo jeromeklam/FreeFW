@@ -21,49 +21,30 @@ class Email extends \FreeFW\Core\ApiController
         );
         $emailVersion = null;
         if ($email) {
-            foreach ($email->getVersions() as $oneVersion) {
-                if ($oneVersion->getLangId() == $user->getLangId()) {
-                    $emailVersion = $oneVersion;
-                    break;
-                }
-            }
-            if ($emailVersion === null) {
-                foreach ($email->getVersions() as $oneVersion) {
-                    $emailVersion = $oneVersion;
-                    if ($oneVersion->getLangId() == $email->getLangId()) {
-                        break;
+            $object = $email->getEmailObjectName();
+            $class  = '\\' . str_replace('_', '\\Model\\', $object);
+            if (class_exists($class)) {
+                $instance = $class::findFirst();
+                if ($instance) {
+                    $filters = [
+                        'email_id' => $email->getEmailId()
+                    ];
+                    $emailService = \FreeFW\DI\DI::get("FreeFW::Service::Email");
+                    $message = $emailService->getEmailAsMessage($filters, 368, $instance);
+                    if ($message) {
+                        $message
+                            ->addDest($user->getUserLogin())
+                            ->setDestId($user->getUserId())
+                        ;
+                        if ($message->create()) {
+                            $this->logger->debug('FreeFW.EmailController.sendOne.end');
+                            return $this->createSuccessOkResponse($message); // 200
+                        }
                     }
                 }
             }
         }
-        if ($emailVersion) {
-            $group = $sso->getUserGroup();
-            $grpId = 4;
-            if ($group) {
-                $grpId = $group->getGrpId();
-            }
-            $message = new \FreeFW\Model\Message();
-            $subject = $oneVersion->getEmaillSubject();
-            $body    = $oneVersion->getEmaillBody();
-            /**
-             * @var \FreeFW\Model\Message $message
-             */
-            $message
-                ->setMsgObjectName($email->getEmailObjectName())
-                ->setMsgObjectId(1)
-                ->setMsgSubject($subject)
-                ->setMsgBody($body)
-                ->setMsgStatus(\FreeFW\Model\Message::STATUS_WAITING)
-                ->setMsgType(\FreeFW\Model\Message::TYPE_EMAIL)
-                ->setLangId($oneVersion->getLangId())
-                ->setReplyTo($email->getEmailReplyTo())
-                ->setFrom($email->getEmailFrom(), $email->getEmailFromName())
-                ->addDest($user->getUserLogin())
-            ;
-            $message->create();
-            return $this->createSuccessOkResponse($message); // 200
-        }
-        $this->logger->debug('FreeFW.EmailController.sendOne.end');
+        $this->logger->debug('FreeFW.EmailController.sendOne.error');
         return $this->createErrorResponse($code, $data);
     }
 }
