@@ -504,11 +504,16 @@ class ApiController extends \FreeFW\Core\Controller
             /**
              * @var \FreeFW\Model\Query $query
              */
-            $query = $model->getQuery();
+            $query    = $model->getQuery();
+            $includes = $apiParams->getInclude();
+            // Les includes de l'édition sont prioritaires
+            if ($edition->getEdiIncludes() != '') {
+                $includes = explode(',', $edition->getEdiIncludes());
+            }
             $query
                 ->addConditions($filters)
                 ->addConditions($apiParams->getFilters())
-                ->addRelations($apiParams->getInclude())
+                ->addRelations($includes)
                 ->setLimit(0, 1)
             ;
             $data = new \FreeFW\Model\ResultSet();
@@ -523,7 +528,7 @@ class ApiController extends \FreeFW\Core\Controller
                 if (method_exists($model, 'afterRead')) {
                     $model->afterRead();
                 }
-                $mergeDatas = $model->getMergeData($apiParams->getInclude());
+                $mergeDatas = $model->getMergeData($includes);
                 // Get group and user
                 $sso        = \FreeFW\DI\DI::getShared('sso');
                 $user       = $sso->getUser();

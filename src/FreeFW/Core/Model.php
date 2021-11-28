@@ -1366,7 +1366,7 @@ abstract class Model implements
         }
         $datas->addData($data, $block);
         if (method_exists($this, 'beforeMerge')) {
-            $datas = $this->beforeMerge($datas, $block);
+            $datas = $this->beforeMerge($datas, $block, $p_includes);
         }
         return $datas;
     }

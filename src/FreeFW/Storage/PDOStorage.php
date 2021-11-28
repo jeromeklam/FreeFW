@@ -1447,6 +1447,12 @@ class PDOStorage extends \FreeFW\Storage\Storage
                             if (substr($rightDatas['value'], -1) === 'Z') {
                                 $rightDatas['value'] = \FreeFW\Tools\Date::stringToMysql($rightDatas['value']);
                             }
+                        } else {
+                            if ($leftDatas['type'] === \FreeFW\Constants::TYPE_MONETARY || $leftDatas['type'] === \FreeFW\Constants::TYPE_DECIMAL) {
+                                if (!is_numeric($rightDatas['value'])) {
+                                    $rightDatas['value'] = 8989786756;
+                                }
+                            }
                         }
                         $nData = $rightDatas['value'];
                         if ($realOper === 'like') {

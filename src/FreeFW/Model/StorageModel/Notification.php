@@ -57,6 +57,13 @@ abstract class Notification extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_COMMENT => 'L\'indentifiant de l\'objet concerné',
         FFCST::PROPERTY_SAMPLE  => 123,
     ];
+    protected static $PRP_NOTIF_OBJECT_INFO = [
+        FFCST::PROPERTY_PRIVATE => 'notif_object_info',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Une information de l\'objet concerné',
+        FFCST::PROPERTY_SAMPLE  => 'Test',
+    ];
     protected static $PRP_NOTIF_CODE = [
         FFCST::PROPERTY_PRIVATE => 'notif_code',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
@@ -140,6 +147,7 @@ abstract class Notification extends \FreeFW\Core\StorageModel
             'notif_subject'     => self::$PRP_NOTIF_SUBJECT,
             'notif_object_name' => self::$PRP_NOTIF_OBJECT_NAME,
             'notif_object_id'   => self::$PRP_NOTIF_OBJECT_ID,
+            'notif_object_info' => self::$PRP_NOTIF_OBJECT_INFO,
             'notif_code'        => self::$PRP_NOTIF_CODE,
             'notif_ts'          => self::$PRP_NOTIF_TS,
             'notif_type'        => self::$PRP_NOTIF_TYPE,

@@ -46,6 +46,12 @@ abstract class Notification extends \FreeFW\Model\StorageModel\Notification
     protected $notif_object_id = null;
 
     /**
+     * notif_object_info
+     * @var string
+     */
+    protected $notif_object_info = null;
+
+    /**
      * notif_code
      * @var string
      */
@@ -223,6 +229,29 @@ abstract class Notification extends \FreeFW\Model\StorageModel\Notification
     public function getNotifObjectId()
     {
         return $this->notif_object_id;
+    }
+
+    /**
+     * Set notif_object_info
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\Notification
+     */
+    public function setNotifObjectInfo($p_value)
+    {
+        $this->notif_object_info = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get notif_object_info
+     *
+     * @return string
+     */
+    public function getNotifObjectInfo()
+    {
+        return $this->notif_object_info;
     }
 
     /**

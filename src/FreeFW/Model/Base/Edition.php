@@ -88,6 +88,12 @@ abstract class Edition extends \FreeFW\Model\StorageModel\Edition
     protected $edi_duration = null;
 
     /**
+     * edi_includes
+     * @var int
+     */
+    protected $edi_includes = null;
+
+    /**
      * Set edi_id
      *
      * @param int $p_value
@@ -384,5 +390,28 @@ abstract class Edition extends \FreeFW\Model\StorageModel\Edition
     public function getEdiDuration()
     {
         return $this->edi_duration;
+    }
+
+    /**
+     * Set edi_includes
+     *
+     * @param int $p_value
+     *
+     * @return \FreeFW\Model\Edition
+     */
+    public function setEdiIncludes($p_value)
+    {
+        $this->edi_includes = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get edi_includes
+     *
+     * @return int
+     */
+    public function getEdiIncludes()
+    {
+        return $this->edi_includes;
     }
 }

@@ -140,7 +140,8 @@ class Date
      */
     public static function mysqlToddmmyyyy($p_date, $p_withSeconds = false, $p_withHour = true)
     {
-        if ($p_date !== null && $p_date != '') {
+        $dt = self::mysqlToDatetime($p_date);
+        if ($dt) {
             $format1 = 'Y-m-d H:i:s';
             $format2 = 'Y-m-d';
             if ($p_withSeconds && $p_withHour) {
@@ -152,12 +153,8 @@ class Date
                     $oFormat = 'd/m/Y';
                 }
             }
-            $date = \DateTime::createFromFormat($format1, $p_date);
-            if ($date === false) {
-                $date = \DateTime::createFromFormat($format2, $p_date);
-            }
-            if ($date !== false) {
-                return $date->format($oFormat);
+            if ($dt !== false) {
+                return $dt->format($oFormat);
             }
         }
         return null;

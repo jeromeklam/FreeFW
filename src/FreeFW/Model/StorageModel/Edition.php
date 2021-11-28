@@ -130,6 +130,14 @@ abstract class Edition extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_DEFAULT => 0,
         FFCST::PROPERTY_SAMPLE  => 123,
     ];
+    protected static $PRP_EDI_INCLUDES = [
+        FFCST::PROPERTY_PRIVATE => 'edi_includes',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Eléments à inclure',
+        FFCST::PROPERTY_MAX     => 255,
+        FFCST::PROPERTY_SAMPLE  => '',
+    ];
 
     /**
      * get properties
@@ -151,7 +159,8 @@ abstract class Edition extends \FreeFW\Core\StorageModel
             'edi_data'        => self::$PRP_EDI_DATA,
             'edi_type'        => self::$PRP_EDI_TYPE,
             'edi_mode'        => self::$PRP_EDI_MODE,
-            'edi_duration'    => self::$PRP_EDI_DURATION
+            'edi_duration'    => self::$PRP_EDI_DURATION,
+            'edi_includes'    => self::$PRP_EDI_INCLUDES,
         ];
     }
 
