@@ -316,8 +316,12 @@ class Conditions extends \FreeFW\Core\Model implements
                                             }
                                         } else {
                                             if (strpos($value2, ',') > 0) {
-                                                $orCondition = new \FreeFW\Model\Conditions();
-                                                $orCondition->setOperator(\FreeFW\Storage\Storage::COND_OR);
+                                                $arrCondition = new \FreeFW\Model\Conditions();
+                                                if (in_array($idx2, [\FreeFW\Storage\Storage::COND_NOT_EQUAL, \FreeFW\Storage\Storage::COND_NOT_EQUAL_OR_NULL])) {
+                                                    $arrCondition->setOperator(\FreeFW\Storage\Storage::COND_AND);
+                                                } else {
+                                                    $arrCondition->setOperator(\FreeFW\Storage\Storage::COND_OR);
+                                                }
                                                 foreach (explode(',', $value2) as $oneValue) {
                                                     $a2Condition = new \FreeFW\Model\SimpleCondition();
                                                     $a2Condition->setLeftMember($aField);
@@ -325,9 +329,9 @@ class Conditions extends \FreeFW\Core\Model implements
                                                     $aValue->setValue($oneValue);
                                                     $a2Condition->setOperator($idx2);
                                                     $a2Condition->setRightMember($aValue);
-                                                    $orCondition[] = $a2Condition;
+                                                    $arrCondition[] = $a2Condition;
                                                 }
-                                                $aCondition = $orCondition;
+                                                $aCondition = $arrCondition;
                                             } else {
                                                 $aValue = new \FreeFW\Model\ConditionValue();
                                                 $aValue->setValue($value2);

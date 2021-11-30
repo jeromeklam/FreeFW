@@ -1283,6 +1283,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $notnull  = false;
         $sql      = false;
         $multi    = false;
+        $reverse  = false;
         $arrayMod = '()';
         $fctL     = '';
         $fctR     = '';
@@ -1315,10 +1316,12 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 break;
             case \FreeFW\Storage\Storage::COND_NOT_EQUAL:
                 $realOper = '!=';
+                $reverse  = true;
                 break;
             case \FreeFW\Storage\Storage::COND_NOT_EQUAL_OR_NULL:
                 $realOper = '!=';
                 $nullable = true;
+                $reverse  = true;
                 break;
             case \FreeFW\Storage\Storage::COND_SOUND_LIKE:
                 $realOper = 'SOUNDEX';
@@ -1355,7 +1358,8 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 break;
             case \FreeFW\Storage\Storage::COND_NOT_IN:
                 $realOper = ' NOT IN ';
-                $multi = true;
+                $multi    = true;
+                $reverse  = true;
                 break;
             case \FreeFW\Storage\Storage::COND_EMPTY:
                 $realOper = '=';
@@ -1364,6 +1368,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
             case \FreeFW\Storage\Storage::COND_NOT_EMPTY:
                 $realOper = '!=';
                 $notnull  = true;
+                $reverse  = true;
                 break;
             case \FreeFW\Storage\Storage::COND_GLOBAL_MAX:
                 $realOper = '=';
