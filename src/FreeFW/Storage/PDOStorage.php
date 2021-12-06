@@ -804,8 +804,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
             if (isset($property[FFCST::PROPERTY_FK])) {
                 foreach ($property[FFCST::PROPERTY_FK] as $fkname => $fkprops) {
                     $fks[$fkname] = [
-                        'left'  => $name,
-                        'right' => $fkprops
+                        'left'   => $name,
+                        'right'  => $fkprops,
+                        'select' => true,
                     ];
                 }
             }
@@ -814,8 +815,9 @@ class PDOStorage extends \FreeFW\Storage\Storage
             foreach ($p_model->getRelationships() as $name => $rel) {
                 if ($rel['type'] !== \FreeFW\Model\Query::JOIN_NONE) {
                     $fks[$name] = [
-                        'left'  => $rel['field'],
-                        'right' => $rel
+                        'left'   => $p_model->getFieldNameByOption(FFCST::OPTION_PK),
+                        'right'  => $rel,
+                        'select' => isset($rel[FFCST::REL_OPTIONS]) ? in_array(\FreeFW\JsonApi\V1\Model\RelationshipObject::ONE_TO_ONE, $rel[FFCST::REL_OPTIONS]) : false,
                     ];
                 }
             }
@@ -843,10 +845,17 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     $newModel = \FreeFW\DI\DI::get($crtFKs[$onePart]['right']['model']);
                     self::$models[$onePart] = $newModel;
                     ++$crtAlias;
+                    // Je ne dois jamais ajouter pour l'instant une table en 0,n
+                    if (!isset($crtFKs[$onePart]['select']) || $crtFKs[$onePart]['select']) {
+                        $addSel = $newModel->getFieldsForSelect($crtAlias, $p_fields, $this->provider);
+                        if (in_array($shortcut, $p_relations) || array_search($shortcut, $p_relations)) {
+                            $select = $select . ', ' . $addSel;
+                        }
+                        //$group = $group . ', ' . $addSel;
+                        $group = $group . ', ' . $newModel->getFieldsAliasForSelect($crtAlias, $p_fields, $this->provider);
+                    }
                     $aliases[$baseAlias . '.' . $onePart] = $crtAlias;
                     $ids[$baseAlias . '.' . $onePart] = $newModel->getFieldNameByOption(FFCST::OPTION_PK);
-                    $select   = $select . ', ' . $newModel->getFieldsForSelect($crtAlias, $p_fields, $this->provider);
-                    $group    = $group . ', ' . $newModel->getFieldsAliasForSelect($crtAlias, $p_fields, $this->provider);
                     $alias1   = $aliases[$baseAlias];
                     switch ($crtFKs[$onePart]['right']['type']) {
                         case \FreeFW\Model\Query::JOIN_RIGHT:
@@ -945,7 +954,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
             }
         }
         // Build query
-        $sql = 'SELECT ' . $select . ' FROM ' . $from . ' WHERE ( ' . $where . ' ) ' . $whereBroker . ' ' . $group . ' ' . $sort . ' ' . $limit;
+        $sql = 'SELECT DISTINCT ' . $select . ' FROM ' . $from . ' WHERE ( ' . $where . ' ) ' . $whereBroker . ' ' . $group . ' ' . $sort . ' ' . $limit;
         $this->logger->debug('FreeFW.PDOStorage.select : ' . $sql);
         $this->logger->debug('FreeFW.PDOStorage.fields : ' . print_r($values, true));
         //var_export($sql);

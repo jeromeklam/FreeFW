@@ -122,6 +122,10 @@ class Date
                 $format = 'd/m/Y H:i';
                 $date = \DateTime::createFromFormat($format, $p_date);
             }
+            if ($date === false) {
+                $format = 'd/m/Y';
+                $date = \DateTime::createFromFormat($format, $p_date);
+            }
             if ($date !== false) {
                 return $date->format('Y-m-d H:i:s');
             }

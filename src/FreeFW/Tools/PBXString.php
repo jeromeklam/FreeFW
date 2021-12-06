@@ -448,4 +448,22 @@ class PBXString
         $newStr = str_replace('i', '[iïî]', $newStr);
         return $newStr;
     }
+
+    /**
+     * Undocumented function
+     *
+     * @param string $p_string1
+     * @param string $p_string2
+     * 
+     * @return boolean
+     */
+    public static function soundLike($p_string1, $p_string2, $p_limit = 85)
+    {
+        $percent = 0;
+        similar_text($p_string1, $p_string2, $percent);
+        if ($percent > $p_limit) {
+            return true;
+        }
+        return false;
+    }
 }

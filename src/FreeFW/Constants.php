@@ -123,6 +123,8 @@ class Constants
     const REL_REMOVE  = 'remove';
     const REL_EXISTS  = 'exists';
     const REL_COMMENT = 'comment';
+    const REL_OPTIONS = 'options';
+    
     //
     const REL_REMOVE_CHECK   = 'check';
     const REL_REMOVE_CASCADE = 'cascade';
