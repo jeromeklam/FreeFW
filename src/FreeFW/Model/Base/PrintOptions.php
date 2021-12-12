@@ -34,6 +34,12 @@ abstract class PrintOptions extends \FreeFW\Model\Model\PrintOptions
     protected $email_id = null;
 
     /**
+     * prt_lang
+     * @var string
+     */
+    protected $prt_lang = null;
+
+    /**
      * Set prt_name
      *
      * @param string $p_value
@@ -123,5 +129,28 @@ abstract class PrintOptions extends \FreeFW\Model\Model\PrintOptions
     public function getEmailId()
     {
         return $this->email_id;
+    }
+
+    /**
+     * Set prt_lang
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\Base\PrintOptions
+     */
+    public function setPrtLang($p_value)
+    {
+        $this->prt_lang = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get prt_lang
+     *
+     * @return string
+     */
+    public function getPrtLang()
+    {
+        return $this->prt_lang;
     }
 }

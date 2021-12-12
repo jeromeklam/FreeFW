@@ -59,16 +59,38 @@ class Edition extends \FreeFW\Model\Base\Edition
     }
 
     /**
+     * Undocumented function
+     *
+     * @return void
+     */
+    public function getLangs()
+    {
+        $versions = $this->getVersions();
+        $langs = [];
+        /**
+         * @var \FreeFW\Model\EditionLang $oneVersion
+         */
+        foreach ($versions as $oneVersion) {
+            $langs[] = $oneVersion->getLang()->getLangCode();
+        }
+        return $langs;
+    }
+
+    /**
      * Get content
      *
      * @return mixed
      */
-    public function getEdiContent()
+    public function getEdiContent($p_lang = '')
     {
+        $retVersion = null;
         foreach ($this->getVersions() as $oneVersion) {
-            return $oneVersion->getEdilData();
+            $retVersion = $oneVersion->getEdilData();
+            if (strtoupper($oneVersion->getLang()->getLangCode()) == strtoupper($p_lang)) {
+                break;
+            }
         }
-        return null;
+        return $retVersion;
     }
 
     /**

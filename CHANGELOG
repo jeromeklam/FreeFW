@@ -1,5 +1,7 @@
-# 1.13.2 : 06/12/2021
+# 1.13.3 : 12/12/2021
 
+* Editions
+    * Possibilité de sélectionner une langue
 * PDO
     * Gestion de la recherche via table 0,n  
 

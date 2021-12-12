@@ -296,9 +296,8 @@ class Conditions extends \FreeFW\Core\Model implements
                         $aCondition->setLeftMember($aField);
                         if (is_array($value)) {
                             foreach ($value as $idx2 => $value2) {
-                                if (is_numeric($idx2) && in_array($value2, [\FreeFW\Storage\Storage::COND_EMPTY, \FreeFW\Storage\Storage::COND_NOT_EMPTY])) {
-                                    $aCondition->setOperator($value2);
-                                    $aCondition->setRightMember(null);
+                                if (($value2 === null || $value2 == '')&& in_array($idx2, [\FreeFW\Storage\Storage::COND_EMPTY, \FreeFW\Storage\Storage::COND_NOT_EMPTY])) {
+                                    $aCondition->setOperator($idx2);
                                 } else {
                                     // Verify oper...
                                     if (is_array($value2)) {

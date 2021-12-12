@@ -471,7 +471,7 @@ class ApiController extends \FreeFW\Core\Controller
         $default = $p_request->default_model;
         $model = \FreeFW\DI\DI::get($default);
         /**
-         *
+         * @var \FreeFW\Model\PrintOptions $print
          */
         $print = $apiParams->getData();
         if (!$print instanceof \FreeFW\Model\PrintOptions) {
@@ -554,7 +554,7 @@ class ApiController extends \FreeFW\Core\Controller
                 $src  = '/tmp/print_' . $file . '_tpl.odt';
                 $dest = '/tmp/print_' . $file . '_dest.odt';
                 $dPdf = '/tmp/print_' . $file . '_dest.pdf';
-                $ediContent = $edition->getEdiContent();
+                $ediContent = $edition->getEdiContent($print->getPrtLang());
                 file_put_contents($src, $ediContent);
                 file_put_contents($dest, $ediContent);
                 $mergeDatas->addGenericBlock('head_user');

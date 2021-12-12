@@ -107,13 +107,13 @@ class Date
     }
 
     /**
-     * Conversion d'une date en chaine
+     * Conversion d'une date en DateTime
      *
      * @param string $p_date
      *
      * @return string
      */
-    public static function ddmmyyyyToMysql($p_date)
+    public static function ddmmyyyyToDateTime($p_date)
     {
         if ($p_date !== null && $p_date != '') {
             $format = 'd/m/Y H:i:s';
@@ -126,7 +126,23 @@ class Date
                 $format = 'd/m/Y';
                 $date = \DateTime::createFromFormat($format, $p_date);
             }
-            if ($date !== false) {
+            return $date;
+        }
+        return null;
+    }
+
+    /**
+     * Conversion d'une date en chaine
+     *
+     * @param string $p_date
+     *
+     * @return string
+     */
+    public static function ddmmyyyyToMysql($p_date)
+    {
+        if ($p_date !== null && $p_date != '') {
+            $date = self::ddmmyyyyToDateTime($p_date);
+            if ($date instanceof \DateTime) {
                 return $date->format('Y-m-d H:i:s');
             }
         }

@@ -211,6 +211,19 @@ class Input extends \FreeFW\Console\Input\AbstractInput
         return '127.0.0.1';
     }
 
-    public function read($p_name, $p_default)
-    {}
+    /**
+     * Get one param
+     *
+     * @param string $p_name
+     * @param mixed  $p_default
+     * 
+     * @return mixed
+     */
+    public function read($p_name, $p_default = null)
+    {
+        if (isset(self::$params[$p_name])) {
+            return self::$params[$p_name];
+        }
+        return $p_default;
+    }
 }

@@ -46,6 +46,13 @@ class PrintOptions extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_COMMENT => 'Identifiant de l\'email',
         FFCST::PROPERTY_SAMPLE  => 1,
     ];
+    protected static $PRT_LANG = [
+        FFCST::PROPERTY_PRIVATE => 'prt_lang',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Langue de l\'édition',
+        FFCST::PROPERTY_SAMPLE  => 'fr',
+    ];
 
     /**
      * get properties
@@ -57,6 +64,7 @@ class PrintOptions extends \FreeFW\Core\StorageModel
         return [
             'prt_name' => self::$PRT_NAME,
             'prt_type' => self::$PRT_TYPE,
+            'prt_lang' => self::$PRT_LANG,
             'edi_id'   => self::$EDI_ID,
             'email_id' => self::$EMAIL_ID,
         ];
