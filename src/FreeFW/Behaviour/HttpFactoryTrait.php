@@ -236,7 +236,7 @@ trait HttpFactoryTrait
      */
     public function createMimeTypeResponse($p_filename,$p_content = null): ResponseInterface
     {
-        $type    = \GuzzleHttp\Psr7\mimetype_from_filename($p_filename);
+        $type    = \GuzzleHttp\Psr7\MimeType::fromFilename($p_filename);
         if (!$type) {
             $type = \FreeFW\Tools\MimeType::get($p_filename,'application/octet-stream');
         }
