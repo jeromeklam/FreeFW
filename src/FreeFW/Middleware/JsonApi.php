@@ -159,13 +159,13 @@ class JsonApi implements
                                     $json
                                 );
                             } else {
-                                $p_response = $p_response->withBody(\GuzzleHttp\Psr7\stream_for($json));
+                                $p_response = $p_response->withBody(\GuzzleHttp\Psr7\Utils::streamFor($json));
                             }
                         } else {
                             $encoder  = new \FreeFW\JsonApi\V1\Encoder();
                             $document = $encoder->encodeList($object, $p_api_params);
                             $p_response = $p_response->withBody(
-                                \GuzzleHttp\Psr7\stream_for(
+                                \GuzzleHttp\Psr7\Utils::streamFor(
                                     json_encode($document)
                                 )
                             );
@@ -173,7 +173,7 @@ class JsonApi implements
                     } else {
                         $document   = new \FreeFW\JsonApi\V1\Model\Document();
                         $p_response = $p_response->withBody(
-                            \GuzzleHttp\Psr7\stream_for(
+                            \GuzzleHttp\Psr7\Utils::streamFor(
                                 json_encode($document)
                             )
                         );
@@ -237,7 +237,7 @@ class JsonApi implements
                     $document->addError($error);
                 }
                 $p_response = $p_response->withBody(
-                    \GuzzleHttp\Psr7\stream_for(
+                    \GuzzleHttp\Psr7\Utils::streamFor(
                         json_encode($document)
                     )
                 );
@@ -249,7 +249,7 @@ class JsonApi implements
                 );
                 $document->addError($error);
                 $p_response = $p_response->withBody(
-                    \GuzzleHttp\Psr7\stream_for(
+                    \GuzzleHttp\Psr7\Utils::streamFor(
                         json_encode($document)
                     )
                 );

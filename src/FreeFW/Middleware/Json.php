@@ -148,7 +148,7 @@ class Json implements
                     $result = $content;
                 }
                 $p_response = $p_response->withBody(
-                    \GuzzleHttp\Psr7\stream_for($result)
+                    \GuzzleHttp\Psr7\Utils::streamFor($result)
                 );
             }
         }

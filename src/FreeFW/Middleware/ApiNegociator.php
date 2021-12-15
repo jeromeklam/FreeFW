@@ -118,7 +118,7 @@ class ApiNegociator implements
         $document->addError($error);
         $response = $this->createResponse(500);
         return $response->withBody(
-            \GuzzleHttp\Psr7\stream_for(
+            \GuzzleHttp\Psr7\Utils::streamFor(
                 json_encode($document)
             )
         );
