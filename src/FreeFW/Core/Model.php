@@ -1258,7 +1258,7 @@ abstract class Model implements
      *
      * @return \FreeFW\Model\MergeModel
      */
-    public function getMergeData($p_includes = [], $p_prefix = '', $p_parent = '', $p_check_merge = false)
+    public function getMergeData($p_includes = [], $p_prefix = '', $p_parent = '', $p_check_merge = false, $p_lang_code = null)
     {
         $config = $this->getAppConfig();
         if ($p_includes === false) {
@@ -1322,7 +1322,7 @@ abstract class Model implements
                                 } else {
                                     $newIncludes = $p_includes;
                                 }
-                                $relDatas = $relModel->getMergeData($newIncludes, $block . '_' . $relName, $p_parent, $p_check_merge);
+                                $relDatas = $relModel->getMergeData($newIncludes, $block . '_' . $relName, $p_parent, $p_check_merge, $p_lang_code);
                                 foreach ($relDatas->getBlocks() as $oneBlock) {
                                     $datas->addBlock($oneBlock);
                                     $datas->addData($relDatas->getDatas($oneBlock), $oneBlock);
@@ -1356,7 +1356,7 @@ abstract class Model implements
         }
         $specific = [];
         if (method_exists($this, 'getSpecificEditionFields')) {
-            $specific = $this->getSpecificEditionFields();
+            $specific = $this->getSpecificEditionFields('/tmp/', true, $p_lang_code);
             foreach ($specific as $specField) {
                 if ($merge === true || in_array($specField['name'], $merge)) {
                     $datas->addField($specField['name'], $specField['title'], $specField['type']);
@@ -1366,7 +1366,7 @@ abstract class Model implements
         }
         $datas->addData($data, $block);
         if (method_exists($this, 'beforeMerge')) {
-            $datas = $this->beforeMerge($datas, $block, $p_includes);
+            $datas = $this->beforeMerge($datas, $block, $p_includes, $p_lang_code);
         }
         return $datas;
     }

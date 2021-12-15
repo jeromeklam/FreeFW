@@ -528,7 +528,7 @@ class ApiController extends \FreeFW\Core\Controller
                 if (method_exists($model, 'afterRead')) {
                     $model->afterRead();
                 }
-                $mergeDatas = $model->getMergeData($includes);
+                $mergeDatas = $model->getMergeData($includes, '', '', false, $print->getPrtLang());
                 // Get group and user
                 $sso        = \FreeFW\DI\DI::getShared('sso');
                 $user       = $sso->getUser();
