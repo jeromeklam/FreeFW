@@ -77,7 +77,7 @@ class Edition extends \FreeFW\Core\Service
             $src  = $bDir . '/print_' . $file . '_tpl.odt';
             $dest = $bDir . '/print_' . $file . '_dest.odt';
             $dPdf = $bDir . '/print_' . $file . '_dest.pdf';
-            $ediContent = $edition->getEdiContent();
+            $ediContent = $editionVersion->getEdilData();
             file_put_contents($src, $ediContent);
             file_put_contents($dest, $ediContent);
             if ($user) {

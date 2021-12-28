@@ -9,6 +9,11 @@ namespace FreeFW\Controller;
 class Email extends \FreeFW\Core\ApiController
 {
 
+    /**
+     * Comportement
+     */
+    use \FreeAsso\Controller\Behaviour\Group;
+
     public function sendOne(\Psr\Http\Message\ServerRequestInterface $p_request, $p_id = null)
     {
         $this->logger->debug('FreeFW.EmailController.sendOne.start');

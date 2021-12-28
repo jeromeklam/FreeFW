@@ -31,6 +31,30 @@ class Json implements
     protected $contentTypes = ['application/json'];
 
     /**
+     * convertion de données en modèle
+     * 
+     * @param mixed $p_json
+     * 
+     * @return \FreeFW\Core\Model
+     */
+    protected function dataToModel($p_json)
+    {
+        $model = null;
+        $data  = null;
+        if ($p_json) {
+            $typeMember = '@type';
+            if (isset($p_json->{$typeMember})) {
+                $type = $p_json->{$typeMember};
+                if (isset($p_json->data)) { 
+                    $data = $p_json->data;
+                    // GOGOGO
+                }
+            }
+        }
+        return $model;
+    }
+
+    /**
      *
      * {@inheritDoc}
      * @see \FreeFW\Interfaces\ApiAdapterInterface::decodeRequest()
@@ -110,6 +134,13 @@ class Json implements
                 ->setStart($start)
                 ->setLength($len)
             ;
+        }
+        // Datas
+        $contents = $p_request->getBody()->getContents();
+        $json     = json_decode($contents, false);
+        $datas    = $this->dataToModel($json);
+        if ($datas) {
+            $apiParams->setData($datas);
         }
         // Next
         $this->logger->debug(sprintf('FreeFW.Middleware.Json.decode.end'));

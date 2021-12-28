@@ -100,6 +100,12 @@ abstract class Email extends \FreeFW\Model\StorageModel\Email
     protected $email_bcc = null;
 
     /**
+     * grp_id
+     * @var int
+     */
+    protected $grp_id = null;
+
+    /**
      * Set email_id
      *
      * @param int $p_value
@@ -442,5 +448,28 @@ abstract class Email extends \FreeFW\Model\StorageModel\Email
     public function getEmailBcc()
     {
         return $this->email_bcc;
+    }
+
+    /**
+     * Set grp_id
+     *
+     * @param int $p_value
+     *
+     * @return \FreeFW\Model\Edition
+     */
+    public function setGrpId($p_value)
+    {
+        $this->grp_id = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get grp_id
+     *
+     * @return int
+     */
+    public function getGrpId()
+    {
+        return $this->grp_id;
     }
 }
