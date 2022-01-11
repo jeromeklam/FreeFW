@@ -329,4 +329,23 @@ class Date
         $diff = $now->diff($p_date);
         return $diff-> h + ($diff->days * 24);
     }
+
+    /**
+     * Adds months without jumping over last days of months
+     *
+     * @param \DateTime $date
+     * @param int $monthsToAdd
+     * @return \DateTime
+     */
+    public static function addMonths(\DateTime $date, $monthsToAdd) {
+        $tmpDate = clone $date;
+        $tmpDate->modify('first day of +'.(int) $monthsToAdd.' month');
+        if($date->format('j') > $tmpDate->format('t')) {
+            $daysToAdd = $tmpDate->format('t') - 1;
+        }else{
+            $daysToAdd = $date->format('j') - 1;
+        }
+        $tmpDate->modify('+ '. $daysToAdd .' days');
+        return $tmpDate;
+    }
 }

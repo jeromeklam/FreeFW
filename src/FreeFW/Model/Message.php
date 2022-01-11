@@ -40,6 +40,26 @@ class Message extends \FreeFW\Model\Base\Message
     protected $no_history = true;
 
     /**
+     * Get new Message
+     *
+     * @return void
+     */
+    public static function getFactory($p_object_name = null, $p_object_id = null)
+    {
+        $config  = \FreeFW\DI\DI::getShared('config');
+        $email   = $config->get('email');
+        $message = new \FreeFW\Model\Message();
+        $message
+            ->setMsgObjectName($p_object_name)
+            ->setMsgObjectId($p_object_id)
+            ->setMsgType(\FreeFW\Model\Message::TYPE_EMAIL)
+            ->setMsgStatus(\FreeFW\Model\Message::STATUS_WAITING)
+            ->setFrom($email['from_email'], $email['from_name'])
+        ;
+        return $message;
+    }
+
+    /**
      * Add new dest
      *
      * @param string $p_address

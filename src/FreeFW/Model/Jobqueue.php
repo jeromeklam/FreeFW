@@ -60,15 +60,21 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
     protected $level = \Psr\Log\LogLevel::DEBUG;
 
     /**
-     * Enregistrement si cache actif
+     * Get logs
+     *
+     * @return string
      */
-    public function __destruct()
+    protected function getLogs()
     {
-        if ($this->cache) {
-            $this->saveLogs();
+        $text = null;
+        if (is_array($this->logs) && count($this->logs) > 0) {
+            $text = '';
+            foreach ($this->logs as $oneLog) {
+                $text .= $oneLog['message'] . PHP_EOL;
+            }
         }
+        return $text;
     }
-
     /**
      * Save logs
      */
@@ -145,8 +151,12 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
      */
     public function run()
     {
+        /**
+         * @var \FreeSSO\Server $sso
+         */
         $sso = \FreeFW\DI\DI::getShared('sso');
         $grp = $sso->getUserGroup();
+        $usr = $sso->getUser();
         try {
             $this
                 ->setJobqStatus(self::STATUS_PENDING)
@@ -166,7 +176,7 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
                         $params = [];
                     }
                     $service->setLogger($this);
-                    $sso->setGroup($this->getGroup());
+                    $sso->forceUser($this->getUser(), $this->getGroup());
                     $defaultErroMessage = 'Unknown Error';
                     try {
                         $result = call_user_func_array([$service, $method], ['params' => $params, 'user' => $this->getUserId()]);
@@ -174,36 +184,68 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
                         $result = false;
                         $defaultErroMessage = $ex->getMessage();
                     }
-                    $sso->setGroup($grp);
+                    $sso->forceUser($usr, $grp);
+                    $email = false;
+                    if (isset($params['report_email'])) {
+                        $email = $params['report_email'];
+                    }
                     if ($result === false) {
                         $this
                             ->setJobqStatus(self::STATUS_ERROR)
                             ->setJobqLastReport($defaultErroMessage)
                             ->save();
+                        if ($email) {
+                            $message = \FreeFW\Model\Message::getFactory('FreeFW_Jobqueue', $this->getJobqId());
+                            $message
+                                ->setMsgSubject('ERROR ' . $this->getJobqName())
+                                ->setMsgBody($defaultErroMessage)
+                                ->addDest($email)
+                                ->create();
+                        }
                     } else {
                         if (is_array($result)) {
                             $this->setJobqParams(json_encode($result));
                         }
                         $this
                             ->finished()
-                            ->setJobqLastReport($result)
+                            ->setJobqLastReport($this->getLogs())
                             ->setJobqNbRetry(0)
                             ->save();
+                        if ($email) {
+                            $message = \FreeFW\Model\Message::getFactory('FreeFW_Jobqueue', $this->getJobqId());
+                            $message
+                                ->setMsgSubject($this->getJobqName())
+                                ->setMsgBody($this->getJobqLastReport())
+                                ->addDest($email)
+                                ->create();
+                        }
                     }
                 } else {
                     $this
                         ->setJobqStatus(self::STATUS_ERROR)
                         ->setJobqLastReport('Unknown method in service !')
                         ->save();
+                    $message = \FreeFW\Model\Message::getFactory('FreeFW_Jobqueue', $this->getJobqId());
+                    $message
+                        ->setMsgSubject($this->getJobqName())
+                        ->setMsgBody('Unknown method in service !')
+                        ->addDest('jeromeklam@free.fr')
+                        ->create();
                 }
             } else {
                 $this
                     ->setJobqStatus(self::STATUS_ERROR)
                     ->setJobqLastReport('Unknown service !')
                     ->save();
+                $message = \FreeFW\Model\Message::getFactory('FreeFW_Jobqueue', $this->getJobqId());
+                $message
+                    ->setMsgSubject($this->getJobqName())
+                    ->setMsgBody('Unknown service !')
+                    ->addDest('jeromeklam@free.fr')
+                    ->create();
             }
         } catch (\Exception $ex) {
-            $sso->setGroup($grp);
+            $sso->forceUser($usr, $grp);
             if ($this->canContinue()) {
                 $this->setJobqStatus(self::STATUS_RETRY);
             } else {
@@ -213,6 +255,12 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
                 ->setJobqLastReport(print_r($ex, true))
                 ->incrementTry()
                 ->save();
+            $message = \FreeFW\Model\Message::getFactory('FreeFW_Jobqueue', $this->getJobqId());
+            $message
+                ->setMsgSubject($this->getJobqName())
+                ->setMsgBody(print_r($ex, true))
+                ->addDest('jeromeklam@free.fr')
+                ->create();
         }
         return $this;
     }
@@ -227,8 +275,7 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
         try {
             $this
                 ->setJobqStatus(self::STATUS_WAITING)
-                ->save()
-            ;
+                ->save();
         } catch (\Exception $ex) {
             // @TODO
         }
@@ -279,9 +326,6 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
             'level' => $level,
             'message' => print_r($message, true)
         ];
-        if (!$this->cache) {
-            $this->saveLogs();
-        }
     }
 
     /**

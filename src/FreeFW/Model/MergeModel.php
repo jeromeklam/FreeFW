@@ -396,4 +396,20 @@ class MergeModel {
         }
         return $datas;
     }
+
+    /**
+     * Merge
+     *
+     * @param \FreeFW\Model\MergeModel $p_other
+     * 
+     * @return \FreeFW\Model\MergeModel
+     */
+    public function merge(\FreeFW\Model\MergeModel $p_other)
+    {
+        foreach ($p_other->getBlocks(false) as $oneBlock) {
+            $this->addBlock($oneBlock);
+            $this->addData($p_other->getDatas($oneBlock), $oneBlock);
+        }
+        return $this;
+    }
 }

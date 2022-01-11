@@ -926,6 +926,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         // Sort
         $sort = '';
         foreach ($p_sort as $column => $order) {
+            $myColumn = '';
             if ($sort == '') {
                 $sort = ' ORDER BY ';
             } else {
@@ -947,10 +948,12 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 }
                 $myColumn = $aliases['@'] . '.' . $column;
             }
-            if ($order == '+') {
-                $sort = $sort . $myColumn;
-            } else {
-                $sort = $sort . $myColumn . ' DESC';
+            if ($myColumn != '') {
+                if ($order == '+') {
+                    $sort = $sort . $myColumn;
+                } else {
+                    $sort = $sort . $myColumn . ' DESC';
+                }
             }
         }
         // Build query

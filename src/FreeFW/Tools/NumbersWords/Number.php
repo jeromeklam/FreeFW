@@ -120,7 +120,7 @@ class Number
     public static function loadLocale($p_locale, $p_requiredMethod)
     {
         $clName    = \FreeFW\Tools\PBXString::toCamelCase(strtolower($p_locale), true);
-        $classname = '\\FreeFW\\Core\\Tools\\NumbersWords\\Locale\\' . $clName;
+        $classname = '\\FreeFW\\Tools\\NumbersWords\\Locale\\' . $clName;
         if (!class_exists($classname)) {
             throw new \FreeFW\Tools\NumbersWords\NumbersWordsException(
                 'Unable to load locale class ' . $classname

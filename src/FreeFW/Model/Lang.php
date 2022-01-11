@@ -11,4 +11,10 @@ use \FreeFW\Constants as FFCST;
 class Lang extends \FreeFW\Model\Base\Lang implements
     \FreeFW\Interfaces\ApiResponseInterface
 {
+
+    public function getLangIsoNumberWords()
+    {
+        $iso = str_replace('-', '_', strtoupper($this->getLangIso()));
+        return $iso;
+    }
 }

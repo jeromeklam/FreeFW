@@ -355,6 +355,7 @@ abstract class Model implements
                         $type   = $property[FFCST::PROPERTY_TYPE];
                         $setter = $property[FFCST::PROPERTY_SETTER];
                         switch ($type) {
+                            case FFCST::TYPE_IMAGE:
                             case FFCST::TYPE_BLOB:
                                 $this->$setter($this->decode_chunk($value));
                                 break;
@@ -1241,6 +1242,9 @@ abstract class Model implements
                         $data[$name . '_hm']  = $content_hm;
                         $data[$name . '_hms'] = $content_hms;
                         break;
+                    case FFCST::TYPE_MONETARY:
+                        $data[$name . '_frmt'] = number_format($content, 2, '.', ' ');
+                        break;
                     case FFCST::TYPE_RESULTSET:
                     case FFCST::TYPE_BLOB:
                         if (!$p_keep_binary) {
@@ -1258,7 +1262,7 @@ abstract class Model implements
      *
      * @return \FreeFW\Model\MergeModel
      */
-    public function getMergeData($p_includes = [], $p_prefix = '', $p_parent = '', $p_check_merge = false, $p_lang_code = null)
+    public function getMergeData($p_includes = [], $p_prefix = '', $p_parent = '', $p_check_merge = false, $p_lang_code = null, $p_block_name = null)
     {
         $config = $this->getAppConfig();
         if ($p_includes === false) {
@@ -1281,10 +1285,14 @@ abstract class Model implements
             }
         }
         $datas = new \FreeFW\Model\MergeModel();
-        $block = $this->getApiType();
-        $parts = explode('_', $block);
-        array_shift($parts);
-        $block = \FreeFW\Tools\PBXString::fromCamelCase(implode('_', $parts));
+        if ($p_block_name != '') {
+            $block = $p_block_name;
+        } else {
+            $block = $this->getApiType();
+            $parts = explode('_', $block);
+            array_shift($parts);
+            $block = \FreeFW\Tools\PBXString::fromCamelCase(implode('_', $parts));
+        }
         if ($p_prefix != '') {
             $block = $p_prefix;
         }
@@ -1342,14 +1350,30 @@ abstract class Model implements
                         $relDatas = $this->{$getter}();
                         $newDatas = [];
                         if ($relDatas instanceof \FreeFW\Model\ResultSet) {
+                            if (is_array($p_includes)) {
+                                $newIncludes = false;
+                                foreach ($p_includes as $newOne) {
+                                    if (strpos($newOne, $relName . '.') === 0) {
+                                        if (!is_array($newIncludes)) {
+                                            $newIncludes = [];
+                                        }
+                                        $newIncludes[] = str_replace($relName . '.', '', $newOne);
+                                    }
+                                }
+                            } else {
+                                $newIncludes = $p_includes;
+                            }
                             foreach ($relDatas as $relData) {
-                                $newDatas = $relData->getMergeData($p_includes, $block . '_' . $relName, $p_parent, $p_check_merge);
+                                $newDatas = $relData->getMergeData($newIncludes, $block . '_' . $relName, $p_parent, $p_check_merge);
                                 foreach ($newDatas->getBlocks() as $oneBlock) {
                                     $datas->addBlock($oneBlock, true);
                                     $datas->addData($newDatas->getDatas($oneBlock), $oneBlock, false);
                                 }
                             }
                         }
+                        $blk = $block . '_' . $relName . '_count';
+                        $datas->addField($blk, $blk, 'INTEGER');
+                        $data[$blk] = count($relDatas);
                     }
                 }
             }

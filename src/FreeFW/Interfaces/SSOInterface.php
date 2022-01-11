@@ -90,4 +90,14 @@ interface SSOInterface
      * @return string
      */
     public function getPermissions() : string;
+
+    /**
+     * Force user
+     *
+     * @param [type] $p_user
+     * @param [type] $p_group
+     * 
+     * @return void
+     */
+    public function forceUser($p_user, $p_group);
 }

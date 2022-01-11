@@ -156,4 +156,19 @@ class SsoMock implements
     {
         return 'ZEUS';
     }
+
+    /**
+     * Force user
+     *
+     * @param [type] $p_user
+     * @param [type] $p_group
+     * 
+     * @return void
+     */
+    public function forceUser($p_user, $p_group) 
+    {
+        $this->user = $p_user;
+        $this->group = $p_group;
+        return $this;
+    }
 }

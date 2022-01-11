@@ -532,21 +532,19 @@ class ApiController extends \FreeFW\Core\Controller
                 // Get group and user
                 $sso        = \FreeFW\DI\DI::getShared('sso');
                 $user       = $sso->getUser();
-                // @todo : rechercher le groupe principal de l'utilisateur
-                $userBrk = \FreeSSO\Model\UserBroker::findFirst(
-                    [
-                        'user_id' => $user->GetUserId(),
-                        'brk_id'  => $sso->getBrokerId()
-                    ]
-                );
-                $userGrp = \FreeSSO\Model\Group::findFirst(
-                    [
-                        'grp_id' => $userBrk->getGrpId()
-                    ]
-                );
+                $grpId      = false;
+                if (method_exists($model, 'getGrpId')) {
+                    $grpId = $model->getGrpId();
+                }
+                if (!$grpId) {
+                    $group = $sso->getUserGroup();
+                    if ($group) {
+                        $grpId = $group->getGrpId();
+                    }
+                }
                 $group = \FreeSSO\Model\Group::findFirst(
                     [
-                        'grp_id' => $userGrp->getGrpRealmId()
+                        'grp_id' => $grpId
                     ]
                 );
                 //
@@ -557,15 +555,19 @@ class ApiController extends \FreeFW\Core\Controller
                 $ediContent = $edition->getEdiContent($print->getPrtLang());
                 file_put_contents($src, $ediContent);
                 file_put_contents($dest, $ediContent);
-                $mergeDatas->addGenericBlock('head_user');
-                $mergeDatas->addGenericData($user->getFieldsAsArray(), 'head_user');
-                $mergeDatas->addGenericBlock('head_group');
-                $mergeDatas->addGenericData($group->getFieldsAsArray(), 'head_group');
+                if ($user) {
+                    $mergeUser = $user->getMergeData([], '', '', false, $print->getPrtLang(), 'head_user');
+                    $mergeDatas->merge($mergeUser);
+                }
+                if ($group) {
+                    $mergeGroup = $group->getMergeData([], '', '', false, $print->getPrtLang(), 'head_group');
+                    $mergeDatas->merge($mergeGroup);
+                }
                 $mergeService = \FreeFW\DI\DI::get('FreeOffice::Service::Merge');
                 $mergeService->merge($src, $dest, $mergeDatas);
                 exec('/usr/bin/unoconv -f pdf -o ' . $dPdf . ' ' . $dest);
-                //@unlink($dest);
-                //@unlink($src);
+                @unlink($dest);
+                @unlink($src);
                 if (is_file($dPdf)) {
                     $this->logger->info('FreeFW.ApiController.printOne.end');
                     return $this->createMimeTypeResponse($dPdf, file_get_contents($dPdf));

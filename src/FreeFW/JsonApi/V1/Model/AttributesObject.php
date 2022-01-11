@@ -93,6 +93,7 @@ class AttributesObject implements \Countable, \JsonSerializable
             if (!$attribute->getJsonIgnore()) {
                 $attName = $attribute->getJsonName();
                 switch ($attribute->getType()) {
+                    case FFCST::TYPE_IMAGE:
                     case FFCST::TYPE_BLOB:
                         $obj->$attName = base64_encode($attribute->getValue());
                         break;

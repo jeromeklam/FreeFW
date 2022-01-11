@@ -12,11 +12,12 @@ class Edition extends \FreeFW\Core\Service
     /**
      * Generate pdf
      *
-     * @param int                $p_edi_id
-     * @param int                $p_lang_id
-     * @param \FreeFW\Core\Model $p_model
+     * @param int                  $p_edi_id
+     * @param int                  $p_lang_id
+     * @param \FreeFW\Core\Model   $p_model
+     * @param \FreeSSO\Model\Group $p_grp_id
      *
-     * @return string
+     * @return array
      */
     public function printEdition($p_edi_id, $p_lang_id, \FreeFW\Core\Model $p_model)
     {
@@ -38,17 +39,19 @@ class Edition extends \FreeFW\Core\Service
                 foreach ($edition->getVersions() as $oneVersion) {
                     $editionVersion = $oneVersion;
                     if ($oneVersion->getLangId() == $edition->getLangId()) {
+                        $p_lang_id = $edition->getLangId();
                         break;
                     }
                 }
             }
         }
         if ($editionVersion) {
+            $lang = \FreeFW\Model\Lang::findFirst(['lang_id' => $p_lang_id]);
             $name = $editionVersion->getEdilFilename();
             if (method_exists($p_model, 'afterRead')) {
                 $p_model->afterRead();
             }
-            $mergeDatas = $p_model->getMergeData(true);
+            $mergeDatas = $p_model->getMergeData(true, '', '', false, $lang->getLangCode());
             // Get group and user
             $sso        = \FreeFW\DI\DI::getShared('sso');
             $user       = $sso->getUser();
@@ -81,12 +84,12 @@ class Edition extends \FreeFW\Core\Service
             file_put_contents($src, $ediContent);
             file_put_contents($dest, $ediContent);
             if ($user) {
-                $mergeDatas->addGenericBlock('head_user');
-                $mergeDatas->addGenericData($user->getFieldsAsArray(), 'head_user');
+                $mergeUser = $user->getMergeData(true, '', '', false, $lang->getLangCode(), 'head_user');
+                $mergeDatas->merge($mergeUser);
             }
             if ($group) {
-                $mergeDatas->addGenericBlock('head_group');
-                $mergeDatas->addGenericData($group->getFieldsAsArray(), 'head_group');
+                $mergeGroup = $group->getMergeData(true, '', '', false, $lang->getLangCode(), 'head_group');
+                $mergeDatas->merge($mergeGroup);
             }
             $mergeService = \FreeFW\DI\DI::get('FreeOffice::Service::Merge');
             $mergeService->merge($src, $dest, $mergeDatas);
@@ -97,7 +100,7 @@ class Edition extends \FreeFW\Core\Service
         }
         return [
             'name' => $name,
-            'filename'  => $filename,
+            'filename' => $filename,
         ];
     }
 }
