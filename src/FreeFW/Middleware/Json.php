@@ -79,8 +79,11 @@ class Json implements
         if (array_key_exists('option', $params)) {
             $options = $params['option'];
             $apiParams->setOption($options);
-            if (isset($options['lang'])) {
+            if (is_array($options) && isset($options['lang'])) {
                 \FreeFW\DI\DI::setShared('lang', $options['lang']);
+            }
+            if (is_array($options) && isset($options['money'])) {
+                \FreeFW\DI\DI::setShared('money', $options['money']);
             }
         }
         // Filters

@@ -6,8 +6,18 @@ namespace FreeFW\JsonApi\V1;
  *
  * @author jeromeklam
  */
-class Encoder
+class Encoder implements \Psr\Log\LoggerAwareInterface
 {
+
+    /**
+     * comportements
+     */
+    use \Psr\Log\LoggerAwareTrait;
+
+    /**
+     * Cached data...
+     */
+    protected static $_cached = [];
 
     /**
      * Encode single resource
@@ -25,11 +35,17 @@ class Encoder
         \FreeFW\Http\ApiParams $p_api_params,
         $p_prefix = ''
     ) : \FreeFW\JsonApi\V1\Model\ResourceObject {
+        $this->logger->debug('FreeFW.JsonApi.Encoder.start.' . $p_api_response->getApiType() . '.' . $p_api_response->getApiId());
         if ($p_prefix != '') {
             $p_prefix = $p_prefix . '.';
         }
         $incTab   = $p_api_params->getInclude();
         $includes = '@@' . implode('@@', $incTab) . '@@';
+        $cacheKey = $p_api_response->getApiType() . '.' . $p_api_response->getApiId();
+        if (isset(self::$_cached[$cacheKey])) {
+            $this->logger->debug('FreeFW.JsonApi.Encoder.cached');
+            return self::$_cached[$cacheKey];
+        }
         $resource = new \FreeFW\JsonApi\V1\Model\ResourceObject(
             $p_api_response->getApiType(),
             $p_api_response->getApiId(),
@@ -38,6 +54,7 @@ class Encoder
         $fieldsForeignkey = [];
         $relations        = $p_api_response->getApiRelationShips();
         $fields           = $p_api_response->getApiAttributes();
+        $this->logger->debug('FreeFW.JsonApi.Encoder.fields');
         if ($fields) {
             $fldTab = $p_api_params->getFieldsFor(rtrim($p_prefix, '.'));
             foreach ($fldTab as $oneFldTab) {
@@ -97,6 +114,7 @@ class Encoder
             }
             $resource->setAttributes($attributes);
         }
+        $this->logger->debug('FreeFW.JsonApi.Encoder.relations');
         $relationShips = new \FreeFW\JsonApi\V1\Model\RelationshipsObject();
         if ($relations) {
             foreach ($relations as $relation) {
@@ -170,6 +188,7 @@ class Encoder
                 }
             }
         }
+        $this->logger->debug('FreeFW.JsonApi.Encoder.extra');
         // Extra included here...
         foreach ($incTab as $include) {
             $parts = explode('.', $include);
@@ -205,7 +224,10 @@ class Encoder
                 }
             }
         }
+        $this->logger->debug('FreeFW.JsonApi.Encoder.set');
         $resource->setRelationShips($relationShips);
+        self::$_cached[$cacheKey] = $resource;
+        $this->logger->debug('FreeFW.JsonApi.Encoder.end');
         // Done
         return $resource;
     }
@@ -256,6 +278,7 @@ class Encoder
      */
     public function encodeList(\Iterator $p_api_response, \FreeFW\Http\ApiParams $p_api_params)
     {
+        self::$_cached = [];
         $count = null;
         if (method_exists($p_api_response, 'getTotalCount')) {    // @todo : use interface instead
             $count = $p_api_response->getTotalCount();

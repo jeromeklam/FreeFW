@@ -73,8 +73,11 @@ class JsonApi implements
         if (array_key_exists('option', $params)) {
             $options = $params['option'];
             $apiParams->setOption($options);
-            if (isset($options['lang'])) {
+            if (is_array($options) && isset($options['lang'])) {
                 \FreeFW\DI\DI::setShared('lang', $options['lang']);
+            }
+            if (is_array($options) && isset($options['money'])) {
+                \FreeFW\DI\DI::setShared('money', $options['money']);
             }
         }
         // Filters
@@ -146,13 +149,18 @@ class JsonApi implements
             $body = $p_response->getBody();
             if (is_object($body)) {
                 if ($body instanceof StreamInterface) {
+                    $this->logger->debug('FreeFW.Middleware.JsonApi.encode.before.unserialize');
                     $content = $body->getContents();
                     $object  = unserialize($content);
+                    $this->logger->debug('FreeFW.Middleware.JsonApi.encode.after.unserialize');
                     if ($object instanceof \FreeFW\Interfaces\ApiResponseInterface) {
                         if ($object->isSingleElement()) {
-                            $encoder    = new \FreeFW\JsonApi\V1\Encoder();
+                            $encoder = new \FreeFW\JsonApi\V1\Encoder();
+                            $encoder->setLogger($this->logger);
+                            $this->logger->debug('FreeFW.Middleware.JsonApi.encode.before.encode');
                             $document   = $encoder->encode($object, $p_api_params);
                             $json       = json_encode($document);
+                            $this->logger->debug('FreeFW.Middleware.JsonApi.encode.after.encode');
                             if ($document->hasErrors()) {
                                 $p_response = $this->createResponse(
                                     $document->getHttpCode(),
@@ -163,12 +171,15 @@ class JsonApi implements
                             }
                         } else {
                             $encoder  = new \FreeFW\JsonApi\V1\Encoder();
+                            $encoder->setLogger($this->logger);
+                            $this->logger->debug('FreeFW.Middleware.JsonApi.encode.before.encode');
                             $document = $encoder->encodeList($object, $p_api_params);
                             $p_response = $p_response->withBody(
                                 \GuzzleHttp\Psr7\Utils::streamFor(
                                     json_encode($document)
                                 )
                             );
+                            $this->logger->debug('FreeFW.Middleware.JsonApi.encode.after.encode');
                         }
                     } else {
                         $document   = new \FreeFW\JsonApi\V1\Model\Document();
@@ -199,6 +210,7 @@ class JsonApi implements
                             $object = @unserialize($content);
                             if ($object instanceof \FreeFW\Interfaces\ValidatorInterface) {
                                 $encoder = new \FreeFW\JsonApi\V1\Encoder();
+                                $encoder->setLogger($this->logger);
                                 /**
                                  * @var \FreeFW\Core\Error $oneError
                                  */

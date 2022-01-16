@@ -445,8 +445,9 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
         $cls = $this->getClassName();
         $vars = null;
         $test = null;
-        if (is_array($p_fields) && count($p_fields) > 0) {
-            foreach ($p_fields as $idx => $fields) {
+        if (is_array($p_fields) && isset($p_fields['relations'])) {
+            //var_dump($p_fields['model']);
+            foreach ($p_fields['relations'] as $idx => $fields) {
                 if (strtolower($idx) == strtolower($cls) && is_array($fields) && count($fields) > 0) {
                     $test = array_flip($fields);
                 }

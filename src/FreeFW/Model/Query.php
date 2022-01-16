@@ -92,6 +92,11 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
     protected $sort = [];
 
     /**
+     * Cache
+     */
+    protected static $_cached = [];
+
+    /**
      * Get default storage
      *
      * @return string
@@ -399,6 +404,25 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
     {
         $this->relations = $p_relations;
         return $this;
+    }
+
+    /**
+     * Execute with cache
+     *
+     * @param array  $p_fields
+     * @param string $p_function
+     * @param array  $p_parameters
+     *
+     * @return boolean
+     */
+    public function executeWithCache(array $p_fields = [], $p_function = null, $p_parameters = [])
+    {
+        $key = md5(serialize($this->conditions));
+        if (isset(self::$_cached[$key])) {
+            return self::$_cached[$key];
+        }
+        self::$_cached[$key] = $this->execute($p_fields, $p_function, $p_parameters);
+        return self::$_cached[$key];
     }
 
     /**

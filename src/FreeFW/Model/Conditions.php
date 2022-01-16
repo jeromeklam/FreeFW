@@ -296,7 +296,7 @@ class Conditions extends \FreeFW\Core\Model implements
                         $aCondition->setLeftMember($aField);
                         if (is_array($value)) {
                             foreach ($value as $idx2 => $value2) {
-                                if (($value2 === null || $value2 == '')&& in_array($idx2, [\FreeFW\Storage\Storage::COND_EMPTY, \FreeFW\Storage\Storage::COND_NOT_EMPTY])) {
+                                if (($value2 === null || $value2 == '') && in_array($idx2, [\FreeFW\Storage\Storage::COND_EMPTY, \FreeFW\Storage\Storage::COND_NOT_EMPTY])) {
                                     $aCondition->setOperator($idx2);
                                 } else {
                                     // Verify oper...
@@ -321,16 +321,26 @@ class Conditions extends \FreeFW\Core\Model implements
                                                 } else {
                                                     $arrCondition->setOperator(\FreeFW\Storage\Storage::COND_OR);
                                                 }
-                                                foreach (explode(',', $value2) as $oneValue) {
-                                                    $a2Condition = new \FreeFW\Model\SimpleCondition();
-                                                    $a2Condition->setLeftMember($aField);
+                                                if ($idx2 == \FreeFW\Storage\Storage::COND_BETWEEN) {
                                                     $aValue = new \FreeFW\Model\ConditionValue();
-                                                    $aValue->setValue($oneValue);
-                                                    $a2Condition->setOperator($idx2);
-                                                    $a2Condition->setRightMember($aValue);
-                                                    $arrCondition[] = $a2Condition;
+                                                    $aValue->setValue($value2);
+                                                    $aCondition->setOperator($idx2);
+                                                    $aValue = new \FreeFW\Model\ConditionValue();
+                                                    $aValue->setValue(explode(',', $value2));
+                                                    $aCondition->setOperator($idx2);
+                                                    $aCondition->setRightMember($aValue);
+                                                } else {
+                                                    foreach (explode(',', $value2) as $oneValue) {
+                                                        $a2Condition = new \FreeFW\Model\SimpleCondition();
+                                                        $a2Condition->setLeftMember($aField);
+                                                        $aValue = new \FreeFW\Model\ConditionValue();
+                                                        $aValue->setValue($oneValue);
+                                                        $a2Condition->setOperator($idx2);
+                                                        $a2Condition->setRightMember($aValue);
+                                                        $arrCondition[] = $a2Condition;
+                                                    }
+                                                    $aCondition = $arrCondition;
                                                 }
-                                                $aCondition = $arrCondition;
                                             } else {
                                                 $aValue = new \FreeFW\Model\ConditionValue();
                                                 $aValue->setValue($value2);

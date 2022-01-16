@@ -139,15 +139,16 @@ class DI
      * Get shared object
      *
      * @param string $p_name
+     * @param mixed  $p_default
      *
      * @return boolean
      */
-    public static function getShared(string $p_name)
+    public static function getShared(string $p_name, $p_default = false)
     {
         if (isset(self::$shared[$p_name])) {
             return self::$shared[$p_name];
         }
-        return false;
+        return $p_default;
     }
 
     /**
