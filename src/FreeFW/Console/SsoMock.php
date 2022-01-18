@@ -30,7 +30,7 @@ class SsoMock implements
 
     /**
      * Group
-     * @var \FreeSSO\Model\Group
+     * @var \FreeFW\MoInterfacesdel\GroupInterface
      */
     protected $group = null;
 
@@ -119,7 +119,7 @@ class SsoMock implements
     /**
      * Set group
      *
-     * @param \FreeSSO\Model\Group $p_group
+     * @param \FreeFW\Interfaces\GroupInterface $p_group
      *
      * @return \FreeFW\Console\SsoMock
      */
@@ -132,7 +132,7 @@ class SsoMock implements
     /**
      * Get group
      *
-     * @return \FreeSSO\Model\Group
+     * @return \FreeFW\Interfaces\GroupInterface
      */
     public function getBrokerGroup()
     {
@@ -140,8 +140,9 @@ class SsoMock implements
     }
 
     /**
-     *
-     * @return \FreeSSO\Model\Group
+     * Get user group
+     * 
+     * @return \FreeFW\Interfaces\GroupInterface
      */
     public function getUserGroup()
     {

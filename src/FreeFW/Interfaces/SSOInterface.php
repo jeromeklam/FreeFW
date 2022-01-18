@@ -19,6 +19,15 @@ interface SSOInterface
     public function getUser();
 
     /**
+     * Get current loggedin group
+     * Events :
+     *     *sso:lastUserUpdateEmpty
+     *
+     * @return \FreeFW\Interfaces\GroupInterface | false
+     */
+    public function getUserGroup();
+
+    /**
      * Register new user
      * Events :
      *     *sso:beforeRegisterNewUser

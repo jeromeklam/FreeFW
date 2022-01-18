@@ -67,10 +67,15 @@ class Message extends \FreeFW\Core\Service
     {
         $message = new \FreeFW\Model\Message();
         $message
+            ->addDest('jeromeklam@free.fr')
             ->setMsgSubject($p_subject)
             ->setMsgBody($p_body)
-            ->addDest('jeromeklam@free.fr')
+            ->setMsgType(\FreeFW\Model\Message::TYPE_EMAIL)
+            ->setMsgStatus(\FreeFW\Model\Message::STATUS_WAITING)
         ;
-        return $message->send();
+        if ($message->create()) {
+            return $message->send();
+        }
+        return false;
     }
 }

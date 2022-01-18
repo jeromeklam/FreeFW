@@ -176,7 +176,15 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
                         $params = [];
                     }
                     $service->setLogger($this);
-                    $sso->forceUser($this->getUser(), $this->getGroup());
+                    $newUser  = $this->getUser();
+                    if (!$newUser) {
+                        $newUser = $usr;
+                    }
+                    $newGroup = $this->getGroup();
+                    if (!$newGroup) {
+                        $newGroup = $grp;
+                    }
+                    $sso->forceUser($newUser, $newGroup);
                     $defaultErroMessage = 'Unknown Error';
                     try {
                         $result = call_user_func_array([$service, $method], ['params' => $params, 'user' => $this->getUserId()]);

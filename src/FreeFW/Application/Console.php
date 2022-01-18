@@ -65,11 +65,8 @@ class Console extends \FreeFW\Core\Console
                 // Broker instance
                 $broker = \FreeSSO\Model\Broker::findFirst(['brk_key' => $brkKey]);
                 if ($broker) {
-                    $sso    = new \FreeFW\Console\SsoMock($broker->getBrkId());
-                    $sso
-                        ->setUser($user)
-                        ->setGroup($broker->getGroup())
-                    ;
+                    $sso = new \FreeFW\Console\SsoMock($broker->getBrkId());
+                    $sso->forceUser($user, $broker->getGroup());
                     // Inject in SSO
                     \FreeFW\DI\DI::setShared('sso', $sso);
                 } else {

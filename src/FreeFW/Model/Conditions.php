@@ -21,13 +21,13 @@ class Conditions extends \FreeFW\Core\Model implements
 
     /**
      * Count
-     * @var number
+     * @var int
      */
     protected $my_count = 0;
 
     /**
      * Total count
-     * @var number
+     * @var int
      */
     protected $total_count = 0;
 
@@ -447,7 +447,7 @@ class Conditions extends \FreeFW\Core\Model implements
      * {@inheritDoc}
      * @see \Iterator::rewind()
      */
-    public function rewind()
+    public function rewind() : void
     {
         reset($this->conditions);
     }
@@ -479,10 +479,9 @@ class Conditions extends \FreeFW\Core\Model implements
      * {@inheritDoc}
      * @see \Iterator::next()
      */
-    public function next()
+    public function next() : void
     {
         $var = next($this->conditions);
-        return $var;
     }
 
     /**
@@ -490,7 +489,7 @@ class Conditions extends \FreeFW\Core\Model implements
      * {@inheritDoc}
      * @see \Iterator::valid()
      */
-    public function valid()
+    public function valid() : bool
     {
         $key = key($this->conditions);
         $var = ($key !== null && $key !== false);
@@ -502,7 +501,7 @@ class Conditions extends \FreeFW\Core\Model implements
      * {@inheritDoc}
      * @see \Countable::count()
      */
-    public function count()
+    public function count() : int
     {
         return $this->my_count;
     }
@@ -525,7 +524,7 @@ class Conditions extends \FreeFW\Core\Model implements
      * {@inheritDoc}
      * @see \ArrayAccess::offsetSet()
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value) : void
     {
         if (is_null($offset)) {
             $this->conditions[] = $value;
@@ -540,7 +539,7 @@ class Conditions extends \FreeFW\Core\Model implements
      * {@inheritDoc}
      * @see \ArrayAccess::offsetExists()
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset) : bool
     {
         return isset($this->conditions[$offset]);
     }
@@ -550,7 +549,7 @@ class Conditions extends \FreeFW\Core\Model implements
      * {@inheritDoc}
      * @see \ArrayAccess::offsetUnset()
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset) : void
     {
         unset($this->conditions[$offset]);
         $this->my_count = count($this->conditions);
@@ -597,5 +596,21 @@ class Conditions extends \FreeFW\Core\Model implements
             $str = $str . ' ' . $oneCondition->__toString();
         }
         return '( ' . trim($str) . ' )';
+    }
+
+    /**
+     * 
+     */
+    public function __callback($p_fct)
+    {
+        foreach ($this->conditions as $oneCondition) {
+            if ($oneCondition instanceof \FreeFW\Model\SimpleCondition) {
+                $p_fct($oneCondition);
+            } else {
+                if ($oneCondition instanceof \FreeFW\Model\Conditions) {
+                    $oneCondition->__callback($p_fct);
+                }
+            }
+        }
     }
 }
