@@ -60,7 +60,7 @@ class Encoder implements \Psr\Log\LoggerAwareInterface
             foreach ($fldTab as $oneFldTab) {
                 $jsonIgnore = false;
                 $allFields  = false;
-                switch($oneFldTab[0]) {
+                switch ($oneFldTab[0]) {
                     case '-' :
                         $jsonIgnore = true;
                         $fldTab = substr($oneFldTab, 1);

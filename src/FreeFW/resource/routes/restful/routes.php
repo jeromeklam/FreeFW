@@ -16,6 +16,8 @@ require_once(__DIR__ . '/lang.php');
 require_once(__DIR__ . '/message.php');
 require_once(__DIR__ . '/notification.php');
 require_once(__DIR__ . '/rate.php');
+require_once(__DIR__ . '/taxonomy.php');
+require_once(__DIR__ . '/taxonomy_lang.php');
 require_once(__DIR__ . '/translation.php');
 
 use \FreeFW\Router\Route as FFCSTRT;
@@ -89,6 +91,8 @@ $localRoutes = array_merge(
     $routes_message,
     $routes_notification,
     $routes_rate,
+    $routes_taxonomy,
+    $routes_taxonomy_lang,
     $routes_translation
 );
 return $localRoutes;

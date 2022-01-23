@@ -4,7 +4,7 @@ namespace FreeFW\Log;
 /**
  * File logger
  */
-class FileLogger extends \Psr\Log\AbstractLogger
+class FileLogger extends \Psr\Log\AbstractLogger implements \Serializable
 {
 
     /**
@@ -244,6 +244,7 @@ class FileLogger extends \Psr\Log\AbstractLogger
         if ($rr) {
             @chmod($this->file, 0666);
         }
+        $j = 0;
         if ($h) {
             while (null !== ($line = array_shift($this->tabCache))) {
                 $content = implode('  ---  ', $line) . PHP_EOL;
@@ -282,5 +283,28 @@ class FileLogger extends \Psr\Log\AbstractLogger
                 return 1;
         }
         return 0;
+    }
+
+    /**
+     * @see \Serializable 
+     */
+    public function serialize() {
+        $this->commit();
+        $datas = [
+            'file' => $this->file,
+            'cache' => $this->cache,
+            'tab' => $this->tabCache,
+        ];
+        return serialize($datas);
+    }
+
+    /**
+     * @see \Serializable 
+     */
+    public function unserialize($data) {
+        $datas = unserialize($data);
+        $this->tabCache = $datas['tab'];
+        $this->file = $datas['file'];
+        $this->cache = $datas['cache'];
     }
 }

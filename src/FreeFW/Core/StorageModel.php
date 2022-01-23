@@ -308,6 +308,26 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
                 $alias = $p_aliases[$p_crtAlias];
                 $subst = strlen($alias) + 1;
             }
+            $newAliases = [];
+            foreach ($p_aliases as $kA => $vA) {
+                if (strpos($kA, $p_crtAlias . '.') == 0) {
+                    $newAliases[substr($kA, strlen($p_crtAlias . '.'))] = $vA;
+                }
+            }
+            if (count($newAliases) > 0) {
+                foreach ($relations as $key => $prop) {
+                    foreach ($prop[FFCST::PROPERTY_FK] as $fk => $pfk) {
+                        $fieldFK = $pfk['field'];
+                        $modelFK = $pfk['model'];
+                        if (isset($newAliases[$fk])) {
+                            $newModel = \FreeFW\DI\DI::get($modelFK, true);
+                            $newModel->setFromArray($p_array, $newAliases, $fk);
+                            $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($fk, true);
+                            $this->$setter($newModel);
+                        }
+                    }
+                }
+            }
             foreach ($p_array as $field => $value) {
                 if ($subst > 0) {
                     if (strpos($field, $alias) !== 0) {
@@ -352,26 +372,6 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
                         default:
                             $this->$setter($value);
                             break;
-                    }
-                }
-            }
-            $newAliases = [];
-            foreach ($p_aliases as $kA => $vA) {
-                if (strpos($kA, $p_crtAlias . '.') == 0) {
-                    $newAliases[substr($kA, strlen($p_crtAlias . '.'))] = $vA;
-                }
-            }
-            if (count($newAliases) > 0) {
-                foreach ($relations as $key => $prop) {
-                    foreach ($prop[FFCST::PROPERTY_FK] as $fk => $pfk) {
-                        $fieldFK = $pfk['field'];
-                        $modelFK = $pfk['model'];
-                        if (isset($newAliases[$fk])) {
-                            $newModel = \FreeFW\DI\DI::get($modelFK, true);
-                            $newModel->setFromArray($p_array, $newAliases, $fk);
-                            $setter = 'set' . \FreeFW\Tools\PBXString::toCamelCase($fk, true);
-                            $this->$setter($newModel);
-                        }
                     }
                 }
             }

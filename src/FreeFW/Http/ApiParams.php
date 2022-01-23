@@ -341,4 +341,18 @@ class ApiParams
         }
         return [];
     }
+
+    /**
+     * Get request unis id
+     * 
+     * @return string
+     */
+    public function getUniqId()
+    {
+        $datas = [
+            'filters' => json_encode($this->getFilters()),
+            'include' => json_encode($this->getInclude())
+        ];
+        return md5(json_encode($datas));
+    }
 }

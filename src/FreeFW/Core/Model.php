@@ -547,13 +547,9 @@ abstract class Model implements
     public function getApiId() : string
     {
         $description = $this->getModelDescription();
-        foreach ($description['properties'] as $name => $property) {
-            if (isset($property[FFCST::PROPERTY_OPTIONS])) {
-                if (in_array(FFCST::OPTION_PK, $property[FFCST::PROPERTY_OPTIONS])) {
-                    $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
-                    return (string)$this->$getter();
-                }
-            }
+        if (isset($description['properties'][$description['pk']])) {
+            $getter = $description['properties'][$description['pk']][FFCST::PROPERTY_GETTER];
+            return (string)$this->$getter();
         }
         return '';
     }
@@ -906,6 +902,8 @@ abstract class Model implements
             $description['properties'] = array_merge_recursive($description['properties'], $cfgProps[$logName]);
         }
         //
+        $pkField = '';
+        $pkGetter = '';
         foreach ($description['properties'] as $name => $oneProperty) {
             $dbField = $name;
             if (!isset($oneProperty[FFCST::PROPERTY_OPTIONS])) {
@@ -914,9 +912,13 @@ abstract class Model implements
             if (isset($oneProperty[FFCST::PROPERTY_PRIVATE])) {
                 $dbField = $oneProperty[FFCST::PROPERTY_PRIVATE];
             }
+            if (in_array(FFCST::OPTION_PK, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
+                $pkField = $name;
+            }
             $description['properties'][$name][FFCST::PROPERTY_GETTER] = 'get' . \FreeFW\Tools\PBXString::toCamelCase($dbField, true);
             $description['properties'][$name][FFCST::PROPERTY_SETTER] = 'set' . \FreeFW\Tools\PBXString::toCamelCase($dbField, true);
         }
+        $description['pk'] = $pkField;
         //
         if ($cache) {
             $item = new \FreeFW\Cache\Item($key);

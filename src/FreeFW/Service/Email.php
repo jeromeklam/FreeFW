@@ -95,6 +95,9 @@ class Email extends \FreeFW\Core\Service
                 $message = new \FreeFW\Model\Message();
                 $subject = $oneVersion->getEmaillSubject();
                 $body    = $oneVersion->getEmaillBody();
+                var_export($body);
+                var_export($fields);
+                die;
                 if ($p_merge) {
                     $subject = \FreeFW\Tools\PBXString::parse($subject, $fields);
                     $body    = \FreeFW\Tools\PBXString::parse($body, $fields);
