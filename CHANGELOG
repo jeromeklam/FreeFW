@@ -1,8 +1,9 @@
-# 1.15.1 : 26/01/2022
+# 1.15.2 : 26/01/2022
 
 * Taxonomy lang
 * Optimisations
 * latest rate
+* fix php-jwt
 
 # 1.15.0 : 23/01/2022
 

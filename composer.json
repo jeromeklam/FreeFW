@@ -27,7 +27,7 @@
         "psr/http-factory"                     : "*",
         "guzzlehttp/guzzle"                    : "*",
         "guzzlehttp/psr7"                      : "*",
-        "firebase/php-jwt"                     : "*",
+        "firebase/php-jwt"                     : "^5.5.1",
         "bshaffer/oauth2-server-php"           : "*",
         "jeromeklam/freeoffice"                : "*",
         "gregwar/image"                        : "^2.0",
