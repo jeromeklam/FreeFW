@@ -28,12 +28,14 @@ class Rate extends \FreeFW\Core\ApiController
         }
         $default = $p_request->default_model;
         $model   = \FreeFW\DI\DI::get($default);
+
+        $latest = \FreeFW\Model\Rate::findFirst([], ['rate_ts' => '-']);
         /**
          * @var \FreeFW\Model\Query $query
          */
         $query   = $model->getQuery();
         $filters = [
-            'rate_ts' => [\FreeFW\Storage\Storage::COND_GLOBAL_MAX]
+            'rate_ts' => $latest->getRateTs()
         ];
         $query
             ->addFromFilters($filters)

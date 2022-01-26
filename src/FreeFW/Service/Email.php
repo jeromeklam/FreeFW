@@ -45,6 +45,7 @@ class Email extends \FreeFW\Core\Service
                     }
                 }
             }
+            $lang = \FreeFW\Model\Lang::findFirst(['lang_id' => $p_lang_id]);
             if ($emailVersion !== null) {
                 // Get group and user
                 $sso        = \FreeFW\DI\DI::getShared('sso');
@@ -58,11 +59,14 @@ class Email extends \FreeFW\Core\Service
                     $models   = [];
                     $models[] = $p_model;
                 }
+                /**
+                 * @var \FreeFW\Core\Model $oneModel
+                 */
                 foreach ($models as $oneModel) {
                     if (!$lModel) {
                         $lModel = $oneModel;
                     }
-                    $datas = $oneModel->getMergeData(true);
+                    $datas = $oneModel->getMergeData(true, '', '', false, $lang->getLangCode());
                     if (!$grpId) {
                         if (method_exists($oneModel, 'getGrpId')) {
                             $grpId = $oneModel->getGrpId();
@@ -78,13 +82,13 @@ class Email extends \FreeFW\Core\Service
                                 'grp_id' => $grpId
                             ]
                         );
-                        $datas->addGenericBlock('head_user');
                         if ($user) {
-                            $datas->addGenericData($user->getFieldsAsArray(), 'head_user');
+                            $mergeUser = $user->getMergeData(true, '', '', false, $lang->getLangCode(), 'head_user');
+                            $datas->merge($mergeUser);
                         }
-                        $datas->addGenericBlock('head_group');
                         if ($group) {
-                            $datas->addGenericData($group->getFieldsAsArray(), 'head_group');
+                            $mergeGroup = $group->getMergeData(true, '', '', false, $lang->getLangCode(), 'head_group');
+                            $datas->merge($mergeGroup);
                         }
                     }
                     $newFields = $datas->__toArray();
@@ -95,9 +99,6 @@ class Email extends \FreeFW\Core\Service
                 $message = new \FreeFW\Model\Message();
                 $subject = $oneVersion->getEmaillSubject();
                 $body    = $oneVersion->getEmaillBody();
-                var_export($body);
-                var_export($fields);
-                die;
                 if ($p_merge) {
                     $subject = \FreeFW\Tools\PBXString::parse($subject, $fields);
                     $body    = \FreeFW\Tools\PBXString::parse($body, $fields);

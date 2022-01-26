@@ -10,4 +10,9 @@ use \FreeFW\Constants as FFCST;
  */
 class TaxonomyLang extends \FreeFW\Model\Base\TaxonomyLang
 {
+
+    /**
+     * Comportement
+     */
+    use \FreeFW\Model\Behaviour\Lang;
 }

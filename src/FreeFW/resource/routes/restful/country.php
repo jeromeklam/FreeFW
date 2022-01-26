@@ -45,7 +45,9 @@ $routes_country = [
         FFCSTRT::ROUTE_CONTROLLER => 'FreeFW::Controller::Country',
         FFCSTRT::ROUTE_FUNCTION   => 'getAll',
         FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,
-        FFCSTRT::ROUTE_MIDDLEWARE => [],
+        FFCSTRT::ROUTE_MIDDLEWARE => [
+            'FreeFW::Middleware::RouteCache'
+        ],
         FFCSTRT::ROUTE_INCLUDE    => [],
         FFCSTRT::ROUTE_SCOPE      => [],
         FFCSTRT::ROUTE_RESULTS    => [

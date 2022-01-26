@@ -55,7 +55,7 @@ abstract class TaxonomyLang extends \FreeFW\Core\StorageModel
     ];
     protected static $PRP_TXL_CONTENT = [
         FFCST::PROPERTY_PRIVATE => 'txl_content',
-        FFCST::PROPERTY_TYPE    => FFCST::TYPE_TEXT,
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_HTML,
         FFCST::PROPERTY_OPTIONS => [],
         FFCST::PROPERTY_TITLE   => 'Contenu',
         FFCST::PROPERTY_COMMENT => 'Contenu',

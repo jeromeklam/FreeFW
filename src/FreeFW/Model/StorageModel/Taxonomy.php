@@ -35,7 +35,7 @@ abstract class Taxonomy extends \FreeFW\Core\StorageModel
     ];
     protected static $PRP_TX_DESC = [
         FFCST::PROPERTY_PRIVATE => 'tx_desc',
-        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BLOB,
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_HTML,
         FFCST::PROPERTY_OPTIONS => [],
         FFCST::PROPERTY_TITLE   => 'Description',
         FFCST::PROPERTY_COMMENT => 'Description',
@@ -66,7 +66,7 @@ abstract class Taxonomy extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_COMMENT => 'Parent',
         FFCST::PROPERTY_SAMPLE  => 123,
         FFCST::PROPERTY_FK      => [
-            'tx_parent_id' =>
+            'parent' =>
             [
                 FFCST::FOREIGN_MODEL => 'FreeFW::Model::Taxonomy',
                 FFCST::FOREIGN_FIELD => 'tx_id',
@@ -140,11 +140,11 @@ abstract class Taxonomy extends \FreeFW\Core\StorageModel
     public function getRelationships()
     {
         return [
-            'traductions' => [
+            'versions' => [
                 FFCST::REL_MODEL   => 'FreeFW::Model::TaxonomyLang',
                 FFCST::REL_FIELD   => 'tx_id',
                 FFCST::REL_TYPE    => \FreeFW\Model\Query::JOIN_LEFT,
-                FFCST::REL_COMMENT => 'Les traductions',
+                FFCST::REL_COMMENT => 'Les versions',
                 FFCST::REL_REMOVE  => FFCST::REL_REMOVE_CASCADE
             ]
         ];
