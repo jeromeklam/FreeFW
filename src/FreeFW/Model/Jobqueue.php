@@ -439,4 +439,32 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
         }
         return $this->jobq_last_report;
     }
+
+    /**
+     * Get factory
+     *
+     * @param string $p_name
+     * @param string $p_service
+     * @param string $p_method
+     * @param array  $p_params
+     * 
+     * @return \FreeFW\Model\Base\Jobqueue
+     */
+    public static function getFactory($p_name, $p_service, $p_method, $p_params = [])
+    {
+        $jobqueue = new self();
+        $jobqueue
+            ->setJobqName($p_name)
+            ->setJobqService($p_service)
+            ->setJobqMethod($p_method)
+            ->setJobqStatus(self::STATUS_WAITING)
+            ->setJobqNbRetry(1)
+            ->setJobqNextRetry(\FreeFW\Tools\Date::getCurrentTimestamp())
+            ->setJobqMaxHour(24)
+            ->setJobqDesc('<p>' . $p_name . '<p/>')
+            ->setJobqType(self::TYPE_ONCE)
+            ->setJobqParams(json_encode($p_params))
+        ;
+        return $jobqueue;
+    }
 }

@@ -45,11 +45,27 @@ class RouteCache implements
          */
         $apiParams = $p_request->getAttribute('api_params', false);
         /**
+         * User or group
+         */
+        $userId = 0;
+        $grpId  = 0;
+        $sso    = \FreeFW\DI\DI::getShared('sso');
+        if ($sso) {
+            $user = $sso->getUser();
+            if ($user) {
+                $userId = $user->getUserId();
+            }
+            $group = $sso->getUserGroup();
+            if ($group) {
+                $grpId = $group->getGrpId();
+            }
+        }
+        /**
          * @var \FreeFW\Router\Route $route
          */
         $route    = $p_request->getAttribute('route');
         $routeId  = $route->getId();
-        $cacheKey = $routeId . '.' . $apiParams->getUniqId();
+        $cacheKey = $grpId . '.' . $userId . '.' . str_replace('::Model::', '_', $route->getDefaultModel()) . '.' . $route->getRole() . '.' . $apiParams->getUniqId();
         $this->logger->info('FreeFW.Middleware.RouteCache : ' . $cacheKey);
         /**
          * @var \Psr\Cache\CacheItemPoolInterface $cache

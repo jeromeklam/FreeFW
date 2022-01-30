@@ -32,6 +32,12 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
     protected static $informations = [];
 
     /**
+     * Cached...
+     * @var boolean
+     */
+    protected $__cached_model = false;
+
+    /**
      * Get default storage
      *
      * @return string
@@ -120,6 +126,15 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
     public function create(bool $p_with_transaction = true, bool $p_raw = false) : bool
     {
         if ($this->isValid()) {
+            if ($this->__cached_model) {
+                /**
+                 * \Psr\Cache\CacheItemPoolInterface
+                 */
+                $cache = \FreeFW\DI\DI::getShared('cache');
+                if ($cache) {
+                    $cache->deleteItem('*.' . $this->getApiType() . '.*');
+                }
+            }
             return $this->strategy->create($this, $p_with_transaction, $p_raw);
         }
         return false;
@@ -133,6 +148,15 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
     public function save(bool $p_with_transaction = true, bool $p_raw = false) : bool
     {
         if ($this->isValid()) {
+            if ($this->__cached_model) {
+                /**
+                 * \Psr\Cache\CacheItemPoolInterface
+                 */
+                $cache = \FreeFW\DI\DI::getShared('cache');
+                if ($cache) {
+                    $cache->deleteItem('*.' . $this->getApiType() . '.*');
+                }
+            }
             return $this->strategy->save($this, $p_with_transaction, $p_raw);
         }
         return false;
@@ -250,6 +274,15 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
      */
     public function remove(bool $p_with_transaction = true, bool $p_raw = false) : bool
     {
+        if ($this->__cached_model) {
+            /**
+             * \Psr\Cache\CacheItemPoolInterface
+             */
+            $cache = \FreeFW\DI\DI::getShared('cache');
+            if ($cache) {
+                $cache->deleteItem('*.' . $this->getApiType() . '.*');
+            }
+        }
         return $this->strategy->remove($this, $p_with_transaction, $p_raw);
     }
 

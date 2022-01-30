@@ -148,7 +148,10 @@ class FileCache implements CacheItemPoolInterface
         if (isset($this->deferredStack[$key])) {
             unset($this->deferredStack[$key]);
         }
-        @unlink($this->filenameFor($key));
+        $keys = $this->findKeys($key);
+        foreach ($keys as $oneKey) {
+            @unlink($this->filenameFor($oneKey));
+        }
         return true;
     }
 
@@ -231,7 +234,7 @@ class FileCache implements CacheItemPoolInterface
      */
     private function filenameFor($p_key)
     {
-        return $this->getFolder() . '/' . $this->getFilenamePrefix() . $p_key;
+        return $this->getFolder() . '/' . $this->getFilenamePrefix() . '.' . $p_key;
     }
 
     /**
@@ -279,7 +282,7 @@ class FileCache implements CacheItemPoolInterface
      */
     private function getFilenamePrefix()
     {
-        return APP_NAME . '-cache-';
+        return APP_NAME . '-cache';
     }
 
     /**
@@ -288,5 +291,26 @@ class FileCache implements CacheItemPoolInterface
     public function __destruct()
     {
         $this->commit();
+    }
+
+    /**
+     * All keys with wildcard, ....
+     *
+     * @return [string]
+     */
+    private function findKeys($p_wildcard)
+    {
+        $keys    = [];
+        $folder  = rtrim($this->getFolder(), '/');
+        $prefix  = $this->getFilenamePrefix();
+        $allKeys = glob($folder . '/' . $prefix . $p_wildcard);
+        if (is_array($allKeys) && count($allKeys) > 0) {
+            foreach ($allKeys as $oneKey) {
+                $keys[] = str_replace($prefix . '.', '', basename($oneKey));
+            }
+        } else {
+            $keys[] = $p_wildcard;
+        }
+        return $keys;
     }
 }

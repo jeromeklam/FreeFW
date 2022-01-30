@@ -31,6 +31,7 @@ class EnUs extends AbstractNumbersWordsLocale
             ->setPlural('s')
             ->addCurrency(\FreeFW\Constants::CURRENCY_EURO, 'euro', 'euro-cent')
             ->addCurrency(\FreeFW\Constants::CURRENCY_DOLLAR, 'dollar', 'cent')
+            ->addCurrency(\FreeFW\Constants::CURRENCY_CHF, 'franc', 'centimes')
             ->setDigits(array(
                 0 => 'zero',
                 1 => 'one',

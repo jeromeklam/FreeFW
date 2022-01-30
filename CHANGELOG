@@ -1,3 +1,8 @@
+# 1.15.3 : 30/01/2022
+
+* Optimisations cache (clean)
+* Correction bug select 0,n to n,1
+
 # 1.15.2 : 26/01/2022
 
 * Taxonomy lang

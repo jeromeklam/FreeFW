@@ -833,12 +833,14 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 }
             }
         }
+        $selectTac = [];
         foreach ($allRels as $idx => $shortcut) {
             $parts     = explode('.', $shortcut);
             $onePart   = array_shift($parts);
             $crtFKs    = $fks;
             $baseAlias = '@';
             $newModel  = null;
+            $canSelect = true;
             while ($onePart != '') {
                 if (isset($crtFKs[$onePart]) && !isset($joins[$onePart])) {
                     $joins[$onePart] = $crtFKs[$onePart]['right'];
@@ -846,13 +848,17 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     self::$models[$onePart] = $newModel;
                     ++$crtAlias;
                     // Je ne dois jamais ajouter pour l'instant une table en 0,n
+                    $selectTac[$onePart] = true;
                     if (!isset($crtFKs[$onePart]['select']) || $crtFKs[$onePart]['select']) {
                         $addSel = $newModel->getFieldsForSelect($crtAlias, $p_fields, $this->provider);
-                        if (in_array($shortcut, $p_relations) || array_search($shortcut, $p_relations)) {
+                        if ($canSelect && (in_array($shortcut, $p_relations) || array_search($shortcut, $p_relations))) {
                             $select = $select . ', ' . $addSel;
                         }
                         //$group = $group . ', ' . $addSel;
                         $group = $group . ', ' . $newModel->getFieldsAliasForSelect($crtAlias, $p_fields, $this->provider);
+                    } else {
+                        $canSelect = false;
+                        $selectTac[$onePart] = false;
                     }
                     $aliases[$baseAlias . '.' . $onePart] = $crtAlias;
                     $ids[$baseAlias . '.' . $onePart] = $newModel->getFieldNameByOption(FFCST::OPTION_PK);
@@ -877,6 +883,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 } else {
                     if (isset(self::$models[$onePart])) {
                         $newModel = self::$models[$onePart];
+                        $canSelect = $selectTac[$onePart];
                     } else {
                         $newModel = null;
                     }

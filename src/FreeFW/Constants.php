@@ -35,6 +35,7 @@ class Constants
      * Monnaies
      * @var string
      */
+    const CURRENCY_CHF    = 'CHF';
     const CURRENCY_EURO   = 'EUR';
     const CURRENCY_DOLLAR = 'USD';
 

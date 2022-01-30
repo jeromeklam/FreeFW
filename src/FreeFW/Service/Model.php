@@ -343,6 +343,11 @@ class Model extends \FreeFW\Core\Service
             $storage = \FreeFW\DI\DI::getShared('Storage::' . $stName);
             $p_model->setMdFields($storage->getFields($source));
         }
+        $filename = $modelPath . '/Behaviour/' . $p_model->getMdClass() . '.php';
+        @unlink($filename);
+        if (!is_file($filename)) {
+            $this->createBehaviourClass($p_model, $filename);
+        }
         $filename = $modelPath . '/StorageModel/' . $p_model->getMdClass() . '.php';
         if (!is_file($filename)) {
             // @todo : read existing to update
@@ -838,6 +843,109 @@ class Model extends \FreeFW\Core\Service
         }
         $lines[] = '}';
         $lines[] = '';
+        file_put_contents($p_filename, implode(PHP_EOL, $lines));
+        return true;
+    }
+
+    protected function createBehaviourClass(\FreeFW\Model\Model &$p_model, string $p_filename)
+    {
+        $className  = $p_model->getMdClass();
+        $classLabel = \FreeFW\Tools\PBXString::fromCamelCase($className);
+        $snakeName  = \FreeFW\Tools\PBXString::fromCamelCase($className);
+        $idField    = $p_model->getPrimaryFieldName();
+        $idCamel    = \FreeFW\Tools\PBXString::toCamelCase($idField, true);
+        $lines = [];
+        $lines[] = '<?php';
+        $lines[] = 'namespace FreeAsso\Model\Behaviour;';
+        $lines[] = '';
+        $lines[] = '/**';
+        $lines[] = ' * ' . $classLabel;
+        $lines[] = ' *';
+        $lines[] = ' * @author jeromeklam';
+        $lines[] = ' *';
+        $lines[] = ' */';
+        $lines[] = 'trait ' . $className;
+        $lines[] = '{';
+        $lines[] = '';
+        $lines[] = '   /**';
+        $lines[] = '     * Id';
+        $lines[] = '     * @var number';
+        $lines[] = '     */';
+        $lines[] = '    protected $' . $idField . ' = null;';
+        $lines[] = '';
+        $lines[] = '    /**';
+        $lines[] = '     * ' . $className;
+        $lines[] = '     * @var \FreeAsso\Model\\' . $className;
+        $lines[] = '     */';
+        $lines[] = '    protected $' . $snakeName . ' = null;';
+        $lines[] = '';
+        $lines[] = '    /**';
+        $lines[] = '     * Set id : ' . $classLabel;
+        $lines[] = '     *';
+        $lines[] = '     * @param number $p_id';
+        $lines[] = '     *';
+        $lines[] = '     * @return \FreeAsso\Model\Behaviour\\' . $className;
+        $lines[] = '     */';
+        $lines[] = '    public function set' . $idCamel . '($p_id)';
+        $lines[] = '    {';
+        $lines[] = '        $this->' . $idField . ' = $p_id;';
+        $lines[] = '        if ($this->' . $snakeName . ') {';
+        $lines[] = '            if ($this->' . $snakeName . '->get' . $idCamel . '() != $this->' . $idField . ') {';
+        $lines[] = '                $this->' . $snakeName . ' = null;';
+        $lines[] = '            }';
+        $lines[] = '        }';
+        $lines[] = '        return $this;';
+        $lines[] = '    }';
+        $lines[] = '';
+        $lines[] = '    /**';
+        $lines[] = '     * Get id : ' . $classLabel;
+        $lines[] = '     *';
+        $lines[] = '     * @return number';
+        $lines[] = '     */';
+        $lines[] = '    public function get' . $idCamel . '()';
+        $lines[] = '    {';
+        $lines[] = '        return $this->' . $idField . ';';
+        $lines[] = '    }';
+        $lines[] = '';
+        $lines[] = '    /**';
+        $lines[] = '     * Set ' . $classLabel;
+        $lines[] = '     *';
+        $lines[] = '     * @param \FreeAsso\Model\\' . $className . ' $p_model';
+        $lines[] = '     *';
+        $lines[] = '     * @return \FreeFW\Core\Model';
+        $lines[] = '     */';
+        $lines[] = '    public function set' . $className . '($p_model)';
+        $lines[] = '    {';
+        $lines[] = '        $this->' . $snakeName . ' = $p_model;';
+        $lines[] = '        if ($p_model) {';
+        $lines[] = '            $this->' . $idField . ' = $p_model->get' . $idCamel . '();';
+        $lines[] = '        }';
+        $lines[] = '        return $this;';
+        $lines[] = '   }';
+        $lines[] = '';
+        $lines[] = '   /**';
+        $lines[] = '     * Get ' . $classLabel;
+        $lines[] = '     *';
+        $lines[] = '     * @param boolean $p_force';
+        $lines[] = '     *';
+        $lines[] = '     * @return \FreeAsso\Model\\' . $className;
+        $lines[] = '     */';
+        $lines[] = '    public function get' . $className . '($p_force = false)';
+        $lines[] = '    {';
+        $lines[] = '        if ($this->' . $snakeName . ' === null || $p_force) {';
+        $lines[] = '            if ($this->' . $idField . ' > 0) {';
+        $lines[] = '                $this->' . $snakeName . ' = \FreeAsso\Model\\' . $className . '::findFirst(';
+        $lines[] = '                    [' ;
+        $lines[] = '                        \'' . $idField . '\' => $this->' . $idField;
+        $lines[] = '                    ]';
+        $lines[] = '                );';
+        $lines[] = '            } else {';
+        $lines[] = '                $this->' . $snakeName . ' = null;';
+        $lines[] = '            }';
+        $lines[] = '        }';
+        $lines[] = '        return $this->' . $snakeName . ';';
+        $lines[] = '    }';
+        $lines[] = '}';
         file_put_contents($p_filename, implode(PHP_EOL, $lines));
         return true;
     }
