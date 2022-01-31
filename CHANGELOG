@@ -1,3 +1,7 @@
+# 1.15.4 : 31/01/2022
+
+* Test des emails avec choix de la langue et groupe courant
+
 # 1.15.3 : 30/01/2022
 
 * Optimisations cache (clean)

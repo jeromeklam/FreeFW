@@ -9,13 +9,14 @@ namespace FreeFW\Controller;
 class Email extends \FreeFW\Core\ApiController
 {
 
-    public function sendOne(\Psr\Http\Message\ServerRequestInterface $p_request, $p_id = null)
+    public function sendOne(\Psr\Http\Message\ServerRequestInterface $p_request, $p_id = null, $p_lang = null)
     {
         $this->logger->debug('FreeFW.EmailController.sendOne.start');
         $code = \FreeFW\Constants::ERROR_NOT_FOUND; // 404
         $data = null;
         $sso = \FreeFW\DI\DI::getShared('sso');
         $user = $sso->getUser();
+        $group = $sso->getUserGroup();
         $email = \FreeFW\Model\Email::findFirst(
             [ 'email_id' => $p_id ]
         );
@@ -30,7 +31,12 @@ class Email extends \FreeFW\Core\ApiController
                         'email_id' => $email->getEmailId()
                     ];
                     $emailService = \FreeFW\DI\DI::get("FreeFW::Service::Email");
-                    $message = $emailService->getEmailAsMessage($filters, 368, $instance);
+                    $lang         = \FreeFW\Model\Lang::findFirst(['lang_code' => $p_lang]);
+                    $lCode        = 368;
+                    if ($lang) {
+                        $lCode = $lang->getLangId();
+                    }
+                    $message = $emailService->getEmailAsMessage($filters, $lCode, $instance, true, $group->getGrpId());
                     if ($message) {
                         $message
                             ->addDest($user->getUserLogin())

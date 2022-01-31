@@ -13,7 +13,7 @@ $routes_email = [
         FFCSTRT::ROUTE_COMMENT    => 'Expédition un objet',
         FFCSTRT::ROUTE_METHOD     => FFCSTRT::METHOD_POST,
         FFCSTRT::ROUTE_MODEL      => 'FreeFW::Model::Email',
-        FFCSTRT::ROUTE_URL        => '/v1/core/email/test/:email_id',
+        FFCSTRT::ROUTE_URL        => '/v1/core/email/test/:email_id/:lang_code',
         FFCSTRT::ROUTE_CONTROLLER => 'FreeFW::Controller::Email',
         FFCSTRT::ROUTE_FUNCTION   => 'sendOne',
         FFCSTRT::ROUTE_AUTH       => FFCSTRT::AUTH_IN,
@@ -28,6 +28,12 @@ $routes_email = [
                 FFCSTRT::ROUTE_PARAMETER_TYPE     => FFCST::TYPE_BIGINT,
                 FFCSTRT::ROUTE_PARAMETER_REQUIRED => true,
                 FFCSTRT::ROUTE_PARAMETER_COMMENT  => 'Identifiant de l\'objet'
+            ],
+            'lang_code' => [
+                FFCSTRT::ROUTE_PARAMETER_ORIGIN   => FFCSTRT::ROUTE_PARAMETER_ORIGIN_PATH,
+                FFCSTRT::ROUTE_PARAMETER_TYPE     => FFCST::TYPE_STRING,
+                FFCSTRT::ROUTE_PARAMETER_REQUIRED => true,
+                FFCSTRT::ROUTE_PARAMETER_COMMENT  => 'La langue à utiliser'
             ],
         ],
         FFCSTRT::ROUTE_RESULTS    => [

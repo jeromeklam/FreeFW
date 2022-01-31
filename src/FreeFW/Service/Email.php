@@ -19,7 +19,7 @@ class Email extends \FreeFW\Core\Service
      *
      * @return NULL|\FreeFW\Model\Message
      */
-    public function getEmailAsMessage(array $p_filters, int $p_lang_id, $p_model, $p_merge = true)
+    public function getEmailAsMessage(array $p_filters, int $p_lang_id, $p_model, $p_merge = true, $p_grpId = null)
     {
         $message = null;
         $emails  = \FreeFW\Model\Email::find($p_filters);
@@ -48,10 +48,10 @@ class Email extends \FreeFW\Core\Service
             $lang = \FreeFW\Model\Lang::findFirst(['lang_id' => $p_lang_id]);
             if ($emailVersion !== null) {
                 // Get group and user
-                $sso        = \FreeFW\DI\DI::getShared('sso');
-                $user       = $sso->getUser();
+                $sso    = \FreeFW\DI\DI::getShared('sso');
+                $user   = $sso->getUser();
                 // @todo : rechercher le groupe principal de l'utilisateur
-                $grpId  = null;
+                $grpId  = $p_grpId;
                 $models = $p_model;
                 $fields = [];
                 $lModel = null;
@@ -77,6 +77,8 @@ class Email extends \FreeFW\Core\Service
                                 $grpId = $group->getGrpId();
                             }
                         }
+                    }
+                    if ($grpId) {
                         $group = \FreeSSO\Model\Group::findFirst(
                             [
                                 'grp_id' => $grpId
