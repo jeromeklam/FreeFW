@@ -30,6 +30,14 @@ abstract class Country extends \FreeFW\Core\StorageCacheModel
         FFCST::PROPERTY_SAMPLE  => 'France',
         FFCST::PROPERTY_MAX     => 80,
     ];
+    protected static $PRP_CNTY_NAME_EN = [
+        FFCST::PROPERTY_PRIVATE => 'cnty_name_en',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Nom du pays en anglais',
+        FFCST::PROPERTY_SAMPLE  => 'France',
+        FFCST::PROPERTY_MAX     => 80,
+    ];
     protected static $PRP_CNTY_CODE = [
         FFCST::PROPERTY_PRIVATE => 'cnty_code',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
@@ -47,9 +55,10 @@ abstract class Country extends \FreeFW\Core\StorageCacheModel
     public static function getProperties()
     {
         return [
-            'cnty_id'   => self::$PRP_CNTY_ID,
-            'cnty_name' => self::$PRP_CNTY_NAME,
-            'cnty_code' => self::$PRP_CNTY_CODE
+            'cnty_id'      => self::$PRP_CNTY_ID,
+            'cnty_name'    => self::$PRP_CNTY_NAME,
+            'cnty_name_en' => self::$PRP_CNTY_NAME_EN,
+            'cnty_code'    => self::$PRP_CNTY_CODE
         ];
     }
 

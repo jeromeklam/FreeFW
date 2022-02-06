@@ -397,7 +397,7 @@ class PBXString
     public static function htmlToText($p_html, $p_preserve_cr = false)
     {
         $html = new \Html2Text\Html2Text($p_html, ['width' => 0]);
-        return $html->getText();
+        return str_replace("\n\n", "\n", $html->getText());
     }
 
     /**

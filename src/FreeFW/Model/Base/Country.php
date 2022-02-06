@@ -22,6 +22,12 @@ abstract class Country extends \FreeFW\Model\StorageModel\Country
     protected $cnty_name = null;
 
     /**
+     * cnty_name_en
+     * @var string
+     */
+    protected $cnty_name_en = null;
+
+    /**
      * cnty_code
      * @var string
      */
@@ -71,6 +77,29 @@ abstract class Country extends \FreeFW\Model\StorageModel\Country
     public function getCntyName()
     {
         return $this->cnty_name;
+    }
+
+    /**
+     * Set cnty_name_en
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\Country
+     */
+    public function setCntyNameEn($p_value)
+    {
+        $this->cnty_name_en = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get cnty_name_en
+     *
+     * @return string
+     */
+    public function getCntyNameEn()
+    {
+        return $this->cnty_name_en;
     }
 
     /**

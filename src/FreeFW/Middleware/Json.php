@@ -108,10 +108,10 @@ class Json implements
                     $number = 1;
                     $size   = 25;
                     if (array_key_exists('number', $page)) {
-                        $number = $page['number'];
+                        $number = intval($page['number']);
                     }
                     if (array_key_exists('size', $page)) {
-                        $size = $page['size'];
+                        $size = intval($page['size']);
                     }
                     $start = ($number - 1) * $size;
                     $len   = $size;
@@ -120,10 +120,10 @@ class Json implements
                     $offset = 1;
                     $limit  = 25;
                     if (array_key_exists('offset', $page)) {
-                        $offset = $page['offset'];
+                        $offset = intval($page['offset']);
                     }
                     if (array_key_exists('limit', $page)) {
-                        $limit = $page['limit'];
+                        $limit = intval($page['limit']);
                     }
                     $start = $offset - 1;
                     $len   = $limit - $offset;

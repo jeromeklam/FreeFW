@@ -46,12 +46,17 @@ class Edition extends \FreeFW\Core\Service
             }
         }
         if ($editionVersion) {
+            $includes = true;
+            // Les includes de l'édition sont prioritaires
+            if ($edition->getEdiIncludes() != '') {
+                $includes = explode(',', $edition->getEdiIncludes());
+            }
             $lang = \FreeFW\Model\Lang::findFirst(['lang_id' => $p_lang_id]);
             $name = $editionVersion->getEdilFilename();
             if (method_exists($p_model, 'afterRead')) {
                 $p_model->afterRead();
             }
-            $mergeDatas = $p_model->getMergeData(true, '', '', false, $lang->getLangCode());
+            $mergeDatas = $p_model->getMergeData($includes, '', '', false, $lang->getLangCode());
             // Get group and user
             $sso        = \FreeFW\DI\DI::getShared('sso');
             $user       = $sso->getUser();

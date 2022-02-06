@@ -12,10 +12,10 @@ class Email extends \FreeFW\Core\ApiController
     public function sendOne(\Psr\Http\Message\ServerRequestInterface $p_request, $p_id = null, $p_lang = null)
     {
         $this->logger->debug('FreeFW.EmailController.sendOne.start');
-        $code = \FreeFW\Constants::ERROR_NOT_FOUND; // 404
-        $data = null;
-        $sso = \FreeFW\DI\DI::getShared('sso');
-        $user = $sso->getUser();
+        $code  = \FreeFW\Constants::ERROR_NOT_FOUND; // 404
+        $data  = null;
+        $sso   = \FreeFW\DI\DI::getShared('sso');
+        $user  = $sso->getUser();
         $group = $sso->getUserGroup();
         $email = \FreeFW\Model\Email::findFirst(
             [ 'email_id' => $p_id ]

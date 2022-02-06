@@ -135,6 +135,12 @@ class Taxonomy extends \FreeFW\Model\Base\Taxonomy
                 'type'    => \FreeFW\Constants::TYPE_HTML,
                 'content' => $content 
             ];
+            $fields[$oneTaxo->getTxCode()] = [
+                'name'    => $oneTaxo->getTxCode() . '_txt',
+                'title'   => $oneTaxo->getTxCode(),
+                'type'    => \FreeFW\Constants::TYPE_TEXT,
+                'content' => \FreeFW\Tools\PBXString::htmlToText($content) 
+            ];
         }
         return $fields;
     }

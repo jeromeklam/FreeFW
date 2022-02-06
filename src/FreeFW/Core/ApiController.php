@@ -603,6 +603,9 @@ class ApiController extends \FreeFW\Core\Controller
                 sprintf('No default model for route !')
             );
         }
+        /**
+         * Must add some extra params, filters, ...
+         */
         if (method_exists($this, 'adaptApiParams')) {
             $apiParams = $this->adaptApiParams($apiParams, 'getAll');
         }

@@ -1236,14 +1236,29 @@ abstract class Model implements
                     case FFCST::TYPE_DATETIMETZ:
                         $content_hm  = '';
                         $content_hms = '';
+                        $content_ch  = '';
+                        $content_frl = '';
+                        $content_enl = '';
+                        $content_frm = '';
+                        $content_enm = '';
                         if ($content != '') {
                             $dth = \FreeFW\Tools\Date::mysqlToDatetime($content, false, false);
                             $content     = $dth->format('d/m/Y');
                             $content_hm  = $dth->format('d/m/Y h:m');
                             $content_hms = $dth->format('d/m/Y h:m:s');
+                            $content_ch  = str_replace('/', '.', $content);
+                            $content_frl = \FreeFW\Tools\DateTime::toFRLetter($dth);
+                            $content_enl = \FreeFW\Tools\DateTime::toENLetter($dth);
+                            $content_frm = \FreeFW\Tools\DateTime::toFRLetter($dth, false);
+                            $content_enm = \FreeFW\Tools\DateTime::toENLetter($dth, false);
                         }
-                        $data[$name . '_hm']  = $content_hm;
-                        $data[$name . '_hms'] = $content_hms;
+                        $data[$name . '_hm']     = $content_hm;
+                        $data[$name . '_hms']    = $content_hms;
+                        $data[$name . '_ch']     = $content_ch;
+                        $data[$name . '_fr_let'] = $content_frl;
+                        $data[$name . '_en_let'] = $content_enl;
+                        $data[$name . '_fr_my']  = $content_frm;
+                        $data[$name . '_en_my']  = $content_enm;
                         break;
                     case FFCST::TYPE_MONETARY:
                         $data[$name . '_frmt'] = number_format($content, 2, '.', ' ');

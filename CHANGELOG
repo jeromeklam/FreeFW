@@ -1,3 +1,9 @@
+# 1.16.0 : 06/02/2022
+
+* Ajout du nom anglais sur les pays
+* Gestion des dates en toute lettre
+* Ajout de fonctions sur les champs de fusion
+
 # 1.15.4 : 31/01/2022
 
 * Test des emails avec choix de la langue et groupe courant
