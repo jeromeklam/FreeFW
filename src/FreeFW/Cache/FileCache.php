@@ -144,12 +144,12 @@ class FileCache implements CacheItemPoolInterface
      */
     public function deleteItem($key)
     {
-        $this->assertValidKey($key);
-        if (isset($this->deferredStack[$key])) {
-            unset($this->deferredStack[$key]);
-        }
         $keys = $this->findKeys($key);
         foreach ($keys as $oneKey) {
+            $this->assertValidKey($oneKey);
+            if (isset($this->deferredStack[$oneKey])) {
+                unset($this->deferredStack[$oneKey]);
+            }
             @unlink($this->filenameFor($oneKey));
         }
         return true;
@@ -300,17 +300,19 @@ class FileCache implements CacheItemPoolInterface
      */
     private function findKeys($p_wildcard)
     {
-        $keys    = [];
-        $folder  = rtrim($this->getFolder(), '/');
-        $prefix  = $this->getFilenamePrefix();
-        $allKeys = glob($folder . '/' . $prefix . $p_wildcard);
-        if (is_array($allKeys) && count($allKeys) > 0) {
-            foreach ($allKeys as $oneKey) {
-                $keys[] = str_replace($prefix . '.', '', basename($oneKey));
+        if (strpos($p_wildcard, '*') !== false) {
+            $keys    = [];
+            $folder  = rtrim($this->getFolder(), '/');
+            $prefix  = $this->getFilenamePrefix();
+            $allKeys = glob($folder . '/' . $prefix . $p_wildcard);
+            if (is_array($allKeys) && count($allKeys) > 0) {
+                foreach ($allKeys as $oneKey) {
+                    $keys[] = str_replace($prefix . '.', '', basename($oneKey));
+                }
+            } else {
+                $keys[] = $p_wildcard;
             }
-        } else {
-            $keys[] = $p_wildcard;
+            return $keys;
         }
-        return $keys;
-    }
+        return $p_wildcard;
 }
