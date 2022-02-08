@@ -314,5 +314,5 @@ class FileCache implements CacheItemPoolInterface
             }
             return $keys;
         }
-        return $p_wildcard;
+        return [$p_wildcard];
 }
