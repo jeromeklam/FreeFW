@@ -53,7 +53,6 @@ class Email extends \FreeFW\Core\Service
                 // @todo : rechercher le groupe principal de l'utilisateur
                 $grpId  = $p_grpId;
                 $models = $p_model;
-                $fields = [];
                 $lModel = null;
                 if (!is_array($models)) {
                     $models   = [];
@@ -93,8 +92,8 @@ class Email extends \FreeFW\Core\Service
                             $datas->merge($mergeGroup);
                         }
                     }
-                    $newFields = $datas->__toArray();
-                    $fields = array_merge_recursive($fields, $newFields);
+                    
+                    $fields = $datas->__toArray();
                 }
                 //
                 //
@@ -104,6 +103,11 @@ class Email extends \FreeFW\Core\Service
                 if ($p_merge) {
                     $subject = \FreeFW\Tools\PBXString::parse($subject, $fields);
                     $body    = \FreeFW\Tools\PBXString::parse($body, $fields);
+                    if ($oneEmail->getTplId() > 0) {
+                        $template = $oneEmail->getTemplate();
+                        $tplBody = $template->getTplContent();
+                        $body = \FreeFW\Tools\PBXString::parse($tplBody, ['template_body' => $body]);
+                    }
                     if ($oneEmail->getEmailEdi1Id()) {
                         try {
                             $editionService = \FreeFW\DI\DI::get('FreeFW::Service::Edition');

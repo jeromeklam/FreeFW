@@ -135,7 +135,7 @@ class Taxonomy extends \FreeFW\Model\Base\Taxonomy
                 'type'    => \FreeFW\Constants::TYPE_HTML,
                 'content' => $content 
             ];
-            $fields[$oneTaxo->getTxCode()] = [
+            $fields[$oneTaxo->getTxCode() . '_txt'] = [
                 'name'    => $oneTaxo->getTxCode() . '_txt',
                 'title'   => $oneTaxo->getTxCode(),
                 'type'    => \FreeFW\Constants::TYPE_TEXT,

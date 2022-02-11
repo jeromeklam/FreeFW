@@ -165,6 +165,20 @@ abstract class Email extends \FreeFW\Core\StorageModel
             ]
         ],
     ];
+    protected static $PRP_TPL_ID = [
+        FFCST::PROPERTY_PRIVATE => 'tpl_id',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
+        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_FK],
+        FFCST::PROPERTY_COMMENT => 'Le template',
+        FFCST::PROPERTY_SAMPLE  => 123,
+        FFCST::PROPERTY_FK      => ['template' =>
+            [
+                FFCST::FOREIGN_MODEL => 'FreeFW::Model::Template',
+                FFCST::FOREIGN_FIELD => 'tpl_id',
+                FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT,
+            ]
+        ],
+    ];
 
     /**
      * get properties
@@ -190,6 +204,7 @@ abstract class Email extends \FreeFW\Core\StorageModel
             'email_object_name' => self::$PRP_EMAIL_OBJECT_NAME,
             'email_bcc'         => self::$PRP_EMAIL_BCC,
             'grp_id'            => self::$PRP_GRP_ID,
+            'tpl_id'            => self::$PRP_TPL_ID,
         ];
     }
 

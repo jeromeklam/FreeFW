@@ -16,6 +16,7 @@ class Email extends \FreeFW\Model\Base\Email implements
      * Behaviours
      */
     use \FreeFW\Model\Behaviour\Lang;
+    use \FreeFW\Model\Behaviour\Template;
     use \FreeSSO\Model\Behaviour\Group;
 
     /**

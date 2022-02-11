@@ -106,6 +106,12 @@ abstract class Email extends \FreeFW\Model\StorageModel\Email
     protected $grp_id = null;
 
     /**
+     * tpl_id
+     * @var int
+     */
+    protected $tpl_id = null;
+
+    /**
      * Set email_id
      *
      * @param int $p_value
