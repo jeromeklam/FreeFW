@@ -146,6 +146,7 @@ class Constants
     const OPTION_PK               = 'PK';
     const OPTION_FK               = 'FK';
     const OPTION_JSONIGNORE       = 'NOJSON';
+    const OPTION_ALLIGNORE        = 'NOALL';
     const OPTION_LOCAL            = 'LOCAL';
     const OPTION_FUNCTION         = 'FUNCTION';
     const OPTION_UNIQ             = 'UNIQ';

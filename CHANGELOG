@@ -1,3 +1,10 @@
+# 1.17.2 : 19/02/2022
+
+* Inbox
+    * Optimisation 
+* PDO Storage
+    * Option : ignore blob for more than once select
+
 # 1.17.1 : 11/02/2022
 
 * Template d'email

@@ -46,7 +46,7 @@ abstract class Inbox extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_SAMPLE  => 123,
         FFCST::PROPERTY_FK      => ['user' =>
             [
-                FFCST::FOREIGN_MODEL => 'FreeFW::Model::User',
+                FFCST::FOREIGN_MODEL => 'FreeSSO::Model::User',
                 FFCST::FOREIGN_FIELD => 'user_id',
                 FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT,
             ]
@@ -55,7 +55,7 @@ abstract class Inbox extends \FreeFW\Core\StorageModel
     protected static $PRP_INBOX_CONTENT = [
         FFCST::PROPERTY_PRIVATE => 'inbox_content',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_BLOB,
-        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_JSONIGNORE,FFCST::OPTION_ALLIGNORE],
         FFCST::PROPERTY_COMMENT => '',
         FFCST::PROPERTY_SAMPLE  => '',
     ];
@@ -133,9 +133,19 @@ abstract class Inbox extends \FreeFW\Core\StorageModel
      *
      * @return string
      */
+    public static function getSourceTitle()
+    {
+        return 'Inbox';
+    }
+
+    /**
+     * Get object short description
+     *
+     * @return string
+     */
     public static function getSourceComments()
     {
-        return '';
+        return 'Inbox';
     }
 
     /**

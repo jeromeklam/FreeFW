@@ -850,7 +850,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     // Je ne dois jamais ajouter pour l'instant une table en 0,n
                     $selectTac[$onePart] = true;
                     if (!isset($crtFKs[$onePart]['select']) || $crtFKs[$onePart]['select']) {
-                        $addSel = $newModel->getFieldsForSelect($crtAlias, $p_fields, $this->provider);
+                        $addSel = $newModel->getFieldsForSelect($crtAlias, $p_fields, $this->provider, $p_length != 1);
                         if ($canSelect && (in_array($shortcut, $p_relations) || array_search($shortcut, $p_relations))) {
                             $select = $select . ', ' . $addSel;
                         }

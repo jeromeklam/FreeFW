@@ -591,13 +591,15 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
      * @param string                                      $p_alias
      * @param array                                       $p_fields
      * @param \FreeFW\Interfaces\StorageProviderInterface $p_provider
+     * @param bool                                        $p_ignore_blob
      *
      * @return string
      */
     public function getFieldsForSelect(
         string $p_alias = '',
         array $p_fields = [],
-        \FreeFW\Interfaces\StorageProviderInterface $p_provider = null
+        \FreeFW\Interfaces\StorageProviderInterface $p_provider = null,
+        $p_ignore_blob = false
     ) : string {
         $select = '';
         $check  = false;
@@ -610,6 +612,10 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
         foreach ($this->getModelDescriptionProperties() as $name => $property) {
             if (isset($property[FFCST::PROPERTY_OPTIONS]) &&
                 in_array(FFCST::OPTION_LOCAL, $property[FFCST::PROPERTY_OPTIONS])) {
+                continue;
+            }
+            if ($p_ignore_blob && isset($property[FFCST::PROPERTY_OPTIONS]) &&
+                in_array(FFCST::OPTION_ALLIGNORE, $property[FFCST::PROPERTY_OPTIONS])) {
                 continue;
             }
             if ($check && !in_array($name, $check)) {
