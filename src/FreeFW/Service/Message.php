@@ -65,15 +65,16 @@ class Message extends \FreeFW\Core\Service
      */
     public function sendAdminMessage($p_subject, $p_body)
     {
-        $config  = $this->getAppConfig('email');
+        $cfg     = $this->getAppConfig();
+        $config  = $cfg->get('email');
         $fEmail  = 'administration@kalaweit.org';
         $fName   = 'Administration Kalaweit';
         if (is_array($config)) {
-            if (isset($config["from_name"])) {
-                $fName = $config->get('from_name');
+            if (isset($config["fromName"])) {
+                $fName = $config['fromName'];
             }
-            if (isset($config["from_email"])) {
-                $fEmail = $config->get('from_email');
+            if (isset($config["fromEmail"])) {
+                $fEmail = $config['fromEmail'];
             }
         }
         $message = new \FreeFW\Model\Message();
@@ -84,6 +85,7 @@ class Message extends \FreeFW\Core\Service
             ->setMsgType(\FreeFW\Model\Message::TYPE_EMAIL)
             ->setMsgStatus(\FreeFW\Model\Message::STATUS_WAITING)
             ->setFrom($fEmail, $fName)
+            ->setReplyTo($fEmail, $fName)
         ;
         if ($message->create()) {
             return $message->send();

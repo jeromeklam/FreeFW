@@ -69,7 +69,7 @@ abstract class Inbox extends \FreeFW\Core\StorageModel
     ];
     protected static $PRP_INBOX_DESC = [
         FFCST::PROPERTY_PRIVATE => 'inbox_desc',
-        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BLOB,
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_HTML,
         FFCST::PROPERTY_OPTIONS => [],
         FFCST::PROPERTY_COMMENT => '',
         FFCST::PROPERTY_SAMPLE  => '',
@@ -96,6 +96,28 @@ abstract class Inbox extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_COMMENT => '',
         FFCST::PROPERTY_SAMPLE  => '',
     ];
+    protected static $PRP_INBOX_KEEP = [
+        FFCST::PROPERTY_PRIVATE => 'inbox_keep',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BOOLEAN,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_DEFAULT => FFCST::DEFAULT_FALSE,
+        FFCST::PROPERTY_COMMENT => '',
+        FFCST::PROPERTY_SAMPLE  => 0,
+    ];
+    protected static $PRP_GRP_ID = [
+        FFCST::PROPERTY_PRIVATE => 'grp_id',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_BIGINT,
+        FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_FK],
+        FFCST::PROPERTY_COMMENT => 'Le groupe',
+        FFCST::PROPERTY_SAMPLE  => 123,
+        FFCST::PROPERTY_FK      => ['group' =>
+            [
+                FFCST::FOREIGN_MODEL => 'FreeSSO::Model::Group',
+                FFCST::FOREIGN_FIELD => 'grp_id',
+                FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT,
+            ]
+        ],
+    ];
 
     /**
      * get properties
@@ -114,7 +136,9 @@ abstract class Inbox extends \FreeFW\Core\StorageModel
             'inbox_desc'        => self::$PRP_INBOX_DESC,
             'inbox_object_name' => self::$PRP_INBOX_OBJECT_NAME,
             'inbox_params'      => self::$PRP_INBOX_PARAMS,
-            'inbox_download_ts' => self::$PRP_INBOX_DOWNLOAD_TS
+            'inbox_download_ts' => self::$PRP_INBOX_DOWNLOAD_TS,
+            'inbox_keep'        => self::$PRP_INBOX_KEEP,
+            'grp_id'            => self::$PRP_GRP_ID,
         ];
     }
 

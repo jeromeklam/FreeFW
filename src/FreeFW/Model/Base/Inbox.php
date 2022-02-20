@@ -70,6 +70,18 @@ abstract class Inbox extends \FreeFW\Model\StorageModel\Inbox
     protected $inbox_download_ts = null;
 
     /**
+     * Keep document
+     * @var boolean
+     */
+    protected $inbox_keep = false;
+
+    /**
+     * Group
+     * @var int
+     */
+    protected $grp_id = null;
+
+    /**
      * Set inbox_id
      *
      * @param int $p_value
@@ -299,4 +311,50 @@ abstract class Inbox extends \FreeFW\Model\StorageModel\Inbox
         return $this->inbox_download_ts;
     }
 
+
+    /**
+     * Get keep document
+     *
+     * @return  boolean
+     */ 
+    public function getInboxKeep()
+    {
+        return $this->inbox_keep;
+    }
+
+    /**
+     * Set keep document
+     *
+     * @param  boolean  $inbox_keep  Keep document
+     *
+     * @return  self
+     */ 
+    public function setInboxKeep($inbox_keep)
+    {
+        $this->inbox_keep = $inbox_keep;
+        return $this;
+    }
+
+    /**
+     * Get group
+     *
+     * @return  int
+     */ 
+    public function getGrpId()
+    {
+        return $this->grp_id;
+    }
+
+    /**
+     * Set group
+     *
+     * @param  int  $grp_id  Group
+     *
+     * @return  self
+     */ 
+    public function setGrpId($grp_id)
+    {
+        $this->grp_id = $grp_id;
+        return $this;
+    }
 }

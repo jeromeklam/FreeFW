@@ -168,7 +168,11 @@ class PHPMailer implements
             $this->mailer->CharSet = 'UTF-8';
             $this->mailer->Subject = $p_message->getMsgSubject();
             $htmlBody = $p_message->getMsgBody();
-            $this->mailer->Body = '<html><body>' . $htmlBody . '</body></html>';
+            if (strpos($htmlBody, '<body>') === false) {
+                $this->mailer->Body = '<html><body>' . $htmlBody . '</body></html>';
+            } else {
+                $this->mailer->Body = $htmlBody;
+            }
             $this->mailer->AltBody = strip_tags(str_replace("<br />", "\n", $htmlBody));
             // Petite pause avant l'envoi...
             sleep(2);

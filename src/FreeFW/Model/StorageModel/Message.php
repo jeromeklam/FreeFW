@@ -253,11 +253,19 @@ abstract class Message extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_SAMPLE  => 123,
         FFCST::PROPERTY_FK      => ['group' =>
             [
-                FFCST::FOREIGN_MODEL => 'FreeFW::Model::Group',
+                FFCST::FOREIGN_MODEL => 'FreeSSO::Model::Group',
                 FFCST::FOREIGN_FIELD => 'grp_id',
                 FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT,
             ]
         ],
+    ];
+    protected static $PRP_MSG_RETRY = [
+        FFCST::PROPERTY_PRIVATE => 'msg_retry',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_INTEGER,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_DEFAULT => 0,
+        FFCST::PROPERTY_COMMENT => '',
+        FFCST::PROPERTY_SAMPLE  => 123,
     ];
 
     /**
@@ -295,6 +303,7 @@ abstract class Message extends \FreeFW\Core\StorageModel
             'msg_pj4_name'    => self::$PRP_MSG_PJ4_NAME,
             'grp_id'          => self::$PRP_GRP_ID,
             'dest_id'         => self::$PRP_DEST_ID,
+            'msg_retry'       => self::$PRP_MSG_RETRY,
         ];
     }
 

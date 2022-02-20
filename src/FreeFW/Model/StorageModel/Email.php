@@ -159,7 +159,7 @@ abstract class Email extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_SAMPLE  => 123,
         FFCST::PROPERTY_FK      => ['group' =>
             [
-                FFCST::FOREIGN_MODEL => 'FreeFW::Model::Group',
+                FFCST::FOREIGN_MODEL => 'FreeSSO::Model::Group',
                 FFCST::FOREIGN_FIELD => 'grp_id',
                 FFCST::FOREIGN_TYPE  => \FreeFW\Model\Query::JOIN_LEFT,
             ]

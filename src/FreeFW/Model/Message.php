@@ -279,6 +279,18 @@ class Message extends \FreeFW\Model\Base\Message
      */
     public function send()
     {
+        $cfg   = $this->getAppConfig();
+        $max   = $cfg->get('email:maxEmails', 80);
+        $dChk  = date('YmdH');
+        $check = rtrim(APP_CACHE, '/') . '/' . $dChk . '.txt';
+        $count = 0;
+        if (is_file($check)) {
+            $count = intval(@file_get_contents($check));
+        }
+        $count++;
+        if ($count >= $max) {
+            return true;
+        }
         /**
          * @var \FreeFW\Interfaces\MessageSenderInterface $mailer
          */
@@ -299,12 +311,22 @@ class Message extends \FreeFW\Model\Base\Message
                         ->save()
                     ;
                 } else {
-                    $this
-                        ->setMsgStatus(self::STATUS_ERROR)
-                        ->setMsgSendTs(\FreeFW\Tools\Date::getCurrentTimestamp())
-                        ->setMsgSendError($mailer->getError())
-                        ->save()
-                    ;
+                    if ($this->getMsgRetry() <= 3) {
+                        $this
+                            ->setMsgStatus(self::STATUS_WAITING)
+                            ->setMsgSendError($mailer->getError())
+                            ->incrementTry()
+                            ->save()
+                        ;
+                    } else {
+                        $this
+                            ->setMsgStatus(self::STATUS_ERROR)
+                            ->setMsgSendTs(\FreeFW\Tools\Date::getCurrentTimestamp())
+                            ->setMsgSendError($mailer->getError())
+                            ->incrementTry()
+                            ->save()
+                        ;
+                    }
                 }
             }
         } catch (\Exception $ex) {
@@ -315,6 +337,8 @@ class Message extends \FreeFW\Model\Base\Message
                 ->save()
             ;
         }
+        @file_put_contents($check, $count);
+        return true;
     }
 
     /**
@@ -391,5 +415,16 @@ class Message extends \FreeFW\Model\Base\Message
     public function beforeCreate()
     {
         return $this->before();
+    }
+
+    /**
+     * Add one try
+     * 
+     * @return self
+     */
+    protected function incrementTry()
+    {
+        $this->msg_retry = intval($this->msg_retry) + 1;
+        return $this;
     }
 }

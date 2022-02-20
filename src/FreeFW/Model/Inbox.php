@@ -15,6 +15,7 @@ class Inbox extends \FreeFW\Model\Base\Inbox
      * Comportements
      */
     use \FreeSSO\Model\Behaviour\User;
+    use \FreeSSO\Model\Behaviour\Group;
 
     /**
      * Prevent from saving history

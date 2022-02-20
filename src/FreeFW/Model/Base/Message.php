@@ -172,6 +172,12 @@ abstract class Message extends \FreeFW\Model\StorageModel\Message
     protected $user_id = null;
 
     /**
+     * retry
+     * @var integer
+     */
+    protected $msg_retry = 0;
+
+    /**
      * Set msg_id
      *
      * @param int $p_value
@@ -790,5 +796,28 @@ abstract class Message extends \FreeFW\Model\StorageModel\Message
     public function getGrpId()
     {
         return $this->grp_id;
+    }
+
+    /**
+     * Get retry
+     *
+     * @return  integer
+     */ 
+    public function getMsgRetry()
+    {
+        return $this->msg_retry;
+    }
+
+    /**
+     * Set retry
+     *
+     * @param  integer  $msg_retry  retry
+     *
+     * @return  self
+     */ 
+    public function setMsgRetry($msg_retry)
+    {
+        $this->msg_retry = $msg_retry;
+        return $this;
     }
 }
