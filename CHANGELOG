@@ -1,3 +1,8 @@
+# 1.18.1 : 21/02/2022
+
+* Email
+    * Gestion de la balise title du template pour insérer le sujet
+
 # 1.18.0 : 20/02/2022
 
 * Email

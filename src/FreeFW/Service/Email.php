@@ -106,7 +106,13 @@ class Email extends \FreeFW\Core\Service
                     if ($oneEmail->getTplId() > 0) {
                         $template = $oneEmail->getTemplate();
                         $tplBody = $template->getTplContent();
-                        $body = \FreeFW\Tools\PBXString::parse($tplBody, ['template_body' => $body]);
+                        $body = \FreeFW\Tools\PBXString::parse(
+                            $tplBody,
+                            [
+                                'template_subject' => $subject,
+                                'template_body'    => $body
+                            ]
+                        );
                     }
                     if ($oneEmail->getEmailEdi1Id()) {
                         try {
