@@ -173,7 +173,7 @@ class PHPMailer implements
             } else {
                 $this->mailer->Body = $htmlBody;
             }
-            $this->mailer->AltBody = strip_tags(str_replace("<br />", "\n", $htmlBody));
+            $this->mailer->AltBody = \FreeFW\Tools\PBXString::htmlToText($htmlBody);
             // Petite pause avant l'envoi...
             sleep(2);
             $result = $this->mailer->send();

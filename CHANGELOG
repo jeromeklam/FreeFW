@@ -1,3 +1,11 @@
+# 1.18.2 : 24/02/2022
+
+* Général
+    * Positionnement des droits en création de répertoire
+* Email
+    * Meilleure gestion du texte brut pour les emails 
+    * Langue des emails dans le template
+
 # 1.18.1 : 21/02/2022
 
 * Email

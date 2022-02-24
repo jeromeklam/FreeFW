@@ -44,10 +44,15 @@ class Dir
             return true;
         } else {
             if (@mkdir($path)) {
+                @chmod($path, 0775);
                 return true;
             } else {
                 self::mkpath(dirname($path));
-                return @mkdir($path);
+                if (@mkdir($path)) {
+                    @chmod($path, 0775);
+                    return true;
+                }
+                return false;
             }
         }
         return true;

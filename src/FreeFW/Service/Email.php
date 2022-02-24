@@ -39,8 +39,9 @@ class Email extends \FreeFW\Core\Service
             }
             if ($emailVersion === null) {
                 foreach ($oneEmail->getVersions() as $oneVersion) {
-                    $emailVersion = $oneVersion;
                     if ($oneVersion->getLangId() == $oneEmail->getLangId()) {
+                        $emailVersion = $oneVersion;
+                        $p_lang_id = $oneEmail->getLangId();
                         break;
                     }
                 }
@@ -109,6 +110,7 @@ class Email extends \FreeFW\Core\Service
                         $body = \FreeFW\Tools\PBXString::parse(
                             $tplBody,
                             [
+                                'template_lang'    => $lang->getLangCode(),
                                 'template_subject' => $subject,
                                 'template_body'    => $body
                             ]
