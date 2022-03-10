@@ -14,10 +14,11 @@ class Jobqueue extends \FreeFW\Core\Service
      *
      * @param mixed $p_params
      * @param mixed $p_user_id
+     * @param mixed $p_grp_id
      *
      * @return boolean
      */
-    public function deferredEmail($p_params, $p_user_id = null)
+    public function deferredEmail($p_params, $p_user_id = null, $p_grp_id = null)
     {
         $this->logger->debug('FreeFW.Service.Jobqueue.deferredEmail.start');
         $result = true;
@@ -42,7 +43,7 @@ class Jobqueue extends \FreeFW\Core\Service
         $email = \FreeFW\Model\Email::findFirst(['email_id' => $emailId]);
         if ($email) {
             if (method_exists($model, 'sendEmail')) {
-                $query->execute([], 'sendEmail', [$email]);
+                $query->execute([], 'sendEmail', [$email, $p_grp_id]);
             } else {
                 $this->logger->debug('FreeFW.Service.Jobqueue.deferredEmail.sendEmail.notfound');
                 return false;
