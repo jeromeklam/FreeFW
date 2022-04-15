@@ -555,6 +555,8 @@ class ApiController extends \FreeFW\Core\Controller
                 $ediContent = $edition->getEdiContent($print->getPrtLang());
                 file_put_contents($src, $ediContent);
                 file_put_contents($dest, $ediContent);
+                $mergeDatas->addBlock('main');
+                $mergeDatas->addData(['now' => \FreeFW\Tools\Date::mysqlToddmmyyyy(\FreeFW\Tools\Date::getCurrentTimestamp(), false, false)], 'main');
                 if ($user) {
                     $mergeUser = $user->getMergeData([], '', '', false, $print->getPrtLang(), 'head_user');
                     $mergeDatas->merge($mergeUser);

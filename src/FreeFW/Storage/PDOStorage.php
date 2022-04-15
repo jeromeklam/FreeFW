@@ -1087,15 +1087,10 @@ class PDOStorage extends \FreeFW\Storage\Storage
                     if ($oneProperty[FFCST::PROPERTY_TYPE] == FFCST::TYPE_DATETIMETZ) {
                         $dtz = true;
                     }
-                    // Compute getter
-                    $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($name, true);
                     // Get data
-                    $val = $p_model->$getter();
-                    if ($val === false) {
-                        $val = 0;
-                    }
-                    if ($dtz && $val != '') {
-                        $val = \FreeFW\Tools\Date::stringToMysql($val);
+                    $val = $value;
+                    if ($dtz && $value != '') {
+                        $val = \FreeFW\Tools\Date::stringToMysql($value);
                     }
                     $fields[':' . $oneProperty[FFCST::PROPERTY_PRIVATE]] = $val;
                     if ($set != '') {
@@ -1119,6 +1114,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         // Build query
         $sql = 'UPDATE ' . $source . ' SET ' . $set . ' WHERE ' . $where;
         $this->logger->debug('PDOStorage.update : ' . $sql);
+        $this->logger->debug('PDOStorage.update : ' . var_export(array_merge($values, $fields), true));
         // I got all, run query...
         try {
             // Get PDO and execute

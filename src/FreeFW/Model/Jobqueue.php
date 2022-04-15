@@ -189,7 +189,7 @@ class Jobqueue extends \FreeFW\Model\Base\Jobqueue implements \Psr\Log\LoggerInt
                     try {
                         $result = call_user_func_array(
                             [$service, $method],
-                            ['params' => $params, 'user' => $this->getUserId(), 'group' => $this->geGrpId()]
+                            ['params' => $params, 'user' => $this->getUserId(), 'group' => $this->getGrpId()]
                         );
                     } catch (\Exception $ex) {
                         $result = false;

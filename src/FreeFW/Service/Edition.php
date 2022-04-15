@@ -88,6 +88,8 @@ class Edition extends \FreeFW\Core\Service
             $ediContent = $editionVersion->getEdilData();
             file_put_contents($src, $ediContent);
             file_put_contents($dest, $ediContent);
+            $mergeDatas->addBlock('main');
+            $mergeDatas->addData(['now' => \FreeFW\Tools\Date::mysqlToddmmyyyy(\FreeFW\Tools\Date::getCurrentTimestamp(), false, false)], 'main');
             if ($user) {
                 $mergeUser = $user->getMergeData(true, '', '', false, $lang->getLangCode(), 'head_user');
                 $mergeDatas->merge($mergeUser);
