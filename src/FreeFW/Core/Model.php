@@ -800,6 +800,7 @@ abstract class Model implements
         unset($serializable['config']);
         unset($serializable['app_config']);
         unset($serializable['updated']);
+        unset($serializable['__cache']);
         return $serializable;
     }
 

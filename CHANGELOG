@@ -1,3 +1,8 @@
+# 1.18.5 : 23/05/2022
+
+* Model
+    * Serialize sans __cache 
+
 # 1.18.4 : 15/04/2022
 
 * Bloc de fusion main
