@@ -45,9 +45,16 @@ class Json implements
             $typeMember = '@type';
             if (isset($p_json->{$typeMember})) {
                 $type = $p_json->{$typeMember};
-                if (isset($p_json->data)) { 
-                    $data = $p_json->data;
-                    // GOGOGO
+                if (class_exists($type)) {
+                    $class = str_replace('\\', '::', trim($type, '\\'));
+                    /**
+                     * @var \FreeFW\Core\Model $model
+                     */
+                    $model = \FreeFW\DI\DI::get($class);
+                    $parts = (array)$p_json;
+                    foreach ($parts as $key => $value) {
+                        $model->$key = $value;
+                    }
                 }
             }
         }
@@ -176,7 +183,11 @@ class Json implements
                         }
                         $result = $serializer->serialize($result);
                     } else {
-                        $result = $serializer->serialize($object);
+                        if (is_object($object) && method_exists($object, 'unset')) {
+                            $result = $serializer->serialize($object->unset());
+                        } else {
+                            $result = $serializer->serialize($object);
+                        }
                     }
                 } else {
                     $result = $content;
