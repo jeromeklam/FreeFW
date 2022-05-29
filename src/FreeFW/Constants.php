@@ -11,7 +11,7 @@ class Constants
      * Regex
      * @var string
      */
-    const PARAM_REGEX = '[0-9a-zA-ZÀ-ÖØ-öø-ÿœŒ_\-\.\@\%]*';
+    const PARAM_REGEX = '[0-9a-zA-ZÀ-ÖØ-öø-ÿœŒ_\-\.\@\%\+\s\*]*';
 
     /**
      * Langues

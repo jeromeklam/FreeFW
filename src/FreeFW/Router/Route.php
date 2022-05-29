@@ -629,6 +629,6 @@ class Route implements \Psr\Log\LoggerAwareInterface
         if (isset($matches[1]) && isset($this->filters[$matches[1]])) {
             return $this->filters[$matches[1]];
         }
-        return "([/]" . FFCST::PARAM_REGEX . ")";
+        return "([\/]" . FFCST::PARAM_REGEX . ")";
     }
 }

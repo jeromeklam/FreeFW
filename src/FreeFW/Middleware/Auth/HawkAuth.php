@@ -130,7 +130,7 @@ class HawkAuth implements
             'ts'     => $ts,
             'nonce'  => $nonce,
             'method' => strtoupper($p_request->getMethod()),
-            'path'   => urldecode($path),
+            'path'   => $path,
             'host'   => strtolower($uri->getHost()),
             'port'   => $port,
             'hash'   => '',
