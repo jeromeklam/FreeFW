@@ -1,3 +1,8 @@
+# 1.18.8 : 11/06/2022
+
+* Router
+    * Correction d'un bug HAWK sur certains encodages 
+
 # 1.18.7 : 29/05/2022
 
 * Router

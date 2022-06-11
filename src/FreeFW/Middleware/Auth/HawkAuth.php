@@ -109,7 +109,7 @@ class HawkAuth implements
         if (isset($params['_request'])) {
             unset($params['_request']);
         }
-        $query = http_build_query($params);
+        $query = urldecode(http_build_query($params));
         if ($p_withPort) {
             $port = $uri->getPort();
             if ($port == '') {
