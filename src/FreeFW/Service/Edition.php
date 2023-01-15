@@ -1,4 +1,5 @@
 <?php
+
 namespace FreeFW\Service;
 
 /**
@@ -27,7 +28,10 @@ class Edition extends \FreeFW\Core\Service
          * @var \FreeFW\Model\EditionLang $editionVersion
          */
         $editionVersion = null;
-        $edition        = \FreeFW\Model\Edition::findFirst(['edi_id' => $p_edi_id]);
+        /**
+         * @var \FreeFW\Model\Edition $edition
+         */
+        $edition = \FreeFW\Model\Edition::findFirst(['edi_id' => $p_edi_id]);
         if ($edition instanceof \FreeFW\Model\Edition) {
             foreach ($edition->getVersions() as $oneVersion) {
                 if ($oneVersion->getLangId() == $p_lang_id) {
@@ -75,19 +79,7 @@ class Edition extends \FreeFW\Core\Service
                     'grp_id' => $grpId
                 ]
             );
-            $cfg  = $this->getAppConfig();
-            $dir  = $cfg->get('ged:dir');
-            if (!is_dir($dir)) {
-                $dir = '/tmp/';
-            }
-            $bDir = rtrim(\FreeFW\Tools\Dir::mkStdFolder($dir), '/');
-            $file = uniqid(true, 'edition');
-            $src  = $bDir . '/print_' . $file . '_tpl.odt';
-            $dest = $bDir . '/print_' . $file . '_dest.odt';
-            $dPdf = $bDir . '/print_' . $file . '_dest.pdf';
-            $ediContent = $editionVersion->getEdilData();
-            file_put_contents($src, $ediContent);
-            file_put_contents($dest, $ediContent);
+            //
             $mergeDatas->addBlock('main');
             $mergeDatas->addData(['now' => \FreeFW\Tools\Date::mysqlToddmmyyyy(\FreeFW\Tools\Date::getCurrentTimestamp(), false, false)], 'main');
             if ($user) {
@@ -98,12 +90,48 @@ class Edition extends \FreeFW\Core\Service
                 $mergeGroup = $group->getMergeData(true, '', '', false, $lang->getLangCode(), 'head_group');
                 $mergeDatas->merge($mergeGroup);
             }
-            $mergeService = \FreeFW\DI\DI::get('FreeOffice::Service::Merge');
-            $mergeService->merge($src, $dest, $mergeDatas);
-            exec('/usr/bin/unoconv -f pdf -o ' . $dPdf . ' ' . $dest);
-            @unlink($dest);
-            @unlink($src);
+            //
+            $cfg  = $this->getAppConfig();
+            $dir  = $cfg->get('ged:dir');
+            if (!is_dir($dir)) {
+                $dir = '/tmp/';
+            }
+            $bDir = rtrim(\FreeFW\Tools\Dir::mkStdFolder($dir), '/');
+            $file = uniqid(true, 'edition');
+            if ($edition->getEdiType() == \FreeFW\Model\Edition::TYPE_PDF) {
+                $src  = $bDir . '/print_' . $file . '_tpl.pdf';
+                $dPdf = $bDir . '/print_' . $file . '_dest.pdf';
+                $this->logger->debug("before " . $dPdf);
+                $ediContent = $editionVersion->getEdilData();
+                file_put_contents($src, $ediContent);
+                $mapping = json_decode($edition->getEdiMapping(), true);
+                if (!$mapping) {
+                    $this->logger->error('Mapping for edition not found or not json !');
+                    return false;
+                }
+                $mergedDatas = $mergeDatas->computeFromMapping($mapping);
+                $pdf = new \mikehaertl\pdftk\Pdf($src);
+                $result = $pdf
+                    ->fillForm($mergedDatas)
+                    ->flatten()
+                    ->saveAs($dPdf);
+                @unlink($src);
+            } else {
+                $src  = $bDir . '/print_' . $file . '_tpl.odt';
+                $dest = $bDir . '/print_' . $file . '_dest.odt';
+                $dPdf = $bDir . '/print_' . $file . '_dest.pdf';
+                $this->logger->debug("before " . $dPdf);
+                $ediContent = $editionVersion->getEdilData();
+                file_put_contents($src, $ediContent);
+                file_put_contents($dest, $ediContent);
+                $mergeService = \FreeFW\DI\DI::get('FreeOffice::Service::Merge');
+                $mergeService->merge($src, $dest, $mergeDatas);
+                exec('/usr/bin/unoconv -f pdf -o ' . $dPdf . ' ' . $dest);
+                @unlink($dest);
+                @unlink($src);
+            }
             $filename = $dPdf;
+            $this->logger->debug("after " . $filename);
         }
         return [
             'name' => $name,

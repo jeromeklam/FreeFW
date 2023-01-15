@@ -94,6 +94,12 @@ abstract class Edition extends \FreeFW\Model\StorageModel\Edition
     protected $edi_includes = null;
 
     /**
+     * edi_mapping
+     * @var string
+     */
+    protected $edi_mapping = null;
+
+    /**
      * Set edi_id
      *
      * @param int $p_value
@@ -413,5 +419,28 @@ abstract class Edition extends \FreeFW\Model\StorageModel\Edition
     public function getEdiIncludes()
     {
         return $this->edi_includes;
+    }
+
+    /**
+     * Set edi_mapping
+     * 
+     * @var string $p_value
+     * 
+     * @return \FreeFW\Model\Edition
+     */
+    public function setEdiMapping($p_value)
+    {
+        $this->edi_mapping = $p_value;
+        return $this;
+    }
+
+    /**
+     * get edi_mapping
+     * 
+     * @return string
+     */
+    public function getEdiMapping()
+    {
+        return $this->edi_mapping;
     }
 }

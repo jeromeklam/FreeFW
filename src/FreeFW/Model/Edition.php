@@ -19,6 +19,7 @@ class Edition extends \FreeFW\Model\Base\Edition
     const TYPE_IMPRESS = 'CALC';
     const TYPE_CALC    = 'CALC';
     const TYPE_HTML    = 'HTML';
+    const TYPE_PDF     = 'PDF';
 
     /**
      * Behaviours

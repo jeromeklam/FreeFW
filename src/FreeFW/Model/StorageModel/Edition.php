@@ -105,7 +105,7 @@ abstract class Edition extends \FreeFW\Core\StorageModel
     protected static $PRP_EDI_TYPE = [
         FFCST::PROPERTY_PRIVATE => 'edi_type',
         FFCST::PROPERTY_TYPE    => FFCST::TYPE_SELECT,
-        FFCST::PROPERTY_ENUM    => ['IMPRESS','CALC','WRITER','HTML'],
+        FFCST::PROPERTY_ENUM    => ['IMPRESS','CALC','WRITER','HTML','PDF'],
         FFCST::PROPERTY_OPTIONS => [FFCST::OPTION_REQUIRED],
         FFCST::PROPERTY_DEFAULT => 'HTML',
         FFCST::PROPERTY_COMMENT => 'Le type de contenu de l\'édition',
@@ -138,6 +138,13 @@ abstract class Edition extends \FreeFW\Core\StorageModel
         FFCST::PROPERTY_MAX     => 255,
         FFCST::PROPERTY_SAMPLE  => '',
     ];
+    protected static $PRP_EDI_MAPPING = [
+        FFCST::PROPERTY_PRIVATE => 'edi_mapping',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_JSON,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Mapping des champs PDF',
+        FFCST::PROPERTY_SAMPLE  => '',
+    ];
 
     /**
      * get properties
@@ -161,6 +168,7 @@ abstract class Edition extends \FreeFW\Core\StorageModel
             'edi_mode'        => self::$PRP_EDI_MODE,
             'edi_duration'    => self::$PRP_EDI_DURATION,
             'edi_includes'    => self::$PRP_EDI_INCLUDES,
+            'edi_mapping'     => self::$PRP_EDI_MAPPING,
         ];
     }
 

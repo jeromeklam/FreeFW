@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Utilitaires Dates
  *
@@ -6,6 +7,7 @@
  * @package Date
  * @category Tools
  */
+
 namespace FreeFW\Tools;
 
 /**
@@ -79,7 +81,7 @@ class Address
      * Get firstname
      *
      * @return  string
-     */ 
+     */
     public function getFirstname()
     {
         return $this->firstname;
@@ -91,7 +93,7 @@ class Address
      * @param  string  $firstname  Firstname
      *
      * @return  self
-     */ 
+     */
     public function setFirstname($firstname)
     {
         $this->firstname = $firstname;
@@ -102,7 +104,7 @@ class Address
      * Get lastname
      *
      * @return  string
-     */ 
+     */
     public function getLastname()
     {
         return $this->lastname;
@@ -114,7 +116,7 @@ class Address
      * @param  string  $lastname  Lastname
      *
      * @return  self
-     */ 
+     */
     public function setLastname($lastname)
     {
         $this->lastname = $lastname;
@@ -125,7 +127,7 @@ class Address
      * Get fullname
      *
      * @return  string
-     */ 
+     */
     public function getFullname()
     {
         return $this->fullname;
@@ -137,7 +139,7 @@ class Address
      * @param  string  $fullname  Fullname
      *
      * @return  self
-     */ 
+     */
     public function setFullname($fullname)
     {
         $this->fullname = $fullname;
@@ -148,7 +150,7 @@ class Address
      * Get address1
      *
      * @return  string
-     */ 
+     */
     public function getAddress1()
     {
         return $this->address1;
@@ -160,7 +162,7 @@ class Address
      * @param  string  $address1  Address1
      *
      * @return  self
-     */ 
+     */
     public function setAddress1($address1)
     {
         $this->address1 = $address1;
@@ -171,7 +173,7 @@ class Address
      * Get address2
      *
      * @return  string
-     */ 
+     */
     public function getAddress2()
     {
         return $this->address2;
@@ -183,7 +185,7 @@ class Address
      * @param  string  $address2  Address2
      *
      * @return  self
-     */ 
+     */
     public function setAddress2($address2)
     {
         $this->address2 = $address2;
@@ -194,7 +196,7 @@ class Address
      * Get address3
      *
      * @return  string
-     */ 
+     */
     public function getAddress3()
     {
         return $this->address3;
@@ -206,7 +208,7 @@ class Address
      * @param  string  $address3  Address3
      *
      * @return  self
-     */ 
+     */
     public function setAddress3($address3)
     {
         $this->address3 = $address3;
@@ -217,7 +219,7 @@ class Address
      * Get postcode
      *
      * @return  string
-     */ 
+     */
     public function getPostcode()
     {
         return $this->postcode;
@@ -229,7 +231,7 @@ class Address
      * @param  string  $postcode  postcode
      *
      * @return  self
-     */ 
+     */
     public function setPostcode($postcode)
     {
         $this->postcode = $postcode;
@@ -240,7 +242,7 @@ class Address
      * Get town
      *
      * @return  string
-     */ 
+     */
     public function getTown()
     {
         return $this->town;
@@ -252,7 +254,7 @@ class Address
      * @param  string  $town  Town
      *
      * @return  self
-     */ 
+     */
     public function setTown($town)
     {
         $this->town = $town;
@@ -263,7 +265,7 @@ class Address
      * Get country
      *
      * @return  string
-     */ 
+     */
     public function getCountry()
     {
         return $this->country;
@@ -275,7 +277,7 @@ class Address
      * @param  string  $country  Country
      *
      * @return  self
-     */ 
+     */
     public function setCountry($country)
     {
         $this->country = $country;
@@ -286,7 +288,7 @@ class Address
      * Get lines
      *
      * @return  array
-     */ 
+     */
     public function getLines()
     {
         return $this->lines;
@@ -366,5 +368,37 @@ class Address
         $this->addLine($this->postcode . ' ' . $this->town, true, 5);
         $this->addLine($this->country, true, 6);
         return true;
+    }
+
+    /**
+     * Split simple line address, not complete one <!DOCTYPE html>
+     * 
+     * @param string $p_streetStr
+     * 
+     * @return array
+     */
+    public static function splitStreet($p_streetStr)
+    {
+        $aMatch = array();
+        $pattern = '#^([0-9]{1,5})([, ]*)(.*)$#';
+        $matchResult = preg_match($pattern, $p_streetStr, $aMatch);
+        if ($matchResult) {
+            $street = (isset($aMatch[3])) ? $aMatch[3] : '';
+            $number = (isset($aMatch[1])) ? $aMatch[1] : '';
+            $numberAddition = '';
+        } else {
+            $pattern = '#^([\w[:punct:] ]+) ([0-9]{1,5})([\w[:punct:]\-/]*)$#';
+            $matchResult = preg_match($pattern, $p_streetStr, $aMatch);
+            if ($matchResult) {
+                $street = (isset($aMatch[1])) ? $aMatch[1] : '';
+                $number = (isset($aMatch[2])) ? $aMatch[2] : '';
+                $numberAddition = (isset($aMatch[3])) ? $aMatch[3] : '';
+            } else {
+                $street = $p_streetStr;
+                $number = '';
+                $numberAddition = '';
+            }
+        }
+        return array('street' => $street, 'number' => $number, 'numberAddition' => $numberAddition);
     }
 }

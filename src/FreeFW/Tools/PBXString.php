@@ -45,9 +45,27 @@ class PBXString
         }
         if (0 < preg_match_all($p_regex, $p_string, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
-                $replace = '';
-                if (isset($datas[$match[1]])) {
-                    $replace = $datas[$match[1]];
+                $replace   = '';
+                $fullWord  = $match[1];
+                $wordParts = explode('@', $fullWord);
+                $word      = $wordParts[0];
+                if (isset($datas[$word])) {
+                    $replace = $datas[$word];
+                }
+                if (count($wordParts) > 1) {
+                    $format = $wordParts[1];
+                    switch (strtoupper($format[0])) {
+                        case 'N':
+                            $replace = intval($replace);
+                            if (count($wordParts) > 2) {
+                                $pad = '0';
+                                if (count($wordParts) > 3) {
+                                    $pad = $wordParts[3];
+                                }
+                                $replace = str_pad($replace, intval($wordParts[2]), $pad, STR_PAD_LEFT);
+                            }
+                            break;
+                    }
                 }
                 $p_string = str_replace(
                     $match[0],

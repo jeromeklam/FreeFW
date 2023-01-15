@@ -157,14 +157,18 @@ class Router
             }
             $currentDir = rtrim($this->base_path, '/');
             $requestUrl = urldecode($requestUrl);
-            //$this->logger->debug('router.findRoute.request : ' . $requestUrl);
+            if ($currentDir != '/') {
+                if (strpos($requestUrl, $currentDir) === 0) {
+                    $requestUrl = substr($requestUrl, strlen($currentDir));
+                }
+                //$requestUrl = str_replace($currentDir, '', $requestUrl);
+            }
+            //var_dump($requestUrl);
+            $this->logger->info('router.findRoute.request : ' . $requestUrl);
             foreach ($this->routes->getRoutes() as $idx => $oneRoute) {
                 //$this->logger->debug('router.findRoute.test : ' . $oneRoute->getUrl());
                 //var_dump($oneRoute->getUrl());
                 if (strtoupper($p_request->getMethod()) == strtoupper($oneRoute->getMethod())) {
-                    if ($currentDir != '/') {
-                        $requestUrl = str_replace($currentDir, '', $requestUrl);
-                    }
                     $params = array();
                     if ($oneRoute->getUrl() == $requestUrl) {
                         // Ok, pas besoin de compliquer....

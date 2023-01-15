@@ -1,4 +1,5 @@
 <?php
+
 namespace FreeFW\Model;
 
 /**
@@ -6,7 +7,8 @@ namespace FreeFW\Model;
  * @author jerome.klam
  *
  */
-class MergeModel {
+class MergeModel
+{
 
     /**
      * Blocks
@@ -184,7 +186,7 @@ class MergeModel {
     public function getTitle($p_name, $p_block = '')
     {
         $name = $p_name;
-        if ($p_block != '')  {
+        if ($p_block != '') {
             $name = $p_block . '_' . $name;
         }
         if (isset($this->titles[$p_name])) {
@@ -217,7 +219,7 @@ class MergeModel {
     public function getType($p_name, $p_block = '')
     {
         $name = $p_name;
-        if ($p_block != '')  {
+        if ($p_block != '') {
             $name = $p_block . '_' . $name;
         }
         if (isset($this->types[$p_name])) {
@@ -388,7 +390,7 @@ class MergeModel {
                 }
             }
         }
-        foreach($this->getGenericBlocks() as $blockName) {
+        foreach ($this->getGenericBlocks() as $blockName) {
             $gDatas = $this->getGenericDatas($blockName);
             foreach ($gDatas as $key => $val) {
                 $datas[$blockName . '.' . $key] = $val;
@@ -411,5 +413,48 @@ class MergeModel {
             $this->addData($p_other->getDatas($oneBlock), $oneBlock);
         }
         return $this;
+    }
+
+    /**
+     * Compute mapping
+     * 
+     * @param array $p_mapping
+     * 
+     * @return array
+     */
+    public function computeFromMapping($p_mapping)
+    {
+        foreach ($p_mapping as $key => $value) {
+            $toCheck = $value;
+            $toData1 = $this->datas;
+            $toData2 = $this->generic_datas;
+            $found   = false;
+            while ($toCheck != '') {
+                $found   = true;
+                $parts   = explode('.', $toCheck);
+                $toCheck = $parts[0];
+                if (isset($toData1[$toCheck])) {
+                    $toData1 = $toData1[$toCheck];
+                } else {
+                    if (isset($toData2[$toCheck])) {
+                        $toData1 = $toData2[$toCheck];
+                    } else {
+                        $found = false;
+                        break;
+                    }
+                }
+                if (count($parts) > 1) {
+                    $toCheck = $parts[1];
+                } else {
+                    $toCheck = '';
+                }
+            }
+            if ($found) {
+                $p_mapping[$key] = $toData1;
+            } else {
+                $p_mapping[$key] = $value;
+            }
+        }
+        return $p_mapping;
     }
 }
