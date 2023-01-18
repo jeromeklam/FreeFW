@@ -1,4 +1,5 @@
 <?php
+
 namespace FreeFW\Storage\Migrations;
 
 abstract class AbstractMigration implements
@@ -81,14 +82,14 @@ abstract class AbstractMigration implements
      *
      * @return bool
      */
-    abstract public function up() : bool;
+    abstract public function up(): bool;
 
     /**
      * Down
      *
      * @return bool
      */
-    abstract public function down() : bool;
+    abstract public function down(): bool;
 
     /**
      * Get base path
@@ -151,13 +152,19 @@ abstract class AbstractMigration implements
      *
      * @return [string]
      */
-    protected function getSqlFiles($p_way)
+    protected function getSqlFiles($p_way, $p_path)
     {
         if (!array_key_exists($p_way, $this->sql_files)) {
             $this->sql_files[$p_way] = [];
         }
         if (count($this->sql_files[$p_way]) <= 0) {
-            $this->sql_files[$p_way][] = strtolower($p_way) . '.sql';
+            if (is_file($p_path . '/' . $p_way . '.sql')) {
+                $this->sql_files[$p_way][] = strtolower($p_way) . '.sql';
+            } else {
+                foreach (glob($p_path . '/' . $p_way . '*.sql') as $sql_file) {
+                    $this->sql_files[$p_way][] = trim(str_replace($p_path, '', $sql_file), '/');
+                }
+            }
         }
         return $this->sql_files[$p_way];
     }
@@ -178,14 +185,33 @@ abstract class AbstractMigration implements
     }
 
     /**
+     * @return bool
+     */
+    protected function scriptUp($p_desc = ''): bool
+    {
+        /**
+         * @var \FreeFW\Model\Version $version
+         */
+        $version = \FreeFW\DI\DI::get('FreeFW::Model::Version');
+        $version
+            ->setVersInstallFile('script')
+            ->setVersInstallStatus(\FreeFW\Model\Version::STATUS_OK)
+            ->setVersInstallDate(\FreeFW\Tools\Date::getCurrentTimestamp())
+            ->setVersVersion($this->getVersion() . '.' . $this->step)
+            ->setVersInstallText($p_desc);
+
+        return $version->create();
+    }
+
+    /**
      *
      * @return bool
      */
-    protected function sqlUp() : bool
+    protected function sqlUp(): bool
     {
         $run   = [];
         $ret   = true;
-        $files = $this->getSqlFiles('up');
+        $files = $this->getSqlFiles('up', $this->getBasePath());
         foreach ($files as $oneFile) {
             $sqlFile = $this->getBasePath() . $oneFile;
             $this->step += 1;
@@ -197,10 +223,15 @@ abstract class AbstractMigration implements
                 ->setVersInstallFile($sqlFile)
                 ->setVersInstallStatus(\FreeFW\Model\Version::STATUS_PENDING)
                 ->setVersInstallDate(\FreeFW\Tools\Date::getCurrentTimestamp())
-                ->setVersVersion($this->getVersion() . '.' . $this->step)
-            ;
+                ->setVersVersion($this->getVersion() . '.' . $this->step);
             if (is_file($sqlFile)) {
-                $sqls = \FreeFW\Tools\PBXString::splitSql(file_get_contents($sqlFile));
+                // A file with "full" in the name is a complete SQL
+                if (strpos($sqlFile, 'full') === false) {
+                    $sqls = \FreeFW\Tools\PBXString::splitSql(file_get_contents($sqlFile));
+                } else {
+                    $sqls   = [];
+                    $sqls[] = file_get_contents($sqlFile);
+                }
                 foreach ($sqls as $oneSql) {
                     $run[] = $oneSql;
                     $version->setVersInstallContent(print_r($run, true));
@@ -208,15 +239,13 @@ abstract class AbstractMigration implements
                     if ($stmt) {
                         if ($stmt->execute()) {
                             $version
-                                ->setVersInstallStatus(\FreeFW\Model\Version::STATUS_OK)
-                            ;
+                                ->setVersInstallStatus(\FreeFW\Model\Version::STATUS_OK);
                         } else {
                             // @todo
                             $ret = false;
                             $version
                                 ->setVersInstallStatus(\FreeFW\Model\Version::STATUS_ERROR)
-                                ->setVersInstallText(print_r($stmt->errorInfo(), true));
-                            ;
+                                ->setVersInstallText(print_r($stmt->errorInfo(), true));;
                             break;
                         }
                     } else {
@@ -224,8 +253,7 @@ abstract class AbstractMigration implements
                         $ret = false;
                         $version
                             ->setVersInstallStatus(\FreeFW\Model\Version::STATUS_ERROR)
-                            ->setVersInstallText(print_r($stmt->errorInfo(), true));
-                        ;
+                            ->setVersInstallText(print_r($stmt->errorInfo(), true));;
                         break;
                     }
                 }
@@ -233,8 +261,7 @@ abstract class AbstractMigration implements
                 // @todo
                 $version
                     ->setVersInstallStatus(\FreeFW\Model\Version::STATUS_ERROR)
-                    ->setVersInstallText('File ' . $sqlFile . ' not found !');
-                ;
+                    ->setVersInstallText('File ' . $sqlFile . ' not found !');;
                 $ret = false;
                 break;
             }
@@ -247,7 +274,7 @@ abstract class AbstractMigration implements
      *
      * @return bool
      */
-    protected function sqlDown() : bool
+    protected function sqlDown(): bool
     {
         return true;
     }
@@ -257,7 +284,7 @@ abstract class AbstractMigration implements
      *
      * @return bool
      */
-    protected function methodUp() : bool
+    protected function methodUp(): bool
     {
         $run     = [];
         $ret     = true;
@@ -272,27 +299,23 @@ abstract class AbstractMigration implements
                 ->setVersInstallFile($oneMethod)
                 ->setVersInstallStatus(\FreeFW\Model\Version::STATUS_PENDING)
                 ->setVersInstallDate(\FreeFW\Tools\Date::getCurrentTimestamp())
-                ->setVersVersion($this->getVersion() . '.' . $this->step)
-            ;
+                ->setVersVersion($this->getVersion() . '.' . $this->step);
             if (method_exists($this, $oneMethod)) {
                 try {
                     if (!$this->$oneMethod()) {
                         $version
                             ->setVersInstallStatus(\FreeFW\Model\Version::STATUS_ERROR)
-                            ->setVersInstallText('Method ' . $oneMethod . ' error !');
-                        ;
+                            ->setVersInstallText('Method ' . $oneMethod . ' error !');;
                         $ret = false;
                         break;
                     }
                     $version
-                        ->setVersInstallStatus(\FreeFW\Model\Version::STATUS_OK)
-                    ;
+                        ->setVersInstallStatus(\FreeFW\Model\Version::STATUS_OK);
                 } catch (\Exception $ex) {
                     // @todo
                     $version
                         ->setVersInstallStatus(\FreeFW\Model\Version::STATUS_ERROR)
-                        ->setVersInstallText('Method ' . $oneMethod . ' error !');
-                    ;
+                        ->setVersInstallText('Method ' . $oneMethod . ' error !');;
                     $ret = false;
                     break;
                 }
@@ -300,8 +323,7 @@ abstract class AbstractMigration implements
                 // @todo
                 $version
                     ->setVersInstallStatus(\FreeFW\Model\Version::STATUS_ERROR)
-                    ->setVersInstallText('Method ' . $oneMethod . ' not found !');
-                ;
+                    ->setVersInstallText('Method ' . $oneMethod . ' not found !');;
                 $ret = false;
                 break;
             }
@@ -315,7 +337,7 @@ abstract class AbstractMigration implements
      *
      * @return bool
      */
-    protected function methodDown() : bool
+    protected function methodDown(): bool
     {
         return true;
     }

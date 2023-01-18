@@ -776,13 +776,14 @@ class PDOStorage extends \FreeFW\Storage\Storage
         $p_function = null,
         array $p_fields = [],
         $p_special = 'SELECT',
-        $p_parameters = []
+        $p_parameters = [],
+        $p_force_blob = false
     ) {
         $crtAlias     = 'A';
         $aliases      = [];
         $aliases['@'] = $crtAlias;
         $ids          = [];
-        $select       = $p_model->getFieldsForSelect($crtAlias, $p_fields, $this->provider);
+        $select       = $p_model->getFieldsForSelect($crtAlias, $p_fields, $this->provider, !$p_force_blob);
         $group        = $p_model->getFieldsAliasForSelect($crtAlias, $p_fields, $this->provider);
         $from         = $p_model::getSource() . ' AS ' . $crtAlias;
         $properties   = $p_model::getProperties();

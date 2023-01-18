@@ -431,10 +431,11 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
      * @param array  $p_fields
      * @param string $p_function
      * @param array  $p_parameters
+     * @param bool   $p_force_blob
      *
      * @return boolean
      */
-    public function execute(array $p_fields = [], $p_function = null, $p_parameters = [])
+    public function execute(array $p_fields = [], $p_function = null, $p_parameters = [], $p_force_blob = false)
     {
         $this->result_set = new \FreeFW\Model\ResultSet();
         switch ($this->type) {
@@ -461,7 +462,9 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
                     '',
                     $p_function,
                     $this->getFields(),
-                    'GROUPBY'
+                    'GROUPBY',
+                    $p_parameters,
+                    $p_force_blob
                 );
                 return true;
             case self::QUERY_SELECT:
@@ -477,7 +480,8 @@ class Query extends \FreeFW\Core\Model implements \FreeFW\Interfaces\StorageStra
                     $p_function,
                     [],
                     'SELECT',
-                    $p_parameters
+                    $p_parameters,
+                    $p_force_blob
                 );
                 return true;
             case self::QUERY_UPDATE:

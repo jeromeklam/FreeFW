@@ -58,7 +58,7 @@ class Inbox extends \FreeFW\Core\ApiController
                 ->setLimit(0, 1)
             ;
             $data = new \FreeFW\Model\ResultSet();
-            if ($query->execute()) {
+            if ($query->execute([], null, [], true)) {
                 $data = $query->getResult();
             }
             if (count($data) > 0) {
@@ -68,7 +68,11 @@ class Inbox extends \FreeFW\Core\ApiController
                 }
                 $model->setInboxDownloadTs(\FreeFW\Tools\Date::getCurrentTimestamp());
                 $model->save();
-                return $this->createMimeTypeResponse($model->getInboxFilename(), $model->getInboxContent());
+                $config = \FreeFW\DI\Di::getShared('config');
+                $dir = $config->get('ged:dir', '/tmp');
+                $dir = rtrim($dir, '/') . '/inbox/';
+                $file = $dir . $model->getInboxId() . '.data';
+                return $this->createMimeTypeResponse($model->getInboxFilename(), file_get_contents($file));
             } else {
                 $data = null;
                 $code = FFCST::ERROR_NOT_FOUND; // 404

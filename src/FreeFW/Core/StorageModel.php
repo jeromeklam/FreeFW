@@ -184,7 +184,7 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
             ->setLimit(0, 1)
         ;
         $model = false;
-        if ($query->execute()) {
+        if ($query->execute([], null, [], true)) {
             /**
              * @var \FreeFW\Model\ResultSet $result
              */
