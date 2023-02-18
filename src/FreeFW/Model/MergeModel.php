@@ -424,36 +424,9 @@ class MergeModel
      */
     public function computeFromMapping($p_mapping)
     {
+        $merged = array_merge_recursive($this->datas, $this->generic_datas);
         foreach ($p_mapping as $key => $value) {
-            $toCheck = $value;
-            $toData1 = $this->datas;
-            $toData2 = $this->generic_datas;
-            $found   = false;
-            while ($toCheck != '') {
-                $found   = true;
-                $parts   = explode('.', $toCheck);
-                $toCheck = $parts[0];
-                if (isset($toData1[$toCheck])) {
-                    $toData1 = $toData1[$toCheck];
-                } else {
-                    if (isset($toData2[$toCheck])) {
-                        $toData1 = $toData2[$toCheck];
-                    } else {
-                        $found = false;
-                        break;
-                    }
-                }
-                if (count($parts) > 1) {
-                    $toCheck = $parts[1];
-                } else {
-                    $toCheck = '';
-                }
-            }
-            if ($found) {
-                $p_mapping[$key] = $toData1;
-            } else {
-                $p_mapping[$key] = $value;
-            }
+            $p_mapping[$key] = \FreeFW\Tools\PBXString::computeFormatedString($value, $merged, '');
         }
         return $p_mapping;
     }

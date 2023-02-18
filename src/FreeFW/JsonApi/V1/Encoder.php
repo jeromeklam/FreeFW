@@ -35,7 +35,7 @@ class Encoder implements \Psr\Log\LoggerAwareInterface
         \FreeFW\Http\ApiParams $p_api_params,
         $p_prefix = ''
     ) : \FreeFW\JsonApi\V1\Model\ResourceObject {
-        $this->logger->debug('FreeFW.JsonApi.Encoder.start.' . $p_api_response->getApiType() . '.' . $p_api_response->getApiId());
+        //$this->logger->debug('FreeFW.JsonApi.Encoder.start.' . $p_api_response->getApiType() . '.' . $p_api_response->getApiId());
         if ($p_prefix != '') {
             $p_prefix = $p_prefix . '.';
         }
@@ -43,7 +43,7 @@ class Encoder implements \Psr\Log\LoggerAwareInterface
         $includes = '@@' . implode('@@', $incTab) . '@@';
         $cacheKey = $p_api_response->getApiType() . '.' . $p_api_response->getApiId();
         if (isset(self::$_cached[$cacheKey])) {
-            $this->logger->debug('FreeFW.JsonApi.Encoder.cached');
+            //$this->logger->debug('FreeFW.JsonApi.Encoder.cached');
             return self::$_cached[$cacheKey];
         }
         $resource = new \FreeFW\JsonApi\V1\Model\ResourceObject(
@@ -54,7 +54,7 @@ class Encoder implements \Psr\Log\LoggerAwareInterface
         $fieldsForeignkey = [];
         $relations        = $p_api_response->getApiRelationShips();
         $fields           = $p_api_response->getApiAttributes();
-        $this->logger->debug('FreeFW.JsonApi.Encoder.fields');
+        //$this->logger->debug('FreeFW.JsonApi.Encoder.fields');
         if ($fields) {
             $fldTab = $p_api_params->getFieldsFor(rtrim($p_prefix, '.'));
             foreach ($fldTab as $oneFldTab) {
@@ -114,7 +114,7 @@ class Encoder implements \Psr\Log\LoggerAwareInterface
             }
             $resource->setAttributes($attributes);
         }
-        $this->logger->debug('FreeFW.JsonApi.Encoder.relations');
+        //$this->logger->debug('FreeFW.JsonApi.Encoder.relations');
         $relationShips = new \FreeFW\JsonApi\V1\Model\RelationshipsObject();
         if ($relations) {
             foreach ($relations as $relation) {
@@ -188,7 +188,7 @@ class Encoder implements \Psr\Log\LoggerAwareInterface
                 }
             }
         }
-        $this->logger->debug('FreeFW.JsonApi.Encoder.extra');
+        //$this->logger->debug('FreeFW.JsonApi.Encoder.extra');
         // Extra included here...
         foreach ($incTab as $include) {
             $parts = explode('.', $include);
@@ -224,10 +224,10 @@ class Encoder implements \Psr\Log\LoggerAwareInterface
                 }
             }
         }
-        $this->logger->debug('FreeFW.JsonApi.Encoder.set');
+        //$this->logger->debug('FreeFW.JsonApi.Encoder.set');
         $resource->setRelationShips($relationShips);
         self::$_cached[$cacheKey] = $resource;
-        $this->logger->debug('FreeFW.JsonApi.Encoder.end');
+        //$this->logger->debug('FreeFW.JsonApi.Encoder.end');
         // Done
         return $resource;
     }

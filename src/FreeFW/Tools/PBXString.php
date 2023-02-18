@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Outils sur les chaines
  *
@@ -6,6 +7,7 @@
  * @package String
  * @category Tools
  */
+
 namespace FreeFW\Tools;
 
 /**
@@ -23,6 +25,49 @@ class PBXString
     const REGEX_PARAM_PLACEHOLDER = '#\[\[:(.*?):\]\]#sim';
 
     /**
+     * 
+     */
+    public static function computeFormatedString($p_string, array $p_values, $p_default = false)
+    {
+        $toCheck = $p_string;
+        $toData1 = $p_values;
+        $found   = false;
+        $formats = false;
+        while ($toCheck != '') {
+            $found   = true;
+            $parts   = explode('.', $toCheck);
+            $toCheck = $parts[0];
+            if (strpos($toCheck, '@') !== false) {
+                $formats = explode('@', $toCheck);
+                $toCheck = $formats[0];
+            }
+            if (array_key_exists($toCheck, $toData1)) {
+                $toData1 = $toData1[$toCheck];
+            } else {
+                $found = false;
+                break;
+            }
+            if (count($parts) > 1) {
+                $toCheck = $parts[1];
+            } else {
+                $toCheck = '';
+            }
+        }
+        if ($found) {
+            $result = $toData1;
+        } else {
+            if ($p_default === false) {
+                $result = $p_string;
+            } else {
+                $result = $p_default;
+            }
+        }
+        if (is_array($formats)) {
+        }
+        return $result;
+    }
+
+    /**
      * Parse et remplace suivant les marqueur
      *
      * @param string $p_string
@@ -33,7 +78,7 @@ class PBXString
      */
     public static function parse($p_string, $p_data = array(), $p_regex = null)
     {
-        if (! is_array($p_data)) {
+        if (!is_array($p_data)) {
             if (is_object($p_data) && method_exists($p_data, '__toArray')) {
                 $datas = $p_data->__toArray();
             }
@@ -172,7 +217,7 @@ class PBXString
         // try to keep mem. use down
         $linecount  = count($lines);
         $in_comment = false;
-        for ($i=0; $i<$linecount; $i++) {
+        for ($i = 0; $i < $linecount; $i++) {
             if (preg_match("/^\/\*/", $lines[$i])) {
                 $in_comment = true;
             }
@@ -216,7 +261,9 @@ class PBXString
         if (preg_match_all($re, $p_sqlText, $matches)) {
             $sqls = $matches[1];
         }
-        return array_filter($sqls, function ($val) {return trim($val) !== '';} );
+        return array_filter($sqls, function ($val) {
+            return trim($val) !== '';
+        });
     }
 
     /**
@@ -278,7 +325,7 @@ class PBXString
             }
             $p_pattern = preg_quote($p_pattern, '#');
             $p_pattern = str_replace('\*', '.*', $p_pattern);
-            $match = (bool)preg_match('#^'.$p_pattern.'\z#u', $oneValue);
+            $match = (bool)preg_match('#^' . $p_pattern . '\z#u', $oneValue);
             if ($match) {
                 return true;
             }

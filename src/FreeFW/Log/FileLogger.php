@@ -218,6 +218,7 @@ class FileLogger extends \Psr\Log\AbstractLogger implements \Serializable
     protected function commit()
     {
         $rr = false;
+        $fg = 'a+';
         if (is_file($this->file)) {
             $size = filesize($this->file);
             if ($size > self::MAXLOGSIZE) {
@@ -225,6 +226,7 @@ class FileLogger extends \Psr\Log\AbstractLogger implements \Serializable
                     unlink($this->file . '.1');
                 }
                 rename($this->file, $this->file . '.1');
+                $rr = true;
             }
         } else {
             $rr = true;
@@ -233,25 +235,20 @@ class FileLogger extends \Psr\Log\AbstractLogger implements \Serializable
             $size = filesize(APP_LOG . '/' . APP_NAME . '.log');
             if ($size > self::MAXLOGSIZE) {
                 if (is_file(APP_LOG . '/' . APP_NAME . '.log.1')) {
-                    @unlink(APP_LOG . '/' . APP_NAME . '.log.1');
+                    unlink(APP_LOG . '/' . APP_NAME . '.log.1');
                 }
-                @rename(APP_LOG . '/' . APP_NAME . '.log', APP_LOG . '/' . APP_NAME . '.log.1');
+                rename(APP_LOG . '/' . APP_NAME . '.log', APP_LOG . '/' . APP_NAME . '.log.1');
             }
-        } else {
-            $rr = true;
         }
-        $h = fopen($this->file, 'a+');
         if ($rr) {
-            @chmod($this->file, 0666);
+            touch($this->file);
+            chmod($this->file, 0666);
         }
-        $j = 0;
-        if ($h) {
-            while (null !== ($line = array_shift($this->tabCache))) {
-                $content = implode('  ---  ', $line) . PHP_EOL;
-                fwrite($h, $content);
-            }
-            fclose($h);
+        $content = '';
+        while (null !== ($line = array_shift($this->tabCache))) {
+            $content .= implode('  ---  ', $line) . PHP_EOL;
         }
+        file_put_contents($this->file, $content, FILE_APPEND);
         return $this;
     }
 

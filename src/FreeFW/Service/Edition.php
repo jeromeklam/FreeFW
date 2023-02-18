@@ -104,29 +104,41 @@ class Edition extends \FreeFW\Core\Service
                 $this->logger->debug("before " . $dPdf);
                 $ediContent = $editionVersion->getEdilData();
                 file_put_contents($src, $ediContent);
+                $this->logger->debug("data ok " . $dPdf);
                 $mapping = json_decode($edition->getEdiMapping(), true);
                 if (!$mapping) {
                     $this->logger->error('Mapping for edition not found or not json !');
                     return false;
                 }
                 $mergedDatas = $mergeDatas->computeFromMapping($mapping);
-                $pdf = new \mikehaertl\pdftk\Pdf($src);
-                $result = $pdf
-                    ->fillForm($mergedDatas)
-                    ->flatten()
-                    ->saveAs($dPdf);
+                $this->logger->debug("computing " . $dPdf);
+                $mergeService = \FreeFW\DI\DI::get('FreeOffice::Service::Pdf');
+                $mergeService->merge($src, $dPdf, $mergedDatas);
                 @unlink($src);
+                $this->logger->debug("done " . $dPdf);
             } else {
                 $src  = $bDir . '/print_' . $file . '_tpl.odt';
                 $dest = $bDir . '/print_' . $file . '_dest.odt';
                 $dPdf = $bDir . '/print_' . $file . '_dest.pdf';
+
                 $this->logger->debug("before " . $dPdf);
                 $ediContent = $editionVersion->getEdilData();
                 file_put_contents($src, $ediContent);
                 file_put_contents($dest, $ediContent);
                 $mergeService = \FreeFW\DI\DI::get('FreeOffice::Service::Merge');
                 $mergeService->merge($src, $dest, $mergeDatas);
-                exec('/usr/bin/unoconv -f pdf -o ' . $dPdf . ' ' . $dest);
+                $try = 5;
+                $exitcode = 255;
+                while ($try > 0 && $exitcode > 0) {
+                    $result = \FreeFW\Tools\Shell::exec_timeout('/usr/bin/unoconv -f pdf -o ' . $dPdf . ' ' . $dest, 60);
+                    if (is_array($result) && isset($result['exitcode'])) {
+                        $exitcode = $result['exitcode'];
+                    }
+                    if ($exitcode > 0) {
+                        var_dump('retry');
+                    }
+                    $try--;
+                }
                 @unlink($dest);
                 @unlink($src);
             }
