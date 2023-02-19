@@ -1283,26 +1283,42 @@ abstract class Model implements
      */
     public function getMergeData($p_includes = [], $p_prefix = '', $p_parent = '', $p_check_merge = false, $p_lang_code = null, $p_block_name = null)
     {
-        $config = $this->getAppConfig();
-        if ($p_includes === false) {
-            $p_includes = [];
+        $name = get_called_class();
+        $my_merge = true;
+        $my_include = true;
+        if (self::$__cache && isset(self::$__cache[$name . '.includes'])) {
+            $my_include = self::$__cache[$name . '.includes'];
         } else {
-            if ($p_includes === true || $p_includes === []) {
-                if (method_exists($this, 'getDefaultMergeIncludes')) {
-                    $p_includes = $this->getDefaultMergeIncludes();
-                } else {
-                    $p_includes = [];
+            $config = $this->getAppConfig();
+            if ($p_includes === false) {
+                $p_includes = [];
+            } else {
+                if ($p_includes === true || $p_includes === []) {
+                    if (method_exists($this, 'getDefaultMergeIncludes')) {
+                        $p_includes = $this->getDefaultMergeIncludes();
+                    } else {
+                        $p_includes = [];
+                    }
                 }
             }
+            $my_include = array_flip($p_includes);
+            self::$__cache[$name . '.includes'] = $my_include;
         }
-        $merge  = true;
-        if ($p_check_merge) {
-            if ($p_prefix !== '') {
-                $merge  = $config->get('models:' . $this->getApiType() . ':merge:include', true);
-            } else {
-                $merge  = $config->get('models:' . $this->getApiType() . ':merge:main', true);
+        if (self::$__cache && isset(self::$__cache[$name . '.merge'])) {
+            $my_merge = self::$__cache[$name . '.merge'];
+        } else {
+            $config = $this->getAppConfig();
+            if ($p_check_merge) {
+                if ($p_prefix !== '') {
+                    $merge  = $config->get('models:' . $this->getApiType() . ':merge:include', true);
+                } else {
+                    $merge  = $config->get('models:' . $this->getApiType() . ':merge:main', true);
+                }
             }
+            $my_merge = array_flip($merge);
+            self::$__cache[$name . '.merge'] = $my_merge;
         }
+        //
         $datas = new \FreeFW\Model\MergeModel();
         if ($p_block_name != '') {
             $block = $p_block_name;
@@ -1325,14 +1341,14 @@ abstract class Model implements
             if (isset($oneProperty[FFCST::PROPERTY_MERGE])) {
                 $title = $oneProperty[FFCST::PROPERTY_MERGE];
             }
-            if ($merge === true || in_array($name, $merge)) {
+            if ($my_merge === true || isset($my_merge[$name])) {
                 $datas->addField($name, $title, $oneProperty[FFCST::PROPERTY_TYPE]);
             }
             if (isset($oneProperty[FFCST::PROPERTY_OPTIONS])) {
                 if (in_array(FFCST::OPTION_FK, $oneProperty[FFCST::PROPERTY_OPTIONS])) {
                     $relName = '';
                     foreach ($oneProperty[FFCST::PROPERTY_FK] as $relName => $relDatas) {
-                        if ($p_includes === true || in_array($relName, $p_includes)) {
+                        if ($my_include === true || isset($my_include[$relName])) {
                             $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relName, true);
                             $relModel = $this->{$getter}();
                             if ($relModel instanceOf \FreeFW\Core\Model) {
@@ -1401,7 +1417,7 @@ abstract class Model implements
         if (method_exists($this, 'getSpecificEditionFields')) {
             $specific = $this->getSpecificEditionFields('/tmp/', true, $p_lang_code);
             foreach ($specific as $specField) {
-                if ($merge === true || in_array($specField['name'], $merge)) {
+                if ($my_merge === true || isset($my_merge[$specField['name']])) {
                     $datas->addField($specField['name'], $specField['title'], $specField['type']);
                     $data[$specField['name']] = $specField['content'];
                 } 

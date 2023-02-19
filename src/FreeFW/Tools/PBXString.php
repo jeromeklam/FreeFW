@@ -25,6 +25,20 @@ class PBXString
     const REGEX_PARAM_PLACEHOLDER = '#\[\[:(.*?):\]\]#sim';
 
     /**
+     * String for Postal Address
+     * 
+     * @param string $p_string
+     * 
+     * @return string
+     */
+    public static function postalString($p_string)
+    {
+        $result = strtoupper(self::withoutAccent($p_string));
+        $result = str_replace([',', '-', '.', '_', '&', '"'], '', $result);
+        return $result;
+    }
+
+    /**
      * 
      */
     public static function computeFormatedString($p_string, array $p_values, $p_default = false)

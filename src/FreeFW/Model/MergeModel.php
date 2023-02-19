@@ -426,7 +426,7 @@ class MergeModel
     {
         $merged = array_merge_recursive($this->datas, $this->generic_datas);
         foreach ($p_mapping as $key => $value) {
-            $p_mapping[$key] = \FreeFW\Tools\PBXString::computeFormatedString($value, $merged, '');
+            $p_mapping[$key] = \FreeFW\Tools\PBXString::computeFormatedString($value, $merged);
         }
         return $p_mapping;
     }
