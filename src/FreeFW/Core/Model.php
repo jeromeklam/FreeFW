@@ -1300,9 +1300,9 @@ abstract class Model implements
                         $p_includes = [];
                     }
                 }
+                $my_include = array_flip($p_includes);
+                self::$__cache[$name . '.includes'] = $my_include;
             }
-            $my_include = array_flip($p_includes);
-            self::$__cache[$name . '.includes'] = $my_include;
         }
         if (self::$__cache && isset(self::$__cache[$name . '.merge'])) {
             $my_merge = self::$__cache[$name . '.merge'];
@@ -1314,9 +1314,9 @@ abstract class Model implements
                 } else {
                     $merge  = $config->get('models:' . $this->getApiType() . ':merge:main', true);
                 }
+                $my_merge = array_flip($merge);
+                self::$__cache[$name . '.merge'] = $my_merge;
             }
-            $my_merge = array_flip($merge);
-            self::$__cache[$name . '.merge'] = $my_merge;
         }
         //
         $datas = new \FreeFW\Model\MergeModel();

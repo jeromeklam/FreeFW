@@ -112,15 +112,15 @@ class FileLogger extends \Psr\Log\AbstractLogger implements \Serializable
             $headers = $_SERVER;
         }
         //Get the forwarded IP if it exists
-        if (array_key_exists('X-Forwarded-For', $headers) &&
+        if (isset($headers['X-Forwarded-For']) &&
             filter_var($headers['X-Forwarded-For'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
             $the_ip = $headers['X-Forwarded-For'];
         } else {
-            if (array_key_exists('HTTP_X_FORWARDED_FOR', $headers) &&
+            if (isset($headers['HTTP_X_FORWARDED_FOR']) &&
                 filter_var($headers['HTTP_X_FORWARDED_FOR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
                 $the_ip = $headers['HTTP_X_FORWARDED_FOR'];
             } else {
-                if (array_key_exists('X-ClientSide', $headers)) {
+                if (isset($headers['X-ClientSide'])) {
                     $parts  = explode(':', $headers['X-ClientSide']);
                     $the_ip = $parts[0];
                 } else {
@@ -170,11 +170,13 @@ class FileLogger extends \Psr\Log\AbstractLogger implements \Serializable
                 'appErrLine' => 0,
                 'appData'    => []
             ];
-            if (isset($_SERVER) && array_key_exists('REQUEST_URI', $_SERVER)) {
+            if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])) {
                 $params['requestUri'] = $_SERVER['REQUEST_URI'];
                 $params['requestIp']  = self::getClientIp();
-                $params['requestUA']  = $_SERVER['HTTP_USER_AGENT'];
-                if (array_key_exists('HTTP_ACCEPT_LANGUAGE', $_SERVER)) {
+                if (isset($_SERVER['HTTP_USER_AGENT'])) {
+                    $params['requestUA']  = $_SERVER['HTTP_USER_AGENT'];
+                }
+                if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
                     $params['requestLg'] = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
                 }
             }
