@@ -212,7 +212,7 @@ abstract class Model implements
         if (preg_match('~^(set|get)([A-Z])(.*)$~', $p_methodName, $matches)) {
             $property = \FreeFW\Tools\PBXString::fromCamelCase($matches[2] . $matches[3]);
             if (!property_exists($this, $property)) {
-                //echo \FreeFW\Tools\Exception::format(new \Exception());
+                echo \FreeFW\Tools\Exception::format(new \Exception());
                 throw new \FreeFW\Core\FreeFWMemberAccessException(
                     'Property ' . $property . ' doesn\'t exists for ' . $p_methodName . ' !'
                 );
