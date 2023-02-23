@@ -159,6 +159,7 @@ class Constants
     const OPTION_NESTED_LEFT      = 'NLEFT';
     const OPTION_NESTED_RIGHT     = 'NRIGHT';
     const OPTION_NESTED_LEVEL     = 'NLEVEL';
+    const OPTION_NOMERGE          = 'NOMERGE';
 
     /**
      * Default constants
