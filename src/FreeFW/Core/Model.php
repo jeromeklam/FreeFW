@@ -1281,13 +1281,21 @@ abstract class Model implements
      *
      * @return \FreeFW\Model\MergeModel
      */
-    public function getMergeData($p_includes = [], $p_prefix = '', $p_parent = '', $p_check_merge = false, $p_lang_code = null, $p_block_name = null)
+    public function getMergeData($p_includes = [], $p_prefix = '', $p_parent = '', $p_check_merge = false, $p_lang_code = null, $p_block_name = null, $p_level = 0, $p_models = [])
     {
+        $datas = new \FreeFW\Model\MergeModel();
+        if ($p_level > 12) {
+            return $datas;
+        }
         $name = get_called_class();
+        if (isset($p_models[$name])) {
+            return $datas;
+        }
+        $p_models[$name] = $name;
         $my_merge = true;
         $my_include = true;
-        if (self::$__cache && isset(self::$__cache[$name . '.includes'])) {
-            $my_include = self::$__cache[$name . '.includes'];
+        if (self::$__cache && isset(self::$__cache[$p_prefix . $name . '.includes'])) {
+            $my_include = self::$__cache[$p_prefix . $name . '.includes'];
         } else {
             $config = $this->getAppConfig();
             if ($p_includes === false) {
@@ -1301,11 +1309,11 @@ abstract class Model implements
                     }
                 }
                 $my_include = array_flip($p_includes);
-                self::$__cache[$name . '.includes'] = $my_include;
+                self::$__cache[$p_prefix . $name . '.includes'] = $my_include;
             }
         }
-        if (self::$__cache && isset(self::$__cache[$name . '.merge'])) {
-            $my_merge = self::$__cache[$name . '.merge'];
+        if (self::$__cache && isset(self::$__cache[$p_prefix . $name . '.merge'])) {
+            $my_merge = self::$__cache[$p_prefix . $name . '.merge'];
         } else {
             $config = $this->getAppConfig();
             if ($p_check_merge) {
@@ -1315,11 +1323,10 @@ abstract class Model implements
                     $merge  = $config->get('models:' . $this->getApiType() . ':merge:main', true);
                 }
                 $my_merge = array_flip($merge);
-                self::$__cache[$name . '.merge'] = $my_merge;
+                self::$__cache[$p_prefix . $name . '.merge'] = $my_merge;
             }
         }
         //
-        $datas = new \FreeFW\Model\MergeModel();
         if ($p_block_name != '') {
             $block = $p_block_name;
         } else {
@@ -1365,7 +1372,7 @@ abstract class Model implements
                                 } else {
                                     $newIncludes = $p_includes;
                                 }
-                                $relDatas = $relModel->getMergeData($newIncludes, $block . '_' . $relName, $p_parent, $p_check_merge, $p_lang_code);
+                                $relDatas = $relModel->getMergeData($newIncludes, $block . '_' . $relName, $p_parent, $p_check_merge, $p_lang_code, null, $p_level++, $p_models);
                                 foreach ($relDatas->getBlocks() as $oneBlock) {
                                     $datas->addBlock($oneBlock);
                                     $datas->addData($relDatas->getDatas($oneBlock), $oneBlock);
@@ -1379,7 +1386,7 @@ abstract class Model implements
         }
         if (method_exists($this, 'getRelationships')) {
             foreach ($this->getRelationships() as $relName => $relOptions) {
-                if ($p_includes === true || in_array($relName, $p_includes)) {
+                if ($my_include === true || isset($my_include[$relName])) {
                     $getter = 'get' . \FreeFW\Tools\PBXString::toCamelCase($relName, true);
                     if (method_exists($this, $getter)) {
                         $relDatas = $this->{$getter}();
@@ -1399,7 +1406,7 @@ abstract class Model implements
                                 $newIncludes = $p_includes;
                             }
                             foreach ($relDatas as $relData) {
-                                $newDatas = $relData->getMergeData($newIncludes, $block . '_' . $relName, $p_parent, $p_check_merge);
+                                $newDatas = $relData->getMergeData($newIncludes, $block . '_' . $relName, $p_parent, $p_check_merge, null, null, $p_level++, $p_models);
                                 foreach ($newDatas->getBlocks() as $oneBlock) {
                                     $datas->addBlock($oneBlock, true);
                                     $datas->addData($newDatas->getDatas($oneBlock), $oneBlock, false);

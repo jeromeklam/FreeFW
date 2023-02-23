@@ -35,7 +35,7 @@ class FileLogger extends \Psr\Log\AbstractLogger implements \Serializable
      * Enregistrement cache
      * @var boolean
      */
-    protected $cache = true;
+    protected $cache = false;
 
     /**
      * Tableau des logs
