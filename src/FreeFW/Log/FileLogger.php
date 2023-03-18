@@ -221,36 +221,36 @@ class FileLogger extends \Psr\Log\AbstractLogger implements \Serializable
     {
         $rr = false;
         $fg = 'a+';
-        if (is_file($this->file)) {
-            $size = filesize($this->file);
+        if (@is_file($this->file)) {
+            $size = @filesize($this->file);
             if ($size > self::MAXLOGSIZE) {
-                if (is_file($this->file . '.1')) {
-                    unlink($this->file . '.1');
+                if (@is_file($this->file . '.1')) {
+                    @unlink($this->file . '.1');
                 }
-                rename($this->file, $this->file . '.1');
+                @rename($this->file, $this->file . '.1');
                 $rr = true;
             }
         } else {
             $rr = true;
         }
-        if (is_file(APP_LOG . '/' . APP_NAME . '.log')) {
-            $size = filesize(APP_LOG . '/' . APP_NAME . '.log');
+        if (@is_file(APP_LOG . '/' . APP_NAME . '.log')) {
+            $size = @filesize(APP_LOG . '/' . APP_NAME . '.log');
             if ($size > self::MAXLOGSIZE) {
-                if (is_file(APP_LOG . '/' . APP_NAME . '.log.1')) {
-                    unlink(APP_LOG . '/' . APP_NAME . '.log.1');
+                if (@is_file(APP_LOG . '/' . APP_NAME . '.log.1')) {
+                    @unlink(APP_LOG . '/' . APP_NAME . '.log.1');
                 }
-                rename(APP_LOG . '/' . APP_NAME . '.log', APP_LOG . '/' . APP_NAME . '.log.1');
+                @rename(APP_LOG . '/' . APP_NAME . '.log', APP_LOG . '/' . APP_NAME . '.log.1');
             }
         }
         if ($rr) {
-            touch($this->file);
-            chmod($this->file, 0666);
+            @touch($this->file);
+            @chmod($this->file, 0666);
         }
         $content = '';
         while (null !== ($line = array_shift($this->tabCache))) {
             $content .= implode('  ---  ', $line) . PHP_EOL;
         }
-        file_put_contents($this->file, $content, FILE_APPEND);
+        @file_put_contents($this->file, $content, FILE_APPEND);
         return $this;
     }
 
