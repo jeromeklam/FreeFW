@@ -180,7 +180,7 @@ class Email extends \FreeFW\Core\Service
                     $dir  = $cfg->get('ged:dir');
                     $bDir = rtrim(\FreeFW\Tools\Dir::mkStdFolder($dir), '/');
                     $filename = $bDir . '/' . uniqid(true);
-                    file_put_contents($filename, $oneVersion->getEmaillPj1());
+                    file_put_contents($filename, $oneVersion->getEmaillPj2());
                     $message->addAttachment($filename, $oneVersion->getEmaillPj2Name());
                 }
             }
