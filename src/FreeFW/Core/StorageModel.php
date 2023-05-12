@@ -395,6 +395,13 @@ abstract class StorageModel extends \FreeFW\Core\Model implements
                                 $this->$setter(false);
                             }
                             break;
+                        case FFCST::TYPE_DATE:
+                            if ($value != '') {
+                                $this->$setter(\FreeFW\Tools\Date::stringToMysql($value, false));
+                            } else {
+                                $this->$setter(null);
+                            }
+                            break;
                         case FFCST::TYPE_DATETIMETZ:
                             if ($value != '') {
                                 $this->$setter(\FreeFW\Tools\Date::stringToISO8601($value));

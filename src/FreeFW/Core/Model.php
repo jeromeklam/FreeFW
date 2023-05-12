@@ -355,6 +355,11 @@ abstract class Model implements
                         $type   = $property[FFCST::PROPERTY_TYPE];
                         $setter = $property[FFCST::PROPERTY_SETTER];
                         switch ($type) {
+                            case FFCST::TYPE_DATE:
+                                if ($value != '') {
+                                    $this->$setter(\FreeFW\Tools\Date::stringToMysql($value, false));
+                                }
+                                break;
                             case FFCST::TYPE_IMAGE:
                             case FFCST::TYPE_BLOB:
                                 $this->$setter($this->decode_chunk($value));

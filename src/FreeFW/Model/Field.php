@@ -300,6 +300,9 @@ class Field extends \FreeFW\Core\Model
             case FFCST::TYPE_DATETIMETZ:
                 $type = 'TYPE_DATETIMETZ';
                 break;
+            case FFCST::TYPE_DATE:
+                $type = 'TYPE_DATE';
+                break;
             case FFCST::TYPE_DATETIME:
                 $type = 'TYPE_DATETIME';
                 break;

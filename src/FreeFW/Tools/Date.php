@@ -22,8 +22,11 @@ class Date
      *
      * @return string
      */
-    public static function stringToMysql($p_str)
+    public static function stringToMysql($p_str, $p_with_hour = true)
     {
+        if (!$p_with_hour) {
+            return date('Y-m-d', strtotime($p_str));
+        }
         return date('Y-m-d H:i:s', strtotime($p_str));
     }
 

@@ -226,6 +226,7 @@ class PDOStorage extends \FreeFW\Storage\Storage
         // Build query
         $sql = \FreeFW\Tools\Sql::makeInsertQuery($source, $fields);
         $this->logger->debug('PDOStorage.create : ' . $sql);
+        $this->logger->debug('PDOStorage.create : ' . print_r($fields, true));
         //$this->logger->debug(print_r($fields, true));
         try {
             // Get PDO and execute
