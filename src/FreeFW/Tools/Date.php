@@ -121,12 +121,16 @@ class Date
         if ($p_date !== null && $p_date != '') {
             $format = 'd/m/Y H:i:s';
             $date = \DateTime::createFromFormat($format, $p_date);
-            if ($date === false) {
+            if (!$date) {
                 $format = 'd/m/Y H:i';
                 $date = \DateTime::createFromFormat($format, $p_date);
             }
-            if ($date === false) {
+            if (strlen($p_date) == 10 && !$date) {
                 $format = 'd/m/Y';
+                $date = \DateTime::createFromFormat($format, $p_date);
+            }
+            if (strlen($p_date) == 8 && !$date) {
+                $format = 'd/m/y';
                 $date = \DateTime::createFromFormat($format, $p_date);
             }
             return $date;
