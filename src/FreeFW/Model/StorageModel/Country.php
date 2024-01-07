@@ -46,6 +46,34 @@ abstract class Country extends \FreeFW\Core\StorageCacheModel
         FFCST::PROPERTY_SAMPLE  => 'FR',
         FFCST::PROPERTY_MAX     => 3,
     ];
+    protected static $PRP_CNTY_COG = [
+        FFCST::PROPERTY_PRIVATE => 'cnty_cog',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Code COG',
+        FFCST::PROPERTY_SAMPLE  => '99100',
+    ];
+    protected static $PRP_CNTY_ISO2 = [
+        FFCST::PROPERTY_PRIVATE => 'cnty_iso2',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Code ISO2',
+        FFCST::PROPERTY_SAMPLE  => 'FR',
+    ];
+    protected static $PRP_CNTY_ISO3 = [
+        FFCST::PROPERTY_PRIVATE => 'cnty_iso3',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Code ISO3',
+        FFCST::PROPERTY_SAMPLE  => 'FRA',
+    ];
+    protected static $PRP_CNTY_NUM = [
+        FFCST::PROPERTY_PRIVATE => 'cnty_num',
+        FFCST::PROPERTY_TYPE    => FFCST::TYPE_STRING,
+        FFCST::PROPERTY_OPTIONS => [],
+        FFCST::PROPERTY_COMMENT => 'Code Numérique',
+        FFCST::PROPERTY_SAMPLE  => '250',
+    ];
 
     /**
      * get properties
@@ -58,7 +86,11 @@ abstract class Country extends \FreeFW\Core\StorageCacheModel
             'cnty_id'      => self::$PRP_CNTY_ID,
             'cnty_name'    => self::$PRP_CNTY_NAME,
             'cnty_name_en' => self::$PRP_CNTY_NAME_EN,
-            'cnty_code'    => self::$PRP_CNTY_CODE
+            'cnty_code'    => self::$PRP_CNTY_CODE,
+            'cnty_cog'     => self::$PRP_CNTY_COG,
+            'cnty_iso2'    => self::$PRP_CNTY_ISO2,
+            'cnty_iso3'    => self::$PRP_CNTY_ISO3,
+            'cnty_num'     => self::$PRP_CNTY_NUM
         ];
     }
 

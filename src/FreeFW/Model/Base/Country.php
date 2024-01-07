@@ -34,6 +34,30 @@ abstract class Country extends \FreeFW\Model\StorageModel\Country
     protected $cnty_code = null;
 
     /**
+     * cnty_cog
+     * @var string
+     */
+    protected $cnty_cog = null;
+
+    /**
+     * cnty_iso2
+     * @var string
+     */
+    protected $cnty_iso2 = null;
+
+    /**
+     * cnty_iso3
+     * @var string
+     */
+    protected $cnty_iso3 = null;
+
+    /**
+     * cnty_num
+     * @var string
+     */
+    protected $cnty_num = null;
+
+    /**
      * Set cnty_id
      *
      * @param int $p_value
@@ -123,5 +147,97 @@ abstract class Country extends \FreeFW\Model\StorageModel\Country
     public function getCntyCode()
     {
         return $this->cnty_code;
+    }
+
+    /**
+     * Set cnty_cog
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\Country
+     */
+    public function setCntyCog($p_value)
+    {
+        $this->cnty_cog = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get cnty_cog
+     *
+     * @return string
+     */
+    public function getCntyCog()
+    {
+        return $this->cnty_cog;
+    }
+
+    /**
+     * Set cnty_iso2
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\Country
+     */
+    public function setCntyIso2($p_value)
+    {
+        $this->cnty_iso2 = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get cnty_iso2
+     *
+     * @return string
+     */
+    public function getCntyIso2()
+    {
+        return $this->cnty_iso2;
+    }
+
+    /**
+     * Set cnty_iso3
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\Country
+     */
+    public function setCntyIso3($p_value)
+    {
+        $this->cnty_iso3 = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get cnty_iso3
+     *
+     * @return string
+     */
+    public function getCntyIso3()
+    {
+        return $this->cnty_iso3;
+    }
+
+    /**
+     * Set cnty_num
+     *
+     * @param string $p_value
+     *
+     * @return \FreeFW\Model\Country
+     */
+    public function setCntyNum($p_value)
+    {
+        $this->cnty_num = $p_value;
+        return $this;
+    }
+
+    /**
+     * Get cnty_num
+     *
+     * @return string
+     */
+    public function getCntyNum()
+    {
+        return $this->cnty_num;
     }
 }

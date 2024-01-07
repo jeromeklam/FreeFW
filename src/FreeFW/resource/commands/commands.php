@@ -29,6 +29,16 @@ $localCommands = [
         'command'    => 'translation::import',
         'controller' => 'FreeFW::Command::Dev',
         'function'   => 'importTranslations'
+    ],
+    /**
+     * ########################################################################
+     * Vérification des payx
+     * ########################################################################
+     */
+    'freefw.opendata.countries' => [
+        'command'    => 'opendata::countries',
+        'controller' => 'FreeFW::Command::OpenData',
+        'function'   => 'checkCountries'
     ]
 ];
 
