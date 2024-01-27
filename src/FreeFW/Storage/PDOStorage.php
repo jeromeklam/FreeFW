@@ -1360,6 +1360,11 @@ class PDOStorage extends \FreeFW\Storage\Storage
                 $addL     = '';
                 $addR     = '';
                 break;
+            case \FreeFW\Storage\Storage::COND_NOT_LIKE:
+                $realOper = 'not like';
+                $addL     = '';
+                $addR     = '';
+                break;
             case \FreeFW\Storage\Storage::COND_EQUAL_OR_NULL:
                 $realOper = '=';
                 $nullable = true;
@@ -1446,14 +1451,18 @@ class PDOStorage extends \FreeFW\Storage\Storage
                         if ($realOper === 'like') {
                             $result['sql'] = $leftId . ' REGEXP ' . $rightId;
                         } else {
-                            if ($realOper == 'SOUNDEX') {
-                                $result['sql'] = '(SOUNDEX(' . $leftId . ') = SOUNDEX(' . $rightId . ') OR ' .
-                                                 $leftId . ' REGEXP ' . $rightDatas['id'] . '_2' . ')';
-                                $nData = $rightDatas['value'];
-                                $nData = \FreeFW\Tools\PBXString::toSqlRegexp($nData);
-                                $result['values'][$rightDatas['id'] . '_2'] = $addL . $nData . $addR;
+                            if ($realOper === 'not like') {
+                                $result['sql'] = $leftId . ' NOT REGEXP ' . $rightId;
                             } else {
-                                $result['sql'] = $leftId . ' ' . $realOper . ' ' . $rightId;
+                                if ($realOper == 'SOUNDEX') {
+                                    $result['sql'] = '(SOUNDEX(' . $leftId . ') = SOUNDEX(' . $rightId . ') OR ' .
+                                                    $leftId . ' REGEXP ' . $rightDatas['id'] . '_2' . ')';
+                                    $nData = $rightDatas['value'];
+                                    $nData = \FreeFW\Tools\PBXString::toSqlRegexp($nData);
+                                    $result['values'][$rightDatas['id'] . '_2'] = $addL . $nData . $addR;
+                                } else {
+                                    $result['sql'] = $leftId . ' ' . $realOper . ' ' . $rightId;
+                                }
                             }
                         }
                     }
