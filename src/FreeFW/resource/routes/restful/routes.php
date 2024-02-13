@@ -59,7 +59,7 @@ $localRoutes = [
         FFCSTRT::ROUTE_INCLUDE    => [],
         FFCSTRT::ROUTE_SCOPE      => ['ROOT'],
     ],
-    'pofw.model.reactjs' => [
+    'free_f_w.model.reactjs' => [
         FFCSTRT::ROUTE_COLLECTION => 'FreeFW/Core/Model',
         FFCSTRT::ROUTE_COMMENT    => 'Génération de la feature ReactJS',
         FFCSTRT::ROUTE_METHOD     => \FreeFW\Router\Route::METHOD_POST,

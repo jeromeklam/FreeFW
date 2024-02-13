@@ -111,6 +111,7 @@ abstract class Storage implements
             self::COND_GREATER_EQUAL_OR_NULL,
             self::COND_GREATER_OR_NULL,
             self::COND_IN,
+            self::COND_NOT_IN,
             self::COND_LIKE,
             self::COND_NOT_LIKE,
             self::COND_LOWER,

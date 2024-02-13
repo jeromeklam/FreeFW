@@ -22,7 +22,7 @@ class Country extends \FreeFW\Model\Base\Country implements
     public static function getIdsByCog(array $p_cogs)
     {
         $ids    = [];
-        $result = \POFW\Model\Country::find(['cnty_cog' => [\FreeFW\Storage\Storage::COND_IN => $p_cogs]]);
+        $result = \FreeFW\Model\Country::find(['cnty_cog' => [\FreeFW\Storage\Storage::COND_IN => $p_cogs]]);
         foreach ($result as $oneCountry) {
             $ids[] = $oneCountry->getCntyId();
         }

@@ -11,7 +11,7 @@ class Model extends \FreeFW\Core\ApiController
 
     /**
      * @desc Génère une doc simplifiée au format markdown <br />
-     *&emsp;- Modéle utilisé : POFW/Model/Model.php<br/>
+     *&emsp;- Modéle utilisé : FreeFW/Model/Model.php<br/>
      *
      * @param \Psr\Http\Message\ServerRequestInterface $p_request
      *
