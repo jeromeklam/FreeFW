@@ -548,28 +548,57 @@ class ApiController extends \FreeFW\Core\Controller
                     ]
                 );
                 //
+                $cfg  = $this->getAppConfig();
+                $dir  = $cfg->get('ged:dir');
+                if (!is_dir($dir)) {
+                    $dir = '/tmp/';
+                }
+                $bDir = rtrim(\FreeFW\Tools\Dir::mkStdFolder($dir), '/');
                 $file = uniqid(true, 'edition');
-                $src  = '/tmp/print_' . $file . '_tpl.odt';
-                $dest = '/tmp/print_' . $file . '_dest.odt';
-                $dPdf = '/tmp/print_' . $file . '_dest.pdf';
-                $ediContent = $edition->getEdiContent($print->getPrtLang());
-                file_put_contents($src, $ediContent);
-                file_put_contents($dest, $ediContent);
-                $mergeDatas->addBlock('main');
-                $mergeDatas->addData(['now' => \FreeFW\Tools\Date::mysqlToddmmyyyy(\FreeFW\Tools\Date::getCurrentTimestamp(), false, false)], 'main');
-                if ($user) {
-                    $mergeUser = $user->getMergeData([], '', '', false, $print->getPrtLang(), 'head_user');
-                    $mergeDatas->merge($mergeUser);
+
+
+                if ($edition->getEdiType() == \FreeFW\Model\Edition::TYPE_PDF) {
+                    $src  = $bDir . '/print_' . $file . '_tpl.pdf';
+                    $dPdf = $bDir . '/print_' . $file . '_dest.pdf';
+                    $this->logger->debug("before " . $dPdf);
+                    $ediContent = $edition->getEdiContent($print->getPrtLang());
+                    file_put_contents($src, $ediContent);
+                    $this->logger->debug("data ok " . $dPdf);
+                    $mapping = json_decode($edition->getEdiMapping(), true);
+                    if (!$mapping) {
+                        $this->logger->error('Mapping for edition not found or not json !');
+                        return false;
+                    }
+                    $mergedDatas = $mergeDatas->computeFromMapping($mapping);
+                    $this->logger->debug("computing " . $dPdf);
+                    $mergeService = \FreeFW\DI\DI::get('FreeOffice::Service::Pdf');
+                    $mergeService->merge($src, $dPdf, $mergedDatas);
+                    @unlink($src);
+                    $this->logger->debug("done " . $dPdf);
+                } else {
+                    $src  = $bDir . '/print_' . $file . '_tpl.odt';
+                    $dest = $bDir . '/print_' . $file . '_dest.odt';
+                    $dPdf = $bDir . '/print_' . $file . '_dest.pdf';
+                    $ediContent = $edition->getEdiContent($print->getPrtLang());
+                    file_put_contents($src, $ediContent);
+                    file_put_contents($dest, $ediContent);
+                    $mergeDatas->addBlock('main');
+                    $mergeDatas->addData(['now' => \FreeFW\Tools\Date::mysqlToddmmyyyy(\FreeFW\Tools\Date::getCurrentTimestamp(), false, false)], 'main');
+                    if ($user) {
+                        $mergeUser = $user->getMergeData([], '', '', false, $print->getPrtLang(), 'head_user');
+                        $mergeDatas->merge($mergeUser);
+                    }
+                    if ($group) {
+                        $mergeGroup = $group->getMergeData([], '', '', false, $print->getPrtLang(), 'head_group');
+                        $mergeDatas->merge($mergeGroup);
+                    }
+                    $mergeService = \FreeFW\DI\DI::get('FreeOffice::Service::Merge');
+                    $mergeService->merge($src, $dest, $mergeDatas);
+                    exec('/usr/bin/unoconv -f pdf -o ' . $dPdf . ' ' . $dest);
+                    @unlink($dest);
+                    @unlink($src);
                 }
-                if ($group) {
-                    $mergeGroup = $group->getMergeData([], '', '', false, $print->getPrtLang(), 'head_group');
-                    $mergeDatas->merge($mergeGroup);
-                }
-                $mergeService = \FreeFW\DI\DI::get('FreeOffice::Service::Merge');
-                $mergeService->merge($src, $dest, $mergeDatas);
-                exec('/usr/bin/unoconv -f pdf -o ' . $dPdf . ' ' . $dest);
-                @unlink($dest);
-                @unlink($src);
+
                 if (is_file($dPdf)) {
                     $this->logger->info('FreeFW.ApiController.printOne.end');
                     return $this->createMimeTypeResponse($dPdf, file_get_contents($dPdf));
